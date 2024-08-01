@@ -114,7 +114,7 @@ namespace WeaponManager {
 		for (int i = 0; i < guns.size(); i++)
 			if (guns[i].name == name)
 				return &guns[i];
-		return NULL;
+		return nullptr;
 	}
 }
 

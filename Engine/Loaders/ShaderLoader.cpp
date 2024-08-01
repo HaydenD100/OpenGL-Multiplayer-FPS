@@ -40,7 +40,7 @@ namespace LoadShaders {
 		// Compile Vertex Shader
 		printf("Compiling shader : %s\n", vertex_file_path);
 		char const* VertexSourcePointer = VertexShaderCode.c_str();
-		glShaderSource(VertexShaderID, 1, &VertexSourcePointer, NULL);
+		glShaderSource(VertexShaderID, 1, &VertexSourcePointer, nullptr);
 		glCompileShader(VertexShaderID);
 
 		// Check Vertex Shader
@@ -48,14 +48,14 @@ namespace LoadShaders {
 		glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
 		if (InfoLogLength > 0) {
 			std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
-			glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
+			glGetShaderInfoLog(VertexShaderID, InfoLogLength, nullptr, &VertexShaderErrorMessage[0]);
 			printf("%s\n", &VertexShaderErrorMessage[0]);
 		}
 
 		// Compile Fragment Shader
 		printf("Compiling shader : %s\n", fragment_file_path);
 		char const* FragmentSourcePointer = FragmentShaderCode.c_str();
-		glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, NULL);
+		glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, nullptr);
 		glCompileShader(FragmentShaderID);
 
 		// Check Fragment Shader
@@ -63,7 +63,7 @@ namespace LoadShaders {
 		glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
 		if (InfoLogLength > 0) {
 			std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
-			glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
+			glGetShaderInfoLog(FragmentShaderID, InfoLogLength, nullptr, &FragmentShaderErrorMessage[0]);
 			printf("%s\n", &FragmentShaderErrorMessage[0]);
 		}
 
@@ -79,7 +79,7 @@ namespace LoadShaders {
 		glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
 		if (InfoLogLength > 0) {
 			std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
-			glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
+			glGetProgramInfoLog(ProgramID, InfoLogLength, nullptr, &ProgramErrorMessage[0]);
 			printf("%s\n", &ProgramErrorMessage[0]);
 		}
 

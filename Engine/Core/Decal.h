@@ -15,7 +15,7 @@ public:
     bool CheckParentIsNull();
     void RenderDecal(GLuint& programID);
 private:    
-    Texture* texture = NULL;
+    Texture* texture = nullptr;
     glm::vec3 normal = glm::vec3(0, 0, 0);
 
     GameObject* parent = nullptr;

@@ -124,7 +124,7 @@ public:
 
 private:
 	Transform transform = Transform();
-	Texture* texture = NULL;
+	Texture* texture = nullptr;
 
 	std::string parentName;
 	std::string name;

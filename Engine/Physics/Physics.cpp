@@ -420,7 +420,7 @@ namespace PhysicsManager {
 
 			Cube* rb_collider = GetColider(rigidbodies[i].GetColider());
 			//Do colider Calculation
-			if (rb_collider != NULL) {
+			if (rb_collider != nullptr) {
 				for (int col = 0; col < coliders.size(); col++) {
 					if (coliders[i].ShouldDelete()) {
 						coliders.erase(coliders.begin() + col);
@@ -469,7 +469,7 @@ namespace PhysicsManager {
 	}
 	Cube* AddCube(GameObject* gameobject, std::string name) {
 		coliders.push_back(Cube(gameobject, name));
-		return NULL;
+		return nullptr;
 	}
 
 	Cube* PhysicsManager::GetColider(std::string name) {
@@ -477,14 +477,14 @@ namespace PhysicsManager {
 			if (coliders[i].GetName() == name)
 				return &coliders[i];
 		}
-		return NULL;
+		return nullptr;
 	}
 	RigidBody* PhysicsManager::GetRigidbody(std::string name) {
 		for (int i = 0; i < rigidbodies.size(); i++) {
 			if (rigidbodies[i].GetName() == name)
 				return &rigidbodies[i];
 		}
-		return NULL;
+		return nullptr;
 
 	}
 	void PhysicsManager::RemoveCube(std::string name) {

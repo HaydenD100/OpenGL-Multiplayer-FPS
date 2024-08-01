@@ -87,7 +87,7 @@ namespace loader {
 
 		/* try to open the file */
 		fp = fopen(imagepath, "rb");
-		if (fp == NULL)
+		if (fp == nullptr)
 			return 0;
 
 		/* verify the type of file */
@@ -171,7 +171,7 @@ namespace loader {
 
 
 		FILE* file = fopen(path, "r");
-		if (file == NULL) {
+		if (file == nullptr) {
 			printf("Impossible to open the file ! Are you in the right path ? See Tutorial 1 for details\n");
 			return false;
 		}

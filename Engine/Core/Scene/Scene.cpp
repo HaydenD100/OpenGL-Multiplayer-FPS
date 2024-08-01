@@ -227,7 +227,7 @@ Crate* Scene::GetCrate(std::string name) {
 		if (crates[i].GetName() == name)
 			return &crates[i];
 	}
-	return NULL;
+	return nullptr;
 }
 
 

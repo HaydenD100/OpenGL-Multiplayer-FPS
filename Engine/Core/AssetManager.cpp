@@ -177,11 +177,11 @@ namespace AssetManager
 			if (GameObjects[i].GetName() == name)
 				return &GameObjects[i];
 		}
-		return NULL;
+		return nullptr;
 	}
 	GameObject* AssetManager::GetGameObject(int index) {
 		if (index >= GameObjects.size() || index < 0)
-			return NULL;
+			return nullptr;
 		return &GameObjects[index];
 	}
 	std::vector<GameObject> AssetManager::GetAllGameObjects() {
@@ -198,6 +198,6 @@ namespace AssetManager
 			if (Textures[i].GetName() == name)
 				return &Textures[i];
 		}
-		return NULL;
+		return nullptr;
 	}
 }

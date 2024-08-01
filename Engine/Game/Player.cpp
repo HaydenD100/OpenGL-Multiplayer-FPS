@@ -79,7 +79,7 @@ namespace Player
 			if (hit.m_collisionObject != nullptr)
 			{
 				GameObject* gameobject = AssetManager::GetGameObject(hit.m_collisionObject->getUserIndex());
-				if (gameobject != NULL)
+				if (gameobject != nullptr)
 				{
 					btRigidBody* body = gameobject->GetRigidBody();
 					body->applyImpulse(2 * glmToBtVector3(Camera::ComputeRay()),  body->getWorldTransform().inverse() * hit.m_hitPointWorld );
@@ -215,7 +215,7 @@ namespace Player
 			if (hit.m_collisionObject != nullptr)
 			{
 				GameObject* gameobject = AssetManager::GetGameObject(hit.m_collisionObject->getUserIndex());
-				if (gameobject != NULL && glm::distance(gameobject->getPosition(), getPosition()) <= interactDistance)
+				if (gameobject != nullptr && glm::distance(gameobject->getPosition(), getPosition()) <= interactDistance)
 				{
 					interactingWithName = gameobject->GetName();
 				}
