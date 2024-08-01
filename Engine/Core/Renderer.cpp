@@ -1,4 +1,3 @@
-#pragma once
 #include "Renderer.h"
 #include "Scene/SceneManager.h"
 

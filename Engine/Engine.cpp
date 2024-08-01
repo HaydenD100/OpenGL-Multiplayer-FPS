@@ -1,4 +1,3 @@
-#pragma once
 #include "Engine.h"
 #include "Engine/Physics/BulletPhysics.h"
 

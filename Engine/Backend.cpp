@@ -1,4 +1,3 @@
-#pragma once
 #include "Backend.h"
 
 namespace Backend {

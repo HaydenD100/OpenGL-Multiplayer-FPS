@@ -1,4 +1,3 @@
-#pragma once
 #include "GameObject.h"
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Physics/BulletPhysics.h"
