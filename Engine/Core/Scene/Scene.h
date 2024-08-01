@@ -18,7 +18,7 @@
 #include "Engine/Game/Gun.h"
 #include "Engine/Game/Crate.h"
 #include "Engine/Game/Window.h"
-#include "Engine/Core/Lights/light.h"
+#include "Engine/Core/Lights/Light.h"
 #include "Engine/Physics/BulletPhysics.h"
 
 class Scene

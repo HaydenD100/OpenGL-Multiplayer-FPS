@@ -11,7 +11,7 @@
 #include "Engine/Core/UI/Text2D.h"
 #include "Loaders/stb_image.h"
 #include "Engine/Core/Common.h"
-#include "Engine/Core/Lights/light.h"
+#include "Engine/Core/Lights/Light.h"
 
 class Texture {
 public:
