@@ -63,7 +63,7 @@ glm::vec3 Decal::GetNormal() {
 void Decal::RenderDecal(GLuint& programID) {
 	glUseProgram(programID);
 
-	if (texture != nullptr)
+	if (texture != nullptr) //< Should this be an assert instead? Do we want to continue??
 	{
 		glActiveTexture(texture->GetTextureNumber() + GL_TEXTURE0);
 		GLuint TextureID = glGetUniformLocation(programID, "DiffuseTextureSampler");
