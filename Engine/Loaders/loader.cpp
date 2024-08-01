@@ -74,10 +74,8 @@ namespace loader {
 	GLuint loader::loadDDS(const char* imagepath) {
 		unsigned char header[124];
 
-		FILE* fp;
-
 		/* try to open the file */
-		fp = fopen(imagepath, "rb");
+		FILE* fp = fopen(imagepath, "rb");
 		if (fp == nullptr)
 			return 0;
 
