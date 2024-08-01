@@ -21,15 +21,9 @@ struct Transform {
     glm::vec3 rotation = glm::vec3(0);
     glm::vec3 scale = glm::vec3(1);
 
-    glm::vec3 getPosition() {
-        return position;
-    }
-    glm::vec3 getRotation() {
-        return rotation;
-    }
-    glm::vec3 getScale() {
-        return scale;
-    }
+    glm::vec3 getPosition() { return position; }
+    glm::vec3 getRotation() { return rotation; }
+    glm::vec3 getScale() { return scale; }
 
     glm::mat4 to_mat4() {
         glm::mat4 m = glm::translate(glm::mat4(1), position);
