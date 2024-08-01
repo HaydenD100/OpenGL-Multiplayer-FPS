@@ -1,10 +1,10 @@
 #pragma once
-#include "Engine/Core/Scene/Scene.h"
 #include <vector>
 #include <iostream>
 
-namespace SceneManager {
+#include "Engine/Core/Scene/Scene.h"
 
+namespace SceneManager {
 	void Init();
 	int CreateScene(Scene scene);
 	void LoadScene(int sceneNumber);

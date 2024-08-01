@@ -6,14 +6,15 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <vector>
+#include <fstream>
+#include <iostream>
+
 #include "GameObject.h"
 #include "Common.h"
 #include "Renderer.h"
 #include "Decal.h"
 
 // Json stuff
-#include <fstream>
-#include <iostream>
 #include "Loaders/nlohmann/json.hpp"
 using json = nlohmann::json;
 

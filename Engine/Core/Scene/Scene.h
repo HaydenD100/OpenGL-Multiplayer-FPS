@@ -1,4 +1,8 @@
 #pragma once
+#include <iostream>
+#include <vector>
+#include <ostream>
+
 #include "Engine/Audio/Audio.h"
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Core/GameObject.h"
@@ -10,9 +14,6 @@
 #include "Engine/Game/Door.h"
 #include "Engine/Game/Gun.h"
 #include "Engine/Core/Animation.h"
-#include <iostream>
-#include <vector>
-#include <ostream>
 #include "Engine/Game/Door.h"
 #include "Engine/Game/Gun.h"
 #include "Engine/Game/Crate.h"

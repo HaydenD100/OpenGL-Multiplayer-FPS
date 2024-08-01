@@ -5,12 +5,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Engine/Core/GameObject.h"
-#include "Engine/Core/AssetManager.h"
-
-
 #include <vector>
 #include <string>
+
+#include "Engine/Core/GameObject.h"
+#include "Engine/Core/AssetManager.h"
 
 // TODO: This is still a work-in-progress and hasn't been implemented into the engine
 

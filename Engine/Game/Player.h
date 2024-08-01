@@ -5,16 +5,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <string>
+
 #include "Engine/Audio/Audio.h"
 #include "Core/Input.h"
 #include "Core/Camera.h"
 #include "Engine/Game/Gun.h"
 #include "Engine/Core/Common.h"
-
-
-
-#include <string>
-
 
 namespace Player
 {
