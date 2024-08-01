@@ -186,56 +186,56 @@ glm::vec3 Cube::getMax() {
 void Cube::SetIsTrigger(bool trigger) {
 	isTrigger = trigger;
 }
-bool Cube::TouchingRight(Cube* colider, float velocity) {
-	return this->getMax().x + velocity > colider->getMin().x &&
-		this->getMin().x < colider->getMin().x &&
-		this->getMax().z > colider->getMin().z &&
-		this->getMin().z < colider->getMax().z &&
-		this->getMin().y < colider->getMax().y &&
-		this->getMax().y > colider->getMin().y;
+bool Cube::TouchingRight(Cube* collider, float velocity) {
+	return this->getMax().x + velocity > collider->getMin().x &&
+		this->getMin().x < collider->getMin().x &&
+		this->getMax().z > collider->getMin().z &&
+		this->getMin().z < collider->getMax().z &&
+		this->getMin().y < collider->getMax().y &&
+		this->getMax().y > collider->getMin().y;
 }
 
-bool Cube::TouchingLeft(Cube* colider, float velocity) {
-	return this->getMin().x + velocity < colider->getMax().x &&
-		this->getMax().x > colider->getMax().x &&
-		this->getMax().z > colider->getMin().z &&
-		this->getMin().z < colider->getMax().z &&
-		this->getMin().y < colider->getMax().y &&
-		this->getMax().y > colider->getMin().y;
+bool Cube::TouchingLeft(Cube* collider, float velocity) {
+	return this->getMin().x + velocity < collider->getMax().x &&
+		this->getMax().x > collider->getMax().x &&
+		this->getMax().z > collider->getMin().z &&
+		this->getMin().z < collider->getMax().z &&
+		this->getMin().y < collider->getMax().y &&
+		this->getMax().y > collider->getMin().y;
 }
 
-bool Cube::TouchingFront(Cube* colider, float velocity) {
-	return this->getMin().z + velocity < colider->getMax().z &&
-		this->getMax().z > colider->getMax().z &&
-		this->getMax().x > colider->getMin().x &&
-		this->getMin().x < colider->getMax().x &&
-		this->getMin().y < colider->getMax().y &&
-		this->getMax().y > colider->getMin().y;
+bool Cube::TouchingFront(Cube* collider, float velocity) {
+	return this->getMin().z + velocity < collider->getMax().z &&
+		this->getMax().z > collider->getMax().z &&
+		this->getMax().x > collider->getMin().x &&
+		this->getMin().x < collider->getMax().x &&
+		this->getMin().y < collider->getMax().y &&
+		this->getMax().y > collider->getMin().y;
 }
 
-bool Cube::TouchingBack(Cube* colider, float velocity) {
-	return this->getMax().z + velocity > colider->getMin().z &&
-		this->getMin().z < colider->getMin().z &&
-		this->getMax().x > colider->getMin().x &&
-		this->getMin().x < colider->getMax().x &&
-		this->getMin().y < colider->getMax().y &&
-		this->getMax().y > colider->getMin().y;
+bool Cube::TouchingBack(Cube* collider, float velocity) {
+	return this->getMax().z + velocity > collider->getMin().z &&
+		this->getMin().z < collider->getMin().z &&
+		this->getMax().x > collider->getMin().x &&
+		this->getMin().x < collider->getMax().x &&
+		this->getMin().y < collider->getMax().y &&
+		this->getMax().y > collider->getMin().y;
 }
 
-bool Cube::TouchingBottom(Cube* colider, float velocity) {
-	return this->getMin().y < colider->getMax().y &&
-		this->getMax().x > colider->getMin().x &&
-		this->getMin().x < colider->getMax().x &&
-		this->getMax().z > colider->getMin().z &&
-		this->getMin().z < colider->getMax().z;
+bool Cube::TouchingBottom(Cube* collider, float velocity) {
+	return this->getMin().y < collider->getMax().y &&
+		this->getMax().x > collider->getMin().x &&
+		this->getMin().x < collider->getMax().x &&
+		this->getMax().z > collider->getMin().z &&
+		this->getMin().z < collider->getMax().z;
 }
 
-bool Cube::TouchingTop(Cube* colider, float velocity) {
-	return this->getMax().y > colider->getMin().y &&
-		this->getMax().x > colider->getMin().x &&
-		this->getMin().x < colider->getMax().x &&
-		this->getMax().z > colider->getMin().z &&
-		this->getMin().z < colider->getMax().z;
+bool Cube::TouchingTop(Cube* collider, float velocity) {
+	return this->getMax().y > collider->getMin().y &&
+		this->getMax().x > collider->getMin().x &&
+		this->getMin().x < collider->getMax().x &&
+		this->getMax().z > collider->getMin().z &&
+		this->getMin().z < collider->getMax().z;
 }
 // Returns -1 if there is no intersection
 float Cube::intersect(Ray r, float t0, float t1) {
@@ -348,8 +348,8 @@ std::string RigidBody::GetName() {
 }
 void RigidBody::NewPosition(float deltaTime) {
 	position += velocity * deltaTime;
-	if(colider != "None")
-		PhysicsManager::GetColider(colider)->setPosition(position);
+	if(collider != "None")
+		PhysicsManager::GetCollider(collider)->setPosition(position);
 
 }
 void RigidBody::NewPositionY(float deltaTime) {
@@ -388,11 +388,11 @@ void RigidBody::RemoveForceY() {
 void RigidBody::RemoveForceZ() {
 	velocity.z = 0;
 }
-void RigidBody::SetColider(std::string colider) {
-	this->colider = colider;
+void RigidBody::SetCollider(std::string collider) {
+	this->collider = collider;
 }
-std::string RigidBody::GetColider() {
-	return colider;
+std::string RigidBody::GetCollider() {
+	return collider;
 }
 glm::vec3 RigidBody::GetForce() {
 	return glm::vec3(0,0,0);
@@ -401,7 +401,7 @@ glm::vec3 RigidBody::GetForce() {
 
 
 namespace PhysicsManager {
-	std::vector<Cube> coliders;
+	std::vector<Cube> colliders;
 	std::vector<RigidBody> rigidbodies;
 
 	// Forces
@@ -418,33 +418,34 @@ namespace PhysicsManager {
 			rigidbodies[i].SetForceZ(rigidbodies[i].GetForce().z / (1 + (deltaTime * friction)));
 			rigidbodies[i].SetForceY(rigidbodies[i].GetForce().y + Gravity * deltaTime);
 
-			Cube* rb_collider = GetColider(rigidbodies[i].GetColider());
-			//Do colider Calculation
+			Cube* rb_collider = GetCollider(rigidbodies[i].GetCollider());
+			
+			// Do collider Calculation
 			if (rb_collider != nullptr) {
-				for (int col = 0; col < coliders.size(); col++) {
-					if (coliders[i].ShouldDelete()) {
-						coliders.erase(coliders.begin() + col);
+				for (int col = 0; col < colliders.size(); col++) {
+					if (colliders[i].ShouldDelete()) {
+						colliders.erase(colliders.begin() + col);
 						continue;
 					}
 
-					if (rb_collider->GetName() == coliders[col].GetName() || coliders[col].GetIsTrigger())
+					if (rb_collider->GetName() == colliders[col].GetName() || colliders[col].GetIsTrigger())
 						continue;
-					if (rigidbodies[i].GetForce().x < 0 && rb_collider->TouchingLeft(&coliders[col], rigidbodies[i].GetForce().x * deltaTime))
+					if (rigidbodies[i].GetForce().x < 0 && rb_collider->TouchingLeft(&colliders[col], rigidbodies[i].GetForce().x * deltaTime))
 						rigidbodies[i].SetForce(-0.2f * rigidbodies[i].GetForce());
 						///rigidbodies[i].RemoveForceX();
-					if (rigidbodies[i].GetForce().x > 0 && rb_collider->TouchingRight(&coliders[col], rigidbodies[i].GetForce().x * deltaTime))
+					if (rigidbodies[i].GetForce().x > 0 && rb_collider->TouchingRight(&colliders[col], rigidbodies[i].GetForce().x * deltaTime))
 						rigidbodies[i].SetForceX(-0.2f * rigidbodies[i].GetForce().x);
 						//rigidbodies[i].RemoveForceX();
-					if (rigidbodies[i].GetForce().z > 0 && rb_collider->TouchingBack(&coliders[col], rigidbodies[i].GetForce().z * deltaTime))
+					if (rigidbodies[i].GetForce().z > 0 && rb_collider->TouchingBack(&colliders[col], rigidbodies[i].GetForce().z * deltaTime))
 						rigidbodies[i].SetForceZ(-0.2f * rigidbodies[i].GetForce().z);
 						//rigidbodies[i].RemoveForceZ();
-					if (rigidbodies[i].GetForce().z < 0 && rb_collider->TouchingFront(&coliders[col], rigidbodies[i].GetForce().z * deltaTime))
+					if (rigidbodies[i].GetForce().z < 0 && rb_collider->TouchingFront(&colliders[col], rigidbodies[i].GetForce().z * deltaTime))
 						rigidbodies[i].SetForceZ(-0.2f * rigidbodies[i].GetForce().z);
 						//rigidbodies[i].RemoveForceZ();
-					if (rigidbodies[i].GetForce().y > 0 && rb_collider->TouchingTop(&coliders[col], rigidbodies[i].GetForce().y * deltaTime))
+					if (rigidbodies[i].GetForce().y > 0 && rb_collider->TouchingTop(&colliders[col], rigidbodies[i].GetForce().y * deltaTime))
 						rigidbodies[i].SetForceY(-0.9f * rigidbodies[i].GetForce().y);
 						//rigidbodies[i].RemoveForceY();
-					if (rigidbodies[i].GetForce().y < 0 && rb_collider->TouchingBottom(&coliders[col], rigidbodies[i].GetForce().y * deltaTime))
+					if (rigidbodies[i].GetForce().y < 0 && rb_collider->TouchingBottom(&colliders[col], rigidbodies[i].GetForce().y * deltaTime))
 						rigidbodies[i].SetForceY(-0.9f * rigidbodies[i].GetForce().y);
 						//rigidbodies[i].RemoveForceY();
 				}
@@ -460,22 +461,22 @@ namespace PhysicsManager {
 		return &rigidbodies[rigidbodies.size() - 1];
 	}
 	Cube* PhysicsManager::AddCube(glm::vec3 position, glm::vec3 min, glm::vec3 max, std::string name) {
-		coliders.push_back(Cube(position, min, max, name));
-		return &coliders[coliders.size() - 1];
+		colliders.push_back(Cube(position, min, max, name));
+		return &colliders[colliders.size() - 1];
 	}
 	Cube* PhysicsManager::AddCube(glm::vec3 position, float width, float height, float depth, std::string name) {
-		coliders.push_back(Cube(position, width, height,depth, name));
-		return &coliders[coliders.size() - 1];
+		colliders.push_back(Cube(position, width, height,depth, name));
+		return &colliders[colliders.size() - 1];
 	}
 	Cube* AddCube(GameObject* gameobject, std::string name) {
-		coliders.push_back(Cube(gameobject, name));
+		colliders.push_back(Cube(gameobject, name));
 		return nullptr;
 	}
 
-	Cube* PhysicsManager::GetColider(std::string name) {
-		for (int i = 0; i < coliders.size(); i++) {
-			if (coliders[i].GetName() == name)
-				return &coliders[i];
+	Cube* PhysicsManager::GetCollider(std::string name) {
+		for (int i = 0; i < colliders.size(); i++) {
+			if (colliders[i].GetName() == name)
+				return &colliders[i];
 		}
 		return nullptr;
 	}
@@ -488,9 +489,9 @@ namespace PhysicsManager {
 
 	}
 	void PhysicsManager::RemoveCube(std::string name) {
-		for (int i = 0; i < coliders.size(); i++) {
-			if (coliders[i].GetName() == name)
-				coliders.erase(coliders.begin() + i);
+		for (int i = 0; i < colliders.size(); i++) {
+			if (colliders[i].GetName() == name)
+				colliders.erase(colliders.begin() + i);
 		}
 	}
 	void RemoveRigidbody(std::string name) {
