@@ -56,10 +56,10 @@ bool Ray::intersectsTriangle(std::vector<glm::vec3> verticies, glm::mat4 ModelMa
 
 
 
-Cube::Cube(glm::vec3 postion, glm::vec3 min, glm::vec3 max, std::string name) {
+Cube::Cube(glm::vec3 position, glm::vec3 min, glm::vec3 max, std::string name) {
 	this->min = min;
 	this->max = max;
-	this->position = postion;
+	this->position = position;
 	this->width = max.x - min.x;
 	this->depth = max.z - min.z;
 	this->height = max.y - min.y;
@@ -68,13 +68,13 @@ Cube::Cube(glm::vec3 postion, glm::vec3 min, glm::vec3 max, std::string name) {
 	
 }
 
-Cube::Cube(glm::vec3 postion, float width, float height, float depth, std::string name) {
-	this->position = postion;
+Cube::Cube(glm::vec3 position, float width, float height, float depth, std::string name) {
+	this->position = position;
 	this->width = width;
 	this->depth = depth;
 	this->height = height;
-	min = glm::vec3(postion.x - width / 2, postion.y - height / 2, postion.z - depth / 2);
-	max = glm::vec3(postion.x + width / 2, postion.y + height / 2, postion.z + depth / 2);
+	min = glm::vec3(position.x - width / 2, position.y - height / 2, position.z - depth / 2);
+	max = glm::vec3(position.x + width / 2, position.y + height / 2, position.z + depth / 2);
 	this->name = name;
 }
 Cube::Cube(GameObject* gameobject, std::string name) {
@@ -337,10 +337,10 @@ RigidBody::RigidBody(glm::vec3 position, std::string name) {
 	this->position = position;
 	this->name = name;
 }
-glm::vec3 RigidBody::GetPostion() {
+glm::vec3 RigidBody::GetPosition() {
 	return position;
 }
-void RigidBody::SetPostion(glm::vec3 position) {
+void RigidBody::SetPosition(glm::vec3 position) {
 	this->position = position;
 }
 std::string RigidBody::GetName() {
@@ -459,12 +459,12 @@ namespace PhysicsManager {
 		rigidbodies.push_back(RigidBody(position, name));
 		return &rigidbodies[rigidbodies.size() - 1];
 	}
-	Cube* PhysicsManager::AddCube(glm::vec3 postion, glm::vec3 min, glm::vec3 max, std::string name) {
-		coliders.push_back(Cube(postion, min, max, name));
+	Cube* PhysicsManager::AddCube(glm::vec3 position, glm::vec3 min, glm::vec3 max, std::string name) {
+		coliders.push_back(Cube(position, min, max, name));
 		return &coliders[coliders.size() - 1];
 	}
-	Cube* PhysicsManager::AddCube(glm::vec3 postion, float width, float height, float depth, std::string name) {
-		coliders.push_back(Cube(postion, width, height,depth, name));
+	Cube* PhysicsManager::AddCube(glm::vec3 position, float width, float height, float depth, std::string name) {
+		coliders.push_back(Cube(position, width, height,depth, name));
 		return &coliders[coliders.size() - 1];
 	}
 	Cube* AddCube(GameObject* gameobject, std::string name) {

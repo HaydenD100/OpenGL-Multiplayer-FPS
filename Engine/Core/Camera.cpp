@@ -22,7 +22,7 @@ namespace Camera {
 	glm::mat4 ViewMatrix;
 	glm::mat4 ProjectionMatrix;
 
-	glm::vec3 Camera::GetPostion() {
+	glm::vec3 Camera::GetPosition() {
 		return position;
 	}
 	glm::mat4 Camera::getViewMatrix() {
