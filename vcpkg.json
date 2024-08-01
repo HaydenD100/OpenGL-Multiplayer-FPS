@@ -1,0 +1,9 @@
+{
+  "dependencies": [
+    "bullet3",
+    "glew",
+    "glfw3",
+    "glm",
+    "assimp"
+  ]
+}
