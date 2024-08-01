@@ -17,7 +17,7 @@ void Scene::Load() {
 
 	AssetManager::AddTexture("concrete", "Assets/Textures/fence.png","Assets/Normals/fence_normal.png");
 	AssetManager::AddTexture("ak47_lowpoly", "Assets/Textures/ak47_lowpoly.png", "Assets/Normals/ak47_lowpoly_normal.png");
-	AssetManager::AddTexture("crosshair", "Assets/Sprites/CrossHair.png	", "Assets/Normals/ak47_lowpoly_normal.png");
+	AssetManager::AddTexture("crosshair", "Assets/Sprites/CrossHair.png", "Assets/Normals/ak47_lowpoly_normal.png");
 	AssetManager::AddTexture("window", "Assets/Textures/window.png");
 	
 	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png");
