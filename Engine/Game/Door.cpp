@@ -1,6 +1,5 @@
 #include "Door.h"
 
-
 Door::Door(std::string Name, const char* doorPath, const char* framePath, Texture* doorTexture, Texture* frameTexture, glm::vec3 position) {
 	name = Name;
 	AssetManager::AddGameObject(GameObject(name+"_frame", framePath, frameTexture, position,false,0,Box,0,0,0));
@@ -12,6 +11,7 @@ Door::Door(std::string Name, const char* doorPath, const char* framePath, Textur
 	opening = false;
 	door_position = position;
 }
+
 void Door::Interact() {
 	if (Player::GetInteractingWithName() == name+"_door")
 	{
@@ -22,20 +22,22 @@ void Door::Interact() {
 			AudioManager::PlaySound("door_open", door_position);
 	}
 }
-void Door::Update(float deltaTime) {
-	if (opening) {
-		if (rotaion >= 1.5f) {
-			rotaion = 0;
-			opening = false;
-			opened = !opened;
-			return;
-		}
-		if(!opened)
-			AssetManager::GetGameObject(name + "_door")->SetRotationY(AssetManager::GetGameObject(name + "_door")->getRotation().y + openingSpeed);
-		else
-			AssetManager::GetGameObject(name + "_door")->SetRotationY(AssetManager::GetGameObject(name + "_door")->getRotation().y - openingSpeed);
 
-		rotaion += openingSpeed;
-		
+void Door::Update(float deltaTime) {
+	if (!opening)
+		return;
+	
+	if (rotaion >= 1.5f) {
+		rotaion = 0;
+		opening = false;
+		opened = !opened;
+		return;
 	}
+		
+	if(!opened)
+		AssetManager::GetGameObject(name + "_door")->SetRotationY(AssetManager::GetGameObject(name + "_door")->getRotation().y + openingSpeed);
+	else
+		AssetManager::GetGameObject(name + "_door")->SetRotationY(AssetManager::GetGameObject(name + "_door")->getRotation().y - openingSpeed);
+
+	rotaion += openingSpeed;
 }

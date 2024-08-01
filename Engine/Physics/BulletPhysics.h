@@ -10,7 +10,6 @@
 #include <glm/gtc/type_ptr.hpp>
 //#include "Engine/Core/GameObject.h"
 
-
 enum ColliderShape {
 	Box,
 	Sphere,

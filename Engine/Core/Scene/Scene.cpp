@@ -38,10 +38,7 @@ void Scene::Load() {
 	crates.push_back(Crate(glm::vec3(1, 30, 0.5), "crate2", "Assets/Objects/Crate.obj", AssetManager::GetTexture("crate")));
 	crates.push_back(Crate(glm::vec3(0.5, 20, 1), "crate2", "Assets/Objects/Crate.obj", AssetManager::GetTexture("crate")));
 
-
-
 	gunPickUps.push_back(GunPickUp("ak47", "ak47_pickup", "Assets/Objects/ak47.obj", AssetManager::GetTexture("ak47"), glm::vec3(1, 30, 1)));
-
 
 	gunPickUps.push_back(GunPickUp("glock", "glock_pickup1", "Assets/Objects/glock_17.obj", AssetManager::GetTexture("glock"), glm::vec3(1,25, 0)));
 
@@ -54,7 +51,7 @@ void Scene::Load() {
 
 	// Sets renderer
 	Renderer::UseProgram(Renderer::GetProgramID("Texture"));
-	std::vector<std::string> faces{ 
+	std::vector<std::string> faces { 
 		"Assets/Skybox/daylight/right.png",
 			"Assets/Skybox/daylight/left.png",
 			"Assets/Skybox/daylight/top.png",
@@ -63,7 +60,6 @@ void Scene::Load() {
 			"Assets/Skybox/daylight/back.png"
 	};
 	sky = SkyBox(faces);
-
 
 	// MAX LIGHTS BY DEFAULT IS 10 if you want more lights go to FragmentShader.frag and VertexShader.vert and change MAXLIGHTS
 	{
@@ -93,19 +89,21 @@ void Scene::Update(float deltaTime) {
 
 		AssetManager::GetGameObject(i)->Update();
 	}
+	
 	for (int door = 0; door < doors.size(); door++) {
 		doors[door].Interact();
 		doors[door].Update(deltaTime);
 	}
+	
 	for (int gun = 0; gun < gunPickUps.size(); gun++) {
 		gunPickUps[gun].Update();
 		if (gunPickUps[gun].Interact() && Player::getCurrentGun() == "nothing")
 			gunPickUps.erase(gunPickUps.begin() + gun);
 	}
+	
 	for (int crate = 0; crate < crates.size(); crate++) {
 		crates[crate].Update();
 	}
-
 	
 	AudioManager::UpdateListener(Player::getPosition(),Player::getForward(),PhysicsManager::GetRigidbody("PlayerRB")->GetForce());
 	AudioManager::Update();
@@ -126,7 +124,6 @@ void Scene::RenderObjects() {
 	Renderer::SetLights(lights);
 
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
-
 		GameObject* gameobjectRender = AssetManager::GetGameObject(i);
 
 		if (!gameobjectRender->ShouldRender())
@@ -178,16 +175,18 @@ void Scene::RenderObjects() {
 	oss.str(""); oss.clear();
 	oss << Player::getCurrentGun();
 	Renderer::RenderText(oss.str().c_str(), 0, 500, 15);
-	
 }
+
 void Scene::AddGunPickUp(GunPickUp gunpickup) {
 	gunPickUps.push_back(gunpickup);
 }
+
 void Scene::AddGunPickUp(std::string gunName, std::string gunObject, glm::vec3 Position) {
 	GunPickUp pickup = GunPickUp(gunName, gunObject, Position);
 	std::cout << " testing";
 	gunPickUps.push_back(pickup);
 }
+
 void Scene::RenderObjects(const char* shaderName) {
 	glm::mat4 ProjectionMatrix = Camera::getProjectionMatrix();
 	glm::mat4 ViewMatrix = Camera::getViewMatrix();
@@ -217,17 +216,15 @@ void Scene::RenderObjects(const char* shaderName) {
 	}
 }
 
-
 int Scene::GetGunPickUpSize() {
 	return gunPickUps.size();
 }
+
 Crate* Scene::GetCrate(std::string name) {
 	for (int i = 0; i < crates.size(); i++) {
 		if (crates[i].GetName() == name)
 			return &crates[i];
 	}
+	
 	return nullptr;
 }
-
-
-

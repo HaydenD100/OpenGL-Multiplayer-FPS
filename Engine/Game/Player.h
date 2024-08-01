@@ -30,5 +30,4 @@ namespace Player
 
 	void SwitchWeapons(int index);
 	void Shoot();
-};
-
+}

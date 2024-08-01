@@ -7,7 +7,6 @@
 //https://github.com/HaydenD100
 
 namespace Engine {
-	
 	int Engine::Run() {
 		//init Engine comps
 		Input::Init();
@@ -20,7 +19,6 @@ namespace Engine {
 		SceneManager::Init();
 		SceneManager::CreateScene(basicScene);
 		SceneManager::LoadScene(0);
-
 
 		// For speed computation
 		double lastTimeDT = glfwGetTime();
@@ -62,5 +60,3 @@ namespace Engine {
 		return 0;
 	}
 }
-
-

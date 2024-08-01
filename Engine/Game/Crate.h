@@ -20,9 +20,7 @@ public:
 	void Break();
 	void DealDamage(int damage, glm::vec3 position, glm::vec3 force);
 	std::string GetName();
-
 private:
 	std::string name = "None";
 	int health = 500;
 };
-

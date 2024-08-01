@@ -51,7 +51,6 @@ private:
 	std::string name;
 
 	GameObject* gameObject;
-
 };
 
 namespace AnimationManager {
@@ -60,10 +59,5 @@ namespace AnimationManager {
 	void Stop(std::string Name);
 	void Pause(std::string Name);
 	void Update(float deltaTime);
-
 	Animation* GetAnimation(std::string Name);
-
-
-
-};
-
+}

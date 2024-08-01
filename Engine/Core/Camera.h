@@ -22,5 +22,4 @@ namespace Camera
 
 	glm::vec3 ComputeRay();
 	btCollisionWorld::ClosestRayResultCallback GetRayHit();
-};
-
+}

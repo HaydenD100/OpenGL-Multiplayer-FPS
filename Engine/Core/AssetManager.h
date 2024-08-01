@@ -18,7 +18,6 @@
 #include "Loaders/nlohmann/json.hpp"
 using json = nlohmann::json;
 
-
 namespace AssetManager
 {
 	void Init();
@@ -37,7 +36,6 @@ namespace AssetManager
 	int AddTexture(const char* name, const char* path);
 	int AddTexture(const char* name, const char* path, const char* normalPath);
 
-
 	void RemoveGameObject(std::string name);
 	void RemoveGameObject(int index);
 
@@ -50,6 +48,4 @@ namespace AssetManager
 	int GetDecalsSize();
 
 	Texture* GetTexture(std::string name);
-
-};
-
+}

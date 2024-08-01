@@ -3,10 +3,7 @@
 #include "Engine/Core/Common.h"
 #include "Engine/Physics/BulletPhysics.h"
 
-
-
 namespace Camera {
-
 	glm::vec3 position = glm::vec3(0, 0, 5);
 	glm::vec3 direction = glm::vec3(0, 0, 0);
 
@@ -16,8 +13,6 @@ namespace Camera {
 	float initialFoV = 45.0f;
 	float maxAngle = 1.5;
 	float mouseSpeed = 0.005f;
-
-
 	
 	glm::mat4 ViewMatrix;
 	glm::mat4 ProjectionMatrix;
@@ -25,21 +20,27 @@ namespace Camera {
 	glm::vec3 Camera::GetPosition() {
 		return position;
 	}
+	
 	glm::mat4 Camera::getViewMatrix() {
 		return ViewMatrix;
 	}
+	
 	glm::mat4 Camera::getProjectionMatrix() {
 		return ProjectionMatrix;
 	}
+	
 	void Camera::SetHorizontalAngle(float angle) {
 		horizontalAngle = angle;
 	}
+	
 	void Camera::SetVerticalAngle(float angle) {
 		verticalAngle = angle;
 	}
+	
 	void Camera::SetPosition(glm::vec3 pos) {
 		position = pos;
 	}
+	
 	glm::vec3 Camera::ComputeRay() {
 		glm::vec4 lRayStart_NDC(
 			((float)Input::GetMouseX() / (float)SCREENWIDTH - 0.5f) * 2.0f, // [0,1024] -> [-1,1]
@@ -47,6 +48,7 @@ namespace Camera {
 			-1.0, // The near plane maps to Z=-1 in Normalized Device Coordinates
 			1.0f
 		);
+		
 		glm::vec4 lRayEnd_NDC(
 			((float)Input::GetMouseX() / (float)SCREENWIDTH - 0.5f) * 2.0f,
 			((float)Input::GetMouseY() / (float)SCREENHEIGHT - 0.5f) * 2.0f,
@@ -66,10 +68,10 @@ namespace Camera {
 		glm::vec4 lRayEnd_world = InverseViewMatrix * lRayEnd_camera;   lRayEnd_world /= lRayEnd_world.w;
 
 		glm::vec3 lRayDir_world(lRayEnd_world - lRayStart_world);
-		
 
 		return glm::normalize(lRayDir_world);
 	}
+	
 	btCollisionWorld::ClosestRayResultCallback Camera::GetRayHit() {
 		glm::vec3 out_end = Camera::position + ComputeRay() * 1000.0f;
 
@@ -82,16 +84,12 @@ namespace Camera {
 		PhysicsManagerBullet::GetDynamicWorld()->rayTest(btVector3(Camera::position.x, Camera::position.y, Camera::position.z),btVector3(out_end.x, out_end.y, out_end.z),RayCallback);
 		return RayCallback;
 	}
-	
 
 	void Camera::Update(float dt) {
-
 		if (verticalAngle <= maxAngle && verticalAngle >= -maxAngle)
 			verticalAngle += mouseSpeed * float(768 / 2 - Input::GetMouseY());
-
 		else if (verticalAngle > maxAngle)
 			verticalAngle = maxAngle;
-
 		else if (verticalAngle < -maxAngle)
 			verticalAngle = -maxAngle;
 
@@ -101,17 +99,20 @@ namespace Camera {
 			sin(verticalAngle),
 			cos(verticalAngle) * cos(horizontalAngle)
 		);
+		
 		// Right vector
 		glm::vec3 right = glm::vec3(
 			sin(horizontalAngle - 3.14f / 2.0f),
 			0,
 			cos(horizontalAngle - 3.14f / 2.0f)
 		);
+		
 		// Up vector
 		glm::vec3 up = glm::cross(right, direction);
 
 		// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
 		ProjectionMatrix = glm::perspective(initialFoV, 4.0f / 3.0f, 0.1f, 100.0f);
+		
 		// Camera matrix
 		ViewMatrix = glm::lookAt(
 			position,           // Camera is here
@@ -119,8 +120,8 @@ namespace Camera {
 			up                  // Head is up (set to 0,-1,0 to look upside-down)
 		);
 	}
+	
 	glm::vec3 Camera::GetDirection() {
 		return direction;
 	}
-
 }

@@ -1,13 +1,6 @@
 #include "loader.hpp"
 
-
-
-
-
-
-
 namespace loader {
-
 	GLuint loader::loadBMP_custom(const char* imagepath) {
 		// Data read from the header of the BMP file
 		unsigned char header[54]; // Each BMP file begins by a 54-bytes header
@@ -72,7 +65,6 @@ namespace loader {
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		return textureID;
-
 	}
 
 #define FOURCC_DXT1 0x31545844 // Equivalent to "DXT1" in ASCII
@@ -80,7 +72,6 @@ namespace loader {
 #define FOURCC_DXT5 0x35545844 // Equivalent to "DXT5" in ASCII
 
 	GLuint loader::loadDDS(const char* imagepath) {
-
 		unsigned char header[124];
 
 		FILE* fp;
@@ -155,11 +146,11 @@ namespace loader {
 			width /= 2;
 			height /= 2;
 		}
+		
 		free(buffer);
 
 		return textureID;
 	}
-
 
 	bool loader::loadOBJ(const char* path, std::vector<glm::vec3>& out_vertices, std::vector<glm::vec2>& out_uvs, std::vector<glm::vec3>& out_normals) {
 		printf("Loading OBJ file %s...\n", path);
@@ -168,7 +159,6 @@ namespace loader {
 		std::vector<glm::vec3> temp_vertices;
 		std::vector<glm::vec2> temp_uvs;
 		std::vector<glm::vec3> temp_normals;
-
 
 		FILE* file = fopen(path, "r");
 		if (file == nullptr) {
@@ -211,7 +201,6 @@ namespace loader {
 					return false;
 				}
 
-
 				vertexIndices.push_back(vertexIndex[0]);
 				vertexIndices.push_back(vertexIndex[1]);
 				vertexIndices.push_back(vertexIndex[2]);
@@ -227,7 +216,6 @@ namespace loader {
 				char stupidBuffer[1000];
 				fgets(stupidBuffer, 1000, file);
 			}
-
 		}
 
 		// For each vertex of each triangle
@@ -248,7 +236,7 @@ namespace loader {
 			out_uvs.push_back(uv);
 			out_normals.push_back(normal);
 		}
-
+		
 		return true;
 	}
 }

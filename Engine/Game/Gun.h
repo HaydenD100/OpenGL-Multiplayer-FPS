@@ -6,8 +6,6 @@
 #include "Engine/Game/Player.h"
 #include "Engine/Core/AssetManager.h"
 
-
-
 enum GunType {
 	Semi,
 	Auto,
@@ -32,7 +30,6 @@ struct Gun {
 	glm::vec3 weaponOffSet = glm::vec3(-0.3, -0.25, 0.5);
 	glm::vec3 aimingPosition = glm::vec3(0, -0.2, 0.5);
 
-
 	float kickbackOffset = 0;
 	int down = 1;
 	void Update(float deltaTime, bool isReloading, bool aiming);
@@ -51,10 +48,8 @@ public:
 	GunPickUp(std::string GunName, std::string ObjectName, const char* objectModel, Texture* texture, glm::vec3 position);
 	GunPickUp(std::string GunName, std::string GunObject, glm::vec3 position);
 	void Update();
-
 	bool Interact();
 private:
 	std::string gunName;
 	std::string objectName;
-
 };

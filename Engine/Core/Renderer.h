@@ -5,6 +5,7 @@
 #include <map>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 #include "Loaders/ShaderLoader.hpp"
 #include "Loaders/loader.hpp"
 #include "Engine/Core/UI/Text2D.h"
@@ -32,7 +33,6 @@ private:
     int textureNormalNumber;
     GLuint texture;
     GLuint textureNormal;
-
 };
 
 class SkyBox {
@@ -41,12 +41,10 @@ public:
     SkyBox(std::vector<std::string> faces);
     unsigned int GetTextureID();
     unsigned int GetSkyBoxVAO();
-
 private:
     unsigned int textureID;
     unsigned int skyboxVAO, skyboxVBO;
     static float skyboxVertices[108];
-
 };
 
 namespace Renderer {
@@ -63,7 +61,6 @@ namespace Renderer {
     // Text Rendering
     void RenderText(const char* text, int x, int y, int size);
     void DrawSprite(Texture* texture, glm::vec2 position, glm::vec2 size = glm::vec2(10.0f, 10.0f), float rotate = 0.0f, glm::vec3 color = glm::vec3(1.0f));
-
     void RendererSkyBox(glm::mat4 view, glm::mat4 projection, SkyBox skybox);
 
     // Shader
@@ -73,4 +70,3 @@ namespace Renderer {
     void setMat4(GLuint id, glm::mat4& mat4);
     void setVec3(GLuint id, glm::vec3& vec3);
 }
-

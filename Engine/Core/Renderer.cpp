@@ -57,6 +57,7 @@ Texture::Texture(const char* name, const char* path) {
 	}
 	stbi_image_free(data1);
 }
+
 Texture::Texture(const char* name, const char* path, const char* normalPath) {
 	this->name = name;
 	int texturenumTemp = CurrentTextureNumber++;
@@ -115,32 +116,32 @@ Texture::Texture(const char* name, const char* path, const char* normalPath) {
 	}
 	stbi_image_free(data1);
 }
+
 int Texture::GetTextureNormalNumber() {
 	return textureNormalNumber;
 }
+
 GLuint Texture::GetTextureNormal() {
 	return textureNormal;
 }
 
-
-
 const char* Texture::GetName() {
 	return name;
 }
+
 int Texture::GetTextureNumber() {
 	return textureNumber;
 }
+
 GLuint Texture::GetTexture() {
 	return texture;
 }
 
 int Texture::CurrentTextureNumber = GL_TEXTURE1;
 
-
 SkyBox::SkyBox() {
 
 }
-
 
 SkyBox::SkyBox(std::vector<std::string> faces) {
 	glGenTextures(1, &textureID);
@@ -163,6 +164,7 @@ SkyBox::SkyBox(std::vector<std::string> faces) {
 			stbi_image_free(data);
 		}
 	}
+	
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -173,7 +175,8 @@ SkyBox::SkyBox(std::vector<std::string> faces) {
 unsigned int SkyBox::GetTextureID() {
 	return textureID;
 }
-unsigned int SkyBox::GetSkyBoxVAO(){
+
+unsigned int SkyBox::GetSkyBoxVAO() {
 	glGenVertexArrays(1, &skyboxVAO);
 	glGenBuffers(1, &skyboxVBO);
 	glBindVertexArray(skyboxVAO);
@@ -184,6 +187,7 @@ unsigned int SkyBox::GetSkyBoxVAO(){
 
 	return skyboxVAO;
 }
+
 float SkyBox::skyboxVertices[108] = {
 	// positions          
 	-1.0f,  1.0f, -1.0f,
@@ -238,22 +242,14 @@ namespace Renderer {
 	GLuint ModelMatrixID;
 	GLuint ModelView3x3MatrixID;
 	GLuint gPosition;
-
-
+	
 	GLuint ubo;
-
-
-
 
 	unsigned int quadVAO;
 	unsigned int VBO;
 
 	unsigned int depthMapFBO;
 	unsigned int depthMap;
-
-
-
-
 
 	GLuint Renderer::GetProgramID(const char* name) {
 		return shaderProgramIds[name];
@@ -264,8 +260,8 @@ namespace Renderer {
 		setMat4(ModelMatrixID, model);
 		setMat4(ViewMatrixID, view);
 		glUniformMatrix3fv(ModelView3x3MatrixID, 1, GL_FALSE, &ModelView3x3Matrix[0][0]);
-
 	}
+	
 	void Renderer::SetLights(std::vector<Light> lights)
 	{
 		// Upload lights data to the GPU
@@ -288,13 +284,11 @@ namespace Renderer {
 		glUniform3fv(lightColorsLoc, lights.size(), glm::value_ptr(lightColors[0]));
 		glUniform1fv(lightPowersLoc, lights.size(), &lightPowers[0]);
 		//setVec3(LightID, lights[0].position);
-
 	}
 
 	int Renderer::init(const char* vertex, const char* fragment, const char* name) {
 		UseProgram(LoadShader(vertex, fragment, name));
 		std::cout << "Loaded texture shader at: " << GetProgramID("Texture") << std::endl;
-		
 
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
@@ -339,15 +333,14 @@ namespace Renderer {
 		return 0;
 	}
 
-
-	void Renderer::setMat4(GLuint id, glm::mat4& mat4)
-	{
+	void Renderer::setMat4(GLuint id, glm::mat4& mat4) {
 		glUniformMatrix4fv(id, 1, GL_FALSE, &mat4[0][0]);
 	}
-	void Renderer::setVec3(GLuint id, glm::vec3& vec3)
-	{
+	
+	void Renderer::setVec3(GLuint id, glm::vec3& vec3) {
 		glUniform3f(id, vec3.x, vec3.y, vec3.z);
 	}
+	
 	void Renderer::ClearScreen() {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -356,6 +349,7 @@ namespace Renderer {
 	void Renderer::UseProgram(int ProgramID) {
 		glUseProgram(ProgramID);
 	}
+	
 	int Renderer::LoadShader(const char* vertex, const char* fragment, const char* name) {
 		shaderProgramIds[name] = LoadShaders::LoadShaders(vertex, fragment); 
 		return shaderProgramIds[name];
@@ -392,14 +386,12 @@ namespace Renderer {
 
 		glBindTexture(GL_TEXTURE_2D, texture->GetTexture());
 		glUniform1i(TextureID, texture->GetTextureNumber());
-		
 
 		glBindVertexArray(Renderer::quadVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
 	}
-
-
+	
 	void Renderer::RendererSkyBox(glm::mat4 view, glm::mat4 projection, SkyBox skybox) {
 		glDepthMask(GL_FALSE);
 		UseProgram(GetProgramID("skybox"));
@@ -426,6 +418,4 @@ namespace Renderer {
 		glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgramID);
 		return currentProgramID;
 	}
-
 }
-

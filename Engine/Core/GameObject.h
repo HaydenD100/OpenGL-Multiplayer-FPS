@@ -15,13 +15,9 @@
 #include "../Loaders/loader.hpp"
 #include "Engine/Physics/BulletPhysics.h"
 
-
-
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
-
 
 class GameObject
 {
@@ -31,13 +27,14 @@ public:
 	GameObject(std::string name, glm::vec3 position, bool save, float mass, ColliderShape shape);
 	GameObject(std::string name, const char* path, bool save, float mass, ColliderShape shape);
 	GameObject(std::string name, const char* path, glm::vec3 position, bool save, float mass, ColliderShape shape);
-	GameObject(std::string name, const char* path,Texture* texture, glm::vec3 position, bool save, float mass, ColliderShape shape);
-	GameObject(std::string name, const char* path, Texture* texture, glm::vec3 position, bool save, float mass, ColliderShape shape,float margin);
+	GameObject(std::string name, const char* path, Texture* texture, glm::vec3 position, bool save, float mass, ColliderShape shape);
+	GameObject(std::string name, const char* path, Texture* texture, glm::vec3 position, bool save, float mass, ColliderShape shape, float margin);
 
-	GameObject(std::string name, const char* path, Texture* texture, glm::vec3 position, bool save, float mass, ColliderShape shape,float width, float height, float depth);
+	GameObject(std::string name, const char* path, Texture* texture, glm::vec3 position, bool save, float mass, ColliderShape shape, float width, float height, float depth);
 
 	GameObject(std::string name, std::string parentname, Texture* texture, glm::vec3 position,glm::vec3 rotation, glm::vec3 scale, std::vector<unsigned short> indices,
-		std::vector<glm::vec3> indexed_vertices,std::vector<glm::vec2> indexed_uvs,std::vector<glm::vec3> indexed_normals, bool save, float mass, ColliderShape shape);
+		std::vector<glm::vec3> indexed_vertices, std::vector<glm::vec2> indexed_uvs, std::vector<glm::vec3> indexed_normals, bool save, float mass, ColliderShape shape);
+	
 	GameObject(std::string name, std::string parentname, Texture* texure, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale,
 		std::vector<glm::vec3> vertices,
 		std::vector<glm::vec2> uvs,
@@ -59,8 +56,7 @@ public:
 	void Copy(std::string copyName);
 	glm::mat4 GetModelMatrix();
 	glm::mat4 GetLocalModelMatrix();
-
-
+	
 	void RenderObject(GLuint& programID);
 
 	void setPosition(glm::vec3 position);
@@ -120,15 +116,12 @@ public:
 	btCollisionShape* GetCollisionShape();
 	btConvexHullShape* GetConvexHull();
 
-
-
 private:
 	Transform transform = Transform();
 	Texture* texture = nullptr;
 
 	std::string parentName;
 	std::string name;
-	
 
 	// Read our .obj file
 	std::vector<glm::vec3> vertices;
@@ -157,11 +150,8 @@ private:
 	btConvexHullShape* convexHullShape = nullptr;
 	btTransform Btransform;
 	btRigidBody* body;
-
-
-
+	
 	bool canSave = false;
 	bool render = true;
 	bool shouldDelete = false;
-
 };

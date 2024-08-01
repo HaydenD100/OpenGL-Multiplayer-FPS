@@ -19,13 +19,8 @@
 #include "Engine/Game/Crate.h"
 #include "Engine/Game/Window.h"
 #include "Engine/Core/Lights/light.h"
-
 #include "Engine/Physics/BulletPhysics.h"
 
-
-
-
- 
 class Scene
 {
 public:
@@ -41,7 +36,6 @@ public:
 
 	int GetGunPickUpSize();
 	Crate* GetCrate(std::string name);
-
 private:
 	SkyBox sky;
 	// Objects
@@ -50,7 +44,4 @@ private:
 	std::vector<GunPickUp> gunPickUps;
 	std::vector<Window> windows;
 	std::vector<Light> lights;
-
-	
 };
-

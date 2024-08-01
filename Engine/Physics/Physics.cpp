@@ -2,21 +2,20 @@
 #include "Camera.h"
 #include "Engine/Game/Player.h"
 
-
-
 Ray::Ray(glm::vec3 dir, glm::vec3 org) {
 	direction = dir;
 	origin = org;
 }
+
 Ray::Ray() {
 	direction = glm::vec3(0, 0, 0);
 	origin = glm::vec3(0, 0, 0);
 }
+
 void Ray::UpdateRay(glm::vec3 dir, glm::vec3 org) {
 	direction = dir;
 	origin = org;
 }
-
 
 bool Ray::intersectsTriangle(std::vector<glm::vec3> verticies, glm::mat4 ModelMatrix) {
 	int i = -1;
@@ -24,7 +23,6 @@ bool Ray::intersectsTriangle(std::vector<glm::vec3> verticies, glm::mat4 ModelMa
 		glm::vec4 point1 = glm::vec4(verticies[++i].x, verticies[++i].y, verticies[++i].z, 1) * ModelMatrix; //a
 		glm::vec4 point2 = glm::vec4(verticies[++i].x, verticies[++i].y, verticies[++i].z, 1) * ModelMatrix; //b
 		glm::vec4 point3 = glm::vec4(verticies[++i].x, verticies[++i].y, verticies[++i].z, 1) * ModelMatrix; //c
-
 
 		glm::vec3 AB = glm::vec3(point2.x - point1.x, point2.y - point1.y, point2.z - point1.z);
 		glm::vec3 AC = glm::vec3(point3.x - point1.x, point3.y - point1.y, point3.z - point1.z);
@@ -36,7 +34,6 @@ bool Ray::intersectsTriangle(std::vector<glm::vec3> verticies, glm::mat4 ModelMa
 			float n_dot_ps = glm::dot(normal, glm::vec3(point1.x, point1.y, point1.z) - origin);
 
 			float t = n_dot_ps / n_dot_d;
-
 
 			glm::vec3 planePoint = origin + direction * t;
 
@@ -54,8 +51,6 @@ bool Ray::intersectsTriangle(std::vector<glm::vec3> verticies, glm::mat4 ModelMa
 	}
 }
 
-
-
 Cube::Cube(glm::vec3 position, glm::vec3 min, glm::vec3 max, std::string name) {
 	this->min = min;
 	this->max = max;
@@ -64,8 +59,6 @@ Cube::Cube(glm::vec3 position, glm::vec3 min, glm::vec3 max, std::string name) {
 	this->depth = max.z - min.z;
 	this->height = max.y - min.y;
 	this->name = name;
-
-	
 }
 
 Cube::Cube(glm::vec3 position, float width, float height, float depth, std::string name) {
@@ -77,6 +70,7 @@ Cube::Cube(glm::vec3 position, float width, float height, float depth, std::stri
 	max = glm::vec3(position.x + width / 2, position.y + height / 2, position.z + depth / 2);
 	this->name = name;
 }
+
 Cube::Cube(GameObject* gameobject, std::string name) {
 	std::vector<glm::vec3> vertices = gameobject->getIndexedVerticies();
 
@@ -107,15 +101,12 @@ Cube::Cube(GameObject* gameobject, std::string name) {
 			minz = tempVec.z;
 		if (tempVec.z > maxx)
 			maxz = tempVec.z;
-
-
 	}
 
 	// 1.05 is for padding because the camera can sometimes clip into the object
 	width = (maxx - minx) * 1.0;
 	height = (maxy - miny) * 1.0;
 	depth = (maxz - minz) * 1.0;
-
 
 	this->position = glm::vec3(gameobject->getPosition().x + (minx + maxx) / 2, gameobject->getPosition().y + (miny + maxy) / 2, gameobject->getPosition().z + (minz + maxz) / 2);
 	min = glm::vec3(position.x - width / 2, position.y - height / 2, position.z - depth / 2);
@@ -127,34 +118,43 @@ Cube::Cube(GameObject* gameobject, std::string name) {
 std::string Cube::GetName() {
 	return name;
 }
+
 std::string Cube::GetTag() {
 	return tag;
 }
+
 void Cube::SetTag(std::string Tag) {
 	tag = Tag;
 }
+
 void Cube::setPosition(glm::vec3 position) {
 	this->position = position;
 	min = glm::vec3(position.x - width / 2, position.y - height / 2, position.z - depth / 2);
 	max = glm::vec3(position.x + width / 2, position.y + height / 2, position.z + depth / 2);
 }
+
 glm::vec3 Cube::getPosition() {
 	return position;
 }
+
 void Cube::SetStatic(bool Static) {
 	this->Static = Static;
 }
+
 bool Cube::GetStatic() {
 	if (this == nullptr)
 		return false;
 	return Static;
 }
+
 float Cube::getDepth() {
 	return depth;
 }
+
 float Cube::getHeight() {
 	return height;
 }
+
 float Cube::getWidth() {
 	return width;
 }
@@ -162,9 +162,11 @@ float Cube::getWidth() {
 void Cube::SetDelete(bool Delete) {
 	shouldDelete = Delete;
 }
+
 bool Cube::ShouldDelete() {
 	return shouldDelete;
 }
+
 void Cube::setDimensions(float width,float height, float depth) {
 	this->depth = depth;
 	this->height = height;
@@ -177,15 +179,19 @@ void Cube::setDimensions(float width,float height, float depth) {
 bool Cube::GetIsTrigger() {
 	return isTrigger;
 }
+
 glm::vec3 Cube::getMin() {
 	return min;
 }
+
 glm::vec3 Cube::getMax() {
 	return max;
 }
+
 void Cube::SetIsTrigger(bool trigger) {
 	isTrigger = trigger;
 }
+
 bool Cube::TouchingRight(Cube* collider, float velocity) {
 	return this->getMax().x + velocity > collider->getMin().x &&
 		this->getMin().x < collider->getMin().x &&
@@ -237,6 +243,7 @@ bool Cube::TouchingTop(Cube* collider, float velocity) {
 		this->getMax().z > collider->getMin().z &&
 		this->getMin().z < collider->getMax().z;
 }
+
 // Returns -1 if there is no intersection
 float Cube::intersect(Ray r, float t0, float t1) {
 	float tmin, tmax, tymin, tymax, tzmin, tzmax;
@@ -282,6 +289,7 @@ float Cube::intersect(Ray r, float t0, float t1) {
 	else
 		return -1;
 }
+
 void Cube::Regenerate(GameObject* gameobject) {
 	std::vector<glm::vec3> vertices = gameobject->getIndexedVerticies();
 
@@ -313,8 +321,6 @@ void Cube::Regenerate(GameObject* gameobject) {
 			minz = tempVec.z;
 		if (tempVec.z > maxx)
 			maxz = tempVec.z;
-
-
 	}
 
 	//1.05 is for padding because the camera can somtimes clip into the object
@@ -322,83 +328,97 @@ void Cube::Regenerate(GameObject* gameobject) {
 	height = (maxy - miny) * 1.0;
 	depth = (maxz - minz) * 1.0;
 
-
 	this->position = glm::vec3(gameobject->getPosition().x + (minx + maxx) / 2, gameobject->getPosition().y + (miny + maxy) / 2, gameobject->getPosition().z + (minz + maxz) / 2);
 	min = glm::vec3(position.x - width / 2, position.y - height / 2, position.z - depth / 2);
 	max = glm::vec3(position.x + width / 2, position.y + height / 2, position.z + depth / 2);
 }
 
-
-
 RigidBody::RigidBody() {
 
 }
+
 RigidBody::RigidBody(glm::vec3 position, std::string name) {
 	this->position = position;
 	this->name = name;
 }
+
 glm::vec3 RigidBody::GetPosition() {
 	return position;
 }
+
 void RigidBody::SetPosition(glm::vec3 position) {
 	this->position = position;
 }
+
 std::string RigidBody::GetName() {
 	return name;
 }
+
 void RigidBody::NewPosition(float deltaTime) {
 	position += velocity * deltaTime;
 	if(collider != "None")
 		PhysicsManager::GetCollider(collider)->setPosition(position);
-
 }
+
 void RigidBody::NewPositionY(float deltaTime) {
 	position.y += velocity.y * deltaTime;
 }
+
 void RigidBody::AddForce(glm::vec3 force) {
 	velocity += force;
 }
+
 void RigidBody::AddForceX(float force) {
 	velocity.x += force;
 }
+
 void RigidBody::AddForceY(float force) {
 	velocity.y += force;
 }
+
 void RigidBody::AddForceZ(float force) {
 	velocity.z += force;
 }
+
 void RigidBody::SetForce(glm::vec3 force) {
 	velocity = force;
 }
+
 void RigidBody::SetForceX(float force) {
 	velocity.x = force;
 }
+
 void RigidBody::SetForceY(float force) {
 	velocity.y = force;
 }
+
 void RigidBody::SetForceZ(float force) {
 	velocity.z = force;
 }
+
 void RigidBody::RemoveForceX() {
 	velocity.x = 0;
 }
+
 void RigidBody::RemoveForceY() {
 	velocity.y = 0;
 }
+
 void RigidBody::RemoveForceZ() {
 	velocity.z = 0;
 }
+
 void RigidBody::SetCollider(std::string collider) {
 	this->collider = collider;
 }
+
 std::string RigidBody::GetCollider() {
 	return collider;
 }
+
 glm::vec3 RigidBody::GetForce() {
 	return glm::vec3(0,0,0);
 }
-
-
 
 namespace PhysicsManager {
 	std::vector<Cube> colliders;
@@ -452,22 +472,27 @@ namespace PhysicsManager {
 				if (!UpdatedCamera)
 					UpdatedCamera = true;
 			}
+			
 			//add velocity to position
 			rigidbodies[i].NewPosition(deltaTime);
 		}
 	}
+	
 	RigidBody* PhysicsManager::AddRigidbody(glm::vec3 position, std::string name) {
 		rigidbodies.push_back(RigidBody(position, name));
 		return &rigidbodies[rigidbodies.size() - 1];
 	}
+	
 	Cube* PhysicsManager::AddCube(glm::vec3 position, glm::vec3 min, glm::vec3 max, std::string name) {
 		colliders.push_back(Cube(position, min, max, name));
 		return &colliders[colliders.size() - 1];
 	}
+	
 	Cube* PhysicsManager::AddCube(glm::vec3 position, float width, float height, float depth, std::string name) {
 		colliders.push_back(Cube(position, width, height,depth, name));
 		return &colliders[colliders.size() - 1];
 	}
+	
 	Cube* AddCube(GameObject* gameobject, std::string name) {
 		colliders.push_back(Cube(gameobject, name));
 		return nullptr;
@@ -480,24 +505,26 @@ namespace PhysicsManager {
 		}
 		return nullptr;
 	}
+	
 	RigidBody* PhysicsManager::GetRigidbody(std::string name) {
 		for (int i = 0; i < rigidbodies.size(); i++) {
 			if (rigidbodies[i].GetName() == name)
 				return &rigidbodies[i];
 		}
 		return nullptr;
-
 	}
+	
 	void PhysicsManager::RemoveCube(std::string name) {
 		for (int i = 0; i < colliders.size(); i++) {
 			if (colliders[i].GetName() == name)
 				colliders.erase(colliders.begin() + i);
 		}
 	}
+	
 	void RemoveRigidbody(std::string name) {
 		for (int i = 0; i < rigidbodies.size(); i++) {
 			if (rigidbodies[i].GetName() == name)
 				rigidbodies.erase(rigidbodies.begin() + i);
 		}
 	}
-};
+}

@@ -1,4 +1,5 @@
 #include "Input.h"
+
 namespace Input {
     //Code taken from Hell2024 engine
     bool keyPressed[372];
@@ -22,15 +23,19 @@ namespace Input {
     bool Input::KeyPressed(char c) {
         return keyPressed[std::toupper(c)];
     }
+    
     bool Input::KeyDown(char c) {
         return keyDown[std::toupper(c)];
     }
+    
     bool Input::KeyDownLastFrame(char c) {
         return keyDownLastFrame[std::toupper(c)];
     }
+    
     int Input::GetMouseX() {
         return (int)mouseX;
     }
+    
     int Input::GetMouseY() {
         return (int)mouseY;
     }
@@ -54,26 +59,29 @@ namespace Input {
     bool Input::LeftMouseDown() {
         return leftMouseDown;
     }
+    
     bool Input::RightMouseDown() {
         return rightMouseDown;
     }
-    bool LeftMousePressed(){
+    
+    bool LeftMousePressed() {
         return leftMousePressed;
     }
+    
     bool RightMousePressed() {
         return rightMousePressed;
     }
 
     void Input::Init() {
-        window = Backend::GetWindowPointer();
-
         double x, y;
+        window = Backend::GetWindowPointer();
         glfwGetCursorPos(window, &x, &y);
         mouseOffsetX = x;
         mouseOffsetY = y;
         mouseX = x;
         mouseY = y;
     }
+    
     void Input::Update() {
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             Backend::CloseWindow();
@@ -104,7 +112,6 @@ namespace Input {
         mouseX = x;
         mouseY = y;
 
-
         // Left mouse down/pressed
         leftMouseDown = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
         if (leftMouseDown == GLFW_PRESS && !leftMouseDownLastFrame)
@@ -120,6 +127,5 @@ namespace Input {
         else
             rightMousePressed = false;
         rightMouseDownLastFrame = rightMouseDown;
-
     }
 }

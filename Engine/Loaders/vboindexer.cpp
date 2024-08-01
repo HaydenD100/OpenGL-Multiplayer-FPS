@@ -1,6 +1,5 @@
 #include "vboindexer.h"
 
-
 namespace indexer {
 
 	// Returns true iif v1 can be considered equal to v2
@@ -36,6 +35,7 @@ namespace indexer {
 				return true;
 			}
 		}
+		
 		// No other vertex could be used instead.
 		// Looks like we'll have to add it to the VBO.
 		return false;
@@ -54,7 +54,6 @@ namespace indexer {
 		std::vector<glm::vec3>& out_normals,
 		std::vector<glm::vec3>& out_tangents,
 		std::vector<glm::vec3>& out_bitangents
-
 	) {
 		// For each input vertex
 		for (unsigned int i = 0; i < in_vertices.size(); i++) {
