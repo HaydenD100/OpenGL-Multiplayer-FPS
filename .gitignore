@@ -6,6 +6,9 @@
 # JetBrains IDE Files
 .idea
 
+# VSCode
+.vscode
+
 # CMake Folder
 build
 
