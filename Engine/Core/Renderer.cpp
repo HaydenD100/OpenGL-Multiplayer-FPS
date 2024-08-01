@@ -36,12 +36,14 @@ Texture::Texture(const char* name, const char* path) {
 
 	glGenTextures(1, &textureNormal);
 	glBindTexture(GL_TEXTURE_2D, textureNormal);
-	// set the texture wrapping/filtering options (on the currently bound texture object)
+	
+	// Set the texture wrapping/filtering options (on the currently bound texture object)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load and generate the texture
+	
+	// Load and generate the texture
 	int width1, height1;
 
 	unsigned char* data1 = stbi_load("Assets/Normals/no_normal.png", &width1, &height1, 0, STBI_rgb_alpha);
@@ -65,12 +67,14 @@ Texture::Texture(const char* name, const char* path, const char* normalPath) {
 
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	// set the texture wrapping/filtering options (on the currently bound texture object)
+	
+	// Set the texture wrapping/filtering options (on the currently bound texture object)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load and generate the texture
+	
+	// Load and generate the texture
 	int width, height;
 	unsigned char* data = stbi_load(path, &width, &height, 0, STBI_rgb_alpha);
 	if (data)
@@ -90,12 +94,14 @@ Texture::Texture(const char* name, const char* path, const char* normalPath) {
 
 	glGenTextures(1, &textureNormal);
 	glBindTexture(GL_TEXTURE_2D, textureNormal);
-	// set the texture wrapping/filtering options (on the currently bound texture object)
+	
+	// Set the texture wrapping/filtering options (on the currently bound texture object)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load and generate the texture
+	
+	// Load and generate the texture
 	int width1, height1;
 
 	unsigned char* data1 = stbi_load(normalPath, &width1, &height1, 0, STBI_rgb_alpha);
@@ -303,14 +309,15 @@ namespace Renderer {
 		LightID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "LightPosition_worldspace");
 		ModelView3x3MatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "MV3x3");
 
-		//skybox
+		// Skybox
 		LoadShader("Assets/Shaders/SkyBoxShader.vert", "Assets/Shaders/SkyBoxShader.frag", "skybox");
 		std::cout << "Loaded skybox shader at: " << GetProgramID("skybox") << std::endl;
 		LoadShader("Assets/Shaders/shaderSprite.vert", "Assets/Shaders/shaderSprite.frag", "sprite");
 		std::cout << "Loaded sprite shader at: " << GetProgramID("sprite") << std::endl;
 
 		UseProgram(GetProgramID("sprite"));
-		// configure VAO/VBO
+		
+		// Configure VAO/VBO
 		float vertices[] = {
 			// pos      // tex
 			0.0f, 1.0f, 0.0f, 1.0f,
@@ -360,7 +367,7 @@ namespace Renderer {
 		Text2D::printText2D(text, x, y, size);
 	}
 
-	//dosent work right now still in progress
+	// TODO: Doesn't work right now still in progress
 	void Renderer::DrawSprite(Texture* texture, glm::vec2 position, glm::vec2 size, float rotate, glm::vec3 color) {
 		UseProgram(GetProgramID("sprite"));
 

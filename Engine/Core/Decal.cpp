@@ -75,7 +75,7 @@ void Decal::RenderDecal(GLuint& programID) {
 		glBindTexture(GL_TEXTURE_2D, texture->GetTextureNormal());
 		glUniform1i(NormalID, texture->GetTextureNormalNumber());
 	}
-	// 1rst attribute buffer : vertices
+	// 1st attribute buffer : vertices
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glVertexAttribPointer(

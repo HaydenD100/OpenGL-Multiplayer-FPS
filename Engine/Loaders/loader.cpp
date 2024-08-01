@@ -50,7 +50,7 @@ namespace loader {
 		// Read the actual data from the file into the buffer
 		fread(data, 1, imageSize, file);
 
-		//Everything is in memory now, the file can be closed
+		// Everything is in memory now, the file can be closed
 		fclose(file);
 
 		// Create one OpenGL texture
@@ -66,7 +66,7 @@ namespace loader {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-		// When MINifying the image, use a LINEAR blend of two mipmaps, each filtered LINEARLY too
+		// When Minifying the image, use a LINEAR blend of two mipmaps, each filtered LINEARLY too
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		// Generate mipmaps, by the way.
 		glGenerateMipmap(GL_TEXTURE_2D);

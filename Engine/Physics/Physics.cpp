@@ -111,7 +111,7 @@ Cube::Cube(GameObject* gameobject, std::string name) {
 
 	}
 
-	//1.05 is for padding because the camera can somtimes clip into the object
+	// 1.05 is for padding because the camera can sometimes clip into the object
 	width = (maxx - minx) * 1.0;
 	height = (maxy - miny) * 1.0;
 	depth = (maxz - minz) * 1.0;
@@ -237,7 +237,7 @@ bool Cube::TouchingTop(Cube* colider, float velocity) {
 		this->getMax().z > colider->getMin().z &&
 		this->getMin().z < colider->getMax().z;
 }
-//Returns -1 if there is no intersection
+// Returns -1 if there is no intersection
 float Cube::intersect(Ray r, float t0, float t1) {
 	float tmin, tmax, tymin, tymax, tzmin, tzmax;
 	if (r.direction.x >= 0) {
@@ -404,7 +404,7 @@ namespace PhysicsManager {
 	std::vector<Cube> coliders;
 	std::vector<RigidBody> rigidbodies;
 
-	//forces
+	// Forces
 	float friction = 7;
 	float Gravity = -12;
 
@@ -413,7 +413,7 @@ namespace PhysicsManager {
 	void PhysicsManager::Update(float deltaTime) {
 		UpdatedCamera = false;
 		for (int i = 0; i < rigidbodies.size(); i++) {
-			//add friction so your not sliding
+			// Add friction so you're not sliding
 			rigidbodies[i].SetForceX(rigidbodies[i].GetForce().x / (1 + (deltaTime * friction)));
 			rigidbodies[i].SetForceZ(rigidbodies[i].GetForce().z / (1 + (deltaTime * friction)));
 			rigidbodies[i].SetForceY(rigidbodies[i].GetForce().y + Gravity * deltaTime);
@@ -451,7 +451,7 @@ namespace PhysicsManager {
 				if (!UpdatedCamera)
 					UpdatedCamera = true;
 			}
-			//add veloctiy to position
+			//add velocity to position
 			rigidbodies[i].NewPosition(deltaTime);
 		}
 	}

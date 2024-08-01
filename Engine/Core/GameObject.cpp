@@ -229,7 +229,7 @@ GameObject::GameObject(std::string name, const char* path, Texture* texture, glm
 	Btransform.setIdentity();
 	Btransform.setOrigin(btVector3(position.x, position.y, position.z));
 
-	//using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
+	// Using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
 	btDefaultMotionState* myMotionState = new btDefaultMotionState(Btransform);
 	if (convexHullShape == nullptr)
 	{
@@ -277,21 +277,20 @@ GameObject::GameObject(std::string name, const char* path, Texture* texture, glm
 	Btransform.setIdentity();
 	Btransform.setOrigin(btVector3(position.x, position.y, position.z));
 
-	//using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
+	// Using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
 	btDefaultMotionState* myMotionState = new btDefaultMotionState(Btransform);
 	btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, collider, localInertia);
 	body = new btRigidBody(rbInfo);
 	body->setActivationState(DISABLE_DEACTIVATION);
 	body->setFriction(0.7f);
 	body->setUserIndex(-1);
-	//add the body to the dynamics world
+	
+	// Add the body to the dynamics world
 	if (mass != 0)
 		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_DYNAMIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
 	else
 		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
 	setPosition(position);
-	//add the body to the dynamics world
-
 }
 
 
@@ -412,7 +411,7 @@ GameObject::GameObject(std::string name, std::string parentname, Texture* textur
 	Btransform.setIdentity();
 	Btransform.setOrigin(btVector3(position.x, position.y, position.z));
 
-	//using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
+	// Using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
 	btDefaultMotionState* myMotionState = new btDefaultMotionState(Btransform);
 	if (convexHullShape == nullptr)
 	{
@@ -427,7 +426,8 @@ GameObject::GameObject(std::string name, std::string parentname, Texture* textur
 	body->setActivationState(DISABLE_DEACTIVATION);
 	body->setFriction(0.7f);
 	body->setUserIndex(-1);
-	//add the body to the dynamics world
+	
+	// Add the body to the dynamics world
 	if (mass != 0)
 		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_DYNAMIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
 	else
@@ -483,8 +483,7 @@ void GameObject::SetUserPoint(void* pointer) {
 	body->setUserPointer(pointer);
 }
 
-
-//Parent child transformations
+// Parent child transformations
 glm::mat4 GameObject::GetModelMatrix() {
 
 	glm::mat4 matrix = transform.to_mat4();
@@ -498,7 +497,8 @@ glm::mat4 GameObject::GetModelMatrix() {
 	}
 	return  matrix;
 }
-//gets the models world space without translations from the parent to the world and not the parent
+
+// Gets the models world space without translations from the parent to the world and not the parent
 glm::mat4 GameObject::GetLocalModelMatrix() {
 	return transform.to_mat4();
 }
@@ -532,7 +532,7 @@ void GameObject::RenderObject(GLuint& programID) {
 		glBindTexture(GL_TEXTURE_2D, texture->GetTextureNormal());
 		glUniform1i(NormalID, texture->GetTextureNormalNumber());
 	}
-	// 1rst attribute buffer : vertices
+	// 1st attribute buffer : vertices
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glVertexAttribPointer(

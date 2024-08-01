@@ -19,7 +19,7 @@ namespace Player
 	std::string interactingWithName = "nothing";
 	float interactDistance = 3;
 
-	//states
+	// States
 	bool reloading = false;
 	bool aiming = false;
 
@@ -39,7 +39,7 @@ namespace Player
 		if (proxy) {
 			proxy->m_collisionFilterGroup = GROUP_PLAYER;
 			proxy->m_collisionFilterMask = GROUP_STATIC | GROUP_DYNAMIC;
-			// Add the constraint to the world
+			// TODO: Add the constraint to the world
 		}
 
 		btRigidBody* body = AssetManager::GetGameObject("player")->GetRigidBody();
@@ -59,7 +59,7 @@ namespace Player
 		if (proxy) {
 			proxy->m_collisionFilterGroup = GROUP_PLAYER;
 			proxy->m_collisionFilterMask = GROUP_STATIC | GROUP_DYNAMIC;
-			// Add the constraint to the world
+			// TODO: Add the constraint to the world
 			
 		}
 		//std::cout << "loading player model" << std::endl;
@@ -93,7 +93,7 @@ namespace Player
 			}
 		}
 		else {
-			//click click
+			// Click click
 			AudioManager::PlaySound("dry_fire", AssetManager::GetGameObject("player")->getPosition());
 		}
 		WeaponManager::GetGunByName(gunName)->lastTimeShot = glfwGetTime();
@@ -182,6 +182,7 @@ namespace Player
 		if (Input::KeyDown('a')) {
 			movement += glmToBtVector3(-right);
 		}
+		// Jump
 		if (Input::KeyDown(' ') && IsGrounded) {
 			movement.setY(jumpforce);
 		}
@@ -191,7 +192,7 @@ namespace Player
 
 
 
-		//deltatime was making it jittery will fix later
+		// TODO: deltatime was making it jittery will fix later
 		
 		movement.setX(movement.x() + player->GetRigidBody()->getLinearVelocity().x());
 		movement.setZ(movement.z() + player->GetRigidBody()->getLinearVelocity().z());

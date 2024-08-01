@@ -43,7 +43,7 @@ public:
 
 private:
 	SkyBox sky;
-	//objects
+	// Objects
 	std::vector<Door> doors;
 	std::vector<Crate> crates;
 	std::vector<GunPickUp> gunPickUps;

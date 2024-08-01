@@ -151,7 +151,8 @@ private:
 	GLuint VertexArrayID;
 	GLuint tangentbuffer;
 	GLuint bitangentbuffer;
-	//phyiscs stuff
+	
+	// Physics stuff
 	btCollisionShape* collider = nullptr;
 	btConvexHullShape* convexHullShape = nullptr;
 	btTransform Btransform;

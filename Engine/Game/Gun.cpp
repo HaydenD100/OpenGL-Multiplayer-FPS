@@ -124,7 +124,7 @@ GunPickUp::GunPickUp(std::string GunName, std::string ObjectName, const char* ob
 	objectName = ObjectName;
 	AssetManager::AddGameObject(objectName, objectModel, texture, position, false,1,Convex);
 }
-//dosent work
+// TODO: Doesn't work
 GunPickUp::GunPickUp(std::string GunName, std::string GunObject, glm::vec3 position) {
 	gunName = GunName;
 	objectName = GunObject + std::to_string(SceneManager::GetCurrentScene()->GetGunPickUpSize());

@@ -11,7 +11,7 @@
 #include "Renderer.h"
 #include "Decal.h"
 
-//Json stuff
+// Json stuff
 #include <fstream>
 #include <iostream>
 #include "Loaders/nlohmann/json.hpp"
@@ -24,7 +24,7 @@ namespace AssetManager
 	void SaveAssets(const char* path);
 	void LoadAssets(const char* path);
 
-	//returns index of object
+	// returns index of object
 	int AddGameObject(GameObject gameobject);
 	int AddGameObject(std::string name, const char* path,Texture* texture, glm::vec3 position, bool save, float mass, ColliderShape shape);
 

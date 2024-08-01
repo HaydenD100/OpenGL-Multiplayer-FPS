@@ -23,7 +23,7 @@ void Scene::Load() {
 	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png");
 	AssetManager::AddTexture("door2", "Assets/Textures/Door_C.jpg");
 
-	//not currently working
+	// TODO: not currently working
 	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
 
 	WeaponManager::Init();
@@ -53,7 +53,7 @@ void Scene::Load() {
 	//gunPickUps.push_back(GunPickUp("glock", "glock_pickup", "Assets/Objects/glock.obj", AssetManager::GetTexture("uvmap"), glm::vec3(8, -13, -6)));
 	//AssetManager::GetGameObject("glock_pickup")->SetRender(false);
 
-	//sets renderer
+	// Sets renderer
 	Renderer::UseProgram(Renderer::GetProgramID("Texture"));
 	std::vector<std::string> faces{ 
 		"Assets/Skybox/daylight/right.png",
@@ -66,7 +66,7 @@ void Scene::Load() {
 	sky = SkyBox(faces);
 
 
-	//MAX LIGHTS BY DEFAULT IS 10 if you want more lights go to FragmentShader.frag and VertexShader.vert and change MAXLIGHTS
+	// MAX LIGHTS BY DEFAULT IS 10 if you want more lights go to FragmentShader.frag and VertexShader.vert and change MAXLIGHTS
 	{
 		Light light(glm::vec3(-2.5, 4, -5), glm::vec3(1, 0.25, 0), 30);
 		lights.push_back(light);
@@ -83,7 +83,7 @@ void Scene::Load() {
 	Player::Init();
 	Player::setPosition(glm::vec3(3, 10, 0));
 
-	//not currently working
+	// TODO: not currently working
 	//AssetManager::SaveAssets("Assets/Saves/mainScene.json");
 }
 
@@ -151,7 +151,7 @@ void Scene::RenderObjects() {
 		Decal* decal = AssetManager::GetDecal(i);
 		if (decal->CheckParentIsNull())
 			continue;
-		//do some pre normal calcualtions
+		// Do some pre-normal calculations
 		glm::mat4 ModelMatrix = decal->GetModel();
 		glm::mat4 MVP = PV * ModelMatrix;
 		glm::mat3 ModelView3x3Matrix = glm::mat3(ViewMatrix * ModelMatrix); // Take the upper-left part of ModelViewMatrix

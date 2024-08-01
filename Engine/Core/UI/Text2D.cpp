@@ -82,7 +82,7 @@ namespace Text2D {
 		glUniform1i(Text2DUniformID, 0);
 
 
-		// 1rst attribute buffer : vertices
+		// 1st attribute buffer : vertices
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, Text2DVertexBufferID);
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
