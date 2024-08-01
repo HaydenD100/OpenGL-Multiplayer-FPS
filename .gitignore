@@ -6,6 +6,9 @@
 # JetBrains IDE Files
 .idea
 
+# CMake Folder
+build
+
 # User-specific files
 *.rsuser
 *.suo
