@@ -31,7 +31,6 @@ public:
 	void RenderObjects(const char* shaderName);
 
 	void AddGunPickUp(GunPickUp gunpickup);
-	void AddGunPickUp(std::string gunName,std::string gunObject,glm::vec3 Position);
 
 	size_t GetGunPickUpSize();
 	Crate* GetCrate(std::string name);

@@ -25,16 +25,13 @@ public:
 	GameObject();
 	GameObject(std::string name, bool save, float mass, ColliderShape shape);
 	GameObject(std::string name, glm::vec3 position, bool save, float mass, ColliderShape shape);
+	GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, btConvexHullShape* shape);
+	GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, btCollisionShape* shape);
 
 	GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape);
 	GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape, float width, float height, float depth);
 
-	
-	
-
-
 	void LoadModel(const char* path);
-	void Copy(std::string copyName);
 	glm::mat4 GetModelMatrix();
 	glm::mat4 GetLocalModelMatrix();
 	
@@ -83,6 +80,7 @@ public:
 
 	void SetUserPoint(void* pointer);
 
+	Model* GetModel();
 	btRigidBody* GetRigidBody();
 	btCollisionShape* GetCollisionShape();
 	btConvexHullShape* GetConvexHull();

@@ -253,7 +253,7 @@ namespace Player
 			}
 			
 			if (Input::KeyPressed('q') && !reloading) {
-				//SceneManager::GetCurrentScene()->AddGunPickUp(gunName, gunName + "_pickup", getPosition() + Camera::GetDirection() * 1.5f);
+				SceneManager::GetCurrentScene()->AddGunPickUp(GunPickUp(getCurrentGun(),getPosition() + glm::vec3(0,1,0) + Camera::GetDirection(), Camera::GetDirection() * 7.0f));
 				AssetManager::GetGameObject(gunName)->SetRender(false);
 				gunName = "nothing";
 			}

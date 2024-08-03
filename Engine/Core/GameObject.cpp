@@ -15,6 +15,79 @@ GameObject::GameObject(std::string name, glm::vec3 position, bool save, float ma
 	parentName = "";
 	canSave = save;
 }
+GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, btConvexHullShape* shape) {
+	this->name = name;
+	this->model = model;
+	parentName = "";
+	canSave = save;
+	Btransform.setOrigin(glmToBtVector3(position));
+	convexHullShape = shape;
+
+	bool isDynamic = (mass != 0.f);
+
+	btVector3 localInertia(0, 0, 0);
+	if (isDynamic)
+		convexHullShape->calculateLocalInertia(btScalar(mass), localInertia);
+
+	Btransform.setIdentity();
+	Btransform.setOrigin(btVector3(position.x, position.y, position.z));
+
+	// Using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
+	btDefaultMotionState* myMotionState = new btDefaultMotionState(Btransform);
+	btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, convexHullShape, localInertia);
+	body = new btRigidBody(rbInfo);
+
+	body->setActivationState(DISABLE_DEACTIVATION);
+	body->setFriction(0.7f);
+	body->setUserIndex(-1);
+
+	// Add the body to the dynamics world
+	if (mass != 0)
+		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_DYNAMIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
+	else
+		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
+
+	setPosition(position);
+}
+
+GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, btCollisionShape* shape) {
+	{
+		this->name = name;
+		this->model = model;
+		parentName = "";
+		canSave = save;
+		Btransform.setOrigin(glmToBtVector3(position));
+		collider = shape;
+
+		bool isDynamic = (mass != 0.f);
+
+		btVector3 localInertia(0, 0, 0);
+		if (isDynamic)
+			collider->calculateLocalInertia(btScalar(mass), localInertia);
+
+		Btransform.setIdentity();
+		Btransform.setOrigin(btVector3(position.x, position.y, position.z));
+
+		// Using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
+		btDefaultMotionState* myMotionState = new btDefaultMotionState(Btransform);
+		btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, collider, localInertia);
+		body = new btRigidBody(rbInfo);
+
+
+		body->setActivationState(DISABLE_DEACTIVATION);
+		body->setFriction(0.7f);
+		body->setUserIndex(-1);
+
+		// Add the body to the dynamics world
+		if (mass != 0)
+			PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_DYNAMIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
+		else
+			PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
+
+		setPosition(position);
+	}
+}
+
 
 
 GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape) {
@@ -44,7 +117,6 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 		}
 		dimensions = maxPoint - minPoint;
 		collider = new btBoxShape(btVector3(btScalar(dimensions.x / 2), btScalar(dimensions.y / 2), btScalar(dimensions.z / 2)));
-
 	}
 	else if (shape == Convex) {
 		convexHullShape = new btConvexHullShape();
@@ -168,8 +240,9 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 
 
 
-void GameObject::Copy(std::string copyName) {
-	//AssetManager::AddGameObject(GameObject(copyName, parentName, texture, getPosition(), getRotation(), getScale(), vertices, uvs, normals, tangents, bitangents, indices, indexed_vertices, indexed_uvs, indexed_normals, indexed_tangents, indexed_bitangents, canSave, render, shouldDelete,1,convexHullShape));
+
+Model* GameObject::GetModel() {
+	return model;
 }
 
 void GameObject::SetUserPoint(void* pointer) {

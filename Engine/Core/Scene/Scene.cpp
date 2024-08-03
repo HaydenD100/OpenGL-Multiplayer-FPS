@@ -194,11 +194,6 @@ void Scene::AddGunPickUp(GunPickUp gunpickup) {
 	gunPickUps.push_back(gunpickup);
 }
 
-void Scene::AddGunPickUp(std::string gunName, std::string gunObject, glm::vec3 Position) {
-	GunPickUp pickup = GunPickUp(gunName, gunObject, Position);
-	std::cout << " testing";
-	gunPickUps.push_back(pickup);
-}
 
 void Scene::RenderObjects(const char* shaderName) {
 	glm::mat4 ProjectionMatrix = Camera::getProjectionMatrix();

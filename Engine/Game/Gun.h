@@ -51,7 +51,7 @@ class GunPickUp
 {
 public:
 	GunPickUp(std::string GunName, std::string ObjectName, Model* model, glm::vec3 position);
-	GunPickUp(std::string GunName, std::string GunObject, glm::vec3 position);
+	GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force);
 	void Update();
 	bool Interact();
 private:

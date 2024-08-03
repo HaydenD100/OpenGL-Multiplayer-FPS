@@ -51,11 +51,11 @@ namespace WeaponManager
 	std::vector<Gun> guns;
 
 	void WeaponManager::Init() {
-		AssetManager::AddGameObject(GameObject("glock", SceneManager::GetCurrentScene()->GetModel("glock"), glm::vec3(0.2, -0.25, 0.2), false, 0, Box, 0, 0, 0));
+		AssetManager::AddGameObject(GameObject("glock", SceneManager::GetCurrentScene()->GetModel("glock"), glm::vec3(0.2, -0.25, 0.2), false, 0, Convex));
 		AssetManager::GetGameObject("glock")->SetRender(false);
 		AssetManager::GetGameObject("glock")->SetParentName("player_head");
 
-		AssetManager::AddGameObject(GameObject("ak47", SceneManager::GetCurrentScene()->GetModel("ak47"), glm::vec3(0.2, -0.25, -0.2), false,0,Box, 0, 0, 0));
+		AssetManager::AddGameObject(GameObject("ak47", SceneManager::GetCurrentScene()->GetModel("ak47"), glm::vec3(0.2, -0.25, -0.2), false,0,Convex));
 		AssetManager::GetGameObject("ak47")->SetRender(false);
 		AssetManager::GetGameObject("ak47")->SetParentName("player_head");
 		
@@ -119,13 +119,17 @@ GunPickUp::GunPickUp(std::string GunName, std::string ObjectName, Model* model, 
 }
 
 // TODO: Doesn't work
-GunPickUp::GunPickUp(std::string GunName, std::string GunObject, glm::vec3 position) {
+GunPickUp::GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force) {
 	gunName = GunName;
-	objectName = GunObject + std::to_string(SceneManager::GetCurrentScene()->GetGunPickUpSize());
-	AssetManager::GetGameObject(GunObject)->Copy(objectName);
-	std::cout << "here1" << std::endl;
-	AssetManager::GetGameObject(objectName)->SetRender(true);
-	AssetManager::GetGameObject(objectName)->setPosition(position);
+	objectName = GunName+ "_pickup" + std::to_string(SceneManager::GetCurrentScene()->GetGunPickUpSize());
+	GameObject* gameobject = AssetManager::GetGameObject(GunName);
+	Model* model_pointer = gameobject->GetModel();
+	btConvexHullShape* collider = gameobject->GetConvexHull();
+	if (collider == nullptr)
+		std::cout << " testing";
+
+	int index = AssetManager::AddGameObject(GameObject(objectName, model_pointer, position, false, 1, collider));
+	AssetManager::GetGameObject(index)->GetRigidBody()->applyCentralImpulse(glmToBtVector3(force));
 }
 
 void GunPickUp::Update() {
