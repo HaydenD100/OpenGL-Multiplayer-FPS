@@ -165,6 +165,7 @@ namespace AssetManager
 	void AssetManager::RemoveGameObject(std::string name) {
 		for (int i = 0; i < GameObjects.size(); i++) {
 			if (GameObjects[i].GetName() == name)
+				PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(GameObjects[i].GetRigidBody());
 				GameObjects.erase(GameObjects.begin() + i);
 		}
 	}

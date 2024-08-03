@@ -11,9 +11,9 @@ namespace Player
 	float initialFoV = 45.0f;
 	float maxAngle = 1.5;
 	float mouseSpeed = 0.005f;
-	float speed = 3000;
+	float speed = 5000;
 	float airSpeed = 1000;
-	float MaxSpeed = 5;
+	float MaxSpeed = 6;
 	float jumpforce = 9;
 	std::string gunName = "nothing";
 	std::string interactingWithName = "nothing";
@@ -170,57 +170,56 @@ namespace Player
 		);
 		
 		// Move forward
-		btVector3 movement = btVector3(0, player->GetRigidBody()->getLinearVelocity().y(), 0);
+		glm::vec3 movement = glm::vec3(0, player->GetRigidBody()->getLinearVelocity().y(), 0);
 		if (Input::KeyDown('w')) {
-			movement += glmToBtVector3(-forward);
+			movement += -forward;
 		}
 		
 		// Move backward
 		if (Input::KeyDown('s')) {
-			movement += glmToBtVector3(forward);
+			movement += forward;
 		}
 		
 		// Strafe right
 		if (Input::KeyDown('d')) {
-			movement += glmToBtVector3(right);
+			movement += right;
 		}
 		
 		// Strafe left
 		if (Input::KeyDown('a')) {
-			movement += glmToBtVector3(-right);
+			movement += -right;
 		}
 		
 		// Jump
 		if (Input::KeyDown(' ') && IsGrounded) {
-			movement.setY(jumpforce);
+			movement.y = jumpforce;
 		}
 		
-		movement.setX(movement.x() * speed);
-		movement.setZ(movement.z() * speed);
+		float x = movement.x / movement.length();
+		float z = movement.z / movement.length();
+		movement = glm::vec3(x, movement.y, z);
+		movement.x = (movement.x * speed);
+		movement.z = (movement.z * speed);
 
-		// TODO: deltatime was making it jittery will fix later
-		
-		movement.setX(movement.x() + player->GetRigidBody()->getLinearVelocity().x());
-		movement.setZ(movement.z() + player->GetRigidBody()->getLinearVelocity().z());
-		movement.setX(movement.x() * deltaTime);
-		movement.setZ(movement.z() * deltaTime);
+		movement.x = movement.x * deltaTime;
+		movement.z = movement.z * deltaTime;
 
-		if (movement.x() > MaxSpeed) movement.setX(MaxSpeed);
-		if (movement.x() < -MaxSpeed) movement.setX(-MaxSpeed);
-		if (movement.z() > MaxSpeed) movement.setZ(MaxSpeed);
-		if (movement.z() < -MaxSpeed) movement.setZ(-MaxSpeed);
-		if (movement.y() < -10) movement.setY(-10);
-		if (movement.y() > 10) movement.setY(10);
+		if (movement.x > MaxSpeed) movement.x = MaxSpeed;
+		if (movement.x < -MaxSpeed) movement.x = -MaxSpeed;
+		if (movement.z > MaxSpeed) movement.z = MaxSpeed;
+		if (movement.z < -MaxSpeed) movement.z = -MaxSpeed;
+
 		
-		player->GetRigidBody()->setLinearVelocity(movement);
+		player->GetRigidBody()->setLinearVelocity(glmToBtVector3(movement));
 		
 		if (Input::KeyPressed('e')) {
 			btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit();
 			if (hit.m_collisionObject != nullptr) {
 				GameObject* gameobject = AssetManager::GetGameObject(hit.m_collisionObject->getUserIndex());
-				if (gameobject != nullptr && glm::distance(gameobject->getPosition(), getPosition()) <= interactDistance) {
+				
+				if (gameobject != nullptr && glm::distance(gameobject->getPosition(), getPosition()) <= interactDistance) 
 					interactingWithName = gameobject->GetName();
-				}
+				
 			}
 		}
 		
@@ -273,7 +272,10 @@ namespace Player
 			AudioManager::PlaySound("foot_step" + std::to_string((rand() % 4) + 1), AssetManager::GetGameObject("player")->getPosition());
 			footstepTime = glfwGetTime();
 		}
-		//AssetManager::GetGameObject("player")->GetRigidBody()->setLinearVelocity(btVector3(0.0f, AssetManager::GetGameObject("player")->GetRigidBody()->getLinearVelocity().y(), 0.0f));
+
+		if(GetInteractingWithName() != "Nothing")
+			std::cout << GetInteractingWithName() << "\n";
+
 	}
 	
 	glm::vec3 Player::getPosition() {

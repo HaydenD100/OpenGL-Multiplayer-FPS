@@ -61,15 +61,9 @@ void Scene::Load() {
 
 
 	gunPickUps.push_back(GunPickUp("ak47", "ak47_pickup", &models["ak47"], glm::vec3(1, 30, 1)));
-
-	gunPickUps.push_back(GunPickUp("glock", "glock_pickup1", &models["glock"], glm::vec3(1,25, 0)));
+	gunPickUps.push_back(GunPickUp("glock", "glock_pickup", &models["glock"], glm::vec3(1,25, 0)));
 
 	doors.push_back(Door("door1", &models["door"],&models["door_frame"], glm::vec3(-3, 0, -3)));
-
-	//gunPickUps.push_back(GunPickUp("ak47", "ak47_pickup", "Assets/Objects/ak47_lowpoly.obj", AssetManager::GetTexture("ak47_lowpoly"), glm::vec3(8, -12, -5)));
-	//AssetManager::GetGameObject("ak47_pickup")->SetRender(false);
-	//gunPickUps.push_back(GunPickUp("glock", "glock_pickup", "Assets/Objects/glock.obj", AssetManager::GetTexture("uvmap"), glm::vec3(8, -13, -6)));
-	//AssetManager::GetGameObject("glock_pickup")->SetRender(false);
 
 	// Sets renderer
 	Renderer::UseProgram(Renderer::GetProgramID("Texture"));
@@ -184,9 +178,8 @@ void Scene::RenderObjects() {
 	oss << "Vel x:" << vel.x << " y:" << vel.y << " z:" << vel.z;
 	Renderer::RenderText(oss.str().c_str(), 0, 540, 15);
 
-	glm::vec3 rotation = btQuatToGLMVec(AssetManager::GetGameObject("player")->GetRigidBody()->getWorldTransform().getRotation());
 	oss.str(""); oss.clear();
-	oss << "rot x:" << rotation.x << " y:" << rotation.y << " z:" << rotation.z;
+	oss << "Current Weapon: " << Player::getCurrentGun();
 	Renderer::RenderText(oss.str().c_str(), 0, 500, 15);
 }
 
