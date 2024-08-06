@@ -1,6 +1,6 @@
 #include "Animation.h"
 
-KeyFrame::KeyFrame(glm::vec3 Position, glm::vec3 Rotation, glm::vec3 Scale, float Duration) {
+KeyFrame::KeyFrame(glm::vec3 Position, glm::quat Rotation, glm::vec3 Scale, float Duration) {
 	position = Position;
 	rotation = Rotation;
 	scale = Scale;
@@ -45,10 +45,9 @@ Animation::Animation(const char* path, std::string Name) {
 
 				glm::vec3 positon = glm::vec3(animationChannel->mPositionKeys[i].mValue.x, animationChannel->mPositionKeys[i].mValue.y, animationChannel->mPositionKeys[i].mValue.z);
 				glm::quat glmQuat(animationChannel->mRotationKeys[i].mValue.w, animationChannel->mRotationKeys[i].mValue.x, animationChannel->mRotationKeys[i].mValue.y, animationChannel->mRotationKeys[i].mValue.z);
-				glm::vec3 rotation = glm::eulerAngles(glmQuat);
 				glm::vec3 scale = glm::vec3(animationChannel->mScalingKeys[i].mValue.x, animationChannel->mScalingKeys[i].mValue.y, animationChannel->mScalingKeys[i].mValue.z);
 
-				keyframes.push_back(KeyFrame(positon, rotation, scale, duration));
+				keyframes.push_back(KeyFrame(positon, glmQuat, scale, duration));
 			}
 		}
 	}
@@ -68,14 +67,17 @@ void Animation::AddKeyFrame(KeyFrame Keyframe) {
 size_t Animation::GetKeyFrameSize() {
 	return keyframes.size();
 }
+std::vector<KeyFrame> Animation::GetKeyFrames() {
+	return keyframes;
+}
 
 bool Animation::Playing() {
 	return playing;
 }
 
 void Animation::Stop() {
-	gameObject->setPosition(initalPosition + keyframes[keyframes.size()-1].position);
-	gameObject->setRotation(initalRotation + keyframes[keyframes.size() - 1].rotation);
+	gameObject->setPosition(initalPosition + keyframes[keyframes.size() -1].position);
+	gameObject->setRotation(initalRotation + glm::eulerAngles(keyframes[keyframes.size() -1].rotation));
 
 	playing = false;
 	currentKeyFrame = 0;
@@ -113,10 +115,11 @@ void Animation::Transform() {
 
 	//TODO: Add scaling, need to scale the bullet rigidbody so collider scales
 	glm::vec3 newPosition = glm::mix(startingPosition, keyframes[currentKeyFrame].position, t);
-	glm::vec3 newRotation = glm::mix(startingRotation, keyframes[currentKeyFrame].rotation, t);
+	glm::quat newRotation = startingRotation * (1 - t) + keyframes[currentKeyFrame].rotation * t;
+	
 
 	gameObject->setPosition(initalPosition + newPosition);
-	gameObject->setRotation(initalRotation + newRotation);
+	gameObject->setRotation(initalRotation + glm::eulerAngles(newRotation));
 	
 }
 

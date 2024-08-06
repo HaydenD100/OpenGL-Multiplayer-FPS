@@ -24,10 +24,10 @@ struct KeyFrame
 {
 	float duration;
 	glm::vec3 position;
-	glm::vec3 rotation;
+	glm::quat rotation;
 	glm::vec3 scale;
 
-	KeyFrame(glm::vec3 Position, glm::vec3 Rotation, glm::vec3 Scale, float Duration);
+	KeyFrame(glm::vec3 Position, glm::quat Rotation, glm::vec3 Scale, float Duration);
 };
 
 class Animation
@@ -38,6 +38,8 @@ public:
 	Animation(std::vector<KeyFrame> Keyframes, std::string Name);
 
 	void AddKeyFrame(KeyFrame Keyframe);
+	std::vector<KeyFrame> GetKeyFrames();
+
 	size_t GetKeyFrameSize();
 	bool Playing();
 	void Stop();
@@ -60,7 +62,7 @@ private:
 	glm::vec3 initalPosition;
 
 	glm::vec3 startingPosition;
-	glm::vec3 startingRotation;
+	glm::quat startingRotation;
 
 	std::string name;
 
