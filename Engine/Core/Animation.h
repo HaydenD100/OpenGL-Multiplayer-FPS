@@ -18,7 +18,7 @@
 // TODO: This is still a work-in-progress and hasn't been implemented into the engine
 
 
-// Still Broken 
+// Works but theres still some problems with FBX file types and stuff, also you cant scale becuase I havent added scaling the collider yet.
 
 struct KeyFrame
 {

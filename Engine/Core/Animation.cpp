@@ -37,17 +37,16 @@ Animation::Animation(const char* path, std::string Name) {
 				else
 					duration = animationChannel->mPositionKeys[i].mTime;
 
-				//This can be changed 
+				//This is just becuase the duration is how many frames the animation takes
+				// right now i dont have a way to say 10 frames is whatever time so im just
+				// hard coding 1 frame = 0.1 seconds ill change this later tho.
+
 				duration = duration / 10;
 
 				glm::vec3 positon = glm::vec3(animationChannel->mPositionKeys[i].mValue.x, animationChannel->mPositionKeys[i].mValue.y, animationChannel->mPositionKeys[i].mValue.z);
 				glm::quat glmQuat(animationChannel->mRotationKeys[i].mValue.w, animationChannel->mRotationKeys[i].mValue.x, animationChannel->mRotationKeys[i].mValue.y, animationChannel->mRotationKeys[i].mValue.z);
 				glm::vec3 rotation = glm::eulerAngles(glmQuat);
 				glm::vec3 scale = glm::vec3(animationChannel->mScalingKeys[i].mValue.x, animationChannel->mScalingKeys[i].mValue.y, animationChannel->mScalingKeys[i].mValue.z);
-
-				std::cout << "Postion: " << animationChannel->mPositionKeys[i].mValue.x << " y: " << animationChannel->mPositionKeys[i].mValue.x << " z: " << animationChannel->mPositionKeys[i].mValue.x << std::endl;
-				std::cout << "Postion: " << rotation.x << " y: " << rotation.x << " z: " << rotation.x << std::endl;
-				std::cout << "duration" << duration << std::endl;
 
 				keyframes.push_back(KeyFrame(positon, rotation, scale, duration));
 			}

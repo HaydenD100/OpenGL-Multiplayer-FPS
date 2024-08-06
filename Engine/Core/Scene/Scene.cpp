@@ -7,20 +7,11 @@ Scene::Scene() {
 void Scene::Load() {
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png");
 	AssetManager::AddTexture("crate", "Assets/Textures/crate.png");
-
-	AssetManager::AddTexture("target", "Assets/Textures/target.jpeg");
-	AssetManager::AddTexture("container", "Assets/Textures/Container.png", "Assets/Normals/container_normal.png");
 	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png");
-	AssetManager::AddTexture("bullet_hole_glass", "Assets/Textures/bullet_hole_glass.png");
 	AssetManager::AddTexture("sand", "Assets/Textures/sandyGround.png","Assets/Normals/sand_normal.png");
-
-	AssetManager::AddTexture("concrete", "Assets/Textures/fence.png","Assets/Normals/fence_normal.png");
-	AssetManager::AddTexture("crosshair", "Assets/Sprites/CrossHair.png", "Assets/Normals/ak47_lowpoly_normal.png");
-	AssetManager::AddTexture("window", "Assets/Textures/window.png");
-	
+	AssetManager::AddTexture("concrete", "Assets/Textures/fence.png","Assets/Normals/fence_normal.png");	
 	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png");
 	AssetManager::AddTexture("door2", "Assets/Textures/Door_C.jpg");
-
 	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png");
 
 	Animation anim = Animation("Assets/Animations/cube_test_anim.fbx", "cube");
