@@ -23,27 +23,27 @@ void Scene::Load() {
 
 	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png");
 
+	Animation anim = Animation("Assets/Animations/cube_test_anim.fbx", "cube");
+	AnimationManager::AddAnimation(anim);
+
 
 	// TODO: not currently working
 	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
 
 	//Loads Models that then can 
-	models["fence1"] = Model( Mesh("Assets/Objects/fence1.obj"), AssetManager::GetTexture("concrete"));
+	models["fence1"] = Model(Mesh("Assets/Objects/fence1.obj"), AssetManager::GetTexture("concrete"));
 	models["fence2"] = Model(Mesh("Assets/Objects/fence2.obj"), AssetManager::GetTexture("concrete"));
 	models["fence3"] = Model(Mesh("Assets/Objects/fence3.obj"), AssetManager::GetTexture("concrete"));
 	models["floor"] = Model(Mesh("Assets/Objects/Floor.obj"), AssetManager::GetTexture("sand"));
 	models["slope"] = Model(Mesh("Assets/Objects/slope.obj"), AssetManager::GetTexture("sand"));
-	models["crate"] = Model(Mesh("Assets/Objects/Crate.obj"), AssetManager::GetTexture("crate"));
+	models["crate"] = Model("Assets/Objects/Crate.fbx", AssetManager::GetTexture("crate"));
 	models["glock"] = Model(Mesh("Assets/Objects/glock_17.obj"), AssetManager::GetTexture("glock"));
 	models["ak47"] = Model(Mesh("Assets/Objects/ak47.obj"), AssetManager::GetTexture("ak47"));
 	models["door"] = Model(Mesh("Assets/Objects/door2.obj"), AssetManager::GetTexture("door2"));
 	models["door_frame"] = Model(Mesh("Assets/Objects/frame2.obj"), AssetManager::GetTexture("door2"));
 	models["player"] = Model(Mesh("Assets/Objects/capsule.obj"), AssetManager::GetTexture("uvmap"));
 
-
-
-
-
+	//models["cube"].RenderAllMeshes(true);
 
 
 	WeaponManager::Init();
@@ -54,6 +54,10 @@ void Scene::Load() {
 	AssetManager::AddGameObject("fence4", &models["fence2"], glm::vec3(-1, 1.3, 5), true, 0, Box);
 	AssetManager::AddGameObject("floor", &models["floor"], glm::vec3(0, 0, 0), true, 0, Box);
 	AssetManager::AddGameObject("floor", &models["slope"], glm::vec3(-1, 2, -7), true, 0, Convex);
+
+	AssetManager::AddGameObject("cube1", &models["crate"], glm::vec3(0, 2, 0), true, 0, Convex);
+
+
 
 	crates.push_back(Crate(glm::vec3(1, 25, 1), "crate1", & models["crate"]));
 	crates.push_back(Crate(glm::vec3(1, 30, 0.5), "crate2", &models["crate"]));
@@ -96,10 +100,16 @@ void Scene::Load() {
 
 	// TODO: not currently working
 	//AssetManager::SaveAssets("Assets/Saves/mainScene.json");
+
+	
 }
 
 void Scene::Update(float deltaTime) {
 	Player::Update(deltaTime);
+
+	if (Input::KeyDown('k')) {
+		AnimationManager::Play("cube", "cube1");
+	}
 
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
 		AssetManager::GetGameObject(i)->Update();
@@ -217,7 +227,8 @@ void Scene::RenderObjects(const char* shaderName) {
 	}
 }
 
-size_t Scene::GetGunPickUpSize() {
+//had to change back to int instead of size_t as it was giving me errors with string sizes
+int Scene::GetGunPickUpSize() {
 	return gunPickUps.size();
 }
 

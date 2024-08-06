@@ -1,13 +1,60 @@
 #include "Animation.h"
 
-void KeyFrame::Create(glm::vec3 Position, glm::vec3 Rotation, float Duration) {
+KeyFrame::KeyFrame(glm::vec3 Position, glm::vec3 Rotation, glm::vec3 Scale, float Duration) {
 	position = Position;
 	rotation = Rotation;
+	scale = Scale;
 	duration = Duration;
 }
 
 Animation::Animation(std::string Name) {
 	name = Name;
+}
+
+Animation::Animation(const char* path, std::string Name) {
+	name = Name;
+
+	Assimp::Importer import;
+	const aiScene * scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+
+	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+	{
+		std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+		return;
+	}
+	std::cout << "Assimp: Loading Model " << path << std::endl;
+	
+	if (scene->HasAnimations()) {
+		for (unsigned int i = 0; i < scene->mAnimations[0]->mNumChannels; i++)
+		{
+			aiNodeAnim* animationChannel = scene->mAnimations[0]->mChannels[i];
+			for (unsigned int i = 0; i < animationChannel->mNumPositionKeys; i++)
+			{
+				
+				float duration;
+				if (i != 0)
+					duration = animationChannel->mPositionKeys[i].mTime - animationChannel->mPositionKeys[i - 1].mTime;
+				else
+					duration = animationChannel->mPositionKeys[i].mTime;
+
+				//This can be changed 
+				duration = duration / 10;
+
+				glm::vec3 positon = glm::vec3(animationChannel->mPositionKeys[i].mValue.x, animationChannel->mPositionKeys[i].mValue.y, animationChannel->mPositionKeys[i].mValue.z);
+				glm::quat glmQuat(animationChannel->mRotationKeys[i].mValue.w, animationChannel->mRotationKeys[i].mValue.x, animationChannel->mRotationKeys[i].mValue.y, animationChannel->mRotationKeys[i].mValue.z);
+				glm::vec3 rotation = glm::eulerAngles(glmQuat);
+				glm::vec3 scale = glm::vec3(animationChannel->mScalingKeys[i].mValue.x, animationChannel->mScalingKeys[i].mValue.y, animationChannel->mScalingKeys[i].mValue.z);
+
+				std::cout << "Postion: " << animationChannel->mPositionKeys[i].mValue.x << " y: " << animationChannel->mPositionKeys[i].mValue.x << " z: " << animationChannel->mPositionKeys[i].mValue.x << std::endl;
+				std::cout << "Postion: " << rotation.x << " y: " << rotation.x << " z: " << rotation.x << std::endl;
+				std::cout << "duration" << duration << std::endl;
+
+				keyframes.push_back(KeyFrame(positon, rotation, scale, duration));
+			}
+		}
+	}
+	else
+		std::cout << "Error no animations found " << path << std::endl;
 }
 
 Animation::Animation(std::vector<KeyFrame> Keyframes, std::string Name) {
@@ -28,13 +75,20 @@ bool Animation::Playing() {
 }
 
 void Animation::Stop() {
+	gameObject->setPosition(initalPosition + keyframes[keyframes.size()-1].position);
+	gameObject->setRotation(initalRotation + keyframes[keyframes.size() - 1].rotation);
+
 	playing = false;
-	currentKeyFrame = -1;
+	currentKeyFrame = 0;
 	gameObject = nullptr;
 }
 
 void Animation::Start() {
 	playing = true;
+	initalPosition = gameObject->getPosition();
+	initalRotation = gameObject->getRotation();
+	startingPosition = keyframes[0].position;
+	startingRotation = keyframes[0].rotation;
 }
 
 void Animation::Pause() {
@@ -51,28 +105,32 @@ void Animation::SetGameObject(GameObject* gameobject) {
 }
 
 void Animation::Transform() {
-	float t = glfwGetTime() / timeStart + keyframes[currentKeyFrame].duration;
-	if (t >= 1) {
+	float t = (glfwGetTime() - timeStart) / keyframes[currentKeyFrame].duration;
+	if (t > 1) {
 		NextKeyFrame();
 		return;
 	}
-	glm::vec3 newPosition = (1 - t) * startingPosition  + t * keyframes[currentKeyFrame].position;
-	glm::vec3 newRotation = (1 - t) * startingRotation + t * keyframes[currentKeyFrame].rotation;
+	std::cout << t << " Current Frame:" << currentKeyFrame << "\n";
 
-	gameObject->setPosition(newPosition);
-	gameObject->setRotation(newRotation);
+	//TODO: Add scaling, need to scale the bullet rigidbody so collider scales
+	glm::vec3 newPosition = glm::mix(startingPosition, keyframes[currentKeyFrame].position, t);
+	glm::vec3 newRotation = glm::mix(startingRotation, keyframes[currentKeyFrame].rotation, t);
+
+	gameObject->setPosition(initalPosition + newPosition);
+	gameObject->setRotation(initalRotation + newRotation);
+	
 }
 
 void Animation::NextKeyFrame() {
-	if (currentKeyFrame < keyframes.size())
-	{
-		startingPosition = gameObject->getPosition();
-		startingRotation = gameObject->getRotation();
+	if (currentKeyFrame < keyframes.size() - 1){
+		startingPosition = keyframes[currentKeyFrame].position;
+		startingRotation = keyframes[currentKeyFrame].rotation;
 		currentKeyFrame++;
 		timeStart = glfwGetTime();
 	}
 	else
 		Stop();
+		
 }
 
 std::string Animation::GetName() {
@@ -88,8 +146,16 @@ namespace AnimationManager
 	}
 	
 	void AnimationManager::Play(std::string Name,std::string ObjectName) {
-		GetAnimation(Name)->SetGameObject(AssetManager::GetGameObject(ObjectName));
-		GetAnimation(Name)->Start();
+		GameObject* gameobject = AssetManager::GetGameObject(ObjectName);
+		Animation* animation = GetAnimation(Name);
+		if (gameobject != nullptr && animation != nullptr) {
+			animation->SetGameObject(gameobject);
+			animation->Start();
+			std::cout << "start \n";
+		}
+		else
+			std::cout << "Null pointer for animation \n";
+		
 	}
 	
 	void AnimationManager::Stop(std::string Name) {
@@ -102,9 +168,9 @@ namespace AnimationManager
 
 	void AnimationManager::Update(float deltaTime) {
 		for (int i = 0; i < animations.size(); i++) {
-			if (animations[i].Playing()) {
+			if (animations[i].Playing()) 
 				animations[i].Transform();
-			}
+			
 		}
 	}
 	

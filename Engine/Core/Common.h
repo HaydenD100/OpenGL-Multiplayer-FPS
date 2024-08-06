@@ -14,6 +14,10 @@
 #include <vector>
 #include "Engine/Core/Texture.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 
 #define SCREENWIDTH 1024
 #define SCREENHEIGHT 768
@@ -40,6 +44,14 @@ struct Transform{
 
 struct Mesh {
     Mesh(const char* path);
+    Mesh(std::vector<glm::vec3> vertices,
+    std::vector<glm::vec3> normals,
+    std::vector<glm::vec2> UV,
+    std::vector<unsigned short> indices,
+    std::vector<glm::vec3> tangets,
+    std::vector<glm::vec3> bitTangents);
+
+    void Render();
 
     std::vector<unsigned short> indices;
     std::vector<glm::vec3> indexed_vertices;
@@ -48,23 +60,8 @@ struct Mesh {
     std::vector<glm::vec3> indexed_tangents;
     std::vector<glm::vec3> indexed_bitangents;
 
-};
-
-class Model {
-public:
-    Model() = default;
-    Model(Mesh mesh, Texture* texture);
-    void AddMesh(Mesh mesh);
-    void SetMesh(int mesh);
-    Mesh* GetCurrentMesh();
-    const char* GetTextureName();
-    void RenderModel(GLuint& programID);
 
 private:
-    std::vector<Mesh> meshes;
-    int currentMesh = 0;
-    Texture* texture = nullptr;
-
     GLuint vertexbuffer;
     GLuint uvbuffer;
     GLuint normalbuffer;
@@ -72,7 +69,30 @@ private:
     GLuint tangentbuffer;
     GLuint bitangentbuffer;
 
-        
+};
+
+class Model {
+public:
+    Model() = default;
+    Model(Mesh mesh, Texture* texture);
+    Model(const char* path, Texture* texture);
+    void AddMesh(Mesh mesh);
+    void SetMesh(int mesh);
+    Mesh* GetCurrentMesh();
+    std::vector<Mesh>* GetAllMeshes();
+    const char* GetTextureName();
+    void RenderModel(GLuint& programID);
+    void RenderAllMeshes(bool state);
+    bool RenderAll();
+
+private:
+    bool renderAllMeshes = false;
+    std::vector<Mesh> meshes;
+    int currentMesh = 0;
+    Texture* texture = nullptr;
+
+    void processNode(aiNode* node, const aiScene* scene);
+    Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 };
 
 btVector3 glmToBtVector3(const glm::vec3& vec);

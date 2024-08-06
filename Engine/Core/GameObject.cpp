@@ -310,6 +310,7 @@ void GameObject::setScale(glm::vec3 scale) {
 	transform.scale = scale;
 }
 
+
 glm::vec3 GameObject::getPosition() {
 	return btToGlmVector3(body->getWorldTransform().getOrigin());
 }

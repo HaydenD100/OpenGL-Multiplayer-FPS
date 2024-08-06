@@ -19,6 +19,7 @@
 #include "Engine/Game/Crate.h"
 #include "Engine/Core/Lights/Light.h"
 #include "Engine/Physics/BulletPhysics.h"
+#include "Engine/Core/Animation.h"
  
 class Scene
 {
@@ -32,7 +33,7 @@ public:
 
 	void AddGunPickUp(GunPickUp gunpickup);
 
-	size_t GetGunPickUpSize();
+	int GetGunPickUpSize();
 	Crate* GetCrate(std::string name);
 	Model* GetModel(std::string name);
 private:

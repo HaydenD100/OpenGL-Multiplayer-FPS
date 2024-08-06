@@ -46,6 +46,7 @@ namespace Engine
 			Input::CenterMouse();
 			Renderer::ClearScreen();
 			SceneManager::Update(dt);
+			AnimationManager::Update(dt);
 			Camera::Update(dt); 
 			SceneManager::Render();
 			AudioManager::Update();

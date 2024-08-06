@@ -11,21 +11,30 @@
 #include "Engine/Core/GameObject.h"
 #include "Engine/Core/AssetManager.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 // TODO: This is still a work-in-progress and hasn't been implemented into the engine
+
+
+// Still Broken 
 
 struct KeyFrame
 {
 	float duration;
 	glm::vec3 position;
 	glm::vec3 rotation;
+	glm::vec3 scale;
 
-	void Create(glm::vec3 Position, glm::vec3 Rotation, float Duration);
+	KeyFrame(glm::vec3 Position, glm::vec3 Rotation, glm::vec3 Scale, float Duration);
 };
 
 class Animation
 {
 public:
 	Animation(std::string Name);
+	Animation(const char* path, std::string Name);
 	Animation(std::vector<KeyFrame> Keyframes, std::string Name);
 
 	void AddKeyFrame(KeyFrame Keyframe);
@@ -44,8 +53,11 @@ private:
 	std::vector<KeyFrame> keyframes;
 
 	float timeStart = 0;
-	int currentKeyFrame = -1;
+	int currentKeyFrame = 0;
 	bool playing = false;
+
+	glm::vec3 initalRotation;
+	glm::vec3 initalPosition;
 
 	glm::vec3 startingPosition;
 	glm::vec3 startingRotation;

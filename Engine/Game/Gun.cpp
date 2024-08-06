@@ -23,6 +23,9 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 		if (currentXRotation > 1.6 / 2)
 			down = -1;
 		const float increment = (1.6 / reloadtime) * down * deltaTime;
+
+
+
 		gun->SetRotationX(currentXRotation + increment);
 		gun->addPosition(glm::vec3(0, -increment / 3, 0));
 	}

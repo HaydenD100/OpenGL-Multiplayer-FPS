@@ -10,14 +10,18 @@ namespace Player
 	float verticalAngle = 0.0f;
 	float initialFoV = 45.0f;
 	float maxAngle = 1.5;
+	std::string gunName = "nothing";
+	std::string interactingWithName = "nothing";
+	float interactDistance = 3;
+
+	float swayIntensity = 0.02f;
+	float swaySpeed = 2.0f;
+	float smoothFactor = 0.1f;
 	float mouseSpeed = 0.005f;
 	float speed = 5000;
 	float airSpeed = 1000;
 	float MaxSpeed = 6;
 	float jumpforce = 9;
-	std::string gunName = "nothing";
-	std::string interactingWithName = "nothing";
-	float interactDistance = 3;
 
 	// States
 	bool reloading = false;
@@ -128,8 +132,10 @@ namespace Player
 		head->setRotation(glm::vec3(-verticalAngle, horizontalAngle, 0));
 		head->setPosition(player->getPosition() + glm::vec3(0, 1.5, 0));
 
+
+		if(verticalAngle < 1.5f && verticalAngle > -1.5f)
+			Camera::SetVerticalAngle(verticalAngle);
 		Camera::SetHorizontalAngle(horizontalAngle);
-		Camera::SetVerticalAngle(verticalAngle);
 		Camera::SetPosition(head->getPosition());
 
 		if (gunName != "nothing")
