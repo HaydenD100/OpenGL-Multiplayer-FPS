@@ -13,6 +13,7 @@ void Scene::Load() {
 	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png");
 	AssetManager::AddTexture("door2", "Assets/Textures/Door_C.jpg");
 	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png");
+	AssetManager::AddTexture("drawer", "Assets/Textures/drawerred.png", "Assets/Normals/drawer_normal.png");
 
 	Animation anim = Animation("Assets/Animations/cube_test_anim.fbx", "cube");
 	AnimationManager::AddAnimation(anim);
@@ -33,6 +34,10 @@ void Scene::Load() {
 	models["door"] = Model(Mesh("Assets/Objects/door2.obj"), AssetManager::GetTexture("door2"));
 	models["door_frame"] = Model(Mesh("Assets/Objects/frame2.obj"), AssetManager::GetTexture("door2"));
 	models["player"] = Model(Mesh("Assets/Objects/capsule.obj"), AssetManager::GetTexture("uvmap"));
+	models["lamp"] = Model(Mesh("Assets/Objects/lamp.obj"), AssetManager::GetTexture("uvmap"));
+	//models["drawer"] = Model(Mesh("Assets/Objects/drawer.obj"), AssetManager::GetTexture("drawer"));
+
+
 
 	//models["cube"].RenderAllMeshes(true);
 
@@ -46,7 +51,14 @@ void Scene::Load() {
 	AssetManager::AddGameObject("floor", &models["floor"], glm::vec3(0, 0, 0), true, 0, Box);
 	AssetManager::AddGameObject("floor", &models["slope"], glm::vec3(-1, 2, -7), true, 0, Convex);
 
-	AssetManager::AddGameObject("cube1", &models["crate"], glm::vec3(0, 2, 0), true, 0, Convex);
+	AssetManager::AddGameObject("lamp", &models["lamp"], glm::vec3(0.3, 2, 4.4), true, 0.8f, Convex);
+	{
+		Light light(glm::vec3(-2.5, 4, -5), glm::vec3(1, 0.779, 0.529), 1.0, 0.7, 1.8);
+		lights.push_back(light);
+	}
+	//AssetManager::AddGameObject("drawer", &models["drawer"], glm::vec3(0.3, 1, 4.4), true, 0.0f, Box);
+	//AssetManager::GetGameObject("drawer")->SetRotationY(1.5708f);
+
 
 
 
@@ -59,6 +71,8 @@ void Scene::Load() {
 	gunPickUps.push_back(GunPickUp("glock", "glock_pickup", &models["glock"], glm::vec3(1,25, 0)));
 
 	doors.push_back(Door("door1", &models["door"],&models["door_frame"], glm::vec3(-3, 0, -3)));
+
+	
 
 	// Sets renderer
 	Renderer::UseProgram(Renderer::GetProgramID("Texture"));
@@ -96,6 +110,8 @@ void Scene::Load() {
 }
 
 void Scene::Update(float deltaTime) {
+	//just a little hack to test out lamps
+	lights[0].position = AssetManager::GetGameObject("lamp")->getPosition();
 	Player::Update(deltaTime);
 
 	if (Input::KeyDown('k')) {

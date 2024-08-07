@@ -1,5 +1,5 @@
 #version 330 core
-#define MAXLIGHTS 3
+#define MAXLIGHTS 10
 
 // Interpolated values from the vertex shaders
 in vec2 UV;
@@ -34,6 +34,10 @@ void main() {
 
     // Calculate lighting contributions from each light
     for (int i = 0; i < MAXLIGHTS; ++i) {
+        //it kept stacking up the ambient light if there were no lights so this prevents in from adding if 
+        if(LightConstants[i] == 0)
+            continue;
+
         // Local normal, in tangent space. V tex coordinate is inverted because normal map is in TGA (not in DDS) for better quality
         vec3 TextureNormal_tangentspace = normalize(texture(NormalTextureSampler, UV).rgb * 2.0 - 1.0);
 
@@ -58,10 +62,7 @@ void main() {
         //  - Looking elsewhere -> < 1
         float cosAlpha = clamp(dot(E, R), 0.0, 1.0);
 
-        //it kept stacking up the ambient light if there were no lights
-        if(LightConstants[i]  == 0)
-            continue;
-
+        
         FinalColor +=
             // Ambient : simulates indirect lighting
             MaterialAmbientColor +

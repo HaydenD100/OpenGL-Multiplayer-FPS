@@ -111,16 +111,13 @@ void Animation::Transform() {
 		NextKeyFrame();
 		return;
 	}
-	std::cout << t << " Current Frame:" << currentKeyFrame << "\n";
-
 	//TODO: Add scaling, need to scale the bullet rigidbody so collider scales
 	glm::vec3 newPosition = glm::mix(startingPosition, keyframes[currentKeyFrame].position, t);
-	glm::quat newRotation = startingRotation * (1 - t) + keyframes[currentKeyFrame].rotation * t;
+	glm::quat newRotation = glm::slerp(startingRotation, keyframes[currentKeyFrame].rotation, t);	
 	
 
 	gameObject->setPosition(initalPosition + newPosition);
 	gameObject->setRotation(initalRotation + glm::eulerAngles(newRotation));
-	
 }
 
 void Animation::NextKeyFrame() {
@@ -132,7 +129,6 @@ void Animation::NextKeyFrame() {
 	}
 	else
 		Stop();
-		
 }
 
 std::string Animation::GetName() {
@@ -153,10 +149,9 @@ namespace AnimationManager
 		if (gameobject != nullptr && animation != nullptr) {
 			animation->SetGameObject(gameobject);
 			animation->Start();
-			std::cout << "start \n";
 		}
 		else
-			std::cout << "Null pointer for animation \n";
+			std::cout << "Null Object pointer passed to animation or animation does not exsit \n";
 		
 	}
 	
