@@ -125,7 +125,7 @@ GunPickUp::GunPickUp(std::string GunName, std::string ObjectName, Model* model, 
 GunPickUp::GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force) {
 	gunName = GunName;
 	//Somtimes an error string to long happens randomly, its because of this and idk how to fix it, Maybe change character set to multi byte on visual studio?
-	objectName = GunName + "_pickup" + std::to_string(SceneManager::GetCurrentScene()->GetGunPickUpSize());
+	objectName = GunName + "_pickup" + std::to_string(rand());
 
 	GameObject* gameobject = AssetManager::GetGameObject(GunName);
 

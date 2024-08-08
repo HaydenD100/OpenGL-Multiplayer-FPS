@@ -23,18 +23,22 @@ void Scene::Load() {
 	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
 
 	//Loads Models that then can 
-	models["fence1"] = Model(Mesh("Assets/Objects/fence1.obj"), AssetManager::GetTexture("concrete"));
-	models["fence2"] = Model(Mesh("Assets/Objects/fence2.obj"), AssetManager::GetTexture("concrete"));
-	models["fence3"] = Model(Mesh("Assets/Objects/fence3.obj"), AssetManager::GetTexture("concrete"));
+	models["fence1"] = Model("Assets/Objects/fence1.fbx", AssetManager::GetTexture("concrete"));
+	models["fence1"].RenderAllMeshes(true);
+	models["fence2"] = Model("Assets/Objects/fence2.fbx", AssetManager::GetTexture("concrete"));
+	models["fence2"].RenderAllMeshes(true);
+	models["fence3"] = Model("Assets/Objects/fence3.fbx", AssetManager::GetTexture("concrete"));
+	models["fence2"].RenderAllMeshes(true);
 	models["floor"] = Model("Assets/Objects/FBX/floor.fbx", AssetManager::GetTexture("sand"));
 	models["slope"] = Model("Assets/Objects/FBX/slope.fbx", AssetManager::GetTexture("sand"));
 	models["crate"] = Model("Assets/Objects/FBX/crate.fbx", AssetManager::GetTexture("crate"));
 	models["glock"] = Model("Assets/Objects/FBX/glock17.fbx", AssetManager::GetTexture("glock"));
+	models["glock"].RenderAllMeshes(true);
 	models["ak47"] = Model("Assets/Objects/FBX/ak47.fbx", AssetManager::GetTexture("ak47"));
 	models["door"] = Model("Assets/Objects/FBX/door2.fbx", AssetManager::GetTexture("door2"));
 	models["door_frame"] = Model("Assets/Objects/FBX/frame2.fbx", AssetManager::GetTexture("door2"));
 	models["player"] = Model("Assets/Objects/FBX/player.fbx", AssetManager::GetTexture("uvmap"));
-	models["lamp"] = Model("Assets/Objects/FBX/lamp.fbx", AssetManager::GetTexture("uvmap"));
+	models["lamp"] = Model("Assets/Objects/FBX/lamp.fbx", "Assets/Objects/lamp_convex.obj", AssetManager::GetTexture("uvmap"));
 	//models["drawer"] = Model(Mesh("Assets/Objects/drawer.obj"), AssetManager::GetTexture("drawer"));
 
 	WeaponManager::Init();

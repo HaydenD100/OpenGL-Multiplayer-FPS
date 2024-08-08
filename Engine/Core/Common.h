@@ -76,20 +76,29 @@ public:
     Model() = default;
     Model(Mesh mesh, Texture* texture);
     Model(const char* path, Texture* texture);
+    Model(const char* path, const char* collisonShapePath, Texture* texture);
     void AddMesh(Mesh mesh);
     void SetMesh(int mesh);
     Mesh* GetCurrentMesh();
     std::vector<Mesh>* GetAllMeshes();
+    Mesh* GetMesh(int i);
+    size_t GetMeshSize();
     const char* GetTextureName();
     void RenderModel(GLuint& programID);
     void RenderAllMeshes(bool state);
     bool RenderAll();
+
+    std::vector<glm::vec3> GetColliderShapeVerticies();
+    size_t GetColliderShapeVerticiesSize();
 
 private:
     bool renderAllMeshes = false;
     std::vector<Mesh> meshes;
     int currentMesh = 0;
     Texture* texture = nullptr;
+
+    //for collison shape
+    std::vector<glm::vec3> collison_shape_vertices;
 
     void processNode(aiNode* node, const aiScene* scene);
     Mesh processMesh(aiMesh* mesh, const aiScene* scene);

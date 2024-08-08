@@ -106,37 +106,57 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 		glm::vec3 minPoint(std::numeric_limits<float>::max());
 		glm::vec3 maxPoint(std::numeric_limits<float>::lowest());
 
-		for (const auto& vertex : model->GetCurrentMesh()->indexed_vertices) {
-			if (vertex.x < minPoint.x) minPoint.x = vertex.x;
-			if (vertex.y < minPoint.y) minPoint.y = vertex.y;
-			if (vertex.z < minPoint.z) minPoint.z = vertex.z;
+		for (int i = 0; i < model->GetAllMeshes()->size(); i++) {
+			for (const auto& vertex : model->GetMesh(i)->indexed_vertices) {
+				if (vertex.x < minPoint.x) minPoint.x = vertex.x;
+				if (vertex.y < minPoint.y) minPoint.y = vertex.y;
+				if (vertex.z < minPoint.z) minPoint.z = vertex.z;
 
-			if (vertex.x > maxPoint.x) maxPoint.x = vertex.x;
-			if (vertex.y > maxPoint.y) maxPoint.y = vertex.y;
-			if (vertex.z > maxPoint.z) maxPoint.z = vertex.z;
+				if (vertex.x > maxPoint.x) maxPoint.x = vertex.x;
+				if (vertex.y > maxPoint.y) maxPoint.y = vertex.y;
+				if (vertex.z > maxPoint.z) maxPoint.z = vertex.z;
+			}
+			if (!model->RenderAll())
+				break;
 		}
 		dimensions = maxPoint - minPoint;
 		collider = new btBoxShape(btVector3(btScalar(dimensions.x / 2), btScalar(dimensions.y / 2), btScalar(dimensions.z / 2)));
 	}
 	else if (shape == Convex) {
 		convexHullShape = new btConvexHullShape();
-		for (const auto& vertex : model->GetCurrentMesh()->indexed_vertices) {
-			convexHullShape->addPoint(glmToBtVector3(vertex));
+		//Models can have Conex hull meshes, these meshes are a simplifed version of the original mesh and can imported from a OBJ file
+		if (model->GetColliderShapeVerticiesSize() > 0) {
+			for (const auto& vertex : model->GetColliderShapeVerticies()) {
+				convexHullShape->addPoint(glmToBtVector3(vertex));
+			}
+		}
+		else {
+			for (int i = 0; i < model->GetAllMeshes()->size(); i++) {
+				for (const auto& vertex : model->GetMesh(i)->indexed_vertices) {
+					convexHullShape->addPoint(glmToBtVector3(vertex));
+				}
+				//only create a collider for the entire model/everymesh if the entire mesh is being renderered
+				if (!model->RenderAll())
+					break;
+			}
 		}
 		convexHullShape->optimizeConvexHull();
 	}
 	else if (shape == Sphere) {
 		glm::vec3 minPoint(std::numeric_limits<float>::max());
 		glm::vec3 maxPoint(std::numeric_limits<float>::lowest());
+		for (int i = 0; i < model->GetAllMeshes()->size(); i++) {
+			for (const auto& vertex : model->GetMesh(i)->indexed_vertices) {
+				if (vertex.x < minPoint.x) minPoint.x = vertex.x;
+				if (vertex.y < minPoint.y) minPoint.y = vertex.y;
+				if (vertex.z < minPoint.z) minPoint.z = vertex.z;
 
-		for (const auto& vertex : model->GetCurrentMesh()->indexed_vertices) {
-			if (vertex.x < minPoint.x) minPoint.x = vertex.x;
-			if (vertex.y < minPoint.y) minPoint.y = vertex.y;
-			if (vertex.z < minPoint.z) minPoint.z = vertex.z;
-
-			if (vertex.x > maxPoint.x) maxPoint.x = vertex.x;
-			if (vertex.y > maxPoint.y) maxPoint.y = vertex.y;
-			if (vertex.z > maxPoint.z) maxPoint.z = vertex.z;
+				if (vertex.x > maxPoint.x) maxPoint.x = vertex.x;
+				if (vertex.y > maxPoint.y) maxPoint.y = vertex.y;
+				if (vertex.z > maxPoint.z) maxPoint.z = vertex.z;
+			}
+			if (!model->RenderAll())
+				break;
 		}
 		dimensions = maxPoint - minPoint;
 		collider = new btSphereShape(btScalar(dimensions.x / 2));
@@ -145,14 +165,18 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 		glm::vec3 minPoint(std::numeric_limits<float>::max());
 		glm::vec3 maxPoint(std::numeric_limits<float>::lowest());
 
-		for (const auto& vertex : model->GetCurrentMesh()->indexed_vertices) {
-			if (vertex.x < minPoint.x) minPoint.x = vertex.x;
-			if (vertex.y < minPoint.y) minPoint.y = vertex.y;
-			if (vertex.z < minPoint.z) minPoint.z = vertex.z;
+		for (int i = 0; i < model->GetAllMeshes()->size(); i++) {
+			for (const auto& vertex : model->GetMesh(i)->indexed_vertices) {
+				if (vertex.x < minPoint.x) minPoint.x = vertex.x;
+				if (vertex.y < minPoint.y) minPoint.y = vertex.y;
+				if (vertex.z < minPoint.z) minPoint.z = vertex.z;
 
-			if (vertex.x > maxPoint.x) maxPoint.x = vertex.x;
-			if (vertex.y > maxPoint.y) maxPoint.y = vertex.y;
-			if (vertex.z > maxPoint.z) maxPoint.z = vertex.z;
+				if (vertex.x > maxPoint.x) maxPoint.x = vertex.x;
+				if (vertex.y > maxPoint.y) maxPoint.y = vertex.y;
+				if (vertex.z > maxPoint.z) maxPoint.z = vertex.z;
+			}
+			if (!model->RenderAll())
+				break;
 		}
 		dimensions = maxPoint - minPoint;
 		collider = new btCapsuleShape(btScalar(dimensions.x / 2), (btScalar(dimensions.y / 2)));
@@ -434,4 +458,5 @@ void GameObject::SetDelete(bool state) {
 bool GameObject::ShouldDlete() {
 	return shouldDelete;
 }
+
 

@@ -267,6 +267,24 @@ Model::Model(const char* path, Texture* texture) {
     processNode(scene->mRootNode, scene);
 
 }
+Model::Model(const char* path, const char* collisonShapePath, Texture* texture) {
+    this->texture = texture;
+    Assimp::Importer import;
+    const aiScene * scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    {
+        std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+        return;
+    }
+    std::cout << "Assimp: Loading Model " << path << std::endl;
+    processNode(scene->mRootNode, scene);
+
+    //Ill make a new loadObj that dosent next uvs and normals but this is just for testing right now
+    std::vector<glm::vec2> uvs;
+    std::vector<glm::vec3> normals;
+    Loader::loadOBJ(collisonShapePath, collison_shape_vertices, uvs, normals);
+}
 
 Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     std::vector<glm::vec3> vertices;
@@ -390,6 +408,13 @@ void Model::SetMesh(int mesh) {
 Mesh* Model::GetCurrentMesh() {
     return &meshes[currentMesh];
 }
+size_t Model::GetMeshSize() {
+    return meshes.size();
+}
+Mesh* Model::GetMesh(int i) {
+    return &meshes[i];
+}
+
 std::vector<Mesh>* Model::GetAllMeshes() {
     return &meshes;
 }
@@ -425,4 +450,11 @@ void Model::RenderModel(GLuint& programID) {
     }
     else
         meshes[currentMesh].Render();
+}
+size_t Model::GetColliderShapeVerticiesSize() {
+    return collison_shape_vertices.size();
+}
+
+std::vector<glm::vec3> Model::GetColliderShapeVerticies() {
+    return collison_shape_vertices;
 }

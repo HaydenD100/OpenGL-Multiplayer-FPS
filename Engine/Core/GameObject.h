@@ -101,4 +101,5 @@ private:
 	bool canSave = false;
 	bool render = true;
 	bool shouldDelete = false;
+
 };
