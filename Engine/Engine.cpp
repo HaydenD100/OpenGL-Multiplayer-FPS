@@ -9,6 +9,7 @@
 namespace Engine
 {
 	int Engine::Run() {
+
 		//init Engine comps
 		Input::Init();
 		Input::HideCursor();
@@ -19,13 +20,19 @@ namespace Engine
 		Scene basicScene = Scene();
 		SceneManager::Init();
 		SceneManager::CreateScene(basicScene);
+		float startLoadTime = glfwGetTime();
 		SceneManager::LoadScene(0);
+		float endLoadTime = glfwGetTime() - startLoadTime;
+		std::cout << "Load took " << endLoadTime << "s \n";
+
 
 		// For speed computation
 		double lastTimeDT = glfwGetTime();
 		double previousTime = glfwGetTime();
 		int frameCount = 0;
 		int FPS = 0;
+
+		
 
 		while (Backend::IsWindowOpen()) {
 			

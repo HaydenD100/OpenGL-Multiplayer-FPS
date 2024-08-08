@@ -1,4 +1,4 @@
-Stuff I Should Add
+Todo
 
-particle system, would be good for glass/explosives
-ui? mygui? 
+- Particle System, would be good for glass/explosives
+- Better UI, add support for Dear MyGui

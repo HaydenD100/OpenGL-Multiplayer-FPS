@@ -26,23 +26,19 @@ void Scene::Load() {
 	models["fence1"] = Model(Mesh("Assets/Objects/fence1.obj"), AssetManager::GetTexture("concrete"));
 	models["fence2"] = Model(Mesh("Assets/Objects/fence2.obj"), AssetManager::GetTexture("concrete"));
 	models["fence3"] = Model(Mesh("Assets/Objects/fence3.obj"), AssetManager::GetTexture("concrete"));
-	models["floor"] = Model(Mesh("Assets/Objects/Floor.obj"), AssetManager::GetTexture("sand"));
-	models["slope"] = Model(Mesh("Assets/Objects/slope.obj"), AssetManager::GetTexture("sand"));
-	models["crate"] = Model("Assets/Objects/Crate.fbx", AssetManager::GetTexture("crate"));
-	models["glock"] = Model(Mesh("Assets/Objects/glock_17.obj"), AssetManager::GetTexture("glock"));
-	models["ak47"] = Model(Mesh("Assets/Objects/ak47.obj"), AssetManager::GetTexture("ak47"));
-	models["door"] = Model(Mesh("Assets/Objects/door2.obj"), AssetManager::GetTexture("door2"));
-	models["door_frame"] = Model(Mesh("Assets/Objects/frame2.obj"), AssetManager::GetTexture("door2"));
-	models["player"] = Model(Mesh("Assets/Objects/capsule.obj"), AssetManager::GetTexture("uvmap"));
-	models["lamp"] = Model(Mesh("Assets/Objects/lamp.obj"), AssetManager::GetTexture("uvmap"));
+	models["floor"] = Model("Assets/Objects/FBX/floor.fbx", AssetManager::GetTexture("sand"));
+	models["slope"] = Model("Assets/Objects/FBX/slope.fbx", AssetManager::GetTexture("sand"));
+	models["crate"] = Model("Assets/Objects/FBX/crate.fbx", AssetManager::GetTexture("crate"));
+	models["glock"] = Model("Assets/Objects/FBX/glock17.fbx", AssetManager::GetTexture("glock"));
+	models["ak47"] = Model("Assets/Objects/FBX/ak47.fbx", AssetManager::GetTexture("ak47"));
+	models["door"] = Model("Assets/Objects/FBX/door2.fbx", AssetManager::GetTexture("door2"));
+	models["door_frame"] = Model("Assets/Objects/FBX/frame2.fbx", AssetManager::GetTexture("door2"));
+	models["player"] = Model("Assets/Objects/FBX/player.fbx", AssetManager::GetTexture("uvmap"));
+	models["lamp"] = Model("Assets/Objects/FBX/lamp.fbx", AssetManager::GetTexture("uvmap"));
 	//models["drawer"] = Model(Mesh("Assets/Objects/drawer.obj"), AssetManager::GetTexture("drawer"));
 
-
-
-	//models["cube"].RenderAllMeshes(true);
-
-
 	WeaponManager::Init();
+
 
 	AssetManager::AddGameObject("fence1", &models["fence3"], glm::vec3(5, 1.3, 2), true, 0, Box);
 	AssetManager::AddGameObject("fence2", &models["fence1"], glm::vec3(-9, 1.3, 2), true, 0, Box);
@@ -50,8 +46,7 @@ void Scene::Load() {
 	AssetManager::AddGameObject("fence4", &models["fence2"], glm::vec3(-1, 1.3, 5), true, 0, Box);
 	AssetManager::AddGameObject("floor", &models["floor"], glm::vec3(0, 0, 0), true, 0, Box);
 	AssetManager::AddGameObject("floor", &models["slope"], glm::vec3(-1, 2, -7), true, 0, Convex);
-
-	AssetManager::AddGameObject("lamp", &models["lamp"], glm::vec3(0.3, 2, 4.4), true, 0.8f, Convex);
+	AssetManager::AddGameObject("lamp", &models["lamp"], glm::vec3(1.6, 2, 2), true, 2.0f, Convex);
 	{
 		Light light(glm::vec3(-2.5, 4, -5), glm::vec3(1, 0.779, 0.529), 1.0, 0.7, 1.8);
 		lights.push_back(light);

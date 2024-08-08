@@ -61,7 +61,6 @@ void main() {
         //  - Looking into the reflection -> 1
         //  - Looking elsewhere -> < 1
         float cosAlpha = clamp(dot(E, R), 0.0, 1.0);
-
         
         FinalColor +=
             // Ambient : simulates indirect lighting
