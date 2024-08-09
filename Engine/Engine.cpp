@@ -1,5 +1,7 @@
 #include "Engine.h"
 #include "Engine/Physics/BulletPhysics.h"
+#include "Editor/EditorManager.h"
+
 
 //rewrite of my first 3D Engine
 //Not sure what im going to call it yet 
@@ -10,7 +12,20 @@
 
 namespace Engine
 {
+
+	bool Editing = false;
+
 	int Engine::Run() {
+
+		//Im g
+		/*
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		ImGui::StyleColorsDark();
+		ImGui_ImplGlfw_InitForOpenGL(Backend::GetWindowPointer(), true);
+		ImGui_ImplOpenGL3_Init("#version 330");
+		*/
 
 		//init Engine comps
 		Input::Init();
@@ -18,7 +33,6 @@ namespace Engine
 		Text2D::initText2D("Assets/Fonts/Holstein.DDS");
 		AudioManager::Init();
 		PhysicsManagerBullet::Init();
-
 		Scene basicScene = Scene();
 		SceneManager::Init();
 		SceneManager::CreateScene(basicScene);
@@ -26,7 +40,7 @@ namespace Engine
 		SceneManager::LoadScene(0);
 		float endLoadTime = glfwGetTime() - startLoadTime;
 		std::cout << "Load took " << endLoadTime << "s \n";
-
+		EditorManager::Init();
 
 		// For speed computation
 		double lastTimeDT = glfwGetTime();
@@ -34,10 +48,7 @@ namespace Engine
 		int frameCount = 0;
 		int FPS = 0;
 
-		
-
 		while (Backend::IsWindowOpen()) {
-			
 			// Delta time stuff
 			double currentTime = glfwGetTime();
 			double dt = currentTime - lastTimeDT;
@@ -49,22 +60,31 @@ namespace Engine
 				frameCount = 0;
 				previousTime = currentTime;
 			}
-
 			// Update Managers
 			Input::Update();
-			Input::CenterMouse();
 			Renderer::ClearScreen();
-			SceneManager::Update(dt);
-			AnimationManager::Update(dt);
-			Camera::Update(dt); 
-			SceneManager::Render();
-			AudioManager::Update();
-			PhysicsManagerBullet::Update(dt);
-			std::ostringstream oss;
-			oss << "FPS: " << FPS;
-			Renderer::RenderText(oss.str().c_str(), 660, 585, 15);
+			if (Editing)
+			{
+				EditorManager::Update();
+			}
+			else {
+				
+				Input::CenterMouse();
+				SceneManager::Update(dt);
+				AnimationManager::Update(dt);
+				Camera::Update(dt);
+				Renderer::GenerateShadowMap();
+				SceneManager::Render();
+				AudioManager::Update();
+				PhysicsManagerBullet::Update(dt);
+				std::ostringstream oss;
+				oss << "FPS: " << FPS;
+				Renderer::RenderText(oss.str().c_str(), 660, 585, 15);
+				//AssetManager::CleanUp();
+			}
 			Renderer::SwapBuffers(Backend::GetWindowPointer());
-			//AssetManager::CleanUp();
+
+			
 		}
 
 		return 0;

@@ -17,12 +17,16 @@ out vec3 LightDirection_cameraspace;
 out vec3 LightDirection_tangentspace;
 out vec3 EyeDirection_tangentspace;
 
+out vec4 FragPosLightSpace;
+
+
 // Values that stay constant for the whole mesh.
 uniform mat4 MVP;
 uniform mat4 V;
 uniform mat4 M;
 uniform mat3 MV3x3;
 uniform vec3 LightPositions_worldspace[MAXLIGHTS]; // Array of light positions
+uniform mat4 lightSpaceMatrix;
 
 void main() {
     // Output position of the vertex, in clip space : MVP * position
@@ -54,6 +58,8 @@ void main() {
 
         LightDirection_tangentspace = TBN * LightDirection_cameraspace;
         EyeDirection_tangentspace = TBN * EyeDirection_cameraspace;
+
+        FragPosLightSpace = lightSpaceMatrix * vec4(vs_out.FragPos, 1.0);
 
         // Send outputs for interpolation
         UV = vertexUV;

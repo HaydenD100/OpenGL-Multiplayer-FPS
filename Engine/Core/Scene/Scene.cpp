@@ -30,7 +30,7 @@ void Scene::Load() {
 	models["fence2"] = Model("Assets/Objects/fence2.fbx", AssetManager::GetTexture("concrete"));
 	models["fence2"].RenderAllMeshes(true);
 	models["fence3"] = Model("Assets/Objects/fence3.fbx", AssetManager::GetTexture("concrete"));
-	models["fence2"].RenderAllMeshes(true);
+	models["fence3"].RenderAllMeshes(true);
 	models["floor"] = Model("Assets/Objects/FBX/floor.fbx", AssetManager::GetTexture("sand"));
 	models["slope"] = Model("Assets/Objects/FBX/slope.fbx", AssetManager::GetTexture("sand"));
 	models["crate"] = Model("Assets/Objects/FBX/crate.fbx", AssetManager::GetTexture("crate"));
@@ -206,16 +206,14 @@ void Scene::AddGunPickUp(GunPickUp gunpickup) {
 }
 
 
-void Scene::RenderObjects(const char* shaderName) {
+void Scene::RenderObjects(const char* shaderName) { 
+	std::cout << "red";
 	glm::mat4 ProjectionMatrix = Camera::getProjectionMatrix();
 	glm::mat4 ViewMatrix = Camera::getViewMatrix();
 	glm::mat4 PV = ProjectionMatrix * ViewMatrix;
 
 	Renderer::RendererSkyBox(ViewMatrix, ProjectionMatrix, sky);
 	GLuint programid = Renderer::GetProgramID(shaderName);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	Renderer::SetLights(lights);
 
@@ -226,10 +224,8 @@ void Scene::RenderObjects(const char* shaderName) {
 			continue;
 
 		glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
-		glm::mat4 MVP = PV * ModelMatrix;
-		glm::mat3 ModelView3x3Matrix = glm::mat3(ViewMatrix * ModelMatrix); // Take the upper-left part of ModelViewMatrix
-
-		Renderer::SetTextureShader(MVP, ModelMatrix, ViewMatrix, ModelView3x3Matrix);
+		
+		Renderer::setMat4(glGetUniformLocation(Renderer::GetCurrentProgramID(), "model"), ModelMatrix);
 		//Renderers model
 		gameobjectRender->RenderObject(programid);
 	}

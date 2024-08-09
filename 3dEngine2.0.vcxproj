@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Editor\EditorManager.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Backend.cpp" />
     <ClCompile Include="Engine\Core\Animation.cpp" />
@@ -176,6 +177,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Saves\mainScene.json" />
+    <None Include="Assets\Shaders\Editor\Editor.frag" />
+    <None Include="Assets\Shaders\Editor\Editor.vert" />
     <None Include="Assets\Shaders\lineshader.frag" />
     <None Include="Assets\Shaders\lineshader.vert" />
     <None Include="Assets\Shaders\ShadowShader.frag" />
@@ -192,6 +195,7 @@
     <Text Include="todo.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Editor\EditorManager.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\Backend.h" />
     <ClInclude Include="Engine\Core\Animation.h" />

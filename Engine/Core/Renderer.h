@@ -51,4 +51,6 @@ namespace Renderer
 
     void setMat4(GLuint id, glm::mat4& mat4);
     void setVec3(GLuint id, glm::vec3& vec3);
+
+    void GenerateShadowMap();
 }

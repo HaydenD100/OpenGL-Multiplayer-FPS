@@ -99,6 +99,9 @@
     <ClCompile Include="Engine\Core\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Editor\EditorManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Scene\Scene.h">
@@ -191,6 +194,9 @@
     <ClInclude Include="Engine\Core\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Editor\EditorManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\SkyBoxShader.vert" />
@@ -205,6 +211,8 @@
     <None Include="Assets\Shaders\Shadows\shadows.frag" />
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.vert" />
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.frag" />
+    <None Include="Assets\Shaders\Editor\Editor.frag" />
+    <None Include="Assets\Shaders\Editor\Editor.vert" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

@@ -23,6 +23,16 @@ uniform float LightLinears[MAXLIGHTS];
 uniform float LightQuadratics[MAXLIGHTS];
 
 
+
+float LinearizeDepth(float depth) 
+{
+    float near = 0.1;
+    float far = 100;
+    float z = depth * 2.0 - 1.0; // back to NDC 
+    return (2.0 * near * far) / (far + near - z * (far - near));	
+}
+
+
 void main() {
     // Material properties
     vec3 MaterialDiffuseColor = texture(DiffuseTextureSampler, UV).rgb;
@@ -71,7 +81,12 @@ void main() {
             MaterialSpecularColor * LightColors[i] * attenuation;
     }
 
+
+
+    //float depth = LinearizeDepth(gl_FragCoord.z) / 100; // divide by far for demonstration
+
+    //color = vec4(vec3(depth), 1.0);
+
     // Output final color
     color = vec4(FinalColor, texture(DiffuseTextureSampler, UV).a);
-    //color = vec4(vec3(gl_FragCoord.z),1.0);
 }
