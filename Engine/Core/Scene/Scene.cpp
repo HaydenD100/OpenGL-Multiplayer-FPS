@@ -14,6 +14,8 @@ void Scene::Load() {
 	AssetManager::AddTexture("door2", "Assets/Textures/Door_C.jpg");
 	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png");
 	AssetManager::AddTexture("drawer", "Assets/Textures/drawerred.png", "Assets/Normals/drawer_normal.png");
+	AssetManager::AddTexture("lamp", "Assets/Textures/lamp.png", "Assets/Normals/lamp_normal.png");
+
 
 	Animation anim = Animation("Assets/Animations/cube_test_anim.fbx", "cube");
 	AnimationManager::AddAnimation(anim);
@@ -32,13 +34,13 @@ void Scene::Load() {
 	models["floor"] = Model("Assets/Objects/FBX/floor.fbx", AssetManager::GetTexture("sand"));
 	models["slope"] = Model("Assets/Objects/FBX/slope.fbx", AssetManager::GetTexture("sand"));
 	models["crate"] = Model("Assets/Objects/FBX/crate.fbx", AssetManager::GetTexture("crate"));
-	models["glock"] = Model("Assets/Objects/FBX/glock17.fbx", AssetManager::GetTexture("glock"));
+	models["glock"] = Model("Assets/Objects/FBX/glock17.fbx","Assets/Objects/glock17_convex.obj", AssetManager::GetTexture("glock"));
 	models["glock"].RenderAllMeshes(true);
-	models["ak47"] = Model("Assets/Objects/FBX/ak47.fbx", AssetManager::GetTexture("ak47"));
+	models["ak47"] = Model("Assets/Objects/FBX/ak47.fbx", "Assets/Objects/ak47_convex.obj", AssetManager::GetTexture("ak47"));
 	models["door"] = Model("Assets/Objects/FBX/door2.fbx", AssetManager::GetTexture("door2"));
 	models["door_frame"] = Model("Assets/Objects/FBX/frame2.fbx", AssetManager::GetTexture("door2"));
 	models["player"] = Model("Assets/Objects/FBX/player.fbx", AssetManager::GetTexture("uvmap"));
-	models["lamp"] = Model("Assets/Objects/FBX/lamp.fbx", "Assets/Objects/lamp_convex.obj", AssetManager::GetTexture("uvmap"));
+	models["lamp"] = Model("Assets/Objects/FBX/lamp.fbx", "Assets/Objects/lamp_convex.obj", AssetManager::GetTexture("lamp"));
 	//models["drawer"] = Model(Mesh("Assets/Objects/drawer.obj"), AssetManager::GetTexture("drawer"));
 
 	WeaponManager::Init();

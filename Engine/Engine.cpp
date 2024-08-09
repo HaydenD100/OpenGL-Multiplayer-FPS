@@ -6,6 +6,8 @@
 //this Engine is fueled by coffee and sleep deprivation
 //https://github.com/HaydenD100
 
+//Just a little note that some of the textures/models are from livinamuk
+
 namespace Engine
 {
 	int Engine::Run() {
