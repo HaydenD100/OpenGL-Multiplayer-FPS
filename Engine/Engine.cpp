@@ -73,7 +73,6 @@ namespace Engine
 				SceneManager::Update(dt);
 				AnimationManager::Update(dt);
 				Camera::Update(dt);
-				Renderer::GenerateShadowMap();
 				SceneManager::Render();
 				AudioManager::Update();
 				PhysicsManagerBullet::Update(dt);

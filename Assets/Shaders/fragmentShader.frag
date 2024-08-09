@@ -83,10 +83,10 @@ void main() {
 
 
 
-    //float depth = LinearizeDepth(gl_FragCoord.z) / 100; // divide by far for demonstration
+    float depth = LinearizeDepth(gl_FragCoord.z) / 100; // divide by far for demonstration
 
     //color = vec4(vec3(depth), 1.0);
 
     // Output final color
-    color = vec4(FinalColor, texture(DiffuseTextureSampler, UV).a);
+    //color = vec4(FinalColor, texture(DiffuseTextureSampler, UV).a);
 }
