@@ -52,6 +52,7 @@ struct Mesh {
     std::vector<glm::vec3> bitTangents);
 
     void Render();
+    glm::vec3 GetVertices(int index);
 
     std::vector<unsigned short> indices;
     std::vector<glm::vec3> indexed_vertices;
@@ -92,7 +93,7 @@ public:
     size_t GetColliderShapeVerticiesSize();
 
 private:
-    bool renderAllMeshes = false;
+    bool renderAllMeshes = true;
     std::vector<Mesh> meshes;
     int currentMesh = 0;
     Texture* texture = nullptr;

@@ -142,6 +142,38 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 		}
 		convexHullShape->optimizeConvexHull();
 	}
+	else if (shape == Concave) {
+
+		btTriangleMesh*	triangleShape = new btTriangleMesh();
+
+
+		for (int i = 0; i < model->GetAllMeshes()->size(); i++) {
+			for (int x = 0; x < model->GetMesh(i)->indices.size(); x += 3) {
+				int i1 = model->GetMesh(i)->indices[x];
+				int i2 = model->GetMesh(i)->indices[x + 1];
+				int i3 = model->GetMesh(i)->indices[x + 2];
+
+				glm::vec3 vertex1 = model->GetMesh(i)->GetVertices(i1);
+				glm::vec3 vertex2 = model->GetMesh(i)->GetVertices(i2);
+				glm::vec3 vertex3 = model->GetMesh(i)->GetVertices(i3);
+
+				triangleShape->addTriangle(
+					btVector3(vertex1.x, vertex1.y, vertex1.z),
+					btVector3(vertex2.x, vertex2.y, vertex2.z),
+					btVector3(vertex3.x, vertex3.y, vertex3.z)
+				);
+
+			}
+
+			//only create a collider for the entire model/everymesh if the entire mesh is being renderered
+			if (!model->RenderAll())
+				break;
+		}
+		
+		triangleCollison = new btBvhTriangleMeshShape(triangleShape, true);
+
+
+	}
 	else if (shape == Sphere) {
 		glm::vec3 minPoint(std::numeric_limits<float>::max());
 		glm::vec3 maxPoint(std::numeric_limits<float>::lowest());
@@ -196,12 +228,16 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 
 	// Using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
 	btDefaultMotionState* myMotionState = new btDefaultMotionState(Btransform);
-	if (convexHullShape == nullptr) {
-		btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, collider, localInertia);
+	if (convexHullShape != nullptr) {
+		btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, convexHullShape, localInertia);
+		body = new btRigidBody(rbInfo);
+	}
+	else if (triangleCollison != nullptr) {
+		btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, triangleCollison, localInertia);
 		body = new btRigidBody(rbInfo);
 	}
 	else {
-		btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, convexHullShape, localInertia);
+		btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, collider, localInertia);
 		body = new btRigidBody(rbInfo);
 	}
 

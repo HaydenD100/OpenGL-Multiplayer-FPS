@@ -245,6 +245,10 @@ void Mesh::Render() {
     glDisableVertexAttribArray(3);
     glDisableVertexAttribArray(4);
 }
+glm::vec3 Mesh::GetVertices(int index) {
+    return indexed_vertices[index];
+}
+
 
 
 Model::Model(Mesh mesh, Texture* texture) {

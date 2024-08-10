@@ -95,6 +95,7 @@ private:
 	// Physics stuff
 	btCollisionShape* collider = nullptr;
 	btConvexHullShape* convexHullShape = nullptr;
+	btBvhTriangleMeshShape* triangleCollison = nullptr;
 	btTransform Btransform;
 	btRigidBody* body;
 	

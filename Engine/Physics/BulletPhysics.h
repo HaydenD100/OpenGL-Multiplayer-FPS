@@ -16,7 +16,8 @@ enum ColliderShape
 	Sphere,
 	Cylinder,
 	Capsule,
-	Convex
+	Convex,
+	Concave
 };
 
 enum CollisionGroups

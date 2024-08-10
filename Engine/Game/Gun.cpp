@@ -83,8 +83,8 @@ namespace WeaponManager
 		glock.recoil = 0.01f;
 		glock.recoilY = 100;
 		glock.kickback = 3;
-		glock.weaponOffSet = glm::vec3(-0.3, -0.2, 0.9);
-		glock.aimingPosition = glm::vec3(0,-0.16, 0.7);
+		glock.weaponOffSet = glm::vec3(-0.3, -0.2f, 0.9);
+		glock.aimingPosition = glm::vec3(0,-0.2, 0.7);
 		glock.gunModel = "glock"; 
 		glock.gunsShotName = "glock_fire";
 		guns.emplace_back(glock);

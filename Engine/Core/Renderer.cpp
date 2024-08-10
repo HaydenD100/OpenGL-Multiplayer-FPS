@@ -107,16 +107,6 @@ namespace Renderer
 	
 	GLuint ubo;
 
-	unsigned int quadVAO;
-	unsigned int VBO;
-
-	unsigned int depthMapFBO;
-	unsigned int depthMap;
-	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-
-
-
-
 	GLuint Renderer::GetProgramID(const char* name) {
 		return shaderProgramIds[name];
 	}
@@ -164,36 +154,6 @@ namespace Renderer
 		//setVec3(LightID, lights[0].position);
 	}
 
-	//Todo:: fix this, also make it less laggy when its running Engine runs at 20fps 
-	void Renderer::GenerateShadowMap() {
-	
-		
-		float near_plane = 1.0f, far_plane = 7.5f;
-		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-		glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f),
-			glm::vec3(0.0f, 0.0f, 0.0f),
-			glm::vec3(0.0f, 1.0f, 0.0f));
-
-		glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-
-
-		//ConfigureShaderAndMatrices();
-		Renderer::UseProgram(Renderer::GetProgramID("shadow"));
-		glUniformMatrix4fv(glGetUniformLocation(Renderer::GetCurrentProgramID(), "lightSpaceMatrix"), 1, GL_FALSE, glm::value_ptr(lightSpaceMatrix));
-
-		// 1. first render to depth map
-		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-		glClear(GL_DEPTH_BUFFER_BIT);
-		SceneManager::GetCurrentScene()->RenderObjects("shadow");
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		// 2. then render scene as normal with shadow mapping (using depth map)
-		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		
-		glBindTexture(GL_TEXTURE_2D, depthMap);
-	}
 
 
 	int Renderer::init(const char* vertex, const char* fragment, const char* name) {
@@ -216,28 +176,6 @@ namespace Renderer
 		LoadShader("Assets/Shaders/SkyBoxShader.vert", "Assets/Shaders/SkyBoxShader.frag", "skybox");
 		LoadShader("Assets/Shaders/Editor/Editor.vert", "Assets/Shaders/Editor/Editor.frag", "editor");
 
-
-
-		glGenFramebuffers(1, &depthMapFBO);
-
-
-		glGenTextures(1, &depthMap);
-		glBindTexture(GL_TEXTURE_2D, depthMap);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-			SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-		glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		
-	
 
 		UseProgram(GetProgramID(name));
 
