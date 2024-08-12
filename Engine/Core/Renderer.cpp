@@ -119,7 +119,7 @@ namespace Renderer
 
 	void Renderer::SetTextureShader(glm::mat4 mvp, glm::mat4 model, glm::mat4 view, glm::mat3 ModelView3x3Matrix) {
 		setMat4(MatrixID, mvp);
-		setMat4(ModelMatrixID, model);
+		setMat4(ModelMatrixID, model); 
 		setMat4(ViewMatrixID, view);
 		glUniformMatrix3fv(ModelView3x3MatrixID, 1, GL_FALSE, &ModelView3x3Matrix[0][0]);
 	}
