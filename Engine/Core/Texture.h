@@ -19,20 +19,12 @@ public:
 
 
     const char* GetName();
-    int GetTextureNumber();
-    int GetTextureNormalNumber();
-    int GetTextureSpecularNumber();
-
-
     GLuint GetTexture();
     GLuint GetTextureNormal();
     GLuint GetTextureSpecular();
 
 private:
     const char* name;
-    int textureNumber;
-    int textureNormalNumber;
-    int textureSpecularNumber;
 
     GLuint texture;
     GLuint textureNormal;

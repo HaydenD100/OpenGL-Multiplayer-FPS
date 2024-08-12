@@ -23,7 +23,6 @@
 #define SCREENHEIGHT 768
 #define WINDOWTITILE "Engine 2.0"
 
-static int CurrentTextureNumber = GL_TEXTURE1;
 
 struct Transform{
     glm::vec3 position = glm::vec3(0);

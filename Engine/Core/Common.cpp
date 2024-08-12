@@ -440,20 +440,18 @@ void Model::RenderModel(GLuint& programID) {
 
     if (texture != nullptr) {
 
-        glActiveTexture(texture->GetTextureNumber() + GL_TEXTURE0);
-        GLuint TextureID = glGetUniformLocation(programID, "DiffuseTextureSampler");
+        glUniform1i(glGetUniformLocation(programID, "DiffuseTextureSampler"), 0);
+        glUniform1i(glGetUniformLocation(programID, "NormalTextureSampler"), 1);
+        glUniform1i(glGetUniformLocation(programID, "SpecularColorTextureSampler"), 2);
+
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture->GetTexture());
-        glUniform1i(TextureID, texture->GetTextureNumber());
 
-        glActiveTexture(texture->GetTextureNormal() + GL_TEXTURE0);
-        GLuint NormalID = glGetUniformLocation(programID, "NormalTextureSampler");
+        glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture->GetTextureNormal());
-        glUniform1i(NormalID, texture->GetTextureNormalNumber());
 
-        glActiveTexture(texture->GetTextureSpecular() + GL_TEXTURE0);
-        GLuint SpecularID = glGetUniformLocation(programID, "SpecularColorTextureSampler");
+        glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, texture->GetTextureSpecular());
-        glUniform1i(SpecularID, texture->GetTextureSpecularNumber());
         
     }
     if (renderAllMeshes)

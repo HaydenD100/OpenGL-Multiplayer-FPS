@@ -3,8 +3,6 @@
 
 Texture::Texture(const char* name, const char* path) {
 	this->name = name;
-	int texturenumTemp = CurrentTextureNumber++;
-	textureNumber = texturenumTemp - GL_TEXTURE1;
 
     std::cout << "Loading Texture " << path << std::endl;
 
@@ -30,10 +28,6 @@ Texture::Texture(const char* name, const char* path) {
 	}
 
 	stbi_image_free(data);
-
-
-    
-	textureNormalNumber = CurrentTextureNumber++ - GL_TEXTURE1;
 
 	glGenTextures(1, &textureNormal);
 	glBindTexture(GL_TEXTURE_2D, textureNormal);
@@ -73,8 +67,6 @@ Texture::Texture(const char* name, const char* path) {
 
 Texture::Texture(const char* name, const char* path, const char* normalPath) {
     this->name = name;
-    int texturenumTemp = CurrentTextureNumber++;
-    textureNumber = texturenumTemp - GL_TEXTURE1;
     std::cout << "Loading Texture " << path << std::endl;
     
     glGenTextures(1, &texture);
@@ -97,8 +89,6 @@ Texture::Texture(const char* name, const char* path, const char* normalPath) {
         std::cout << "Failed to load texture" << std::endl;
     }
     stbi_image_free(data);
-
-    textureNormalNumber = CurrentTextureNumber++ - GL_TEXTURE0 + 1;
 
 
     glGenTextures(1, &textureNormal);
@@ -142,8 +132,7 @@ Texture::Texture(const char* name, const char* path, const char* normalPath) {
 
 Texture::Texture(const char* name, const char* path, const char* normalPath, const char* specularPath) {
     this->name = name;
-    int texturenumTemp = CurrentTextureNumber++;
-    textureNumber = texturenumTemp - GL_TEXTURE0;
+    
     std::cout << "Loading Texture " << path << std::endl;
 
     glGenTextures(1, &texture);
@@ -166,8 +155,6 @@ Texture::Texture(const char* name, const char* path, const char* normalPath, con
         std::cout << "Failed to load texture" << std::endl;
     }
     stbi_image_free(data);
-
-    textureNormalNumber = CurrentTextureNumber++ - GL_TEXTURE0;
 
 
     glGenTextures(1, &textureNormal);
@@ -215,34 +202,19 @@ Texture::Texture(const char* name, const char* path, const char* normalPath, con
     }
 
     stbi_image_free(data2);
-
-    textureSpecularNumber = CurrentTextureNumber++ - GL_TEXTURE0;
-
 }
 
-int Texture::GetTextureSpecularNumber() {
-    return textureSpecularNumber;
+
+const char* Texture::GetName() {
+    return name;
 }
 
 GLuint Texture::GetTextureSpecular() {
     return textureSpecular;
 }
 
-
-int Texture::GetTextureNormalNumber() {
-    return textureNormalNumber;
-}
-
 GLuint Texture::GetTextureNormal() {
     return textureNormal;
-}
-
-const char* Texture::GetName() {
-    return name;
-}
-
-int Texture::GetTextureNumber() {
-    return textureNumber;
 }
 
 GLuint Texture::GetTexture() {

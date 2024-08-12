@@ -61,15 +61,18 @@ void Decal::RenderDecal(GLuint& programID) {
 	glUseProgram(programID);
 
 	if (texture != nullptr) {
-		glActiveTexture(texture->GetTextureNumber() + GL_TEXTURE0);
-		GLuint TextureID = glGetUniformLocation(programID, "DiffuseTextureSampler");
-		glBindTexture(GL_TEXTURE_2D, texture->GetTexture());
-		glUniform1i(TextureID, texture->GetTextureNumber());
+		glUniform1i(glGetUniformLocation(programID, "DiffuseTextureSampler"), 0);
+		glUniform1i(glGetUniformLocation(programID, "NormalTextureSampler"), 1);
+		glUniform1i(glGetUniformLocation(programID, "SpecularColorTextureSampler"), 2);
 
-		glActiveTexture(texture->GetTextureNormalNumber() + GL_TEXTURE0);
-		GLuint NormalID = glGetUniformLocation(programID, "NormalTextureSampler");
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture->GetTexture());
+
+		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture->GetTextureNormal());
-		glUniform1i(NormalID, texture->GetTextureNormalNumber());
+
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, texture->GetTextureSpecular());
 	}
 	
 	// 1st attribute buffer : vertices
