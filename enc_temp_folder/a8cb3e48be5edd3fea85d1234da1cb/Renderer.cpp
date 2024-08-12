@@ -105,7 +105,7 @@ namespace Renderer
 	GLuint ModelView3x3MatrixID;
 	GLuint gPosition;
 	
-	GLuint ubo; 
+	GLuint ubo;
 
 	//deffered rendering stuff
 	GLuint FramebufferName = 0;
