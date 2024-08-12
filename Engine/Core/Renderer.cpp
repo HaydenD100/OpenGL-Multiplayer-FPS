@@ -107,6 +107,12 @@ namespace Renderer
 	
 	GLuint ubo;
 
+	//deffered rendering stuff
+	GLuint FramebufferName = 0;
+	GLuint renderedTexture;
+
+
+
 	GLuint Renderer::GetProgramID(const char* name) {
 		return shaderProgramIds[name];
 	}
@@ -178,6 +184,13 @@ namespace Renderer
 
 
 		UseProgram(GetProgramID(name));
+
+		//glGenFramebuffers(1, &FramebufferName);
+		//glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+
+
+
+
 
 		return 0;
 	}

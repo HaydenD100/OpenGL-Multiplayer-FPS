@@ -16,6 +16,9 @@ out vec4 color;
 // Values that stay constant for the whole mesh.
 uniform sampler2D DiffuseTextureSampler;
 uniform sampler2D NormalTextureSampler;
+uniform sampler2D SpecularColorTextureSampler;
+
+
 uniform vec3 LightColors[MAXLIGHTS]; // Array of light colors
 uniform vec3 LightPositions_worldspace[MAXLIGHTS]; // Array of light positions
 uniform float LightConstants[MAXLIGHTS];
@@ -37,7 +40,7 @@ void main() {
     // Material properties
     vec3 MaterialDiffuseColor = texture(DiffuseTextureSampler, UV).rgb;
     vec3 MaterialAmbientColor = vec3(0.1) * MaterialDiffuseColor;
-    vec3 MaterialSpecularColor = vec3(0.0);
+    vec3 MaterialSpecularColor = vec3(1.0)  * texture(SpecularColorTextureSampler, UV).rgb;
 
     // Initialize final color
     vec3 FinalColor = vec3(0,0,0);

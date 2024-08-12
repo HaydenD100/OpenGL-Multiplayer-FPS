@@ -16,6 +16,11 @@ void Scene::Load() {
 	AssetManager::AddTexture("drawer", "Assets/Textures/drawerred.png", "Assets/Normals/drawer_normal.png");
 	AssetManager::AddTexture("lamp", "Assets/Textures/lamp.png", "Assets/Normals/lamp_normal.png");
 
+	AssetManager::AddTexture("beige_wall", "Assets/Textures/beige_wall.jpg", "Assets/Normals/beige_wall_normal.jpg");
+	AssetManager::AddTexture("wooden_floor", "Assets/Textures/wooden_floor.jpg", "Assets/Normals/wooden_floor_normal.jpg","Assets/Specular/Default_Specular.jpg");
+
+
+
 
 	Animation anim = Animation("Assets/Animations/cube_test_anim.fbx", "cube");
 	AnimationManager::AddAnimation(anim);
@@ -38,9 +43,11 @@ void Scene::Load() {
 	models["player"] = Model("Assets/Objects/FBX/player.fbx", AssetManager::GetTexture("uvmap"));
 	//models["lamp"] = Model("Assets/Objects/FBX/lamp.fbx", "Assets/Objects/lamp_convex.obj", AssetManager::GetTexture("lamp"));
 
+	models["map_floor"] = Model("Assets/Objects/Map1/floors.fbx", AssetManager::GetTexture("wooden_floor"));
+	models["map_walls"] = Model("Assets/Objects/Map1/walls.fbx", AssetManager::GetTexture("beige_wall"));
+	models["map_ceiling"] = Model("Assets/Objects/Map1/ceiling.fbx", AssetManager::GetTexture("uvmap"));
 
-	models["wooden_floor"] = Model("Assets/Objects/Map1/floor.fbx", AssetManager::GetTexture("uvmap"));
-	models["map"] = Model("Assets/Objects/Map1/map1.fbx", AssetManager::GetTexture("uvmap"));
+
 	//models["map1"] = Model("Assets/Objects/Map1/map1.fbx", AssetManager::GetTexture("uvmap"));
 
 
@@ -53,7 +60,10 @@ void Scene::Load() {
 	//AssetManager::AddGameObject("fence2", &models["fence1"], glm::vec3(-9, 1.3, 2), true, 0, Box);
 	//AssetManager::AddGameObject("fence3", &models["fence2"], glm::vec3(2, 1.3, -9), true, 0, Box);
 	//AssetManager::AddGameObject("fence4", &models["fence2"], glm::vec3(-1, 1.3, 5), true, 0, Box);
-	AssetManager::AddGameObject("map1", &models["map"], glm::vec3(0, 1.85, 0), true, 0, Concave);
+	AssetManager::AddGameObject("map1_floor", &models["map_floor"], glm::vec3(0, 1.85, 0), true, 0, Concave);
+	AssetManager::AddGameObject("map1_walls", &models["map_walls"], glm::vec3(0, 1.85, 0), true, 0, Concave);
+	AssetManager::AddGameObject("map1_ceiling", &models["map_ceiling"], glm::vec3(0, 1.85, 0), true, 0, Convex);
+
 
 	AssetManager::AddGameObject("floor", &models["floor"], glm::vec3(0, 0, 0), true, 0, Convex);
 
@@ -64,13 +74,6 @@ void Scene::Load() {
 		lights.push_back(light);
 	}
 	*/
-
-	//AssetManager::AddGameObject("Map1", &models["map1"], glm::vec3(0, 2, 0), true, 0.0f, Convex);
-	//AssetManager::AddGameObject("drawer", &models["drawer"], glm::vec3(0.3, 1, 4.4), true, 0.0f, Box);
-	//AssetManager::GetGameObject("drawer")->SetRotationY(1.5708f);
-
-
-
 
 	crates.push_back(Crate(glm::vec3(1, 25, 1), "crate1", &models["crate"]));
 	crates.push_back(Crate(glm::vec3(1, 30, 0.5), "crate2", &models["crate"]));
@@ -97,6 +100,23 @@ void Scene::Load() {
 	sky = SkyBox(faces);
 
 	// MAX LIGHTS BY DEFAULT IS 10 if you want more lights go to FragmentShader.frag and VertexShader.vert and change MAXLIGHTS
+	{
+		Light light(glm::vec3(-11, 4, 15), glm::vec3(1, 0.25, 0), 1, 0.14, 0.07);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(-11, 4, 6), glm::vec3(1, 0.25, 0), 1, 0.22, 0.2);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(-15, 4, 5), glm::vec3(1, 0.25, 0), 1, 0.22, 0.2);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(-7.5, 4, 5), glm::vec3(1, 0.25, 0), 1, 0.22, 0.2);
+		lights.push_back(light);
+	}
+
 	{
 		Light light(glm::vec3(-2.5, 4, -5), glm::vec3(1, 0.25, 0), 1, 0.22, 0.20);
 		lights.push_back(light);

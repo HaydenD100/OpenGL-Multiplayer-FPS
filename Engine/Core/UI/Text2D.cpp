@@ -1,4 +1,5 @@
 #include "Text2D.h"
+#include "Engine/Core/Common.h"
 
 namespace Text2D
 {

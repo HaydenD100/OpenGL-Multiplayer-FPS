@@ -40,6 +40,8 @@ namespace AssetManager
 	size_t AddTexture(Texture texture);
 	size_t AddTexture(const char* name, const char* path);
 	size_t AddTexture(const char* name, const char* path, const char* normalPath);
+	size_t AddTexture(const char* name, const char* path, const char* normaPath, const char* SpecularPath);
+
 
 	void RemoveGameObject(std::string name);
 	void RemoveGameObject(int index);

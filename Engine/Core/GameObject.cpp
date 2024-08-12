@@ -91,6 +91,8 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 
 
 GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape) {
+	if (model == nullptr)
+		std::cout << "model is null \n";
 	this->name = name;
 	this->model = model;
 	parentName = "";

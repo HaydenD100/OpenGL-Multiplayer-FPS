@@ -5,6 +5,8 @@
 
 #include "Engine/Core/AssetManager.h"
 
+
+
 btVector3 glmToBtVector3(const glm::vec3& vec) {
     return btVector3(vec.x, vec.y, vec.z);
 }
@@ -437,15 +439,22 @@ void Model::RenderModel(GLuint& programID) {
     glUseProgram(programID);
 
     if (texture != nullptr) {
+
         glActiveTexture(texture->GetTextureNumber() + GL_TEXTURE0);
         GLuint TextureID = glGetUniformLocation(programID, "DiffuseTextureSampler");
         glBindTexture(GL_TEXTURE_2D, texture->GetTexture());
         glUniform1i(TextureID, texture->GetTextureNumber());
 
-        glActiveTexture(texture->GetTextureNormalNumber() + GL_TEXTURE0);
+        glActiveTexture(texture->GetTextureNormal() + GL_TEXTURE0);
         GLuint NormalID = glGetUniformLocation(programID, "NormalTextureSampler");
         glBindTexture(GL_TEXTURE_2D, texture->GetTextureNormal());
         glUniform1i(NormalID, texture->GetTextureNormalNumber());
+
+        glActiveTexture(texture->GetTextureSpecular() + GL_TEXTURE0);
+        GLuint SpecularID = glGetUniformLocation(programID, "SpecularColorTextureSampler");
+        glBindTexture(GL_TEXTURE_2D, texture->GetTextureSpecular());
+        glUniform1i(SpecularID, texture->GetTextureSpecularNumber());
+        
     }
     if (renderAllMeshes)
     {

@@ -160,7 +160,12 @@ namespace AssetManager
 	size_t AddTexture(const char* name, const char* path, const char* normalPath) {
 		Textures.push_back(Texture(name, path,normalPath));
 		return Textures.size() - 1;
+	}	
+	size_t AddTexture(const char* name, const char* path, const char* normalPath, const char* SpecularPath) {
+		Textures.push_back(Texture(name, path, normalPath,SpecularPath));
+		return Textures.size() - 1;
 	}
+
 
 	void AssetManager::RemoveGameObject(std::string name) {
 		for (int i = 0; i < GameObjects.size(); i++) {
