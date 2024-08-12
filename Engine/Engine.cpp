@@ -62,7 +62,7 @@ namespace Engine
 			}
 			// Update Managers
 			Input::Update();
-			Renderer::ClearScreen();
+			//Renderer::ClearScreen();
 			if (Editing)
 			{
 				EditorManager::Update();
@@ -73,7 +73,8 @@ namespace Engine
 				SceneManager::Update(dt);
 				AnimationManager::Update(dt);
 				Camera::Update(dt);
-				SceneManager::Render();
+				//SceneManager::Render();
+				Renderer::RenderScene();
 				AudioManager::Update();
 				PhysicsManagerBullet::Update(dt);
 				std::ostringstream oss;

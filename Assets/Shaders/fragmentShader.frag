@@ -1,6 +1,8 @@
 #version 330 core
 #define MAXLIGHTS 10
 
+layout(location = 0) out vec4 color;
+
 // Interpolated values from the vertex shaders
 in vec2 UV;
 in vec3 Position_worldspace;
@@ -11,7 +13,7 @@ in vec3 LightDirection_tangentspace;
 in vec3 EyeDirection_tangentspace;
 
 // Output data
-out vec4 color;
+//out vec4 color;
 
 // Values that stay constant for the whole mesh.
 uniform sampler2D DiffuseTextureSampler;

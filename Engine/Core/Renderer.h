@@ -53,4 +53,6 @@ namespace Renderer
     void setVec3(GLuint id, glm::vec3& vec3);
 
     void GenerateShadowMap();
+
+    void RenderScene();
 }

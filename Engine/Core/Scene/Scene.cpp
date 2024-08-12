@@ -176,8 +176,7 @@ void Scene::RenderObjects() {
 	glm::mat4 ViewMatrix = Camera::getViewMatrix();
 	glm::mat4 PV = ProjectionMatrix * ViewMatrix;
 
-	Renderer::RendererSkyBox(ViewMatrix, ProjectionMatrix, sky);
-	Renderer::UseProgram(Renderer::GetProgramID("Texture"));
+
 
 	GLuint programid = Renderer::GetCurrentProgramID();
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -211,23 +210,6 @@ void Scene::RenderObjects() {
 	}
 
 	glDisable(GL_BLEND);
-	std::ostringstream oss;
-	oss.precision(2);
-	glm::vec3 pos = btToGlmVector3(AssetManager::GetGameObject("player")->GetRigidBody()->getWorldTransform().getOrigin());
-
-	oss << "Pos x:" << pos.x << " y:" << pos.y << " z:" << pos.z;
-	Renderer::RenderText(oss.str().c_str(), 0, 570, 15);
-
-	glm::vec3 vel = btToGlmVector3(AssetManager::GetGameObject("player")->GetRigidBody()->getLinearVelocity());
-	oss.str("");
-	oss.clear();
-	oss.precision(2);
-	oss << "Vel x:" << vel.x << " y:" << vel.y << " z:" << vel.z;
-	Renderer::RenderText(oss.str().c_str(), 0, 540, 15);
-
-	oss.str(""); oss.clear();
-	oss << "Current Weapon: " << Player::getCurrentGun();
-	Renderer::RenderText(oss.str().c_str(), 0, 500, 15);
 }
 
 void Scene::AddGunPickUp(GunPickUp gunpickup) {
@@ -236,7 +218,6 @@ void Scene::AddGunPickUp(GunPickUp gunpickup) {
 
 
 void Scene::RenderObjects(const char* shaderName) {
-	std::cout << "red";
 	glm::mat4 ProjectionMatrix = Camera::getProjectionMatrix();
 	glm::mat4 ViewMatrix = Camera::getViewMatrix();
 	glm::mat4 PV = ProjectionMatrix * ViewMatrix;
@@ -274,4 +255,8 @@ Crate* Scene::GetCrate(std::string name) {
 }
 Model* Scene::GetModel(std::string name) {
 	return &models[name];
+}
+
+SkyBox Scene::GetSkyBox() {
+	return sky;
 }

@@ -213,6 +213,7 @@
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.frag" />
     <None Include="Assets\Shaders\Editor\Editor.frag" />
     <None Include="Assets\Shaders\Editor\Editor.vert" />
+    <None Include="Assets\Shaders\SSAO\ssao.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

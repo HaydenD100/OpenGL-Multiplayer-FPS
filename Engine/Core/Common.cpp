@@ -241,11 +241,6 @@ void Mesh::Render() {
         (void*)0           // element array buffer offset
     );
 
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
-    glDisableVertexAttribArray(2);
-    glDisableVertexAttribArray(3);
-    glDisableVertexAttribArray(4);
 }
 glm::vec3 Mesh::GetVertices(int index) {
     return indexed_vertices[index];
@@ -436,7 +431,6 @@ bool Model::RenderAll(){
 
 
 void Model::RenderModel(GLuint& programID) {
-    glUseProgram(programID);
 
     if (texture != nullptr) {
 
