@@ -4,9 +4,11 @@ in vec2 UV;
 
 out vec3 color;
 
-uniform sampler2D renderedTexture;
-uniform float time;
+uniform sampler2D gPostion;
+uniform sampler2D gNormal;
+uniform sampler2D gAlbeido;
+uniform sampler2D depthTexture;
 
 void main(){
-	color = texture( renderedTexture, UV).xyz ;
+	color = texture( gAlbeido, UV).xyz ;
 }

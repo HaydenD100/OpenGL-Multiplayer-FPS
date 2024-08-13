@@ -111,9 +111,14 @@ namespace Renderer
 
 	//deffered rendering stuff
 	GLuint FramebufferName = 0;
-	GLuint renderedTexture;
+	GLuint gPostion;
+	GLuint gNormal;
+	GLuint gAlbeido;
+
+
+
 	GLuint depthrenderbuffer;
-	GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
+	GLenum DrawBuffers[3] = { GL_COLOR_ATTACHMENT0,GL_COLOR_ATTACHMENT1,GL_COLOR_ATTACHMENT2 };
 	GLuint quad_vertexbuffer;
 	GLuint depthTexture;
 
@@ -128,6 +133,7 @@ namespace Renderer
 		setMat4(ViewMatrixID, view);
 		glUniformMatrix3fv(ModelView3x3MatrixID, 1, GL_FALSE, &ModelView3x3Matrix[0][0]);
 	}
+
 	
 	void Renderer::SetLights(std::vector<Light> lights) {
 		// Upload lights data to the GPU
@@ -176,17 +182,10 @@ namespace Renderer
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
-		MatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "MVP");
-		ViewMatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "V");
-		ModelMatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "M");
-		LightID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "LightPosition_worldspace");
-		ModelView3x3MatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "MV3x3");
-
 		// Skybox
 		LoadShader("Assets/Shaders/SkyBoxShader.vert", "Assets/Shaders/SkyBoxShader.frag", "skybox");
 		LoadShader("Assets/Shaders/Editor/Editor.vert", "Assets/Shaders/Editor/Editor.frag", "editor");
-		LoadShader("Assets/Shaders/SSAO/ssao.vert", "Assets/Shaders/SSAO/ssao.frag", "geomerty");
+		LoadShader("Assets/Shaders/SSAO/ssao.vert", "Assets/Shaders/SSAO/ssao.frag", "ssao");
 
 		LoadShader("Assets/Shaders/Texture_Render/Texture_Render.vert", "Assets/Shaders/Texture_Render/Texture_Render.frag", "screen");
 
@@ -195,15 +194,21 @@ namespace Renderer
 		glGenFramebuffers(1, &FramebufferName);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 
-		glGenTextures(1, &renderedTexture);
-
-		// "Bind" the newly created texture : all future texture functions will modify this texture
-		glBindTexture(GL_TEXTURE_2D, renderedTexture);
-
-		// Give an empty image to OpenGL ( the last "0" )
+		glGenTextures(1, &gPosition);
+		glBindTexture(GL_TEXTURE_2D, gPosition);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-		// Poor filtering. Needed !
+		glGenTextures(1, &gNormal);
+		glBindTexture(GL_TEXTURE_2D, gNormal);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+		glGenTextures(1, &gAlbeido);
+		glBindTexture(GL_TEXTURE_2D, gAlbeido);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
@@ -217,15 +222,17 @@ namespace Renderer
 
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture, 0);
 		// Set "renderedTexture" as our colour attachement #0
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, gPosition, 0);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, gNormal, 0);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, gAlbeido, 0);
+
 
 		// Set the list of draw buffers.
-		glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffer
+		glDrawBuffers(3, DrawBuffers); // "1" is the size of DrawBuffer
 
 
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			std::cout << "problem \n";
-
 
 		static const GLfloat g_quad_vertex_buffer_data[] = {
 		-1.0f, -1.0f, 0.0f,
@@ -241,8 +248,13 @@ namespace Renderer
 		glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
 		
 
+		UseProgram(GetProgramID("ssao"));
 
-		UseProgram(GetProgramID(name));
+		MatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "MVP");
+		ViewMatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "V");
+		ModelMatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "M");
+		LightID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "LightPosition_worldspace");
+		ModelView3x3MatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "MV3x3");
 
 		return 0;
 	}
@@ -281,7 +293,7 @@ namespace Renderer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		Renderer::RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
 
-		Renderer::UseProgram(Renderer::GetProgramID("Texture"));
+		Renderer::UseProgram(Renderer::GetProgramID("ssao"));
 		SceneManager::Render();
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -290,11 +302,19 @@ namespace Renderer
 		glDisable(GL_DEPTH_TEST);
 
 		glUseProgram(GetProgramID("screen"));
-
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, renderedTexture);
-		glUniform1i(glGetUniformLocation(GetProgramID("screen"), "renderedTexture"), 0);
-		glUniform1f(glGetUniformLocation(GetProgramID("screen"), "time"), (float)(glfwGetTime() * 10.0f));
+		glBindTexture(GL_TEXTURE_2D, gPosition);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, gNormal);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, gAlbeido);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, depthTexture);
+		glUniform1i(glGetUniformLocation(GetProgramID("screen"), "gPostion"), 0);
+		glUniform1i(glGetUniformLocation(GetProgramID("screen"), "gNormal"), 1);
+		glUniform1i(glGetUniformLocation(GetProgramID("screen"), "gAlbeido"), 2);
+		glUniform1i(glGetUniformLocation(GetProgramID("screen"), "depthTexture"), 3);
+
 
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);

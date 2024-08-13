@@ -181,7 +181,7 @@ void Scene::RenderObjects() {
 	GLuint programid = Renderer::GetCurrentProgramID();
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
-	Renderer::SetLights(lights);
+	//Renderer::SetLights(lights);
 
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
 		GameObject* gameobjectRender = AssetManager::GetGameObject(i);
