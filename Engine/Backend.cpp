@@ -36,7 +36,7 @@ namespace Backend
 		glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-		Renderer::init("Assets/Shaders/vertexShader.vert", "Assets/Shaders/fragmentShader.frag","Texture");
+		Renderer::init("Assets/Shaders/Lighting/lighting.vert", "Assets/Shaders/Lighting/lighting.frag","lighting");
 		return 0;
 	}
 

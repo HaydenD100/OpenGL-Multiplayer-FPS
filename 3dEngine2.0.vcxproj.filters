@@ -202,18 +202,16 @@
     <None Include="Assets\Shaders\SkyBoxShader.vert" />
     <None Include="Assets\Shaders\SkyBoxShader.frag" />
     <None Include="Assets\Saves\mainScene.json" />
-    <None Include="Assets\Shaders\ShadowShader.vert" />
-    <None Include="Assets\Shaders\ShadowShader.frag" />
-    <None Include="Assets\Shaders\lineshader.frag" />
-    <None Include="Assets\Shaders\lineshader.vert" />
     <None Include="Assets\Shaders\SSAO\ssao.vert" />
-    <None Include="Assets\Shaders\Shadows\shadows.vert" />
-    <None Include="Assets\Shaders\Shadows\shadows.frag" />
+    <None Include="Assets\Shaders\Lighting\lighting.vert" />
+    <None Include="Assets\Shaders\Lighting\lighting.frag" />
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.vert" />
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.frag" />
     <None Include="Assets\Shaders\Editor\Editor.frag" />
     <None Include="Assets\Shaders\Editor\Editor.vert" />
     <None Include="Assets\Shaders\SSAO\ssao.frag" />
+    <None Include="Assets\Shaders\Deffered\geomerty.frag" />
+    <None Include="Assets\Shaders\Deffered\geomerty.vert" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

@@ -184,9 +184,7 @@ namespace Renderer
 
 		// Skybox
 		LoadShader("Assets/Shaders/SkyBoxShader.vert", "Assets/Shaders/SkyBoxShader.frag", "skybox");
-		LoadShader("Assets/Shaders/Editor/Editor.vert", "Assets/Shaders/Editor/Editor.frag", "editor");
-		LoadShader("Assets/Shaders/SSAO/ssao.vert", "Assets/Shaders/SSAO/ssao.frag", "ssao");
-
+		LoadShader("Assets/Shaders/Deffered/geomerty.vert", "Assets/Shaders/Deffered/geomerty.frag", "geomerty");
 		LoadShader("Assets/Shaders/Texture_Render/Texture_Render.vert", "Assets/Shaders/Texture_Render/Texture_Render.frag", "screen");
 
 
@@ -248,7 +246,7 @@ namespace Renderer
 		glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
 		
 
-		UseProgram(GetProgramID("ssao"));
+		UseProgram(GetProgramID("geomerty"));
 
 		MatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "MVP");
 		ViewMatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "V");
@@ -293,7 +291,7 @@ namespace Renderer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		Renderer::RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
 
-		Renderer::UseProgram(Renderer::GetProgramID("ssao"));
+		Renderer::UseProgram(Renderer::GetProgramID("geomerty"));
 		SceneManager::Render();
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -301,7 +299,7 @@ namespace Renderer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
 
-		glUseProgram(GetProgramID("screen"));
+		glUseProgram(GetProgramID("lighting"));
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, gPosition);
 		glActiveTexture(GL_TEXTURE1);
@@ -310,10 +308,10 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, gAlbeido);
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, depthTexture);
-		glUniform1i(glGetUniformLocation(GetProgramID("screen"), "gPostion"), 0);
-		glUniform1i(glGetUniformLocation(GetProgramID("screen"), "gNormal"), 1);
-		glUniform1i(glGetUniformLocation(GetProgramID("screen"), "gAlbeido"), 2);
-		glUniform1i(glGetUniformLocation(GetProgramID("screen"), "depthTexture"), 3);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 2);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "depthTexture"), 3);
 
 
 		glEnableVertexAttribArray(0);
