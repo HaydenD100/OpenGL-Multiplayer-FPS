@@ -10,5 +10,5 @@ uniform sampler2D gAlbeido;
 uniform sampler2D depthTexture;
 
 void main(){
-	color = texture( gAlbeido, UV).xyz ;
+	color = texture(  gNormal, UV).xyz ;
 }

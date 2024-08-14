@@ -36,6 +36,7 @@ public:
 	int GetGunPickUpSize();
 	Crate* GetCrate(std::string name);
 	Model* GetModel(std::string name);
+	std::vector<Light> getLights();
 
 	SkyBox GetSkyBox();
 private:

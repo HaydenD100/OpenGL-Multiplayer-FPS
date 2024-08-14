@@ -51,8 +51,19 @@ Texture::Texture(const char* name, const char* path) {
 
 	stbi_image_free(data1);
 
+
+    glGenTextures(1, &textureSpecular);
+    glBindTexture(GL_TEXTURE_2D, textureSpecular);
+
+    // Set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
     // Load and generate the texture
     int width2, height2;
+
     unsigned char* data2 = stbi_load("Assets/Specular/Default_Specular.jpg", &width2, &height2, 0, STBI_rgb_alpha);
     if (data2) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width2, height2, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
@@ -114,8 +125,18 @@ Texture::Texture(const char* name, const char* path, const char* normalPath) {
 
     stbi_image_free(data1);
 
+    glGenTextures(1, &textureSpecular);
+    glBindTexture(GL_TEXTURE_2D, textureSpecular);
+
+    // Set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
     // Load and generate the texture
     int width2, height2;
+
     unsigned char* data2 = stbi_load("Assets/Specular/Default_Specular.jpg", &width2, &height2, 0, STBI_rgb_alpha);
     if (data2) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width2, height2, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);

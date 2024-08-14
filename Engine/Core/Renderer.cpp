@@ -139,7 +139,6 @@ namespace Renderer
 		// Upload lights data to the GPU
 		std::vector<glm::vec3> lightPositions;
 		std::vector<glm::vec3> lightColors;
-		std::vector<float> LightConstants;
 		std::vector<float> LightLinears;
 		std::vector<float> LightQuadratics;
 
@@ -147,28 +146,25 @@ namespace Renderer
 		for (const auto& light : lights) {
 			lightPositions.push_back(light.position);
 			lightColors.push_back(light.colour);
-			LightConstants.push_back(light.constant);
 			LightLinears.push_back(light.linear);
 			LightQuadratics.push_back(light.quadratic);
-			
-			
 		}
 
-		// Set up uniform arrays in the shader
-		GLuint lightPositionsLoc = glGetUniformLocation(GetProgramID("Texture"), "LightPositions_worldspace");
-		GLuint lightColorsLoc = glGetUniformLocation(GetProgramID("Texture"), "LightColors");
-		GLuint LightConstantsLoc = glGetUniformLocation(GetProgramID("Texture"), "LightConstants");
-		GLuint LightLinearsLoc = glGetUniformLocation(GetProgramID("Texture"), "LightLinears");
-		GLuint LightQuadraticsLoc = glGetUniformLocation(GetProgramID("Texture"), "LightQuadratics");
+		std::cout << lightPositions.size() << std::endl;
 
+		// Set up uniform arrays in the shader
+		GLuint lightPositionsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightPositions_worldspace");
+		GLuint lightColorsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightColors");
+		GLuint LightLinearsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightLinears");
+		GLuint LightQuadraticsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightQuadratics");
 
 		glUniform3fv(lightPositionsLoc, (GLsizei)lights.size(), glm::value_ptr(lightPositions[0]));
 		glUniform3fv(lightColorsLoc, (GLsizei)lights.size(), glm::value_ptr(lightColors[0]));
-		glUniform1fv(LightConstantsLoc, (GLsizei)lights.size(), &LightConstants[0]);
 		glUniform1fv(LightLinearsLoc, (GLsizei)lights.size(), &LightLinears[0]);
 		glUniform1fv(LightQuadraticsLoc, (GLsizei)lights.size(), &LightQuadratics[0]);
+		
+		
 
-		//setVec3(LightID, lights[0].position);
 	}
 
 
@@ -312,6 +308,13 @@ namespace Renderer
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 2);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "depthTexture"), 3);
+
+
+		glUniform3fv(glGetUniformLocation(GetCurrentProgramID(), "viewPos"),1, &Camera::GetPosition()[0]);
+
+
+
+		SetLights(SceneManager::GetCurrentScene()->getLights());
 
 
 		glEnableVertexAttribArray(0);

@@ -105,7 +105,7 @@ void Scene::Load() {
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-11, 4, 6), glm::vec3(1, 0.25, 0), 1, 0.22, 0.2);
+		Light light(glm::vec3(-11, 4, 6), glm::vec3(1, 0.25, 0), 1, 0.4, 0.002);
 		lights.push_back(light);
 	}
 	{
@@ -126,7 +126,7 @@ void Scene::Load() {
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-1, 2, -1), glm::vec3(0, 1, 1), 1, 0.22, 0.20);
+		Light light(glm::vec3(-1, 2, -1), glm::vec3(1, 1, 0), 1, 0.045,	0.0075);
 		lights.push_back(light);
 	}
 
@@ -181,7 +181,6 @@ void Scene::RenderObjects() {
 	GLuint programid = Renderer::GetCurrentProgramID();
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
-	//Renderer::SetLights(lights);
 
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
 		GameObject* gameobjectRender = AssetManager::GetGameObject(i);
@@ -255,6 +254,9 @@ Crate* Scene::GetCrate(std::string name) {
 }
 Model* Scene::GetModel(std::string name) {
 	return &models[name];
+}
+std::vector<Light> Scene::getLights() {
+	return lights;
 }
 
 SkyBox Scene::GetSkyBox() {
