@@ -1,7 +1,7 @@
 #version 330 core
 
 in vec2 UV;
-#define MAXLIGHTS 10
+#define MAXLIGHTS 60
 
 out vec4 color;
 

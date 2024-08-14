@@ -99,7 +99,7 @@ void Scene::Load() {
 	};
 	sky = SkyBox(faces);
 
-	// MAX LIGHTS BY DEFAULT IS 10 if you want more lights go to FragmentShader.frag and VertexShader.vert and change MAXLIGHTS
+	// MAX LIGHTS BY DEFAULT IS 60 if you want more lights go to lighting.frag and change MAXLIGHTS
 	{
 		Light light(glm::vec3(-11, 4, 15), glm::vec3(1, 0.25, 0), 0.14, 0.07);
 		lights.push_back(light);
