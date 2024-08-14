@@ -167,11 +167,8 @@ namespace Player
 		forward.y = 0;
 		
 		// Right vector
-		glm::vec3 right = glm::vec3(
-			sin(horizontalAngle - 3.14f / 2.0f),
-			0,
-			cos(horizontalAngle - 3.14f / 2.0f)
-		);
+		glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0,1,0)));
+
 		
 		// Move forward
 		glm::vec3 movement = glm::vec3(0, player->GetRigidBody()->getLinearVelocity().y(), 0);
@@ -196,22 +193,27 @@ namespace Player
 		
 		// Jump
 		if (Input::KeyDown(' ') && IsGrounded) {
-			movement.y = jumpforce;
+			movement.y = 1;
 		}
 		
-		float x = movement.x / movement.length();
-		float z = movement.z / movement.length();
-		movement = glm::vec3(x, movement.y, z);
-		movement.x = (movement.x * speed);
-		movement.z = (movement.z * speed);
+		
+		//movement = glm::normalize(movement);
+		movement.x = movement.x / movement.length();
+		movement.y = movement.y / movement.length();
+		movement.z = movement.z / movement.length();
 
-		movement.x = movement.x * deltaTime;
-		movement.z = movement.z * deltaTime;
 
+		float y = movement.y;
+		movement = movement * speed;
+		//fallout4 did it so why not?? TODO:: fix delta time
+		movement = movement * 0.003f;
+		movement.y = y * jumpforce;
+		/*
 		if (movement.x > MaxSpeed) movement.x = MaxSpeed;
 		if (movement.x < -MaxSpeed) movement.x = -MaxSpeed;
 		if (movement.z > MaxSpeed) movement.z = MaxSpeed;
 		if (movement.z < -MaxSpeed) movement.z = -MaxSpeed;
+		*/
 
 		
 		player->GetRigidBody()->setLinearVelocity(glmToBtVector3(movement));

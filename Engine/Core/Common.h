@@ -21,6 +21,7 @@
 
 #define SCREENWIDTH 1600
 #define SCREENHEIGHT 900
+#define RATIO 16.0f/9.0f
 #define WINDOWTITILE "Engine 2.0"
 
 
