@@ -64,7 +64,6 @@ namespace Player
 			proxy->m_collisionFilterGroup = GROUP_PLAYER;
 			proxy->m_collisionFilterMask = GROUP_STATIC | GROUP_DYNAMIC;
 			// TODO: Add the constraint to the world
-			
 		}
 		
 		//std::cout << "loading player model" << std::endl;
@@ -193,21 +192,22 @@ namespace Player
 		
 		// Jump
 		if (Input::KeyDown(' ') && IsGrounded) {
-			movement.y = 1;
+			movement.y = 1 * jumpforce;
 		}
 		
 		
 		//movement = glm::normalize(movement);
-		movement.x = movement.x / movement.length();
-		movement.y = movement.y / movement.length();
-		movement.z = movement.z / movement.length();
+		float lenght = glm::vec3(movement.x, 0, movement.z).length();
+		movement.x = movement.x / lenght;
+		movement.z = movement.z / lenght;
 
+		movement.x = movement.x * speed;
+		movement.z = movement.z * speed;
 
-		float y = movement.y;
-		movement = movement * speed;
 		//fallout4 did it so why not?? TODO:: fix delta time
-		movement = movement * 0.003f;
-		movement.y = y * jumpforce;
+		movement.x = movement.x * 0.003f;
+		movement.z = movement.z * 0.003f;
+
 		/*
 		if (movement.x > MaxSpeed) movement.x = MaxSpeed;
 		if (movement.x < -MaxSpeed) movement.x = -MaxSpeed;
