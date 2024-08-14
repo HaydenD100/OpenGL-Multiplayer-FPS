@@ -101,34 +101,37 @@ void Scene::Load() {
 
 	// MAX LIGHTS BY DEFAULT IS 10 if you want more lights go to FragmentShader.frag and VertexShader.vert and change MAXLIGHTS
 	{
-		Light light(glm::vec3(-11, 4, 15), glm::vec3(1, 0.25, 0), 1, 0.14, 0.07);
+		Light light(glm::vec3(-11, 4, 15), glm::vec3(1, 0.25, 0), 0.14, 0.07);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-11, 4, 6), glm::vec3(1, 0.25, 0), 1, 0.4, 0.002);
+		Light light(glm::vec3(-11, 4, 6), glm::vec3(1, 0.25, 0), 0.4, 0.002);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-15, 4, 5), glm::vec3(1, 0.25, 0), 1, 0.22, 0.2);
+		Light light(glm::vec3(-15, 4, 5), glm::vec3(1, 0.25, 0), 0.22, 0.2);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-7.5, 4, 5), glm::vec3(1, 0.25, 0), 1, 0.22, 0.2);
+		Light light(glm::vec3(-7.5, 4, 5), glm::vec3(1, 0.25, 0), 0.22, 0.2);
 		lights.push_back(light);
 	}
 
 	{
-		Light light(glm::vec3(-2.5, 4, -5), glm::vec3(1, 0.25, 0), 1, 0.22, 0.20);
+		Light light(glm::vec3(-2.5, 4, -5), glm::vec3(1, 0.25, 0), 0.22, 0.20);
+		lights.push_back(light);
+	}
+	
+	{
+		Light light(glm::vec3(-6, 2, -2), glm::vec3(1, 0, 1), 0.22, 0.20);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-6, 2, -2), glm::vec3(1, 0, 1), 1, 0.22, 0.20);
+		Light light(glm::vec3(-1, 2, -1), glm::vec3(0, 1, 1), 0.22, 0.20);
 		lights.push_back(light);
 	}
-	{
-		Light light(glm::vec3(-1, 2, -1), glm::vec3(1, 1, 0), 1, 0.045,	0.0075);
-		lights.push_back(light);
-	}
+	
+	
 
 	Player::Init();
 	Player::setPosition(glm::vec3(0, 10, 0));
@@ -176,11 +179,7 @@ void Scene::RenderObjects() {
 	glm::mat4 ViewMatrix = Camera::getViewMatrix();
 	glm::mat4 PV = ProjectionMatrix * ViewMatrix;
 
-
-
 	GLuint programid = Renderer::GetCurrentProgramID();
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
 
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
 		GameObject* gameobjectRender = AssetManager::GetGameObject(i);
@@ -207,8 +206,6 @@ void Scene::RenderObjects() {
 		Renderer::SetTextureShader(MVP, ModelMatrix, ViewMatrix, ModelView3x3Matrix);
 		decal->RenderDecal(programid);
 	}
-
-	glDisable(GL_BLEND);
 }
 
 void Scene::AddGunPickUp(GunPickUp gunpickup) {

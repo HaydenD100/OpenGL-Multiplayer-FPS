@@ -20,6 +20,5 @@ void main()
 
     gNormal = (texture2D(NormalTextureSampler, UV).rgb * 2.0 - 1.0) * tangentToWorld;
 
-    gAlbedoSpec = vec4(MaterialDiffuseColor,1); // RGB for Albedo, R for Specular Intensity
-    //MaterialSpecularColor.r
+    gAlbedoSpec = vec4(MaterialDiffuseColor,MaterialSpecularColor.r); // RGB for Albedo, R for Specular Intensity
 }

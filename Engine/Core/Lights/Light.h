@@ -13,11 +13,12 @@ struct Light
 	glm::vec3 position = glm::vec3(0,0,0);
 	glm::vec3 colour = glm::vec3(1,1,1);
 
-	float constant;
 	float linear;
 	float quadratic;
+	float lightMax;
+	float radius;
 
-	Light(glm::vec3 position, glm::vec3 colour, float constant, float linear, float quadratic);
+	Light(glm::vec3 position, glm::vec3 colour, float linear, float quadratic);
 };
 
 

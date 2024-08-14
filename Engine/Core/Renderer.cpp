@@ -141,6 +141,8 @@ namespace Renderer
 		std::vector<glm::vec3> lightColors;
 		std::vector<float> LightLinears;
 		std::vector<float> LightQuadratics;
+		std::vector<float> LightRadius;
+
 
 
 		for (const auto& light : lights) {
@@ -148,6 +150,7 @@ namespace Renderer
 			lightColors.push_back(light.colour);
 			LightLinears.push_back(light.linear);
 			LightQuadratics.push_back(light.quadratic);
+			LightRadius.push_back(light.radius);
 		}
 
 		std::cout << lightPositions.size() << std::endl;
@@ -157,11 +160,15 @@ namespace Renderer
 		GLuint lightColorsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightColors");
 		GLuint LightLinearsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightLinears");
 		GLuint LightQuadraticsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightQuadratics");
+		GLuint LightRadiusLoc = glGetUniformLocation(GetCurrentProgramID(), "LightRadius");
+
 
 		glUniform3fv(lightPositionsLoc, (GLsizei)lights.size(), glm::value_ptr(lightPositions[0]));
 		glUniform3fv(lightColorsLoc, (GLsizei)lights.size(), glm::value_ptr(lightColors[0]));
 		glUniform1fv(LightLinearsLoc, (GLsizei)lights.size(), &LightLinears[0]);
 		glUniform1fv(LightQuadraticsLoc, (GLsizei)lights.size(), &LightQuadratics[0]);
+		glUniform1fv(LightRadiusLoc, (GLsizei)lights.size(), &LightRadius[0]);
+
 		
 		
 
@@ -175,7 +182,6 @@ namespace Renderer
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 		glEnable(GL_CULL_FACE);
-		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		// Skybox
@@ -190,19 +196,19 @@ namespace Renderer
 
 		glGenTextures(1, &gPosition);
 		glBindTexture(GL_TEXTURE_2D, gPosition);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 		glGenTextures(1, &gNormal);
 		glBindTexture(GL_TEXTURE_2D, gNormal);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 		glGenTextures(1, &gAlbeido);
 		glBindTexture(GL_TEXTURE_2D, gAlbeido);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
@@ -295,6 +301,7 @@ namespace Renderer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
 
+		RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
 		glUseProgram(GetProgramID("lighting"));
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, gPosition);

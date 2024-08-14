@@ -14,6 +14,8 @@ uniform vec3 LightColors[MAXLIGHTS]; // Array of light colors
 uniform vec3 LightPositions_worldspace[MAXLIGHTS]; // Array of light positions
 uniform float LightLinears[MAXLIGHTS];
 uniform float LightQuadratics[MAXLIGHTS];
+uniform float LightRadius[MAXLIGHTS];
+
 
 uniform vec3 viewPos;
 
@@ -27,13 +29,17 @@ void main()
     
     // then calculate lighting as usual
    
+   // retrieve data from gbuffer
+    
+    
+    // then calculate lighting as usual
     vec3 lighting  = Diffuse * 0.1; // hard-coded ambient component
     vec3 viewDir  = normalize(viewPos - FragPos);
     for(int i = 0; i < MAXLIGHTS; ++i)
     {
         // calculate distance between light source and current fragment
         float distance = length(LightPositions_worldspace[i] - FragPos);
-        if(distance < 15)
+        if(distance < LightRadius[i])
         {
             // diffuse
             vec3 lightDir = normalize(LightPositions_worldspace[i] - FragPos);
@@ -41,7 +47,7 @@ void main()
             // specular
             vec3 halfwayDir = normalize(lightDir + viewDir);  
             float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
-            vec3 specular = LightColors[i] * spec * 0.5;
+            vec3 specular = LightColors[i] * spec * Specular;
             // attenuation
             float attenuation = 1.0 / (1.0 + LightLinears[i] * distance + LightQuadratics[i] * distance * distance);
             diffuse *= attenuation;
@@ -49,5 +55,6 @@ void main()
             lighting += diffuse + specular;
         }
     }    
+
     color = vec4(lighting, 1.0);
 }
