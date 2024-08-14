@@ -153,8 +153,6 @@ namespace Renderer
 			LightRadius.push_back(light.radius);
 		}
 
-		std::cout << lightPositions.size() << std::endl;
-
 		// Set up uniform arrays in the shader
 		GLuint lightPositionsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightPositions_worldspace");
 		GLuint lightColorsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightColors");
@@ -168,9 +166,6 @@ namespace Renderer
 		glUniform1fv(LightLinearsLoc, (GLsizei)lights.size(), &LightLinears[0]);
 		glUniform1fv(LightQuadraticsLoc, (GLsizei)lights.size(), &LightQuadratics[0]);
 		glUniform1fv(LightRadiusLoc, (GLsizei)lights.size(), &LightRadius[0]);
-
-		
-		
 
 	}
 

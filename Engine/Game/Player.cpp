@@ -146,6 +146,7 @@ namespace Player
 			player->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
 			player->GetRigidBody()->setLinearVelocity(btVector3(player->GetRigidBody()->getLinearVelocity().x() * 0.0, 0, player->GetRigidBody()->getLinearVelocity().z() * 0.0));
 		}
+		player->GetRigidBody()->setLinearVelocity(btVector3(player->GetRigidBody()->getLinearVelocity().x() * 0.0, player->GetRigidBody()->getLinearVelocity().y(), player->GetRigidBody()->getLinearVelocity().z() * 0.0));
 			
 		btQuaternion quat;
 		quat.setEuler(0, player->getRotation().y, 0);
@@ -154,7 +155,7 @@ namespace Player
 		interactingWithName = "Nothing";
 
 		if (verticalAngle <= maxAngle && verticalAngle >= -maxAngle)
-			verticalAngle += mouseSpeed * float(768 / 2 - Input::GetMouseY());
+			verticalAngle += mouseSpeed * float(SCREENHEIGHT / 2 - Input::GetMouseY());
 		
 		else if (verticalAngle > maxAngle)
 			verticalAngle = maxAngle;
@@ -162,11 +163,8 @@ namespace Player
 		else if (verticalAngle < -maxAngle)
 			verticalAngle = -maxAngle;
 		
-		forward = glm::vec3(
-			sin(horizontalAngle + 3.14f),
-			0,
-			cos(horizontalAngle + 3.14f)
-		);
+		forward = Camera::GetRotation();
+		forward.y = 0;
 		
 		// Right vector
 		glm::vec3 right = glm::vec3(
@@ -178,12 +176,12 @@ namespace Player
 		// Move forward
 		glm::vec3 movement = glm::vec3(0, player->GetRigidBody()->getLinearVelocity().y(), 0);
 		if (Input::KeyDown('w')) {
-			movement += -forward;
+			movement += forward;
 		}
 		
 		// Move backward
 		if (Input::KeyDown('s')) {
-			movement += forward;
+			movement += -forward;
 		}
 		
 		// Strafe right
@@ -272,7 +270,7 @@ namespace Player
 			SelectWeapon(inv[1]);
 		}
 		
-		horizontalAngle += mouseSpeed * float(1024 / 2 - Input::GetMouseX());
+		horizontalAngle += mouseSpeed * float(SCREENWIDTH / 2 - Input::GetMouseX());
 
 		if ((Input::KeyDown('w') || Input::KeyDown('a') || Input::KeyDown('s') || Input::KeyDown('d')) && footstepTime + footstep_interval < glfwGetTime() ) {
 			AudioManager::PlaySound("foot_step" + std::to_string((rand() % 4) + 1), AssetManager::GetGameObject("player")->getPosition());

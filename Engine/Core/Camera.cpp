@@ -88,7 +88,7 @@ namespace Camera
 
 	void Camera::Update(float dt) {
 		if (verticalAngle <= maxAngle && verticalAngle >= -maxAngle)
-			verticalAngle += mouseSpeed * float(768 / 2 - Input::GetMouseY());
+			verticalAngle += mouseSpeed * float(SCREENHEIGHT / 2 - Input::GetMouseY());
 		else if (verticalAngle > maxAngle)
 			verticalAngle = maxAngle;
 		else if (verticalAngle < -maxAngle)
@@ -124,5 +124,14 @@ namespace Camera
 	
 	glm::vec3 Camera::GetDirection() {
 		return direction;
+	}
+	glm::vec3 GetRotation() {
+		glm::vec3 cameraDirection;
+		cameraDirection.x = -ViewMatrix[0][2];
+		cameraDirection.y = -ViewMatrix[1][2];
+		cameraDirection.z = -ViewMatrix[2][2];
+
+		return glm::normalize(cameraDirection);
+
 	}
 }

@@ -80,6 +80,11 @@ namespace Engine
 				std::ostringstream oss;
 				oss << "FPS: " << FPS;
 				Renderer::RenderText(oss.str().c_str(), 660, 585, 15);
+				oss.str(""); oss.clear();
+				oss.clear();
+				
+				oss << "Position: " << Player::getPosition().x << " y:" << Player::getPosition().y << " z:" << Player::getPosition().z << "\n";
+				Renderer::RenderText(oss.str().c_str(), 0, 560, 15);
 				//AssetManager::CleanUp();
 			}
 			Renderer::SwapBuffers(Backend::GetWindowPointer());

@@ -130,9 +130,6 @@ namespace AudioManager {
 		vel.y = Velocity.y;
 		vel.z = Velocity.z;
 
-		result = system->set3DListenerAttributes(0, &listenerpos, &vel, &forward, &up);
-		if (!succeededOrWarn("FMOD: Failed to create system object", result))
-			return;
 	}
 	
 	void AudioManager::Update() {

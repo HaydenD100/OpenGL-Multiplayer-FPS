@@ -20,6 +20,8 @@ namespace Camera
 	glm::vec3 GetDirection();
 	void Update(float dt);
 
+	glm::vec3 GetRotation();
+
 	glm::vec3 ComputeRay();
 	btCollisionWorld::ClosestRayResultCallback GetRayHit();
 }
