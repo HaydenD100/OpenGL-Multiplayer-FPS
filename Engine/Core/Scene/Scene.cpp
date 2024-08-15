@@ -60,9 +60,9 @@ void Scene::Load() {
 	//AssetManager::AddGameObject("fence2", &models["fence1"], glm::vec3(-9, 1.3, 2), true, 0, Box);
 	//AssetManager::AddGameObject("fence3", &models["fence2"], glm::vec3(2, 1.3, -9), true, 0, Box);
 	//AssetManager::AddGameObject("fence4", &models["fence2"], glm::vec3(-1, 1.3, 5), true, 0, Box);
-	AssetManager::AddGameObject("map1_floor", &models["map_floor"], glm::vec3(0, 1.85, 0), true, 0, Concave);
-	AssetManager::AddGameObject("map1_walls", &models["map_walls"], glm::vec3(0, 1.85, 0), true, 0, Concave);
-	AssetManager::AddGameObject("map1_ceiling", &models["map_ceiling"], glm::vec3(0, 1.85, 0), true, 0, Convex);
+	AssetManager::AddGameObject("map1_floor", &models["map_floor"], glm::vec3(0, 1.6, 0), true, 0, Concave);
+	AssetManager::AddGameObject("map1_walls", &models["map_walls"], glm::vec3(0, 1.6, 0), true, 0, Concave);
+	AssetManager::AddGameObject("map1_ceiling", &models["map_ceiling"], glm::vec3(0, 1.6, 0), true, 0, Convex);
 
 
 	AssetManager::AddGameObject("floor", &models["floor"], glm::vec3(0, 0, 0), true, 0, Convex);
@@ -83,7 +83,9 @@ void Scene::Load() {
 	gunPickUps.push_back(GunPickUp("ak47", "ak47_pickup", &models["ak47"], glm::vec3(1, 30, 1)));
 	gunPickUps.push_back(GunPickUp("glock", "glock_pickup", &models["glock"], glm::vec3(1, 25, 0)));
 
-	doors.push_back(Door("door1", &models["door"], &models["door_frame"], glm::vec3(-3, 0, -3)));
+	doors.push_back(Door("door1", &models["door"], &models["door_frame"], glm::vec3(-11.8, 0, 0)));
+	doors.push_back(Door("door2", &models["door"], &models["door_frame"], glm::vec3(-11.8, 0, 10)));
+
 
 
 
