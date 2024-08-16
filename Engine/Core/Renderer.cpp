@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include "Scene/SceneManager.h"
 #include "Engine/Core/Common.h"
+#include <random>
 
 
 
@@ -122,6 +123,16 @@ namespace Renderer
 	GLuint quad_vertexbuffer;
 	GLuint depthTexture;
 
+	//ssao
+	std::vector<glm::vec3> ssaoKernel;
+	std::vector<glm::vec3> ssaoNoise;
+	unsigned int noiseTexture;
+	unsigned int ssaoColorBuffer;
+	GLuint ssaoFBO = 0;
+
+
+
+
 
 	GLuint Renderer::GetProgramID(const char* name) {
 		return shaderProgramIds[name];
@@ -182,6 +193,7 @@ namespace Renderer
 		// Skybox
 		LoadShader("Assets/Shaders/SkyBoxShader.vert", "Assets/Shaders/SkyBoxShader.frag", "skybox");
 		LoadShader("Assets/Shaders/Deffered/geomerty.vert", "Assets/Shaders/Deffered/geomerty.frag", "geomerty");
+		LoadShader("Assets/Shaders/SSAO/ssao.vert", "Assets/Shaders/SSAO/ssao.frag", "ssao");
 		LoadShader("Assets/Shaders/Texture_Render/Texture_Render.vert", "Assets/Shaders/Texture_Render/Texture_Render.frag", "screen");
 
 
@@ -251,6 +263,54 @@ namespace Renderer
 		LightID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "LightPosition_worldspace");
 		ModelView3x3MatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "MV3x3");
 
+
+		//SSAO
+		std::uniform_real_distribution<float> randomFloats(0.0, 1.0); // random floats between [0.0, 1.0]
+		std::default_random_engine generator;
+		for (unsigned int i = 0; i < 64; ++i)
+		{
+			glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
+			sample = glm::normalize(sample);
+			sample *= randomFloats(generator);
+			float scale = float(i) / 64.0f;
+
+			// scale samples s.t. they're more aligned to center of kernel
+			scale = 0.1f + (scale * scale) * (0.1f - 0.1f);
+			
+			sample *= scale;
+			ssaoKernel.push_back(sample);
+		}
+
+		for (unsigned int i = 0; i < 16; i++)
+		{
+			glm::vec3 noise(
+				randomFloats(generator) * 2.0 - 1.0,
+				randomFloats(generator) * 2.0 - 1.0,
+				0.0f);
+			ssaoNoise.push_back(noise);
+		}
+
+
+		glGenTextures(1, &noiseTexture);
+		glBindTexture(GL_TEXTURE_2D, noiseTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, 4, 4, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		glGenFramebuffers(1, &ssaoFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+
+		glGenTextures(1, &ssaoColorBuffer);
+		glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, SCREENWIDTH, SCREENHEIGHT, 0, GL_RED, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
+
+
 		return 0;
 	}
 
@@ -286,16 +346,62 @@ namespace Renderer
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//this needs to stay here ill figure out why later
 		Renderer::RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
-
 		Renderer::UseProgram(Renderer::GetProgramID("geomerty"));
+		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "P"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
 		SceneManager::Render();
+
+		glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//ssao pass
+		Renderer::UseProgram(Renderer::GetProgramID("ssao"));
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gPosition);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, gNormal);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, noiseTexture);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, depthTexture);
+
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "texNoise"), 2);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "depthTexture"), 3);
+
+
+		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "projection"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "view"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
+
+		glUniform3fv(glGetUniformLocation(GetCurrentProgramID(), "samples"), (GLsizei)ssaoKernel.size(), glm::value_ptr(ssaoKernel[0]));
+
+		glUniform1f(glGetUniformLocation(GetCurrentProgramID(), "ScreenWidth"), SCREENWIDTH);
+		glUniform1f(glGetUniformLocation(GetCurrentProgramID(), "ScreenHeight"), SCREENHEIGHT);
+
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
+		glVertexAttribPointer(
+			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+			3,                  // size
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			0,                  // stride
+			(void*)0            // array buffer offset
+		);
+
+		// Draw the triangles !
+		glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
+		glDisableVertexAttribArray(0);
+
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glDisable(GL_DEPTH_TEST);
-
+		
 		RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
 		glUseProgram(GetProgramID("lighting"));
 		glActiveTexture(GL_TEXTURE0);
@@ -306,18 +412,26 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, gAlbeido);
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, depthTexture);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 2);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "depthTexture"), 3);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "ssaoTexture"), 4);
+
 
 
 		glUniform3fv(glGetUniformLocation(GetCurrentProgramID(), "viewPos"),1, &Camera::GetPosition()[0]);
+		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "inverseV"), 1, GL_FALSE, &glm::inverse(Camera::getViewMatrix())[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "V"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
+
+
 
 
 
 		SetLights(SceneManager::GetCurrentScene()->getLights());
-
+		
 
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);

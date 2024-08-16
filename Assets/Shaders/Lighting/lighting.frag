@@ -5,56 +5,69 @@ in vec2 UV;
 
 out vec4 color;
 
-uniform sampler2D gPostion;
-uniform sampler2D gNormal;
+uniform sampler2D gPostion;    // View-space position
+uniform sampler2D gNormal;     // View-space normal
 uniform sampler2D gAlbeido;
 uniform sampler2D depthTexture;
+uniform sampler2D ssaoTexture;
 
-uniform vec3 LightColors[MAXLIGHTS]; // Array of light colors
-uniform vec3 LightPositions_worldspace[MAXLIGHTS]; // Array of light positions
+uniform vec3 LightColors[MAXLIGHTS];
+uniform vec3 LightPositions_worldspace[MAXLIGHTS];
 uniform float LightLinears[MAXLIGHTS];
 uniform float LightQuadratics[MAXLIGHTS];
 uniform float LightRadius[MAXLIGHTS];
 
-
 uniform vec3 viewPos;
+uniform mat4 inverseV; // Inverse of the view matrix
+uniform mat4 V; // Transpose of the inverse view matrix for normals
 
 void main()
-{             
-    // retrieve data from gbuffer
-    vec3 FragPos = texture(gPostion, UV).rgb;
-    vec3 Normal = texture(gNormal, UV).rgb;
+{
+    // Retrieve data from G-buffer
+    vec3 FragPos_view = vec3(texture(gPostion, UV).rgb); // View-space position
+    vec3 Normal_view = normalize(vec3(texture(gNormal, UV).rgb)); // View-space normal
     vec3 Diffuse = texture(gAlbeido, UV).rgb;
     float Specular = texture(gAlbeido, UV).a;
-    
-    // then calculate lighting as usual
-   
-   // retrieve data from gbuffer
-    
-    
-    // then calculate lighting as usual
-    vec3 lighting  = Diffuse * 0.1; // hard-coded ambient component
-    vec3 viewDir  = normalize(viewPos - FragPos);
+    float AmbientOcclusion = texture(ssaoTexture, UV).r;
+
+    // Transform view-space position to world-space position
+    vec4 FragPos_world = inverseV* vec4(FragPos_view, 1.0);
+    FragPos_world /= FragPos_world.w; // Normalize by w
+    vec3 FragPos = FragPos_world.xyz;
+
+    // Transform view-space normal to world-space normal
+    vec3 Normal_world = normalize((transpose(V) * vec4(Normal_view, 0.0)).xyz);
+
+    // Calculate ambient lighting
+    vec3 ambient = vec3(0.3 * Diffuse * AmbientOcclusion);
+
+    // Lighting calculations
+    vec3 lighting = ambient;
+    vec3 viewDir = normalize(viewPos - FragPos);
+
     for(int i = 0; i < MAXLIGHTS; ++i)
     {
-        // calculate distance between light source and current fragment
+        // Calculate distance between light source and current fragment
         float distance = length(LightPositions_worldspace[i] - FragPos);
         if(distance < LightRadius[i])
         {
-            // diffuse
+            // Diffuse lighting
             vec3 lightDir = normalize(LightPositions_worldspace[i] - FragPos);
-            vec3 diffuse = max(dot(Normal, lightDir), 0.0) * Diffuse * LightColors[i];
-            // specular
+            vec3 diffuse = max(dot(Normal_world, lightDir), 0.0) * Diffuse * LightColors[i];
+
+            // Specular lighting
             vec3 halfwayDir = normalize(lightDir + viewDir);  
-            float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
+            float spec = pow(max(dot(Normal_world, halfwayDir), 0.0), 16.0);
             vec3 specular = LightColors[i] * spec * Specular;
-            // attenuation
+
+            // Attenuation
             float attenuation = 1.0 / (1.0 + LightLinears[i] * distance + LightQuadratics[i] * distance * distance);
             diffuse *= attenuation;
             specular *= attenuation;
+
             lighting += diffuse + specular;
         }
-    }    
+    }
 
     color = vec4(lighting, 1.0);
 }

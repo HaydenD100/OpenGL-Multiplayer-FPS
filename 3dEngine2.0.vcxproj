@@ -115,6 +115,8 @@
       <AdditionalIncludeDirectories>C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\core\inc;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\studio\inc;C:\Users\kokok\OneDrive\Desktop\Code\Home\C++\3dEngine2.0\Engine\Core;C:\Users\kokok\OneDrive\Desktop\Code\Home\C++\3dEngine2.0\Engine;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glew-2.1.0\include;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glfw-3.3.8.bin.WIN64\include;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\GLM;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

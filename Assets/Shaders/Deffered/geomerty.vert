@@ -6,29 +6,30 @@ layout(location = 3) in vec3 vertexTangent_modelspace;
 layout(location = 4) in vec3 vertexBitangent_modelspace;
 
 out vec2 UV;
-out vec3 Position_worldspace;
-out mat3 tangentToWorld;
+out vec3 FragPos;
+out mat3 TBN; // Tangent-Bitangent-Normal matrix
 
 
 uniform mat4 MVP;
 uniform mat4 V;
 uniform mat4 M;
+uniform mat4 P;
 uniform mat3 MV3x3;
 
 
 void main()
 {	
-    mat3 normalMatrix = transpose(inverse(mat3(M)));
-    vec3 normal = normalMatrix * vertexNormal_modelspace;
-    vec3 Tangent = normalize(gl_NormalMatrix[0]); 
-    vec3 Binormal = normalize(gl_NormalMatrix[1]);
+    vec4 viewPos = V * M * vec4(vertexPosition_modelspace, 1.0);
+    FragPos = viewPos.xyz; 
+    UV = vertexUV;
+    
+      mat3 normalMatrix = transpose(inverse(mat3(V * M)));
+    vec3 normal = normalize(normalMatrix * vertexNormal_modelspace);
+    vec3 tangent = normalize(normalMatrix * vertexTangent_modelspace);
+    vec3 bitangent = normalize(normalMatrix * vertexBitangent_modelspace);
 
-    tangentToWorld = mat3(Tangent.x, Binormal.x, normal.x,
-                           Tangent.y, Binormal.y, normal.y,
-                           Tangent.z, Binormal.z, normal.z);
-     
+    TBN = mat3(tangent, bitangent, normal); // Construct TBN matrix for transforming the normal map
 
-	Position_worldspace = (M * vec4(vertexPosition_modelspace, 1)).xyz;
-	UV = vertexUV;
-	gl_Position =  MVP * vec4(vertexPosition_modelspace, 1);
+    
+    gl_Position = P * viewPos;
 }
