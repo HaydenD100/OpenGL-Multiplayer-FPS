@@ -22,7 +22,6 @@ uniform float ScreenHeight;
 vec2 noiseScale = vec2(ScreenWidth/4.0, ScreenHeight/4.0); 
 
 uniform mat4 projection;
-uniform mat4 view;
 
 
 

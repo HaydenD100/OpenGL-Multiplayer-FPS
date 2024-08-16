@@ -212,6 +212,8 @@
     <None Include="Assets\Shaders\SSAO\ssao.frag" />
     <None Include="Assets\Shaders\Deffered\geomerty.frag" />
     <None Include="Assets\Shaders\Deffered\geomerty.vert" />
+    <None Include="Assets\Shaders\SSAO\blur.vert" />
+    <None Include="Assets\Shaders\SSAO\blur.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

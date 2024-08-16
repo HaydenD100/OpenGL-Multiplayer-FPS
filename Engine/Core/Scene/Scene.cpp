@@ -45,7 +45,7 @@ void Scene::Load() {
 
 	models["map_floor"] = Model("Assets/Objects/Map1/floors.fbx", AssetManager::GetTexture("wooden_floor"));
 	models["map_walls"] = Model("Assets/Objects/Map1/walls.fbx", AssetManager::GetTexture("beige_wall"));
-	models["map_ceiling"] = Model("Assets/Objects/Map1/ceiling.fbx", AssetManager::GetTexture("uvmap"));
+	models["map_ceiling"] = Model("Assets/Objects/Map1/ceiling.fbx", AssetManager::GetTexture("beige_wall"));
 
 
 	//models["map1"] = Model("Assets/Objects/Map1/map1.fbx", AssetManager::GetTexture("uvmap"));

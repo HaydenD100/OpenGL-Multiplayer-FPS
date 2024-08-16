@@ -365,20 +365,14 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, gNormal);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, noiseTexture);
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, depthTexture);
 
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "texNoise"), 2);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "depthTexture"), 3);
 
 
 		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "projection"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "view"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
-
 		glUniform3fv(glGetUniformLocation(GetCurrentProgramID(), "samples"), (GLsizei)ssaoKernel.size(), glm::value_ptr(ssaoKernel[0]));
-
 		glUniform1f(glGetUniformLocation(GetCurrentProgramID(), "ScreenWidth"), SCREENWIDTH);
 		glUniform1f(glGetUniformLocation(GetCurrentProgramID(), "ScreenHeight"), SCREENHEIGHT);
 

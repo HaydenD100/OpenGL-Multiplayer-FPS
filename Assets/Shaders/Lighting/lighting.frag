@@ -39,7 +39,7 @@ void main()
     vec3 Normal_world = normalize((transpose(V) * vec4(Normal_view, 0.0)).xyz);
 
     // Calculate ambient lighting
-    vec3 ambient = vec3(0.3 * Diffuse * AmbientOcclusion);
+    vec3 ambient = vec3(0.2 * Diffuse * AmbientOcclusion);
 
     // Lighting calculations
     vec3 lighting = ambient;

@@ -187,6 +187,8 @@
     <None Include="Assets\Shaders\Lighting\lighting.vert" />
     <None Include="Assets\Shaders\SkyBoxShader.frag" />
     <None Include="Assets\Shaders\SkyBoxShader.vert" />
+    <None Include="Assets\Shaders\SSAO\blur.frag" />
+    <None Include="Assets\Shaders\SSAO\blur.vert" />
     <None Include="Assets\Shaders\SSAO\ssao.frag" />
     <None Include="Assets\Shaders\SSAO\ssao.vert" />
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.frag" />
