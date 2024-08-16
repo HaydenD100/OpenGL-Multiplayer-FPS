@@ -3,6 +3,10 @@ https://github.com/HaydenD100/3dEngine2.0
 
 ## Changelog
 
+### 3D Engine 2.0 2024/August/16
+The Engine is now a deferred renderer instead of a forward renderer. Deferred rendering allows 100s of lights without a massive performance impact. Post processing can also be added with ease. Screen Space Ambient Occlusion has also been implemented; this adds a nice depth and makes the scene feel more realistic. An Animation system has been added FBX animation files can now be imported and played. The animation system uses linear interpolation to interpolate between keyframes. There's also been a few changes in the physics system to allow a mesh to have simple convex meshes making loading times much faster for complex shapes, as well as allowing the mesh perfect collision objects. 
+![screenshot](https://github.com/HaydenD100/3dEngine2.0/blob/Bullet3-physics/github/screenshots/deffered.png)
+
 ### 3D Engine 2.0 2024/August/2
 My main focus for the next couple weeks is going to be overhauling the lighting and rendering systems. The Engine now supports multiple lights that can be dynamically changed in the scene. I'm looking at other graphical improvements like SSAO or Rendering to a texture allowing post processing as well as working on a material system to make the textures feel more unique.
 ![screenshot](https://github.com/HaydenD100/3dEngine2.0/blob/Bullet3-physics/github/screenshots/better_lighting.png)

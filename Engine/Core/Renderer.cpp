@@ -253,6 +253,14 @@ namespace Renderer
 		glGenBuffers(1, &quad_vertexbuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
+
+		UseProgram(GetProgramID("lighting"));
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 2);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "ssaoTexture"), 3);
+
+		
 		
 
 		UseProgram(GetProgramID("geomerty"));
@@ -289,6 +297,14 @@ namespace Renderer
 				0.0f);
 			ssaoNoise.push_back(noise);
 		}
+
+		UseProgram(GetProgramID("ssao"));
+		glUniform3fv(glGetUniformLocation(GetCurrentProgramID(), "samples"), (GLsizei)ssaoKernel.size(), glm::value_ptr(ssaoKernel[0]));
+		glUniform1f(glGetUniformLocation(GetCurrentProgramID(), "ScreenWidth"), SCREENWIDTH);
+		glUniform1f(glGetUniformLocation(GetCurrentProgramID(), "ScreenHeight"), SCREENHEIGHT);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "texNoise"), 2);
 
 
 		glGenTextures(1, &noiseTexture);
@@ -365,16 +381,8 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, gNormal);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, noiseTexture);
-
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "texNoise"), 2);
-
-
 		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "projection"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
-		glUniform3fv(glGetUniformLocation(GetCurrentProgramID(), "samples"), (GLsizei)ssaoKernel.size(), glm::value_ptr(ssaoKernel[0]));
-		glUniform1f(glGetUniformLocation(GetCurrentProgramID(), "ScreenWidth"), SCREENWIDTH);
-		glUniform1f(glGetUniformLocation(GetCurrentProgramID(), "ScreenHeight"), SCREENHEIGHT);
+		
 
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
@@ -405,17 +413,8 @@ namespace Renderer
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, gAlbeido);
 		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, depthTexture);
-		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 2);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "depthTexture"), 3);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "ssaoTexture"), 4);
-
-
-
+		
 		glUniform3fv(glGetUniformLocation(GetCurrentProgramID(), "viewPos"),1, &Camera::GetPosition()[0]);
 		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "inverseV"), 1, GL_FALSE, &glm::inverse(Camera::getViewMatrix())[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "V"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
@@ -442,6 +441,9 @@ namespace Renderer
 		glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
 
 		glDisableVertexAttribArray(0);
+
+		glDisable(GL_DEPTH_TEST);
+
 
 
 	}

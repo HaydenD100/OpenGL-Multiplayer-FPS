@@ -8,7 +8,6 @@ out vec4 color;
 uniform sampler2D gPostion;    // View-space position
 uniform sampler2D gNormal;     // View-space normal
 uniform sampler2D gAlbeido;
-uniform sampler2D depthTexture;
 uniform sampler2D ssaoTexture;
 
 uniform vec3 LightColors[MAXLIGHTS];
@@ -19,7 +18,7 @@ uniform float LightRadius[MAXLIGHTS];
 
 uniform vec3 viewPos;
 uniform mat4 inverseV; // Inverse of the view matrix
-uniform mat4 V; // Transpose of the inverse view matrix for normals
+uniform mat4 V; // TT
 
 void main()
 {
@@ -31,15 +30,14 @@ void main()
     float AmbientOcclusion = texture(ssaoTexture, UV).r;
 
     // Transform view-space position to world-space position
-    vec4 FragPos_world = inverseV* vec4(FragPos_view, 1.0);
+    vec4 FragPos_world = inverseV * vec4(FragPos_view, 1.0);
     FragPos_world /= FragPos_world.w; // Normalize by w
     vec3 FragPos = FragPos_world.xyz;
-
     // Transform view-space normal to world-space normal
     vec3 Normal_world = normalize((transpose(V) * vec4(Normal_view, 0.0)).xyz);
 
     // Calculate ambient lighting
-    vec3 ambient = vec3(0.2 * Diffuse * AmbientOcclusion);
+    vec3 ambient = vec3(0.15 * Diffuse * AmbientOcclusion);
 
     // Lighting calculations
     vec3 lighting = ambient;
@@ -68,6 +66,5 @@ void main()
             lighting += diffuse + specular;
         }
     }
-
     color = vec4(lighting, 1.0);
 }

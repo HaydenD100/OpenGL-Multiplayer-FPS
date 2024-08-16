@@ -83,11 +83,11 @@ namespace Engine
 				oss.str(""); oss.clear();
 				oss.clear();
 				
+				oss.precision(2);
 				oss << "Position: " << Player::getPosition().x << " y:" << Player::getPosition().y << " z:" << Player::getPosition().z << "\n";
 				Renderer::RenderText(oss.str().c_str(), 0, 560, 15);
 				//AssetManager::CleanUp();
 
-				std::cout << "FPS: " << FPS << std::endl;
 			}
 			Renderer::SwapBuffers(Backend::GetWindowPointer());
 
