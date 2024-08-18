@@ -358,9 +358,9 @@ namespace Renderer
 	}
 
 	void Renderer::RenderScene() {
-		float time = glfwGetTime();
-		float newTime = 0;
-		std::cout << "-------------- Renderer Time ms-------------------- \n";
+		//float time = glfwGetTime();
+		//float newTime = 0;
+		//std::cout << "-------------- Renderer Time ms-------------------- \n";
 		glEnable(GL_DEPTH_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
@@ -370,15 +370,15 @@ namespace Renderer
 		//Renderer::RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
 		glBindVertexArray(quad_vertexbuffer);
 
-		newTime = glfwGetTime();
-		std::cout << "Sky:" << (newTime - time) * 1000 << "ms" << std::endl;
-		time = newTime;
+		//newTime = glfwGetTime();
+		//std::cout << "Sky:" << (newTime - time) * 1000 << "ms" << std::endl;
+		//time = newTime;
 		Renderer::UseProgram(Renderer::GetProgramID("geomerty"));
 		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "P"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
 		SceneManager::Render();
-		newTime = glfwGetTime();
-		std::cout << "Geometry:" << (newTime - time) * 1000 << "ms" << std::endl;
-		time = newTime;
+		//newTime = glfwGetTime();
+		//std::cout << "Geometry:" << (newTime - time) * 1000 << "ms" << std::endl;
+		//time = newTime;
 		glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -410,9 +410,9 @@ namespace Renderer
 		glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
 		glDisableVertexAttribArray(0);
 
-		newTime = glfwGetTime();
-		std::cout << "SSAO:" << (newTime - time) * 1000 << "ms" << std::endl;
-		time = newTime;
+		//newTime = glfwGetTime();
+		//std::cout << "SSAO:" << (newTime - time) * 1000 << "ms" << std::endl;
+		//time = newTime;
 
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -454,9 +454,9 @@ namespace Renderer
 
 		glDisable(GL_DEPTH_TEST);
 
-		newTime = glfwGetTime();
-		std::cout << "Lights:" << (newTime - time) * 1000 << "ms" << std::endl;
-		time = newTime;
+		//newTime = glfwGetTime();
+		//std::cout << "Lights:" << (newTime - time) * 1000 << "ms" << std::endl;
+		//time = newTime;
 
 
 

@@ -63,11 +63,16 @@ void Scene::Load() {
 	gunPickUps.push_back(GunPickUp("ak47", "ak47_pickup", &models["ak47"], glm::vec3(1, 30, 1)));
 	gunPickUps.push_back(GunPickUp("glock", "glock_pickup", &models["glock"], glm::vec3(1, 25, 0)));
 
-	doors.push_back(Door("door1", &models["door"], &models["door_frame"], glm::vec3(-10.6, 0, 0)));
-	doors.push_back(Door("door2", &models["door"], &models["door_frame"], glm::vec3(-10.6, 0, 10)));
-	doors.push_back(Door("door3", &models["door"], &models["door_frame"], glm::vec3(0, 0, 0)));
-	AssetManager::GetGameObject("door3_door")->SetRotationY(1.56f);
-	AssetManager::GetGameObject("door3_frame")->SetRotationY(1.56f);
+	doors.push_back(Door("door1", &models["door"], &models["door_frame"], glm::vec3(-10.6, 0, 0.05)));
+	doors.push_back(Door("door2", &models["door"], &models["door_frame"], glm::vec3(-10.6, 0, 9.95)));
+
+	doors.push_back(Door("door3", &models["door"], &models["door_frame"], glm::vec3(-12.3, 0, 4.6)));
+	AssetManager::GetGameObject("door3_door")->SetRotationY(1.5708f);
+	AssetManager::GetGameObject("door3_frame")->SetRotationY(1.5708f);
+
+	doors.push_back(Door("door4", &models["door"], &models["door_frame"], glm::vec3(-10, 0, 4.6)));
+	AssetManager::GetGameObject("door4_door")->SetRotationY(1.5708f);
+	AssetManager::GetGameObject("door4_frame")->SetRotationY(1.5708f);
 
 
 

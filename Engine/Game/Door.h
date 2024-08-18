@@ -19,6 +19,7 @@ private:
 	bool opening;
 	glm::vec3 door_position;
 	glm::vec3 door_rotation;
-	float rotation = 0.0f;
-	float openingSpeed = 0.08f;
+	double rotation = 0;
+	double openingSpeed = 0.08f;
+	double maxRotation = 1.5f;
 };
