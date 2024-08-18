@@ -17,7 +17,7 @@ void Door::Interact() {
 	if (Player::GetInteractingWithName() == name + "_door" && opening == false) {
 		opening = true;
 		if (opened) {
-			rotation = 1.5;
+			rotation = 1.6;
 			AudioManager::PlaySound("door_close", door_position);
 		}
 		else {
@@ -30,7 +30,7 @@ void Door::Interact() {
 void Door::Update(float deltaTime) {
 	if (!opening)
 		return;
-	if ((rotation >= 1.5f && !opened) || (rotation <= 0 && opened)) {
+	if ((rotation >= 1.6f && !opened) || (rotation <= 0 && opened)) {
 		opening = false;
 		opened = !opened;
 	}
