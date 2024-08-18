@@ -66,8 +66,8 @@ void Scene::Load() {
 	doors.push_back(Door("door1", &models["door"], &models["door_frame"], glm::vec3(-10.6, 0, 0)));
 	doors.push_back(Door("door2", &models["door"], &models["door_frame"], glm::vec3(-10.6, 0, 10)));
 	doors.push_back(Door("door3", &models["door"], &models["door_frame"], glm::vec3(0, 0, 0)));
-	AssetManager::GetGameObject("door3_door")->SetRotationY(1.5f);
-	AssetManager::GetGameObject("door3_frame")->SetRotationY(1.5f);
+	AssetManager::GetGameObject("door3_door")->SetRotationY(1.56f);
+	AssetManager::GetGameObject("door3_frame")->SetRotationY(1.56f);
 
 
 
@@ -128,11 +128,6 @@ void Scene::Load() {
 
 void Scene::Update(float deltaTime) {
 	Player::Update(deltaTime);
-
-	if (Input::KeyDown('k')) {
-		AnimationManager::Play("cube", "cube1");
-	}
-
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
 		AssetManager::GetGameObject(i)->Update();
 	}
@@ -141,13 +136,11 @@ void Scene::Update(float deltaTime) {
 		doors[door].Interact();
 		doors[door].Update(deltaTime);
 	}
-
 	for (int gun = 0; gun < gunPickUps.size(); gun++) {
 		gunPickUps[gun].Update();
 		if (gunPickUps[gun].Interact() && Player::getCurrentGun() == "nothing")
 			gunPickUps.erase(gunPickUps.begin() + gun);
 	}
-
 	for (int crate = 0; crate < crates.size(); crate++) {
 		crates[crate].Update();
 	}

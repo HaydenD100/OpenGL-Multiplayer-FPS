@@ -367,7 +367,9 @@ namespace Renderer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//this needs to stay here ill figure out why later
 
-		Renderer::RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
+		//Renderer::RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
+		glBindVertexArray(quad_vertexbuffer);
+
 		newTime = glfwGetTime();
 		std::cout << "Sky:" << (newTime - time) * 1000 << "ms" << std::endl;
 		time = newTime;
@@ -464,7 +466,7 @@ namespace Renderer
 
 	
 	void Renderer::RendererSkyBox(glm::mat4 view, glm::mat4 projection, SkyBox skybox) {
-
+		/*
 		glDepthMask(GL_FALSE);
 		UseProgram(GetProgramID("skybox"));
 		GLuint projectionid = glGetUniformLocation(GetProgramID("skybox"), "projection");
@@ -473,10 +475,11 @@ namespace Renderer
 
 		setMat4(viewid, viewWithoutTranslation);
 		setMat4(projectionid, projection);
+		*/
 		glBindVertexArray(skybox.GetSkyBoxVAO());
-		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetTextureID());
-		glDrawArrays(GL_TRIANGLES, 0, 36);
-		glDepthMask(GL_TRUE);
+		//glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetTextureID());
+		//glDrawArrays(GL_TRIANGLES, 0, 36);
+		//glDepthMask(GL_TRUE);
 	}
 
 	void Renderer::SwapBuffers(GLFWwindow* window) {
