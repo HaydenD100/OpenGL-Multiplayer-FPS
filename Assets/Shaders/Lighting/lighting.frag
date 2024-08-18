@@ -69,16 +69,7 @@ void main()
         }
     }
 
-    //not sure if this all works
 
-
-    float gamma = 1;
-    float exposure = 1.0;
   
-    // exposure tone mapping
-    vec3 mapped = vec3(1.0) - exp(-lighting * exposure);
-    // gamma correction 
-    mapped = pow(mapped, vec3(1.0 / gamma));
-  
-    color = vec4(mapped, 1.0);
+    color = vec4(lighting, 1.0);
 }
