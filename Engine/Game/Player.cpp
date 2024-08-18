@@ -131,7 +131,6 @@ namespace Player
 		head->setRotation(glm::vec3(-verticalAngle, horizontalAngle, 0));
 		head->setPosition(player->getPosition() + glm::vec3(0, 1.5, 0));
 
-
 		if(verticalAngle < 1.5f && verticalAngle > -1.5f)
 			Camera::SetVerticalAngle(verticalAngle);
 		Camera::SetHorizontalAngle(horizontalAngle);

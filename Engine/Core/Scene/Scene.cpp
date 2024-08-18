@@ -65,6 +65,11 @@ void Scene::Load() {
 
 	doors.push_back(Door("door1", &models["door"], &models["door_frame"], glm::vec3(-10.6, 0, 0)));
 	doors.push_back(Door("door2", &models["door"], &models["door_frame"], glm::vec3(-10.6, 0, 10)));
+	doors.push_back(Door("door3", &models["door"], &models["door_frame"], glm::vec3(0, 0, 0)));
+	AssetManager::GetGameObject("door3_door")->SetRotationY(1.5f);
+	AssetManager::GetGameObject("door3_frame")->SetRotationY(1.5f);
+
+
 
 	// Sets renderer
 	Renderer::UseProgram(Renderer::GetProgramID("Texture"));

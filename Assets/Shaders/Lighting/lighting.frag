@@ -45,6 +45,8 @@ void main()
 
     for(int i = 0; i < MAXLIGHTS; ++i)
     {
+        if(LightRadius[i] == 0)
+            continue;
         // Calculate distance between light source and current fragment
         float distance = length(LightPositions_worldspace[i] - FragPos);
         if(distance < LightRadius[i])

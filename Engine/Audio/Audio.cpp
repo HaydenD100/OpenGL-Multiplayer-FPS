@@ -163,6 +163,7 @@ namespace AudioManager {
 				if (!succeededOrWarn("FMOD4: ", result))
 					return Sound::DEFAULT;
 
+
 				return i;
 			}
 		}		
@@ -177,6 +178,7 @@ namespace AudioManager {
 				if (!succeededOrWarn("Error1", result))
 					return Sound::DEFAULT;
 				//GetSound(sound)->SetPosition(Position);
+
 
 				FMOD_VECTOR position;
 				position.x = Position.x;
@@ -200,7 +202,7 @@ namespace AudioManager {
 		return Sound::DEFAULT;
 	}
 	
-	int PlaySound(std::string sound, glm::vec3 Position, int channel) {
+	int AudioManager::PlaySound(std::string sound, glm::vec3 Position, int channel) {
 		FMOD_VECTOR position;
 		position.x = Position.x;
 		position.y = Position.y;
@@ -213,7 +215,9 @@ namespace AudioManager {
 		
 		if (!succeededOrWarn("Error", result))
 			return Sound::DEFAULT;
-		
+
+
+
 		return channel;
 	}
 

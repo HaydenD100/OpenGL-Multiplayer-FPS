@@ -358,16 +358,25 @@ namespace Renderer
 	}
 
 	void Renderer::RenderScene() {
+		float time = glfwGetTime();
+		float newTime = 0;
+		std::cout << "-------------- Renderer Time ms-------------------- \n";
 		glEnable(GL_DEPTH_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//this needs to stay here ill figure out why later
+
 		Renderer::RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
+		newTime = glfwGetTime();
+		std::cout << "Sky:" << (newTime - time) * 1000 << "ms" << std::endl;
+		time = newTime;
 		Renderer::UseProgram(Renderer::GetProgramID("geomerty"));
 		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "P"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
 		SceneManager::Render();
-
+		newTime = glfwGetTime();
+		std::cout << "Geometry:" << (newTime - time) * 1000 << "ms" << std::endl;
+		time = newTime;
 		glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -399,6 +408,10 @@ namespace Renderer
 		glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
 		glDisableVertexAttribArray(0);
 
+		newTime = glfwGetTime();
+		std::cout << "SSAO:" << (newTime - time) * 1000 << "ms" << std::endl;
+		time = newTime;
+
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
@@ -419,13 +432,8 @@ namespace Renderer
 		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "inverseV"), 1, GL_FALSE, &glm::inverse(Camera::getViewMatrix())[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "V"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
 
-
-
-
-
 		SetLights(SceneManager::GetCurrentScene()->getLights());
 		
-
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
 		glVertexAttribPointer(
@@ -444,6 +452,11 @@ namespace Renderer
 
 		glDisable(GL_DEPTH_TEST);
 
+		newTime = glfwGetTime();
+		std::cout << "Lights:" << (newTime - time) * 1000 << "ms" << std::endl;
+		time = newTime;
+
+
 
 
 	}
@@ -451,6 +464,7 @@ namespace Renderer
 
 	
 	void Renderer::RendererSkyBox(glm::mat4 view, glm::mat4 projection, SkyBox skybox) {
+
 		glDepthMask(GL_FALSE);
 		UseProgram(GetProgramID("skybox"));
 		GLuint projectionid = glGetUniformLocation(GetProgramID("skybox"), "projection");
