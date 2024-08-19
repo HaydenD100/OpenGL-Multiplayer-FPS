@@ -56,7 +56,7 @@ void Scene::Load() {
 	
 
 	crates.push_back(Crate(glm::vec3(1, 10, 1), "crate1", &models["crate"]));
-	crates.push_back(Crate(glm::vec3(1, 12, 0.5), "crate2", &models["crate"]));
+	crates.push_back(Crate(glm::vec3(1, 12, 0.5), "crate2", &models["crate"])); 
 	crates.push_back(Crate(glm::vec3(0.5, 13, 1), "crate3", &models["crate"]));
 
 
