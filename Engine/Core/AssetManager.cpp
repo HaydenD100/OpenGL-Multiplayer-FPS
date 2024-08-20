@@ -152,7 +152,7 @@ namespace AssetManager
 		return Textures.size() - 1;
 	}
 
-	size_t AssetManager::AddTexture(const char* name, const char* path, float roughness, float metalic) {
+	size_t AssetManager::AddTexture(const char* name, const char* path, float roughness, float metalic) { 
 		Textures.push_back(Texture(name, path, roughness, metalic));
 		return Textures.size() - 1;
 	}
