@@ -8,7 +8,7 @@
 
 #include "Loaders/ShaderLoader.hpp"
 #include "Loaders/Loader.hpp"
-#include "Engine/Core/UI/Text2D.h"
+#include "Engine/Core/UI/Text2D.h" 
 #include "Loaders/stb_image.h"
 #include "Engine/Core/Lights/Light.h"
 #include "Engine/Core/Texture.h"
