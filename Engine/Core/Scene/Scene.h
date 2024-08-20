@@ -49,4 +49,6 @@ private:
 
 	//holds the models
 	std::map<std::string, Model> models;
+
+	GLuint ModelMatrixId;
 };

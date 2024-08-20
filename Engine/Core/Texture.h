@@ -13,21 +13,30 @@ class Texture
 public:
     //static int CurrentTextureNumber;
 
-    Texture(const char* name, const char* path);
-    Texture(const char* name, const char* path, const char* normalPath);
-    Texture(const char* name, const char* path, const char* normalPath, const char* specularPath);
-
+    Texture(const char* name, const char* path, float roughness, float metalic);
+    Texture(const char* name, const char* path, const char* normalPath, float roughness, float metalic);
+    Texture(const char* name, const char* path, const char* normalPath, const char* roughnessPath, const char* metalicPath);
 
     const char* GetName();
     GLuint GetTexture();
     GLuint GetTextureNormal();
-    GLuint GetTextureSpecular();
+    GLuint GetTextureRoughness();
+    GLuint GetTextureMetalic();
+    float GetRoughness();
+    float GetMetalic();
+
+
 
 private:
     const char* name;
 
     GLuint texture;
     GLuint textureNormal;
-    GLuint textureSpecular;
+    GLuint textureRoughness;
+    GLuint textureMetalic;
+
+    float roughness = -1;
+    float metalic = -1;
+
 
 };

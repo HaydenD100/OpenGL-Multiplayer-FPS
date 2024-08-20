@@ -152,17 +152,17 @@ namespace AssetManager
 		return Textures.size() - 1;
 	}
 
-	size_t AssetManager::AddTexture(const char* name, const char* path) {
-		Textures.push_back(Texture(name, path));
+	size_t AssetManager::AddTexture(const char* name, const char* path, float roughness, float metalic) {
+		Textures.push_back(Texture(name, path, roughness, metalic));
 		return Textures.size() - 1;
 	}
 
-	size_t AddTexture(const char* name, const char* path, const char* normalPath) {
-		Textures.push_back(Texture(name, path,normalPath));
+	size_t AddTexture(const char* name, const char* path, const char* normalPath, float roughness, float metalic) {
+		Textures.push_back(Texture(name, path,normalPath, roughness, metalic));
 		return Textures.size() - 1;
 	}	
-	size_t AddTexture(const char* name, const char* path, const char* normalPath, const char* SpecularPath) {
-		Textures.push_back(Texture(name, path, normalPath,SpecularPath));
+	size_t AddTexture(const char* name, const char* path, const char* normalPath, const char* RoughnessPath, const char* MetalicPath) {
+		Textures.push_back(Texture(name, path, normalPath, RoughnessPath, MetalicPath));
 		return Textures.size() - 1;
 	}
 
