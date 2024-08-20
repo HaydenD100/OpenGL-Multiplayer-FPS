@@ -11,7 +11,7 @@ void Scene::Load() {
 	AssetManager::AddTexture("sand", "Assets/Textures/sandyGround.png", "Assets/Normals/sand_normal.png",0.3,0);
 	AssetManager::AddTexture("concrete", "Assets/Textures/fence.png", "Assets/Normals/fence_normal.png",0.3,0);
 	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png",0.2,0.5);
-	AssetManager::AddTexture("door", "Assets/Textures/door.png","Assets/Normal/door_normal.png",0.2,0);
+	AssetManager::AddTexture("door", "Assets/Textures/door.png","Assets/Normals/door_normal.png",0.2,0);
 	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png",0.4,0.4);
 	AssetManager::AddTexture("drawer", "Assets/Textures/drawerred.png", "Assets/Normals/drawer_normal.png",0.5,0);
 	AssetManager::AddTexture("lamp", "Assets/Textures/lamp.png", "Assets/Normals/lamp_normal.png",0.5,0.1);
@@ -90,33 +90,33 @@ void Scene::Load() {
 
 	// MAX LIGHTS BY DEFAULT IS 60 if you want more lights go to lighting.frag and change MAXLIGHTS
 	{
-		Light light(glm::vec3(-11, 4, 15), glm::vec3(1, 0.779, 0.529), 0.09, 0.032);
+		Light light(glm::vec3(-11, 4, 15), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.032);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-11, 4, 6), glm::vec3(1, 0.779, 0.529), 0.09, 0.032);
+		Light light(glm::vec3(-11, 4, 6), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.032);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-15, 4, 5), glm::vec3(1, 0.25, 0),0.09, 0.032);
+		Light light(glm::vec3(-15, 4, 5), glm::vec3(1, 0.25, 0) * 5.0f,0.09, 0.032);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-7.5, 4, 5), glm::vec3(1, 0.25, 0),0.09, 0.032);
+		Light light(glm::vec3(-7.5, 4, 5), glm::vec3(1, 0.25, 0) * 5.0f,0.09, 0.032);
 		lights.push_back(light);
 	}
 
 	{
-		Light light(glm::vec3(-2.5, 4, -5), glm::vec3(1, 0.25, 0),0.09, 0.0320);
+		Light light(glm::vec3(-2.5, 4, -5), glm::vec3(1, 0.25, 0) * 4.0f,0.09, 0.0320);
 		lights.push_back(light);
 	}
 	
 	{
-		Light light(glm::vec3(-6, 2, -2), glm::vec3(1, 0, 1),0.09, 0.0320);
+		Light light(glm::vec3(-6, 2, -2), glm::vec3(1, 0, 1) * 4.0f,0.09, 0.0320);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-1, 2, -1), glm::vec3(0, 1, 1),0.09, 0.0320);
+		Light light(glm::vec3(-1, 2, -1), glm::vec3(0, 1, 1) * 4.0f ,0.09, 0.0320);
 		lights.push_back(light);
 	}
 	
