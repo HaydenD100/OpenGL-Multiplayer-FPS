@@ -6,7 +6,7 @@ Scene::Scene() {
 
 void Scene::Load() { 
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png",0,0);
-	AssetManager::AddTexture("crate", "Assets/Textures/crate.png",0.7,0);
+	AssetManager::AddTexture("crate", "Assets/Textures/crate.png",0.2,0);
 	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png",1,0);
 	AssetManager::AddTexture("sand", "Assets/Textures/sandyGround.png", "Assets/Normals/sand_normal.png",0.3,0);
 	AssetManager::AddTexture("concrete", "Assets/Textures/fence.png", "Assets/Normals/fence_normal.png",0.3,0);
@@ -57,7 +57,7 @@ void Scene::Load() {
 
 	crates.push_back(Crate(glm::vec3(1, 10, 1), "crate1", &models["crate"]));
 	crates.push_back(Crate(glm::vec3(1, 12, 0.5), "crate2", &models["crate"])); 
-	crates.push_back(Crate(glm::vec3(0.5, 13, 1), "crate3", &models["crate"]));
+	crates.push_back(Crate(glm::vec3(-10, 2, 14), "crate3", &models["crate"]));
 
 
 	gunPickUps.push_back(GunPickUp("ak47", "ak47_pickup", &models["ak47"], glm::vec3(1, 30, 1)));
@@ -98,25 +98,25 @@ void Scene::Load() {
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-15, 4, 5), glm::vec3(1, 0.25, 0) * 5.0f,0.09, 0.032);
+		Light light(glm::vec3(-15, 4, 5), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.032);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-7.5, 4, 5), glm::vec3(1, 0.25, 0) * 5.0f,0.09, 0.032);
+		Light light(glm::vec3(-7.5, 4, 5), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.032);
 		lights.push_back(light);
 	}
 
 	{
-		Light light(glm::vec3(-2.5, 4, -5), glm::vec3(1, 0.25, 0) * 4.0f,0.09, 0.0320);
+		Light light(glm::vec3(-2.5, 4, -5), glm::vec3(1, 0.25, 0) * 4.0f, 0.09, 0.0320);
 		lights.push_back(light);
 	}
 	
 	{
-		Light light(glm::vec3(-6, 2, -2), glm::vec3(1, 0, 1) * 4.0f,0.09, 0.0320);
+		Light light(glm::vec3(-6, 2, -2), glm::vec3(1, 0, 1) * 4.0f, 0.09, 0.0320);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-1, 2, -1), glm::vec3(0, 1, 1) * 4.0f ,0.09, 0.0320);
+		Light light(glm::vec3(-1, 2, -1), glm::vec3(0, 1, 1) * 4.0f, 0.09, 0.0320);
 		lights.push_back(light);
 	}
 	
