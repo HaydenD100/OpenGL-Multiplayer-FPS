@@ -38,9 +38,9 @@ namespace AssetManager
 	std::vector<Decal>* GetAllDecals();
 
 	size_t AddTexture(Texture texture);
-	size_t AddTexture(const char* name, const char* path);
-	size_t AddTexture(const char* name, const char* path, const char* normalPath);
-	size_t AddTexture(const char* name, const char* path, const char* normaPath, const char* SpecularPath);
+	size_t AddTexture(const char* name, const char* path, float roughness, float metalic);
+	size_t AddTexture(const char* name, const char* path, const char* normalPath, float roughness, float metalic);
+	size_t AddTexture(const char* name, const char* path, const char* normaPath, const char* RoughnessPath, const char* MetalicPath);
 
 
 	void RemoveGameObject(std::string name);

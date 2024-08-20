@@ -5,19 +5,19 @@ Scene::Scene() {
 }
 
 void Scene::Load() {
-	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png");
-	AssetManager::AddTexture("crate", "Assets/Textures/crate.png");
-	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png");
-	AssetManager::AddTexture("sand", "Assets/Textures/sandyGround.png", "Assets/Normals/sand_normal.png");
-	AssetManager::AddTexture("concrete", "Assets/Textures/fence.png", "Assets/Normals/fence_normal.png");
-	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png");
-	AssetManager::AddTexture("door", "Assets/Textures/door.png","Assets/Normal/door_normal.png");
-	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png");
-	AssetManager::AddTexture("drawer", "Assets/Textures/drawerred.png", "Assets/Normals/drawer_normal.png");
-	AssetManager::AddTexture("lamp", "Assets/Textures/lamp.png", "Assets/Normals/lamp_normal.png");
+	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png",0,0);
+	AssetManager::AddTexture("crate", "Assets/Textures/crate.png",0.7,0);
+	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png",1,0);
+	AssetManager::AddTexture("sand", "Assets/Textures/sandyGround.png", "Assets/Normals/sand_normal.png",0.3,0);
+	AssetManager::AddTexture("concrete", "Assets/Textures/fence.png", "Assets/Normals/fence_normal.png",0.3,0);
+	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png",0.2,0.5);
+	AssetManager::AddTexture("door", "Assets/Textures/door.png","Assets/Normal/door_normal.png",0.2,0);
+	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png",0.4,0.4);
+	AssetManager::AddTexture("drawer", "Assets/Textures/drawerred.png", "Assets/Normals/drawer_normal.png",0.5,0);
+	AssetManager::AddTexture("lamp", "Assets/Textures/lamp.png", "Assets/Normals/lamp_normal.png",0.5,0.1);
 
-	AssetManager::AddTexture("beige_wall", "Assets/Textures/beige_wall.jpg", "Assets/Normals/beige_wall_normal.jpg");
-	AssetManager::AddTexture("wooden_floor", "Assets/Textures/wooden_floor.jpg", "Assets/Normals/wooden_floor_normal.jpg","Assets/Specular/floor_Specular.jpg");
+	AssetManager::AddTexture("beige_wall", "Assets/Textures/beige_wall.jpg", "Assets/Normals/beige_wall_normal.jpg",0.2,0);
+	AssetManager::AddTexture("wooden_floor", "Assets/Textures/wooden_floor.jpg", "Assets/Normals/wooden_floor_normal.jpg",0.2,0.2);
 
 
 
@@ -90,33 +90,33 @@ void Scene::Load() {
 
 	// MAX LIGHTS BY DEFAULT IS 60 if you want more lights go to lighting.frag and change MAXLIGHTS
 	{
-		Light light(glm::vec3(-11, 4, 15), glm::vec3(1, 0.779, 0.529), 0.14, 0.07);
+		Light light(glm::vec3(-11, 4, 15), glm::vec3(1, 0.779, 0.529), 0.09, 0.032);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-11, 4, 6), glm::vec3(1, 0.779, 0.529), 0.4, 0.002);
+		Light light(glm::vec3(-11, 4, 6), glm::vec3(1, 0.779, 0.529), 0.09, 0.032);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-15, 4, 5), glm::vec3(1, 0.25, 0), 0.22, 0.2);
+		Light light(glm::vec3(-15, 4, 5), glm::vec3(1, 0.25, 0),0.09, 0.032);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-7.5, 4, 5), glm::vec3(1, 0.25, 0), 0.22, 0.2);
+		Light light(glm::vec3(-7.5, 4, 5), glm::vec3(1, 0.25, 0),0.09, 0.032);
 		lights.push_back(light);
 	}
 
 	{
-		Light light(glm::vec3(-2.5, 4, -5), glm::vec3(1, 0.25, 0), 0.22, 0.20);
+		Light light(glm::vec3(-2.5, 4, -5), glm::vec3(1, 0.25, 0),0.09, 0.0320);
 		lights.push_back(light);
 	}
 	
 	{
-		Light light(glm::vec3(-6, 2, -2), glm::vec3(1, 0, 1), 0.22, 0.20);
+		Light light(glm::vec3(-6, 2, -2), glm::vec3(1, 0, 1),0.09, 0.0320);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-1, 2, -1), glm::vec3(0, 1, 1), 0.22, 0.20);
+		Light light(glm::vec3(-1, 2, -1), glm::vec3(0, 1, 1),0.09, 0.0320);
 		lights.push_back(light);
 	}
 	
@@ -127,6 +127,9 @@ void Scene::Load() {
 
 	// TODO: not currently working
 	//AssetManager::SaveAssets("Assets/Saves/mainScene.json");
+
+
+	ModelMatrixId = glGetUniformLocation(Renderer::GetCurrentProgramID(), "model");
 
 
 }
@@ -212,7 +215,7 @@ void Scene::RenderObjects(const char* shaderName) {
 
 		glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
 
-		Renderer::setMat4(glGetUniformLocation(Renderer::GetCurrentProgramID(), "model"), ModelMatrix);
+		Renderer::setMat4(ModelMatrixId, ModelMatrix);
 		//Renderers model
 		gameobjectRender->RenderObject(programid);
 	}

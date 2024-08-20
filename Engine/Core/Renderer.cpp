@@ -265,6 +265,11 @@ namespace Renderer
 
 		UseProgram(GetProgramID("geomerty"));
 
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "DiffuseTextureSampler"), 0);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "NormalTextureSampler"), 1);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "RoughnessTextureSampler"), 2);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "MetalicTextureSampler"), 3);
+
 		MatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "MVP");
 		ViewMatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "V");
 		ModelMatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "M");

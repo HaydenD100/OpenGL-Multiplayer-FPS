@@ -3,7 +3,7 @@
 in vec2 UV;
 #define MAXLIGHTS 60
 
-out vec4 color;
+out vec4 FragColor;
 
 uniform sampler2D gPostion;    // View-space position
 uniform sampler2D gNormal;     // View-space normal
@@ -20,56 +20,129 @@ uniform vec3 viewPos;
 uniform mat4 inverseV; // Inverse of the view matrix
 uniform mat4 V; // TT
 
+const float PI = 3.14159265359;
+
+float DistributionGGX(vec3 N, vec3 H, float roughness)
+{
+    float a = roughness*roughness;
+    float a2 = a*a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH*NdotH;
+
+    float nom   = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+
+    return nom / denom;
+}
+// ----------------------------------------------------------------------------
+float GeometrySchlickGGX(float NdotV, float roughness)
+{
+    float r = (roughness + 1.0);
+    float k = (r*r) / 8.0;
+
+    float nom   = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+
+    return nom / denom;
+}
+// ----------------------------------------------------------------------------
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+
+    return ggx1 * ggx2;
+}
+// ----------------------------------------------------------------------------
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
 void main()
 {
     // Retrieve data from G-buffer
     vec3 FragPos_view = vec3(texture(gPostion, UV).rgb); // View-space position
     vec3 Normal_view = normalize(vec3(texture(gNormal, UV).rgb)); // View-space normal
-    vec3 Diffuse = texture(gAlbeido, UV).rgb;
-    float Specular = texture(gAlbeido, UV).a;
-    float AmbientOcclusion = texture(ssaoTexture, UV).r;
+
+    vec3 albedo = texture(gAlbeido, UV).rgb;
+    float metallic  = texture(gAlbeido, UV).a;
+    float roughness = texture(gNormal, UV).a;
+    float ao = texture(ssaoTexture, UV).r;
 
     // Transform view-space position to world-space position
     vec4 FragPos_world = inverseV * vec4(FragPos_view, 1.0);
     FragPos_world /= FragPos_world.w; // Normalize by w
     vec3 FragPos = FragPos_world.xyz;
-    // Transform view-space normal to world-space normal
-    vec3 Normal_world = normalize((transpose(V) * vec4(Normal_view, 0.0)).xyz);
 
-    // Calculate ambient lighting
-    vec3 ambient = vec3(0.15 * Diffuse * AmbientOcclusion);
+    vec3 N = normalize((transpose(V) * vec4(Normal_view, 0.0)).xyz);
+    vec3 V = normalize(viewPos - FragPos);
+
+    // calculate reflectance at normal incidence; if dia-electric (like plastic) use F0 
+    // of 0.04 and if it's a metal, use the albedo color as F0 (metallic workflow)    
+    vec3 F0 = vec3(0.04); 
+    F0 = mix(F0, albedo, metallic);
+
+
+    vec3 Lo = vec3(0);
 
     // Lighting calculations
-    vec3 lighting = ambient;
     vec3 viewDir = normalize(viewPos - FragPos);
 
     for(int i = 0; i < MAXLIGHTS; ++i)
     {
         if(LightRadius[i] == 0)
             continue;
-        // Calculate distance between light source and current fragment
+            // Calculate distance between light source and current fragment
         float distance = length(LightPositions_worldspace[i] - FragPos);
-        if(distance < LightRadius[i])
-        {
-            // Diffuse lighting
-            vec3 lightDir = normalize(LightPositions_worldspace[i] - FragPos);
-            vec3 diffuse = max(dot(Normal_world, lightDir), 0.0) * Diffuse * LightColors[i];
+        
+        // calculate per-light radiance
+        vec3 L = normalize(LightPositions_worldspace[i] - FragPos);
+        vec3 H = normalize(V + L);
+        float attenuation = 1.0 / (1 + LightLinears[i] * distance + 
+  			        LightQuadratics[i] * (distance * distance)); 
+        vec3 radiance = LightColors[i] * attenuation;
 
-            // Specular lighting
-            vec3 halfwayDir = normalize(lightDir + viewDir);  
-            float spec = pow(max(dot(Normal_world, halfwayDir), 0.0), 16.0);
-            vec3 specular = LightColors[i] * spec * Specular;
+        float NDF = DistributionGGX(N, H, roughness);   
+        float G   = GeometrySmith(N, V, L, roughness);      
+        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
-            // Attenuation
-            float attenuation = 1.0 / (1.0 + LightLinears[i] * distance + LightQuadratics[i] * distance * distance);
-            diffuse *= attenuation;
-            specular *= attenuation;
+        vec3 numerator    = NDF * G * F; 
+        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
+        vec3 specular = numerator / denominator;
 
-            lighting += diffuse + specular;
-        }
+            // kS is equal to Fresnel
+        vec3 kS = F;
+        // for energy conservation, the diffuse and specular light can't
+        // be above 1.0 (unless the surface emits light); to preserve this
+        // relationship the diffuse component (kD) should equal 1.0 - kS.
+        vec3 kD = vec3(1.0) - kS;
+        // multiply kD by the inverse metalness such that only non-metals 
+        // have diffuse lighting, or a linear blend if partly metal (pure metals
+        // have no diffuse light).
+        kD *= 1.0 - metallic;	  
+
+        // scale light by NdotL
+        float NdotL = max(dot(N, L), 0.0);        
+
+        // add to outgoing radiance Lo
+        Lo +=  (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+        
     }
 
+    // ambient lighting (note that the next IBL tutorial will replace 
+    // this ambient lighting with environment lighting).
+    vec3 ambient = vec3(0.03) * ao;
+    
+    vec3 color = ambient + Lo;
+
+    // HDR tonemapping
+    color = color / (color + vec3(1.0));
+    // gamma    
 
   
-    color = vec4(lighting, 1.0);
+    FragColor = vec4(color, 1.0);
 }
