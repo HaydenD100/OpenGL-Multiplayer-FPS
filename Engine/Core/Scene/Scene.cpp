@@ -4,7 +4,7 @@ Scene::Scene() {
 
 }
 
-void Scene::Load() {
+void Scene::Load() { 
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png",0,0);
 	AssetManager::AddTexture("crate", "Assets/Textures/crate.png",0.7,0);
 	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png",1,0);
