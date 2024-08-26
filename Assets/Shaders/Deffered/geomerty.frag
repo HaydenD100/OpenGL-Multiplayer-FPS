@@ -39,7 +39,6 @@ void main()
     gPosition = FragPos;
     // also store the per-fragment normals into the gbuffer
     gNormal = vec4(transformedNormal, MaterialMetalic);
-
     gAlbedoSpec = vec4(MaterialDiffuseColor, MaterialRoughness); // RGB for Albedo, R for Specular Intensity
 
 }

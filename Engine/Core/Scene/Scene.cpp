@@ -158,46 +158,40 @@ void Scene::Update(float deltaTime) {
 }
 
 void Scene::RenderObjects() {
-	glm::mat4 ProjectionMatrix = Camera::getProjectionMatrix();
+	//glm::mat4 ProjectionMatrix = Camera::getProjectionMatrix();
 	glm::mat4 ViewMatrix = Camera::getViewMatrix();
-	glm::mat4 PV = ProjectionMatrix * ViewMatrix;
+	//glm::mat4 PV = ProjectionMatrix * ViewMatrix;
 
 	GLuint programid = Renderer::GetCurrentProgramID();
 
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
 		GameObject* gameobjectRender = AssetManager::GetGameObject(i);
-
 		if (!gameobjectRender->ShouldRender())
 			continue;
-
 		glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
-		glm::mat4 MVP = PV * ModelMatrix;
-		glm::mat3 ModelView3x3Matrix = glm::mat3(ViewMatrix * ModelMatrix); // Take the upper-left part of ModelViewMatrix
-
-		Renderer::SetTextureShader(MVP, ModelMatrix, ViewMatrix, ModelView3x3Matrix);
-
+		glm::mat4 modelViewMatrix = ViewMatrix * ModelMatrix;
+		glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
+		glUniformMatrix3fv(glGetUniformLocation(Renderer::GetCurrentProgramID(), "normalMatrix3"), 1, GL_FALSE, &normalMatrix[0][0]);
+		
+		Renderer::setMat4(glGetUniformLocation(Renderer::GetCurrentProgramID(), "M"), ModelMatrix);
 		gameobjectRender->RenderObject(programid);
 	}
+	/*
 	
 	for (int i = 0; i < AssetManager::GetDecalsSize(); i++) {
 		Decal* decal = AssetManager::GetDecal(i);
 		if (decal->CheckParentIsNull())
 			continue;
-		// Do some pre-normal calculations
 		glm::mat4 ModelMatrix = decal->GetModel();
-		glm::mat4 MVP = PV * ModelMatrix;
-		glm::mat3 ModelView3x3Matrix = glm::mat3(ViewMatrix * ModelMatrix); // Take the upper-left part of ModelViewMatrix
-		Renderer::SetTextureShader(MVP, ModelMatrix, ViewMatrix, ModelView3x3Matrix);
+		Renderer::setMat4(glGetUniformLocation(Renderer::GetCurrentProgramID(), "M"), ModelMatrix);
 		decal->RenderDecal(programid);
-	}
+	}*/
 	
 }
 
 void Scene::AddGunPickUp(GunPickUp gunpickup) {
 	gunPickUps.push_back(gunpickup);
 }
-
-
 void Scene::RenderObjects(const char* shaderName) {
 	glm::mat4 ProjectionMatrix = Camera::getProjectionMatrix();
 	glm::mat4 ViewMatrix = Camera::getViewMatrix();

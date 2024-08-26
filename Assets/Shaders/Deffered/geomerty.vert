@@ -9,12 +9,11 @@ out vec2 UV;
 out vec3 FragPos;
 out mat3 TBN; // Tangent-Bitangent-Normal matrix
 
-
 uniform mat4 MVP;
 uniform mat4 V;
 uniform mat4 M;
 uniform mat4 P;
-uniform mat3 MV3x3;
+uniform mat3 normalMatrix3;
 
 
 void main()
@@ -22,8 +21,7 @@ void main()
     vec4 viewPos = V * M * vec4(vertexPosition_modelspace, 1.0);
     FragPos = viewPos.xyz; 
     UV = vertexUV;
-    
-      mat3 normalMatrix = transpose(inverse(mat3(V * M)));
+    mat3 normalMatrix = transpose(inverse(mat3(V * M)));
     vec3 normal = normalize(normalMatrix * vertexNormal_modelspace);
     vec3 tangent = normalize(normalMatrix * vertexTangent_modelspace);
     vec3 bitangent = normalize(normalMatrix * vertexBitangent_modelspace);
