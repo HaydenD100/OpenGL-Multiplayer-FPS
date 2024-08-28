@@ -19,22 +19,8 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 	);
 	
 	if (isReloading) {
-		/*
-		const float currentXRotation = AssetManager::GetGameObject(gunModel)->getRotation().x;
-		if (currentXRotation > 1.6 / 2)
-			down = -1;
-		const float increment = (1.6 / reloadtime) * down * deltaTime;
-
-
-
-		gun->SetRotationX(currentXRotation + increment);
-		gun->addPosition(glm::vec3(0, -increment / 3, 0));
-
-		*/
-
 		if(!AnimationManager::IsAnimationPlaying("ak47_reload"))
-			AnimationManager::Play("ak47_reload", "ak47");
-
+			AnimationManager::Play("ak47_reload", Player::getCurrentGun());
 	}
 	else if (aiming) {
 		AssetManager::GetGameObject(gunModel)->setPosition(aimingPosition);
@@ -133,15 +119,10 @@ GunPickUp::GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force) {
 	gunName = GunName;
 	//Somtimes an error string to long happens randomly, its because of this and idk how to fix it, Maybe change character set to multi byte on visual studio?
 	objectName = GunName + "_pickup" + std::to_string(rand());
-
 	GameObject* gameobject = AssetManager::GetGameObject(GunName);
-
 	Model* model_pointer = gameobject->GetModel();
-
 	btConvexHullShape* collider = gameobject->GetConvexHull();
-
 	int index = AssetManager::AddGameObject(GameObject(objectName, model_pointer, position, false, 1, collider));
-
 	AssetManager::GetGameObject(index)->GetRigidBody()->applyCentralImpulse(glmToBtVector3(force));
 	
 }
@@ -153,11 +134,8 @@ void GunPickUp::Update() {
 bool GunPickUp::Interact() {
 	if (Player::GetInteractingWithName() != objectName || !Player::SelectWeapon(gunName))
 		return false;
-	std::cout << objectName << "\n";
-
 	
 	GameObject* object = AssetManager::GetGameObject(objectName);
-
 	PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(object->GetRigidBody());
 	object->SetRender(false);
 		
