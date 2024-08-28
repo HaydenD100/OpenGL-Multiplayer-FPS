@@ -19,13 +19,6 @@ void Scene::Load() {
 	AssetManager::AddTexture("beige_wall", "Assets/Textures/beige_wall.jpg", "Assets/Normals/beige_wall_normal.jpg",0.2,0);
 	AssetManager::AddTexture("wooden_floor", "Assets/Textures/wooden_floor.jpg", "Assets/Normals/wooden_floor_normal.jpg",0.2,0.2);
 
-
-
-
-	Animation anim = Animation("Assets/Animations/cube_test_anim.fbx", "cube");
-	AnimationManager::AddAnimation(anim);
-
-
 	// TODO: not currently working
 	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
 
@@ -44,6 +37,8 @@ void Scene::Load() {
 	models["map_floor"] = Model("Assets/Objects/Map1/floors.fbx", AssetManager::GetTexture("wooden_floor"));
 	models["map_walls"] = Model("Assets/Objects/Map1/walls.fbx", AssetManager::GetTexture("beige_wall"));
 	models["map_ceiling"] = Model("Assets/Objects/Map1/ceiling.fbx", AssetManager::GetTexture("beige_wall"));
+
+	AnimationManager::AddAnimation(Animation("Assets/Objects/FBX/reload_anim.fbx", "ak47_reload"));
 
 	WeaponManager::Init();
 
@@ -158,12 +153,8 @@ void Scene::Update(float deltaTime) {
 }
 
 void Scene::RenderObjects() {
-	//glm::mat4 ProjectionMatrix = Camera::getProjectionMatrix();
 	glm::mat4 ViewMatrix = Camera::getViewMatrix();
-	//glm::mat4 PV = ProjectionMatrix * ViewMatrix;
-
 	GLuint programid = Renderer::GetCurrentProgramID();
-
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
 		GameObject* gameobjectRender = AssetManager::GetGameObject(i);
 		if (!gameobjectRender->ShouldRender())

@@ -19,6 +19,7 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 	);
 	
 	if (isReloading) {
+		/*
 		const float currentXRotation = AssetManager::GetGameObject(gunModel)->getRotation().x;
 		if (currentXRotation > 1.6 / 2)
 			down = -1;
@@ -28,13 +29,19 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 
 		gun->SetRotationX(currentXRotation + increment);
 		gun->addPosition(glm::vec3(0, -increment / 3, 0));
+
+		*/
+
+		if(!AnimationManager::IsAnimationPlaying("ak47_reload"))
+			AnimationManager::Play("ak47_reload", "ak47");
+
 	}
 	else if (aiming) {
 		AssetManager::GetGameObject(gunModel)->setPosition(aimingPosition);
 	}
 	else {
 		gun->setPosition(weaponOffSet + (direction * -kickbackOffset * deltaTime));
-		gun->SetRotationX(0);
+		//gun->SetRotationX(0);
 	}
 	
 	AudioManager::GetSound(gunsShotName + std::to_string(1))->SetPosition(Player::getPosition());

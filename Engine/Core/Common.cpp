@@ -14,6 +14,20 @@ btVector3 glmToBtVector3(const glm::vec3& vec) {
 glm::vec3 btToGlmVector3(const btVector3& vec) {
     return glm::vec3(vec.getX(), vec.getY(), vec.getZ());
 }
+glm::vec3 ConvertBlenderPositionToOpenGL(const glm::vec3& blenderPosition) {
+    // Convert from Blender's (x, y, z) to OpenGL's (x, z, -y)
+    return glm::vec3(blenderPosition.x, blenderPosition.z, -blenderPosition.y);
+}
+
+glm::quat ConvertBlenderQuaternionToOpenGL(const glm::quat& blenderQuat) {
+    // Convert from Blender's (w, x, y, z) to OpenGL's (w, x, z, -y)
+    return glm::quat(blenderQuat.w, blenderQuat.x, blenderQuat.z, -blenderQuat.y);
+}
+
+glm::vec3 ConvertBlenderScaleToOpenGL(const glm::vec3& blenderScale) {
+    // Convert from Blender's (x, y, z) to OpenGL's (x, z, y)
+    return glm::vec3(blenderScale.x, blenderScale.z, blenderScale.y);
+}
 
 glm::vec3 btQuatToGLMVec(const btQuaternion& quat) {
     // Convert btQuaternion to glm::quat

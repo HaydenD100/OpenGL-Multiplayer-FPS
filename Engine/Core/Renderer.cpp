@@ -365,7 +365,7 @@ namespace Renderer
 	void Renderer::RenderScene() {
 		float time = glfwGetTime();
 		float newTime = 0;
-		std::cout << "-------------- Renderer Time ms-------------------- \n";
+		//std::cout << "-------------- Renderer Time ms-------------------- \n";
 		glEnable(GL_DEPTH_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
@@ -381,7 +381,7 @@ namespace Renderer
 
 		SceneManager::Render();
 		newTime = glfwGetTime();
-		std::cout << "Geometry:" << (newTime - time) * 1000 << "ms" << std::endl;
+		//std::cout << "Geometry:" << (newTime - time) * 1000 << "ms" << std::endl;
 		time = newTime;
 		glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
@@ -414,7 +414,7 @@ namespace Renderer
 		glDisableVertexAttribArray(0);
 
 		newTime = glfwGetTime();
-		std::cout << "SSAO:" << (newTime - time) * 1000 << "ms" << std::endl;
+		//std::cout << "SSAO:" << (newTime - time) * 1000 << "ms" << std::endl;
 		time = newTime;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -454,7 +454,7 @@ namespace Renderer
 		glDisable(GL_DEPTH_TEST);
 
 		newTime = glfwGetTime();
-		std::cout << "Light:" << (newTime - time) * 1000 << "ms" << std::endl;
+		//std::cout << "Light:" << (newTime - time) * 1000 << "ms" << std::endl;
 		time = newTime;
 
 	}

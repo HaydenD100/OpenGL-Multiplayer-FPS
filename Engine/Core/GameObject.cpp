@@ -427,6 +427,16 @@ void GameObject::SetRotationY(float y) {
 	t.setRotation(quat);
 	body->getMotionState()->setWorldTransform(t);
 }
+void GameObject::SetTransform(Transform transform) {
+	this->transform = transform;
+
+	btTransform& t = body->getWorldTransform();
+	btQuaternion quat;
+	quat.setEuler(transform.rotation.y, transform.rotation.x, transform.rotation.z);
+	t.setRotation(quat);
+	body->getMotionState()->setWorldTransform(t);
+	body->getWorldTransform().setOrigin(btVector3(transform.position.x, transform.position.y, transform.position.z));
+}
 
 void GameObject::SetRotationZ(float z) {
 	transform.rotation.z = z;

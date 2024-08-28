@@ -43,11 +43,20 @@ Animation::Animation(const char* path, std::string Name) {
 
 				duration = duration / 10;
 
-				glm::vec3 positon = glm::vec3(animationChannel->mPositionKeys[i].mValue.x, animationChannel->mPositionKeys[i].mValue.y, animationChannel->mPositionKeys[i].mValue.z);
-				glm::quat glmQuat(animationChannel->mRotationKeys[i].mValue.w, animationChannel->mRotationKeys[i].mValue.x, animationChannel->mRotationKeys[i].mValue.y, animationChannel->mRotationKeys[i].mValue.z);
+				const aiVector3D& positionKey = animationChannel->mPositionKeys[i].mValue;
+
+				//
+				glm::vec3 position = glm::vec3(positionKey.x / 100, positionKey.y / 100, positionKey.z / 100);
+				glm::quat glmQuat = glm::quat(animationChannel->mRotationKeys[i].mValue.w, animationChannel->mRotationKeys[i].mValue.x, animationChannel->mRotationKeys[i].mValue.y, animationChannel->mRotationKeys[i].mValue.z) + glm::quat(glm::vec3(1.5708,0,0));
 				glm::vec3 scale = glm::vec3(animationChannel->mScalingKeys[i].mValue.x, animationChannel->mScalingKeys[i].mValue.y, animationChannel->mScalingKeys[i].mValue.z);
 
-				keyframes.push_back(KeyFrame(positon, glmQuat, scale, duration));
+				keyframes.push_back(KeyFrame(position, glmQuat, scale, duration));
+
+				//glm::vec3 testrot = glm::eulerAngles(glmQuat);
+				//std::cout << "pos: " << positionKey.x << " y: " << positionKey.y << " z: " << positionKey.z << "\n";
+				//std::cout << "rot: " << testrot.x << " y: " << testrot.y << " z: " << testrot.z << "\n";
+
+
 			}
 		}
 	}
@@ -76,8 +85,8 @@ bool Animation::Playing() {
 }
 
 void Animation::Stop() {
-	gameObject->setPosition(initalPosition + keyframes[keyframes.size() -1].position);
-	gameObject->setRotation(initalRotation + glm::eulerAngles(keyframes[keyframes.size() -1].rotation));
+	gameObject->setPosition(initalPosition); //+ keyframes[keyframes.size() -1].position);
+	gameObject->setRotation(initalRotation); //+ glm::eulerAngles(keyframes[keyframes.size() -1].rotation));
 
 	playing = false;
 	currentKeyFrame = 0;
@@ -88,8 +97,8 @@ void Animation::Start() {
 	playing = true;
 	initalPosition = gameObject->getPosition();
 	initalRotation = gameObject->getRotation();
-	startingPosition = keyframes[0].position;
-	startingRotation = keyframes[0].rotation;
+	startingPosition = initalPosition;
+	startingRotation = initalRotation;
 }
 
 void Animation::Pause() {
@@ -105,19 +114,22 @@ void Animation::SetGameObject(GameObject* gameobject) {
 	this->gameObject = gameobject;
 }
 
-void Animation::Transform() {
+void Animation::TransformObject() {
 	float t = (glfwGetTime() - timeStart) / keyframes[currentKeyFrame].duration;
 	if (t > 1) {
 		NextKeyFrame();
 		return;
 	}
 	//TODO: Add scaling, need to scale the bullet rigidbody so collider scales
-	glm::vec3 newPosition = glm::mix(startingPosition, keyframes[currentKeyFrame].position, t);
-	glm::quat newRotation = glm::slerp(startingRotation, keyframes[currentKeyFrame].rotation, t);	
 	
+	Transform animationTransform;
+	animationTransform.position = initalPosition + glm::mix(startingPosition, keyframes[currentKeyFrame].position, t);
+	animationTransform.rotation = initalRotation + glm::eulerAngles(glm::slerp(startingRotation, keyframes[currentKeyFrame].rotation, t));
 
-	gameObject->setPosition(initalPosition + newPosition);
-	gameObject->setRotation(initalRotation + glm::eulerAngles(newRotation));
+	std::cout << "pos: " << keyframes[currentKeyFrame].position.x << " y: " << keyframes[currentKeyFrame].position.y << " z: " << keyframes[currentKeyFrame].position.z << "\n";
+	std::cout << "rot: " << animationTransform.rotation.x << " y: " << animationTransform.rotation.y << " z: " << animationTransform.rotation.z << "\n";
+
+	gameObject->SetTransform(animationTransform);
 }
 
 void Animation::NextKeyFrame() {
@@ -154,6 +166,14 @@ namespace AnimationManager
 			std::cout << "Null Object pointer passed to animation or animation does not exsit \n";
 		
 	}
+
+	bool IsAnimationPlaying(std::string name) {
+		for (int i = 0; i < animations.size(); i++) {
+			if (animations[i].GetName() == name)
+				return animations[i].Playing();
+		}
+		return false;
+	}
 	
 	void AnimationManager::Stop(std::string Name) {
 		GetAnimation(Name)->Stop();
@@ -166,8 +186,7 @@ namespace AnimationManager
 	void AnimationManager::Update(float deltaTime) {
 		for (int i = 0; i < animations.size(); i++) {
 			if (animations[i].Playing()) 
-				animations[i].Transform();
-			
+				animations[i].TransformObject();
 		}
 	}
 	

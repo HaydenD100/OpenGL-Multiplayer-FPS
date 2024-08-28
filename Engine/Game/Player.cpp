@@ -231,6 +231,9 @@ namespace Player
 		if (Input::KeyPressed('r') && !reloading && !aiming) {
 			reloading = true;
 			reloadingTime = glfwGetTime();
+
+			//AnimationManager::Play("ak47_reload", "ak47");
+
 		}
 
 		if (Input::RightMouseDown() && !reloading) {

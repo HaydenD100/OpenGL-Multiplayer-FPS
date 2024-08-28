@@ -176,6 +176,7 @@
     <ClCompile Include="Engine\Physics\Physics.cpp" />
     <ClCompile Include="Engine\Core\Lights\light.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Engine\Physics\NividaPhysics.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Saves\mainScene.json" />
@@ -229,6 +230,7 @@
     <ClInclude Include="Engine\Physics\BulletPhysics.h" />
     <ClInclude Include="Engine\Physics\Physics.h" />
     <ClInclude Include="Engine\Core\Lights\light.h" />
+    <ClInclude Include="Engine\Physics\NividaPhysics.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

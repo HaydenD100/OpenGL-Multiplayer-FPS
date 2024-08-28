@@ -46,7 +46,7 @@ public:
 	void Start();
 	void Pause();
 	void SetKeyFrame(int keyframeIndex);
-	void Transform();
+	void TransformObject();
 	std::string GetName();
 	void SetGameObject(GameObject* gameobject);
 
@@ -76,5 +76,6 @@ namespace AnimationManager
 	void Stop(std::string Name);
 	void Pause(std::string Name);
 	void Update(float deltaTime);
+	bool IsAnimationPlaying(std::string name);
 	Animation* GetAnimation(std::string Name);
 }

@@ -57,6 +57,8 @@ public:
 	void SetRotationY(float rotation);
 	void SetRotationZ(float rotation);
 
+	void SetTransform(Transform transform);
+
 	void SetScale(float scale);
 
 	std::string GetName();
