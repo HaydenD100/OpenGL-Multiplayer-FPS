@@ -47,14 +47,14 @@ Animation::Animation(const char* path, std::string Name) {
 
 				//
 				glm::vec3 position = glm::vec3(positionKey.x / 100, positionKey.y / 100, positionKey.z / 100);
-				glm::quat glmQuat = glm::quat(animationChannel->mRotationKeys[i].mValue.w, animationChannel->mRotationKeys[i].mValue.x, animationChannel->mRotationKeys[i].mValue.y, animationChannel->mRotationKeys[i].mValue.z) + glm::quat(glm::vec3(1.5708,0,0));
+				glm::quat glmQuat = glm::quat(animationChannel->mRotationKeys[i].mValue.w, animationChannel->mRotationKeys[i].mValue.x, animationChannel->mRotationKeys[i].mValue.y, animationChannel->mRotationKeys[i].mValue.z);
 				glm::vec3 scale = glm::vec3(animationChannel->mScalingKeys[i].mValue.x, animationChannel->mScalingKeys[i].mValue.y, animationChannel->mScalingKeys[i].mValue.z);
 
 				keyframes.push_back(KeyFrame(position, glmQuat, scale, duration));
 
-				//glm::vec3 testrot = glm::eulerAngles(glmQuat);
-				//std::cout << "pos: " << positionKey.x << " y: " << positionKey.y << " z: " << positionKey.z << "\n";
-				//std::cout << "rot: " << testrot.x << " y: " << testrot.y << " z: " << testrot.z << "\n";
+				glm::vec3 testrot = glm::eulerAngles(glmQuat);
+				std::cout << "pos: " << positionKey.x << " y: " << positionKey.y << " z: " << positionKey.z << "\n";
+				std::cout << "rot: " << testrot.x << " y: " << testrot.y << " z: " << testrot.z << "\n";
 
 
 			}
@@ -85,8 +85,8 @@ bool Animation::Playing() {
 }
 
 void Animation::Stop() {
-	gameObject->setPosition(initalPosition); //+ keyframes[keyframes.size() -1].position);
-	gameObject->setRotation(initalRotation); //+ glm::eulerAngles(keyframes[keyframes.size() -1].rotation));
+	gameObject->setPosition(initalPosition + keyframes[keyframes.size() - 1].position);
+	gameObject->setRotation(initalRotation + glm::eulerAngles(keyframes[keyframes.size() - 1].rotation));
 
 	playing = false;
 	currentKeyFrame = 0;

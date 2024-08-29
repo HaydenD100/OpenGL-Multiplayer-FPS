@@ -38,7 +38,10 @@ void Scene::Load() {
 	models["map_walls"] = Model("Assets/Objects/Map1/walls.fbx", AssetManager::GetTexture("beige_wall"));
 	models["map_ceiling"] = Model("Assets/Objects/Map1/ceiling.fbx", AssetManager::GetTexture("beige_wall"));
 
-	AnimationManager::AddAnimation(Animation("Assets/Objects/FBX/reload_anim.fbx", "ak47_reload"));
+	AnimationManager::AddAnimation(Animation("Assets/Objects/FBX/ak47.fbx", "ak47_reload"));
+	AnimationManager::AddAnimation(Animation("Assets/Animations/door_open.fbx", "door_open"));
+	AnimationManager::AddAnimation(Animation("Assets/Animations/door_close.fbx", "door_close"));
+
 
 	WeaponManager::Init();
 
@@ -85,24 +88,24 @@ void Scene::Load() {
 
 	// MAX LIGHTS BY DEFAULT IS 60 if you want more lights go to lighting.frag and change MAXLIGHTS
 	{
-		Light light(glm::vec3(-11, 4, 15), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.032);
+		Light light(glm::vec3(-11, 3, 15), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.032);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-11, 4, 6), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.032);
+		Light light(glm::vec3(-11, 3, 6), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.032);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-15, 4, 5), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.032);
+		Light light(glm::vec3(-15, 3, 5), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.032);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-7.5, 4, 5), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.032);
+		Light light(glm::vec3(-7.5, 3, 5), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.032);
 		lights.push_back(light);
 	}
 
 	{
-		Light light(glm::vec3(-2.5, 4, -5), glm::vec3(1, 0.25, 0) * 4.0f, 0.09, 0.0320);
+		Light light(glm::vec3(-2.5, 3, -5), glm::vec3(1, 0.25, 0) * 4.0f, 0.09, 0.0320);
 		lights.push_back(light);
 	}
 	

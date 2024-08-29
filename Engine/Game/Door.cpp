@@ -1,4 +1,5 @@
 #include "Door.h"
+#include "Animation.h"
 
 Door::Door(std::string Name, Model* door, Model* frame, glm::vec3 position) {
 	name = Name;
@@ -18,15 +19,25 @@ Door::Door(std::string Name, Model* door, Model* frame, glm::vec3 position) {
 void Door::Interact() {
 	if (Player::GetInteractingWithName() == name + "_door" && opening == false) {
 		opening = true;
-		if (!opened) 
+		if (!opened) {
+			//AnimationManager::Play("door_open", name + "_door");
 			AudioManager::PlaySound("door_open", door_position);
-		else 
+			//opened = true;
+		}
+			
+		else {
+			//AnimationManager::Play("door_close", name + "_door");	
 			AudioManager::PlaySound("door_close", door_position);
+			//opened = false;
+		}
 		
 	}
 }
 
 void Door::Update(float deltaTime) {
+	//if (!AnimationManager::IsAnimationPlaying("door_open") && !AnimationManager::IsAnimationPlaying("door_close"))
+		//opening = false;
+	
 	if (!opening)
 		return;
 	//door is opening
@@ -37,6 +48,7 @@ void Door::Update(float deltaTime) {
 	if (opened) {
 		rotation -= openingSpeed;
 	}
+	
 	if (rotation >= maxRotation) {
 		opening = false;
 		opened = true;
@@ -56,4 +68,6 @@ void Door::Update(float deltaTime) {
 	std::cout << rotation << std::endl;
 
 	AssetManager::GetGameObject(name + "_door")->setRotation(door_rotation + glm::vec3(0,rotation,0));
+
+	
 }
