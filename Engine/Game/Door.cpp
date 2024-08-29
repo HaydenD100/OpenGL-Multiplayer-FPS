@@ -10,7 +10,7 @@ Door::Door(std::string Name, Model* door, Model* frame, glm::vec3 position) {
 	gameobject->GetRigidBody()->setCcdSweptSphereRadius(0.2); // Set the radius for CCD
 	door_rotation = gameobject->getRotation();
 	door_position = position;
-	rotation = 0;
+	rotation = 0; 
 
 	opened = false;
 	opening = false;
