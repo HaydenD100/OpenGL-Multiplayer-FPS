@@ -224,4 +224,33 @@
   <ItemGroup>
     <Text Include="todo.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="github\screenshots\PBRHallwayLight.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="github\screenshots\3DEngine.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="github\screenshots\better_lighting.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="github\screenshots\bullet.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="github\screenshots\bullet_physics.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="github\screenshots\Decals.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="github\screenshots\deffered.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="github\screenshots\gunsnmore.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="github\screenshots\lights.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

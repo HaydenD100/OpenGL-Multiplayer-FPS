@@ -232,6 +232,17 @@
     <ClInclude Include="Engine\Core\Lights\light.h" />
     <ClInclude Include="Engine\Physics\NividaPhysics.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="github\screenshots\3DEngine.png" />
+    <Image Include="github\screenshots\better_lighting.png" />
+    <Image Include="github\screenshots\bullet.png" />
+    <Image Include="github\screenshots\bullet_physics.png" />
+    <Image Include="github\screenshots\Decals.png" />
+    <Image Include="github\screenshots\deffered.png" />
+    <Image Include="github\screenshots\gunsnmore.png" />
+    <Image Include="github\screenshots\lights.png" />
+    <Image Include="github\screenshots\PBRHallwayLight.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
