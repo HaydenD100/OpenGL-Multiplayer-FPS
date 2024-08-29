@@ -14,7 +14,7 @@ Door::Door(std::string Name, Model* door, Model* frame, glm::vec3 position) {
 	opened = false;
 	opening = false;
 }
-
+ 
 void Door::Interact() {
 	if (Player::GetInteractingWithName() == name + "_door" && opening == false) {
 		opening = true;
