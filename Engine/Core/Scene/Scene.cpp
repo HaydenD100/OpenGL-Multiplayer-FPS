@@ -50,7 +50,7 @@ void Scene::Load() {
 	AssetManager::AddGameObject("map1_ceiling", &models["map_ceiling"], glm::vec3(0, 1.6, 0), true, 0, Convex);
 
 
-	AssetManager::AddGameObject("floor", &models["floor"], glm::vec3(0, 0, 0), true, 0, Convex);
+	AssetManager::AddGameObject("floor", &models["floor"], glm::vec3(0, 0, 0), true, 0, Box);
 	
 
 	crates.push_back(Crate(glm::vec3(1, 10, 1), "crate1", &models["crate"]));
@@ -130,6 +130,7 @@ void Scene::Load() {
 	ModelMatrixId = glGetUniformLocation(Renderer::GetCurrentProgramID(), "model");
 
 
+	glBindVertexArray(sky.GetSkyBoxVAO());
 }
 
 void Scene::Update(float deltaTime) {
@@ -155,9 +156,8 @@ void Scene::Update(float deltaTime) {
 	AudioManager::Update();
 }
 
-void Scene::RenderObjects() {
+void Scene::RenderObjects(GLuint programid) {
 	glm::mat4 ViewMatrix = Camera::getViewMatrix();
-	GLuint programid = Renderer::GetCurrentProgramID();
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
 		GameObject* gameobjectRender = AssetManager::GetGameObject(i);
 		if (!gameobjectRender->ShouldRender())
@@ -165,9 +165,10 @@ void Scene::RenderObjects() {
 		glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
 		glm::mat4 modelViewMatrix = ViewMatrix * ModelMatrix;
 		glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
-		glUniformMatrix3fv(glGetUniformLocation(Renderer::GetCurrentProgramID(), "normalMatrix3"), 1, GL_FALSE, &normalMatrix[0][0]);
-		
-		Renderer::setMat4(glGetUniformLocation(Renderer::GetCurrentProgramID(), "M"), ModelMatrix);
+
+		glUniformMatrix3fv(glGetUniformLocation(programid, "normalMatrix3"), 1, GL_FALSE, &normalMatrix[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);
+
 		gameobjectRender->RenderObject(programid);
 	}
 	/*
@@ -180,7 +181,6 @@ void Scene::RenderObjects() {
 		Renderer::setMat4(glGetUniformLocation(Renderer::GetCurrentProgramID(), "M"), ModelMatrix);
 		decal->RenderDecal(programid);
 	}*/
-	
 }
 
 void Scene::AddGunPickUp(GunPickUp gunpickup) {

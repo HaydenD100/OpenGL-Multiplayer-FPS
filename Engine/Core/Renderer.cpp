@@ -105,6 +105,10 @@ namespace Renderer
 	GLuint ModelMatrixID;
 	GLuint ModelView3x3MatrixID;
 	GLuint gPosition;
+	GLuint P;
+	GLuint V;
+
+
 	
 	GLuint ubo; 
 
@@ -275,6 +279,8 @@ namespace Renderer
 		ModelMatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "M");
 		LightID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "LightPosition_worldspace");
 		ModelView3x3MatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "MV3x3");
+		P = glGetUniformLocation(Renderer::GetCurrentProgramID(), "P");
+		V = glGetUniformLocation(Renderer::GetCurrentProgramID(), "V");
 
 
 		//SSAO
@@ -372,14 +378,14 @@ namespace Renderer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//this needs to stay here ill figure out why later
 
-		Renderer::RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
-		glBindVertexArray(quad_vertexbuffer);
 
-		Renderer::UseProgram(Renderer::GetProgramID("geomerty"));
-		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "P"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "V"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
 
-		SceneManager::Render();
+		GLuint programid = Renderer::GetProgramID("geomerty");
+		Renderer::UseProgram(programid);
+		glUniformMatrix4fv(P, 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
+		glUniformMatrix4fv(V, 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
+
+		SceneManager::Render(programid);
 		newTime = glfwGetTime();
 		//std::cout << "Geometry:" << (newTime - time) * 1000 << "ms" << std::endl;
 		time = newTime;
@@ -388,7 +394,8 @@ namespace Renderer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//ssao pass
-		Renderer::UseProgram(Renderer::GetProgramID("ssao"));
+		programid = Renderer::GetProgramID("ssao");
+		Renderer::UseProgram(programid);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, gPosition);
@@ -396,7 +403,7 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, gNormal);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, noiseTexture);
-		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "projection"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(programid, "projection"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
 		
 
 		glEnableVertexAttribArray(0);
@@ -421,8 +428,10 @@ namespace Renderer
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
-		glUseProgram(GetProgramID("lighting"));
+		//RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
+
+		programid = GetProgramID("lighting");
+		glUseProgram(programid);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, gPosition);
 		glActiveTexture(GL_TEXTURE1);
@@ -432,9 +441,9 @@ namespace Renderer
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
 		
-		glUniform3fv(glGetUniformLocation(GetCurrentProgramID(), "viewPos"),1, &Camera::GetPosition()[0]);
-		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "inverseV"), 1, GL_FALSE, &glm::inverse(Camera::getViewMatrix())[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(GetCurrentProgramID(), "V"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
+		glUniform3fv(glGetUniformLocation(programid, "viewPos"),1, &Camera::GetPosition()[0]);
+		glUniformMatrix4fv(glGetUniformLocation(programid, "inverseV"), 1, GL_FALSE, &glm::inverse(Camera::getViewMatrix())[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(programid, "V"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
 
 		SetLights(SceneManager::GetCurrentScene()->getLights());
 		
@@ -469,10 +478,11 @@ namespace Renderer
 		GLuint viewid = glGetUniformLocation(GetProgramID("skybox"), "view");
 		glm::mat4 viewWithoutTranslation = glm::mat4(glm::mat3(view));
 
+
 		setMat4(viewid, viewWithoutTranslation);
 		setMat4(projectionid, projection);
 		*/
-		glBindVertexArray(skybox.GetSkyBoxVAO());
+		//glBindVertexArray(skybox.GetSkyBoxVAO());
 		//glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetTextureID());
 		//glDrawArrays(GL_TRIANGLES, 0, 36);
 		//glDepthMask(GL_TRUE);

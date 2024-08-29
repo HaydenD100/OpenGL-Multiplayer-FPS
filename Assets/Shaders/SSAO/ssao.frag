@@ -58,5 +58,5 @@ void main()
     }
     occlusion = 1.0 - (occlusion / kernelSize);
     
-    color = vec3(pow(occlusion,2));
+    color = vec3(pow(occlusion,1));
 }

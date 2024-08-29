@@ -10,6 +10,6 @@ namespace SceneManager
 	size_t CreateScene(Scene scene);
 	void LoadScene(int sceneNumber);
 	void Update(float dt);
-	void Render();
+	void Render(GLuint programid);
 	Scene* GetCurrentScene();
 }

@@ -28,7 +28,7 @@ public:
 
 	void Load();
 	void Update(float dt);
-	void RenderObjects();
+	void RenderObjects(GLuint programid);
 	void RenderObjects(const char* shaderName);
 
 	void AddGunPickUp(GunPickUp gunpickup);
