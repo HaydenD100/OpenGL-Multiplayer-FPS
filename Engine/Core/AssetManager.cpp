@@ -6,6 +6,8 @@ namespace AssetManager
 	std::vector<Texture> Textures;
 	std::vector<Decal> Decals;
 
+	std::string path;
+
 	void AssetManager::Init() {
 		Textures.clear();
 		GameObjects.clear();

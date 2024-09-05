@@ -5,8 +5,6 @@
 
 #include "Engine/Core/AssetManager.h"
 
-
-
 btVector3 glmToBtVector3(const glm::vec3& vec) {
     return btVector3(vec.x, vec.y, vec.z);
 }

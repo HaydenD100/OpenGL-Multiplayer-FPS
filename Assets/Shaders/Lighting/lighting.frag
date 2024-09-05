@@ -1,20 +1,27 @@
 #version 330 core
+out vec4 FragColor;
 
 in vec2 UV;
 #define MAXLIGHTS 60
 
-out vec4 FragColor;
 
 uniform sampler2D gPostion;    // View-space position
 uniform sampler2D gNormal;     // View-space normal
 uniform sampler2D gAlbeido;
+uniform sampler2D gPBR;
+
 uniform sampler2D ssaoTexture;
 
 uniform vec3 LightColors[MAXLIGHTS];
 uniform vec3 LightPositions_worldspace[MAXLIGHTS];
+uniform vec3 Lightdirection[MAXLIGHTS];
 uniform float LightLinears[MAXLIGHTS];
 uniform float LightQuadratics[MAXLIGHTS];
 uniform float LightRadius[MAXLIGHTS];
+uniform float LightCutOff[MAXLIGHTS];
+uniform float LightOuterCutOff[MAXLIGHTS];
+
+
 
 uniform vec3 viewPos;
 uniform mat4 inverseV; // Inverse of the view matrix
@@ -61,7 +68,6 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
-
 void main()
 {
     // Retrieve data from G-buffer
@@ -69,8 +75,8 @@ void main()
     vec3 Normal_view = normalize(vec3(texture(gNormal, UV).rgb)); // View-space normal
 
     vec3 albedo = texture(gAlbeido, UV).rgb;
-    float metallic  = texture(gAlbeido, UV).a;
-    float roughness = texture(gNormal, UV).a;
+    float metallic  = texture(gPBR, UV).y;
+    float roughness = texture(gPBR, UV).x;
     float ao = texture(ssaoTexture, UV).r;
 
     // Transform view-space position to world-space position
@@ -96,24 +102,23 @@ void main()
     {
         if(LightRadius[i] == 0)
             continue;
+
             // Calculate distance between light source and current fragment
         float distance = length(LightPositions_worldspace[i] - FragPos);
         
         // calculate per-light radiance
         vec3 L = normalize(LightPositions_worldspace[i] - FragPos);
         vec3 H = normalize(V + L);
-        float attenuation = 1.0 / (1 + LightLinears[i] * distance + 
-  			        LightQuadratics[i] * (distance * distance)); 
+        float attenuation = 1.0 / (1 + LightLinears[i] * distance + LightQuadratics[i] * (distance * distance)); 
         vec3 radiance = LightColors[i] * attenuation;
 
         float NDF = DistributionGGX(N, H, roughness);   
         float G   = GeometrySmith(N, V, L, roughness);      
         vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
-        vec3 numerator    = NDF * G * F; 
+        vec3 numerator = NDF * G * F; 
         float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; // + 0.0001 to prevent divide by zero
         vec3 specular = numerator / denominator;
-
             // kS is equal to Fresnel
         vec3 kS = F;
         // for energy conservation, the diffuse and specular light can't
@@ -142,7 +147,5 @@ void main()
     // HDR tonemapping
     color = color / (color + vec3(1.0));
     // gamma    
-
-  
     FragColor = vec4(color, 1.0);
 }

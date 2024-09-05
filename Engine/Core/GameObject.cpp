@@ -507,4 +507,11 @@ bool GameObject::ShouldDlete() {
 	return shouldDelete;
 }
 
+void GameObject::SetShaderType(std::string shaderType) {
+	this->shaderType = shaderType;
+}
+std::string GameObject::GetShaderType() {
+	return shaderType;
+}
+
 

@@ -6,17 +6,18 @@ Scene::Scene() {
 
 void Scene::Load() { 
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png",0,0);
-	AssetManager::AddTexture("crate", "Assets/Textures/crate.png",0.2,0);
-	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png",1,0);
-	AssetManager::AddTexture("sand", "Assets/Textures/sandyGround.png", "Assets/Normals/sand_normal.png",0.3,0);
-	AssetManager::AddTexture("concrete", "Assets/Textures/fence.png", "Assets/Normals/fence_normal.png",0.3,0);
-	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png",0.2,0.5);
-	AssetManager::AddTexture("door", "Assets/Textures/door.png","Assets/Normals/door_normal.png",0.2,0);
-	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png",0.4,0.4);
-	AssetManager::AddTexture("drawer", "Assets/Textures/drawerred.png", "Assets/Normals/drawer_normal.png",0.5,0);
-	AssetManager::AddTexture("lamp", "Assets/Textures/lamp.png", "Assets/Normals/lamp_normal.png",0.5,0.1);
+	AssetManager::AddTexture("red_glass", "Assets/Textures/red_glass.png", 0, 0);
 
-	AssetManager::AddTexture("beige_wall", "Assets/Textures/beige_wall.jpg", "Assets/Normals/beige_wall_normal.jpg",0.2,0);
+	AssetManager::AddTexture("crate", "Assets/Textures/crate.png",0.7,0);
+	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png",0.5,0);
+	AssetManager::AddTexture("sand", "Assets/Textures/sandyGround.png", "Assets/Normals/sand_normal.png",0.9,0);
+	AssetManager::AddTexture("concrete", "Assets/Textures/fence.png", "Assets/Normals/fence_normal.png",0.9,0);
+	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png",0.5,0.5);
+	AssetManager::AddTexture("door", "Assets/Textures/door.png","Assets/Normals/door_normal.png",0.6,0);
+	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png",0.4,0.4);
+	AssetManager::AddTexture("drawer", "Assets/Textures/drawerred.png", "Assets/Normals/drawer_normal.png",0.7,0);
+	AssetManager::AddTexture("lamp", "Assets/Textures/lamp.png", "Assets/Normals/lamp_normal.png",0.7,0.1);
+	AssetManager::AddTexture("beige_wall", "Assets/Textures/beige_wall.jpg", "Assets/Normals/beige_wall_normal.jpg",0.7,0);
 	AssetManager::AddTexture("wooden_floor", "Assets/Textures/wooden_floor.jpg", "Assets/Normals/wooden_floor_normal.jpg",0.2,0.2);
 
 	// TODO: not currently working
@@ -29,6 +30,8 @@ void Scene::Load() {
 	models["floor"] = Model("Assets/Objects/FBX/floor.fbx", AssetManager::GetTexture("sand"));
 	models["slope"] = Model("Assets/Objects/FBX/slope.fbx", AssetManager::GetTexture("sand"));
 	models["crate"] = Model("Assets/Objects/FBX/crate.fbx", AssetManager::GetTexture("crate"));
+	models["cube"] = Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("red_glass"));
+
 	models["glock"] = Model("Assets/Objects/FBX/glock17.fbx", "Assets/Objects/glock17_convex.obj", AssetManager::GetTexture("glock"));
 	models["ak47"] = Model("Assets/Objects/FBX/ak47.fbx", "Assets/Objects/ak47_convex.obj", AssetManager::GetTexture("ak47"));
 	models["door"] = Model(Mesh("Assets/Objects/door.obj"), AssetManager::GetTexture("door"));
@@ -37,6 +40,7 @@ void Scene::Load() {
 	models["map_floor"] = Model("Assets/Objects/Map1/floors.fbx", AssetManager::GetTexture("wooden_floor"));
 	models["map_walls"] = Model("Assets/Objects/Map1/walls.fbx", AssetManager::GetTexture("beige_wall"));
 	models["map_ceiling"] = Model("Assets/Objects/Map1/ceiling.fbx", AssetManager::GetTexture("beige_wall"));
+
 
 	AnimationManager::AddAnimation(Animation("Assets/Objects/FBX/ak47.fbx", "ak47_reload"));
 	AnimationManager::AddAnimation(Animation("Assets/Animations/door_open.fbx", "door_open"));
@@ -49,7 +53,8 @@ void Scene::Load() {
 	AssetManager::AddGameObject("map1_walls", &models["map_walls"], glm::vec3(0, 1.6, 0), true, 0, Concave);
 	AssetManager::AddGameObject("map1_ceiling", &models["map_ceiling"], glm::vec3(0, 1.6, 0), true, 0, Convex);
 
-
+	AssetManager::AddGameObject("red_glass", &models["cube"], glm::vec3(2, 2, 0), true, 0, Convex);
+	AssetManager::GetGameObject("red_glass")->SetShaderType("Transparent");
 	AssetManager::AddGameObject("floor", &models["floor"], glm::vec3(0, 0, 0), true, 0, Box);
 	
 
@@ -105,7 +110,7 @@ void Scene::Load() {
 	}
 
 	{
-		Light light(glm::vec3(-2.5, 3, -5), glm::vec3(1, 0.25, 0) * 4.0f, 0.09, 0.0320);
+		Light light(glm::vec3(-2.5, 3, -5), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.0320);
 		lights.push_back(light);
 	}
 	
@@ -118,8 +123,6 @@ void Scene::Load() {
 		lights.push_back(light);
 	}
 	
-	
-
 	Player::Init();
 	Player::setPosition(glm::vec3(0, 10, 0));
 
@@ -157,11 +160,18 @@ void Scene::Update(float deltaTime) {
 }
 
 void Scene::RenderObjects(GLuint programid) {
+	NeedRendering.clear();
+
 	glm::mat4 ViewMatrix = Camera::getViewMatrix();
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
 		GameObject* gameobjectRender = AssetManager::GetGameObject(i);
 		if (!gameobjectRender->ShouldRender())
 			continue;
+		//if (gameobjectRender->GetShaderType() != "Default") {
+			//NeedRendering.push_back(gameobjectRender);
+			//continue;
+		//}
+
 		glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
 		glm::mat4 modelViewMatrix = ViewMatrix * ModelMatrix;
 		glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
@@ -230,4 +240,7 @@ std::vector<Light> Scene::getLights() {
 
 SkyBox Scene::GetSkyBox() {
 	return sky;
+}
+std::vector<GameObject*> Scene::NeedRenderingObjects() {
+	return NeedRendering;
 }

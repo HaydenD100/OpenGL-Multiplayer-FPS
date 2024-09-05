@@ -36,7 +36,7 @@ namespace Player
 	void Player::Init() {
 		srand((unsigned int)time(nullptr));
 		AssetManager::AddGameObject(GameObject("player", SceneManager::GetCurrentScene()->GetModel("player"), glm::vec3(0, 10, 5), false, 1, Capsule, 0.5, 1, 0.5));
-		AssetManager::AddGameObject(GameObject("player_head", SceneManager::GetCurrentScene()->GetModel("player"), glm::vec3(0, 10, 5), false, 0, Sphere, 1, 2, 1));
+		AssetManager::AddGameObject(GameObject("player_head", SceneManager::GetCurrentScene()->GetModel("player"), glm::vec3(0, 10, 5), false, 1, Sphere, 0.25, 0.25, 0.25));
 		GameObject* player_head = AssetManager::GetGameObject("player_head");
 		player_head->SetRender(false);
 		btBroadphaseProxy*  proxy = player_head->GetRigidBody()->getBroadphaseHandle();

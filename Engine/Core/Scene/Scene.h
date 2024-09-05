@@ -39,7 +39,11 @@ public:
 	std::vector<Light> getLights();
 
 	SkyBox GetSkyBox();
+
+	std::vector<GameObject*> NeedRenderingObjects();
+
 private:
+	std::vector<GameObject*> NeedRendering;
 	SkyBox sky = SkyBox();
 	// Objects
 	std::vector<Door> doors;

@@ -194,6 +194,8 @@
     <None Include="Assets\Shaders\SSAO\ssao.vert" />
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.frag" />
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.vert" />
+    <None Include="Assets\Shaders\Transparent\transparent.frag" />
+    <None Include="Assets\Shaders\Transparent\transparent.vert" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

@@ -119,11 +119,13 @@ namespace Renderer
 	GLuint gPostion;
 	GLuint gNormal;
 	GLuint gAlbeido;
+	GLuint gPBR;
+
 
 
 
 	GLuint depthrenderbuffer;
-	GLenum DrawBuffers[3] = { GL_COLOR_ATTACHMENT0,GL_COLOR_ATTACHMENT1,GL_COLOR_ATTACHMENT2 };
+	GLenum DrawBuffers[4] = { GL_COLOR_ATTACHMENT0,GL_COLOR_ATTACHMENT1,GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
 	GLuint quad_vertexbuffer;
 	GLuint depthTexture;
 
@@ -133,59 +135,7 @@ namespace Renderer
 	unsigned int noiseTexture;
 	unsigned int ssaoColorBuffer;
 	GLuint ssaoFBO = 0;
-
-
-
-
-
-	GLuint Renderer::GetProgramID(const char* name) {
-		return shaderProgramIds[name];
-	}
-
-	void Renderer::SetTextureShader(glm::mat4 mvp, glm::mat4 model, glm::mat4 view, glm::mat3 ModelView3x3Matrix) {
-		setMat4(MatrixID, mvp);
-		setMat4(ModelMatrixID, model); 
-		setMat4(ViewMatrixID, view);
-		glUniformMatrix3fv(ModelView3x3MatrixID, 1, GL_FALSE, &ModelView3x3Matrix[0][0]);
-	}
-
 	
-	void Renderer::SetLights(std::vector<Light> lights) {
-		// Upload lights data to the GPU
-		std::vector<glm::vec3> lightPositions;
-		std::vector<glm::vec3> lightColors;
-		std::vector<float> LightLinears;
-		std::vector<float> LightQuadratics;
-		std::vector<float> LightRadius;
-
-
-
-		for (const auto& light : lights) {
-			lightPositions.push_back(light.position);
-			lightColors.push_back(light.colour);
-			LightLinears.push_back(light.linear);
-			LightQuadratics.push_back(light.quadratic);
-			LightRadius.push_back(light.radius);
-		}
-
-		// Set up uniform arrays in the shader
-		GLuint lightPositionsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightPositions_worldspace");
-		GLuint lightColorsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightColors");
-		GLuint LightLinearsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightLinears");
-		GLuint LightQuadraticsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightQuadratics");
-		GLuint LightRadiusLoc = glGetUniformLocation(GetCurrentProgramID(), "LightRadius");
-
-
-		glUniform3fv(lightPositionsLoc, (GLsizei)lights.size(), glm::value_ptr(lightPositions[0]));
-		glUniform3fv(lightColorsLoc, (GLsizei)lights.size(), glm::value_ptr(lightColors[0]));
-		glUniform1fv(LightLinearsLoc, (GLsizei)lights.size(), &LightLinears[0]);
-		glUniform1fv(LightQuadraticsLoc, (GLsizei)lights.size(), &LightQuadratics[0]);
-		glUniform1fv(LightRadiusLoc, (GLsizei)lights.size(), &LightRadius[0]);
-
-	}
-
-
-
 	int Renderer::init(const char* vertex, const char* fragment, const char* name) {
 		UseProgram(LoadShader(vertex, fragment, name));
 
@@ -199,6 +149,8 @@ namespace Renderer
 		LoadShader("Assets/Shaders/Deffered/geomerty.vert", "Assets/Shaders/Deffered/geomerty.frag", "geomerty");
 		LoadShader("Assets/Shaders/SSAO/ssao.vert", "Assets/Shaders/SSAO/ssao.frag", "ssao");
 		LoadShader("Assets/Shaders/Texture_Render/Texture_Render.vert", "Assets/Shaders/Texture_Render/Texture_Render.frag", "screen");
+		LoadShader("Assets/Shaders/Transparent/transparent.vert", "Assets/Shaders/Transparent/transparent.frag", "transparent");
+
 
 
 		// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
@@ -223,11 +175,17 @@ namespace Renderer
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
+		glGenTextures(1, &gPBR);
+		glBindTexture(GL_TEXTURE_2D, gPBR);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
 		glGenTextures(1, &depthTexture);
 		glBindTexture(GL_TEXTURE_2D, depthTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0,GL_DEPTH_COMPONENT24, SCREENWIDTH, SCREENHEIGHT, 0,GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, SCREENWIDTH, SCREENHEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); 
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -236,10 +194,12 @@ namespace Renderer
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, gPosition, 0);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, gNormal, 0);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, gAlbeido, 0);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, gPBR, 0);
+
 
 
 		// Set the list of draw buffers.
-		glDrawBuffers(3, DrawBuffers); // "1" is the size of DrawBuffer
+		glDrawBuffers(4, DrawBuffers); // "1" is the size of DrawBuffer
 
 
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -262,10 +222,15 @@ namespace Renderer
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 2);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "ssaoTexture"), 3);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPBR"), 3);
 
-		
-		
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "ssaoTexture"), 4);
+
+
+		UseProgram(GetProgramID("transparent"));
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 0);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPositionTexture"), 1);
+
 
 		UseProgram(GetProgramID("geomerty"));
 
@@ -295,7 +260,7 @@ namespace Renderer
 
 			// scale samples s.t. they're more aligned to center of kernel
 			scale = 0.1f + (scale * scale) * (0.1f - 0.1f);
-			
+
 			sample *= scale;
 			ssaoKernel.push_back(sample);
 		}
@@ -339,6 +304,66 @@ namespace Renderer
 
 
 		return 0;
+	}
+
+	GLuint Renderer::GetProgramID(const char* name) {
+		return shaderProgramIds[name];
+	}
+
+	void Renderer::SetTextureShader(glm::mat4 mvp, glm::mat4 model, glm::mat4 view, glm::mat3 ModelView3x3Matrix) {
+		setMat4(MatrixID, mvp);
+		setMat4(ModelMatrixID, model); 
+		setMat4(ViewMatrixID, view);
+		glUniformMatrix3fv(ModelView3x3MatrixID, 1, GL_FALSE, &ModelView3x3Matrix[0][0]);
+	}
+
+	
+	void Renderer::SetLights(std::vector<Light> lights) {
+		// Upload lights data to the GPU
+		std::vector<glm::vec3> lightPositions;
+		std::vector<glm::vec3> lightDirection;
+
+		std::vector<glm::vec3> lightColors;
+		std::vector<float> LightLinears;
+		std::vector<float> LightQuadratics;
+		std::vector<float> LightRadius;
+		std::vector<float> LightCutoff;
+		std::vector<float> LightOuterCutOff;
+
+
+		for (const auto& light : lights) {
+			lightPositions.push_back(light.position);
+			lightDirection.push_back(light.direction);
+			lightColors.push_back(light.colour);
+			LightLinears.push_back(light.linear);
+			LightQuadratics.push_back(light.quadratic);
+			LightRadius.push_back(light.radius);
+			LightCutoff.push_back(light.cutoff);
+			LightOuterCutOff.push_back(light.outercutoff);
+		}
+
+		
+
+		// Set up uniform arrays in the shader
+		GLuint lightPositionsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightPositions_worldspace");
+		GLuint lightColorsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightColors");
+		GLuint LightLinearsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightLinears");
+		GLuint LightQuadraticsLoc = glGetUniformLocation(GetCurrentProgramID(), "LightQuadratics");
+		GLuint LightRadiusLoc = glGetUniformLocation(GetCurrentProgramID(), "LightRadius");
+		GLuint LightCutoffLoc = glGetUniformLocation(GetCurrentProgramID(), " LightCutOff");
+		GLuint LightDirectionLoc = glGetUniformLocation(GetCurrentProgramID(), "Lightdirection");
+		GLuint LightOuterCutOffLoc = glGetUniformLocation(GetCurrentProgramID(), "LightOuterCutOff");
+
+
+		glUniform3fv(lightPositionsLoc, (GLsizei)lights.size(), glm::value_ptr(lightPositions[0]));
+		glUniform3fv(LightDirectionLoc, (GLsizei)lights.size(), glm::value_ptr(lightDirection[0]));
+		glUniform3fv(lightColorsLoc, (GLsizei)lights.size(), glm::value_ptr(lightColors[0]));
+		glUniform1fv(LightLinearsLoc, (GLsizei)lights.size(), &LightLinears[0]);
+		glUniform1fv(LightQuadraticsLoc, (GLsizei)lights.size(), &LightQuadratics[0]);
+		glUniform1fv(LightRadiusLoc, (GLsizei)lights.size(), &LightRadius[0]);
+		glUniform1fv(LightCutoffLoc, (GLsizei)lights.size(), &LightCutoff[0]);
+		glUniform1fv(LightOuterCutOffLoc, (GLsizei)lights.size(), &LightOuterCutOff[0]);
+
 	}
 
 	void Renderer::setMat4(GLuint id, glm::mat4& mat4) {
@@ -389,6 +414,33 @@ namespace Renderer
 		newTime = glfwGetTime();
 		//std::cout << "Geometry:" << (newTime - time) * 1000 << "ms" << std::endl;
 		time = newTime;
+
+		programid = Renderer::GetProgramID("transparent");
+		Renderer::UseProgram(programid);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gAlbeido);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, gPosition);
+		
+		
+		std::vector<GameObject*> needRendering = SceneManager::GetCurrentScene()->NeedRenderingObjects();
+
+		for (int i = 0; i < needRendering.size(); i++) {
+			std::cout << "Test \n";
+			
+			glm::mat4 ModelMatrix = needRendering[i]->GetModelMatrix();
+			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;
+			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
+
+			glUniformMatrix3fv(glGetUniformLocation(programid, "normalMatrix3"), 1, GL_FALSE, &normalMatrix[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);
+
+			needRendering[i]->RenderObject(programid);
+		}
+		
+
+
 		glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -439,6 +491,8 @@ namespace Renderer
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, gAlbeido);
 		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, gPBR);
+		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
 		
 		glUniform3fv(glGetUniformLocation(programid, "viewPos"),1, &Camera::GetPosition()[0]);

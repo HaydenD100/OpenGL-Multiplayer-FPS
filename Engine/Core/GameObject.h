@@ -41,6 +41,9 @@ public:
 	void setRotation(glm::vec3 rotation);
 	void setScale(glm::vec3 scale);
 
+	void SetShaderType(std::string shaderType);
+	std::string GetShaderType();
+
 	void Update();
 
 	glm::vec3 getPosition();
@@ -93,6 +96,8 @@ private:
 
 	std::string parentName;
 	std::string name;
+	//Water or Glass
+	std::string shaderType = "Default";
 	
 	// Physics stuff
 	btCollisionShape* collider = nullptr;

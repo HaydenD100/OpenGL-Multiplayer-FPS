@@ -7,16 +7,30 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
+enum LightType
+{
+	PointLight,
+	Spotlight,
+	DirectionalLight,
+};
+
 
 struct Light
 {
+	LightType lighttype;
 	glm::vec3 position = glm::vec3(0,0,0);
+	glm::vec3 direction = glm::vec3(0, 0, 0);
 	glm::vec3 colour = glm::vec3(1,1,1);
 
 	float linear;
 	float quadratic;
 	float lightMax;
 	float radius;
+	float cutoff;
+	float outercutoff;
+
+	Light(glm::vec3 position, glm::vec3 direction, glm::vec3 colour, float cutoff, float outercutoff, float linear, float quadratic);
+
 
 	Light(glm::vec3 position, glm::vec3 colour, float linear, float quadratic);
 };

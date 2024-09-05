@@ -1,7 +1,9 @@
 #version 330 core
 layout (location = 0) out vec3 gPosition;
 layout (location = 1) out vec4 gNormal;
-layout (location = 2) out vec4 gAlbedoSpec;  // Stores both albedo and specular in one vector
+layout (location = 2) out vec4 gAlbedo;  // Stores both albedo and specular in one vector
+layout (location = 3) out vec4 gPBR;  // Stores both albedo and specular in one vector
+
 
 in vec2 UV;
 in vec3 FragPos;
@@ -38,7 +40,8 @@ void main()
     // store the fragment position vector in the first gbuffer texture
     gPosition = FragPos;
     // also store the per-fragment normals into the gbuffer
-    gNormal = vec4(transformedNormal, MaterialMetalic);
-    gAlbedoSpec = vec4(MaterialDiffuseColor, MaterialRoughness); // RGB for Albedo, R for Specular Intensity
+    gPBR = vec4(MaterialRoughness,MaterialMetalic,1,1);
+    gNormal = vec4(transformedNormal, 0);
+    gAlbedo = vec4(MaterialDiffuseColor, 1); // RGB for Albedo, R for Specular Intensity
 
 }

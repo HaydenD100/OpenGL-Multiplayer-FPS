@@ -43,8 +43,7 @@ namespace PhysicsManagerBullet
 	}
 	
 	void Update(float deltaTime) {
-		//int maxSubsteps = static_cast<int>(fabs(deltaTime / (1.f / 60.0f) + 0.5f)) + 1;
-		dynamicsWorld->stepSimulation(deltaTime,3);
+		dynamicsWorld->stepSimulation(deltaTime, 3);
 		dynamicsWorld->debugDrawWorld();
 	}
 }
