@@ -402,9 +402,6 @@ namespace Renderer
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//this needs to stay here ill figure out why later
-
-
-
 		GLuint programid = Renderer::GetProgramID("geomerty");
 		Renderer::UseProgram(programid);
 		glUniformMatrix4fv(P, 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
@@ -417,25 +414,20 @@ namespace Renderer
 
 		programid = Renderer::GetProgramID("transparent");
 		Renderer::UseProgram(programid);
-
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, gAlbeido);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, gPosition);
-		
+		glUniformMatrix4fv(glGetUniformLocation(programid, "P"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(programid, "V"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
 		
 		std::vector<GameObject*> needRendering = SceneManager::GetCurrentScene()->NeedRenderingObjects();
-
 		for (int i = 0; i < needRendering.size(); i++) {
-			std::cout << "Test \n";
-			
 			glm::mat4 ModelMatrix = needRendering[i]->GetModelMatrix();
 			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;
 			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
-
 			glUniformMatrix3fv(glGetUniformLocation(programid, "normalMatrix3"), 1, GL_FALSE, &normalMatrix[0][0]);
 			glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);
-
 			needRendering[i]->RenderObject(programid);
 		}
 		

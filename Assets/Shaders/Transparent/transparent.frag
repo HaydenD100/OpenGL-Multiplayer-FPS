@@ -22,9 +22,7 @@ void main()
     //if(texture(gPositionTexture, vec2(gl_FragCoord)).z < gl_FragDepth)
          //alpha = 0;
 
-    // store the fragment position vector in the first gbuffer texture
-    gPosition = FragPos;
-    // also store the per-fragment normals into the gbuffer
     gAlbedoSpec = vec4(MaterialDiffuseColor, alpha); // RGB for Albedo, R for Specular Intensity
+    //gAlbedoSpec = vec4(1,0,0,1);
 
 }

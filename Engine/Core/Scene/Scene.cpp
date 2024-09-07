@@ -53,7 +53,7 @@ void Scene::Load() {
 	AssetManager::AddGameObject("map1_walls", &models["map_walls"], glm::vec3(0, 1.6, 0), true, 0, Concave);
 	AssetManager::AddGameObject("map1_ceiling", &models["map_ceiling"], glm::vec3(0, 1.6, 0), true, 0, Convex);
 
-	AssetManager::AddGameObject("red_glass", &models["cube"], glm::vec3(2, 2, 0), true, 0, Convex);
+	AssetManager::AddGameObject("red_glass", &models["cube"], glm::vec3(-7, 2, 6), true, 0, Convex);
 	AssetManager::GetGameObject("red_glass")->SetShaderType("Transparent");
 	AssetManager::AddGameObject("floor", &models["floor"], glm::vec3(0, 0, 0), true, 0, Box);
 	
@@ -167,10 +167,11 @@ void Scene::RenderObjects(GLuint programid) {
 		GameObject* gameobjectRender = AssetManager::GetGameObject(i);
 		if (!gameobjectRender->ShouldRender())
 			continue;
-		//if (gameobjectRender->GetShaderType() != "Default") {
-			//NeedRendering.push_back(gameobjectRender);
-			//continue;
-		//}
+
+		if (gameobjectRender->GetShaderType() != "Default") {
+			NeedRendering.push_back(gameobjectRender);
+			continue;
+		}
 
 		glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
 		glm::mat4 modelViewMatrix = ViewMatrix * ModelMatrix;
