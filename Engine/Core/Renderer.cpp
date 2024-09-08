@@ -430,8 +430,6 @@ namespace Renderer
 			glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]); 
 			needRendering[i]->RenderObject(programid);
 		}
-		
-
 
 		glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);

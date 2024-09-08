@@ -35,9 +35,11 @@ namespace Player
 
 	void Player::Init() {
 		srand((unsigned int)time(nullptr));
-		AssetManager::AddGameObject(GameObject("player", SceneManager::GetCurrentScene()->GetModel("player"), glm::vec3(0, 10, 5), false, 1, Capsule, 0.5, 1, 0.5));
-		AssetManager::AddGameObject(GameObject("player_head", SceneManager::GetCurrentScene()->GetModel("player"), glm::vec3(0, 10, 5), false, 1, Sphere, 0.25, 0.25, 0.25));
+		AssetManager::AddGameObject(GameObject("player", SceneManager::GetCurrentScene()->GetModel("player"), glm::vec3(0, 10, 5), false, 1, Capsule, 0.5, 2.2, 0.5));
+		AssetManager::AddGameObject(GameObject("player_head", SceneManager::GetCurrentScene()->GetModel("player"), glm::vec3(0, 10, 5), false, 0, Sphere, 0, 0, 0));
 		GameObject* player_head = AssetManager::GetGameObject("player_head");
+		GameObject* player_body = AssetManager::GetGameObject("player");
+
 		player_head->SetRender(false);
 		btBroadphaseProxy*  proxy = player_head->GetRigidBody()->getBroadphaseHandle();
 		if (proxy) {
@@ -45,6 +47,19 @@ namespace Player
 			proxy->m_collisionFilterMask = GROUP_STATIC | GROUP_DYNAMIC;
 			// TODO: Add the constraint to the world
 		}
+		btBroadphaseProxy* otherProxy = player_body->GetRigidBody()->getBroadphaseHandle();
+		if (otherProxy) {
+			// Set the collision filter group and mask for the other object
+			otherProxy->m_collisionFilterGroup = GROUP_DYNAMIC; // Group for dynamic objects
+			otherProxy->m_collisionFilterMask = GROUP_STATIC | GROUP_DYNAMIC; // Collide with static and dynamic, but not the player
+		}
+
+		proxy->m_collisionFilterMask &= ~GROUP_DYNAMIC; // Remove dynamic objects from the player head's collision mask
+		otherProxy->m_collisionFilterMask &= ~GROUP_PLAYER; // Remove the player group from the other object's collision mask
+
+
+		btRigidBody* playerHeadRigidBody = player_head->GetRigidBody(); // Assuming GetRigidBody() returns btRigidBody*
+		playerHeadRigidBody->setActivationState(DISABLE_SIMULATION);
 
 		btRigidBody* body = AssetManager::GetGameObject("player")->GetRigidBody();
 		AssetManager::GetGameObject("player")->SetRender(false);
@@ -104,7 +119,7 @@ namespace Player
 	
 	bool Player::OnGround() {
 		GameObject* player = AssetManager::GetGameObject("player");
-		glm::vec3 out_end = player->getPosition() + glm::vec3(0,-0.65,0);
+		glm::vec3 out_end = player->getPosition() + glm::vec3(0,-1.1,0);
 
 		btCollisionWorld::ClosestRayResultCallback RayCallback(
 			btVector3(player->getPosition().x, player->getPosition().y, player->getPosition().z),
@@ -127,9 +142,9 @@ namespace Player
 		GameObject* player =  AssetManager::GetGameObject("player");
 
 		GameObject* head = AssetManager::GetGameObject("player_head");
-		player->setRotation(glm::vec3(0, horizontalAngle, 0));
+		player->setRotation(glm::vec3(horizontalAngle,0, 0));
 		head->setRotation(glm::vec3(-verticalAngle, horizontalAngle, 0));
-		head->setPosition(player->getPosition() + glm::vec3(0, 1.5, 0));
+		head->setPosition(player->getPosition() + glm::vec3(0, 1, 0));
 
 		if(verticalAngle < 1.5f && verticalAngle > -1.5f)
 			Camera::SetVerticalAngle(verticalAngle);
@@ -140,6 +155,7 @@ namespace Player
 			WeaponManager::GetGunByName(gunName)->Update(deltaTime, reloading, aiming);
 
 		bool IsGrounded = OnGround();
+		std::cout << IsGrounded << " \n";
 		if (IsGrounded) {
 			player->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
 			player->GetRigidBody()->setLinearVelocity(btVector3(player->GetRigidBody()->getLinearVelocity().x() * 0.0, 0, player->GetRigidBody()->getLinearVelocity().z() * 0.0));

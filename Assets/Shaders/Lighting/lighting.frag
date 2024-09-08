@@ -75,6 +75,8 @@ void main()
     vec3 Normal_view = normalize(vec3(texture(gNormal, UV).rgb)); // View-space normal
 
     vec3 albedo = texture(gAlbeido, UV).rgb;
+    float alpha = texture(gAlbeido, UV).a;
+
     float metallic  = texture(gPBR, UV).y;
     float roughness = texture(gPBR, UV).x;
     float ao = texture(ssaoTexture, UV).r;
@@ -147,5 +149,5 @@ void main()
     // HDR tonemapping
     color = color / (color + vec3(1.0));
     // gamma    
-    FragColor = vec4(color, 1.0);
+    FragColor = vec4(color, alpha);
 }

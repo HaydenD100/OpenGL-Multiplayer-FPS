@@ -55,6 +55,10 @@ void Scene::Load() {
 
 	AssetManager::AddGameObject("red_glass", &models["cube"], glm::vec3(-7, 2, 6), true, 0, Convex);
 	AssetManager::GetGameObject("red_glass")->SetShaderType("Transparent");
+
+	AssetManager::AddGameObject("red_glass1", &models["cube"], glm::vec3(-9, 2, 8), true, 0, Convex);
+	AssetManager::GetGameObject("red_glass1")->SetShaderType("Transparent");
+
 	AssetManager::AddGameObject("floor", &models["floor"], glm::vec3(0, 0, 0), true, 0, Box);
 	
 

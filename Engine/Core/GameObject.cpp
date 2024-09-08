@@ -270,6 +270,9 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	else
 		collider = new btBoxShape(btVector3(btScalar(width / 2), btScalar(height / 2), btScalar(depth / 2)));
 
+	if(width == 0 || height == 0 || depth == 0)
+		collider = new btEmptyShape();
+
 	PhysicsManagerBullet::AddColliderShape(collider);
 	bool isDynamic = (mass != 0.f);
 
