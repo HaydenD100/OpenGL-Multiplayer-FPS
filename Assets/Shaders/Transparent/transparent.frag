@@ -14,5 +14,5 @@ void main()
 {    
     float alpha = texture(DiffuseTextureSampler, UV).a;
     vec3 MaterialDiffuseColor = texture(DiffuseTextureSampler, UV).rgb;
-    gAlbedoSpec = vec4(MaterialDiffuseColor, 100); // RGB for Albedo, R for Specular Intensity
+    gAlbedoSpec = vec4(MaterialDiffuseColor, alpha); // RGB for Albedo, R for Specular Intensity
 }
