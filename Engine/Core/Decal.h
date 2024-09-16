@@ -15,6 +15,10 @@ public:
     glm::vec3 GetNormal();
     bool CheckParentIsNull();
     void RenderDecal(GLuint& programID);
+
+    glm::vec3 GetPosition() const {
+        return transform.position;
+    }
 private:    
     Texture* texture = nullptr;
     glm::vec3 normal = glm::vec3(0, 0, 0);

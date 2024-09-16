@@ -7,6 +7,7 @@ Scene::Scene() {
 void Scene::LoadAssets() {
 	AssetManager::ClearAssets();
 	AnimationManager::ClearAnimations();
+	//Thank you to tokyo splif for some of the models and sounds
 
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
 	AssetManager::AddTexture("red_glass", "Assets/Textures/red_glass.png", 0, 0);
