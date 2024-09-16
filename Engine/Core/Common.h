@@ -23,6 +23,9 @@
 #define RATIO 16.0f/9.0f
 #define WINDOWTITILE "Engine 2.0"
 
+
+
+
 struct Transform{
     glm::vec3 position = glm::vec3(0);
     glm::vec3 rotation = glm::vec3(0);
