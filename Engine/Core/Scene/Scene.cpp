@@ -197,14 +197,6 @@ void Scene::RenderObjects(GLuint programid) {
 	}
 	
 	
-	for (int i = 0; i < AssetManager::GetDecalsSize(); i++) {
-		Decal* decal = AssetManager::GetDecal(i);
-		if (decal->CheckParentIsNull())
-			continue;
-		glm::mat4 ModelMatrix = decal->GetModel();
-		Renderer::setMat4(glGetUniformLocation(Renderer::GetCurrentProgramID(), "M"), ModelMatrix);
-		decal->RenderDecal(programid);
-	}
 }
 
 void Scene::AddGunPickUp(GunPickUp gunpickup) {

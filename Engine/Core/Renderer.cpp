@@ -433,6 +433,9 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, gPosition);
 		glUniformMatrix4fv(glGetUniformLocation(programid, "P"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(programid, "V"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		
 		std::vector<GameObject*> needRendering = SceneManager::GetCurrentScene()->NeedRenderingObjects();
 		for (int i = 0; i < needRendering.size(); i++) {
@@ -443,6 +446,17 @@ namespace Renderer
 			glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]); 
 			needRendering[i]->RenderObject(programid);
 		}
+
+		for (int i = 0; i < AssetManager::GetDecalsSize(); i++) {
+			Decal* decal = AssetManager::GetDecal(i);
+			if (decal->CheckParentIsNull())
+				continue;
+			glm::mat4 ModelMatrix = decal->GetModel();
+			Renderer::setMat4(glGetUniformLocation(Renderer::GetCurrentProgramID(), "M"), ModelMatrix);
+			decal->RenderDecal(programid);
+		}
+
+		glDisable(GL_BLEND);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
