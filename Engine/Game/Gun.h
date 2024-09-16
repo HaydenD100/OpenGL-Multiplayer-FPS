@@ -35,6 +35,9 @@ struct Gun
 
 	float kickbackOffset = 0;
 	int down = 1;
+	int firesounds = 4;
+	int bulletsPerShot = 1;
+	float spread = 0;
 	void Update(float deltaTime, bool isReloading, bool aiming);
 	void Shoot();
 

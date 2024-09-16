@@ -63,11 +63,18 @@ namespace Engine
 			// Update Managers
 			Input::Update();
 			//Renderer::ClearScreen();
+
+			//TO DO :: Editing
 			if (Editing)
 			{
 				EditorManager::Update();
 			}
 			else {
+
+				//Reloads Shaders
+				if (Input::KeyDown('h'))
+					Renderer::LoadAllShaders();
+
 				
 				Input::CenterMouse();
 				SceneManager::Update(dt);
@@ -82,7 +89,6 @@ namespace Engine
 				Renderer::RenderText(oss.str().c_str(), 660, 585, 15);
 				oss.str(""); oss.clear();
 				oss.clear();
-				
 				oss.precision(4);
 				oss << "Position: " << Player::getPosition().x << " y:" << Player::getPosition().y << " z:" << Player::getPosition().z << "\n";
 				Renderer::RenderText(oss.str().c_str(), 0, 560, 15);

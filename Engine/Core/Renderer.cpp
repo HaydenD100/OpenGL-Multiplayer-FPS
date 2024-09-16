@@ -108,12 +108,7 @@ namespace Renderer
 	GLuint P;
 	GLuint V;
 
-
-	
-	GLuint ubo; 
-
-
-
+	GLuint ubo;
 	//deffered rendering stuff
 	GLuint FramebufferName = 0;
 	GLuint gPostion;
@@ -135,23 +130,93 @@ namespace Renderer
 	unsigned int noiseTexture;
 	unsigned int ssaoColorBuffer;
 	GLuint ssaoFBO = 0;
-	
-	int Renderer::init(const char* vertex, const char* fragment, const char* name) {
-		UseProgram(LoadShader(vertex, fragment, name));
 
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
-		glEnable(GL_CULL_FACE);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		// Skybox
+	void Renderer::LoadAllShaders() {
+		if (shaderProgramIds.size() > 0) {
+			for (auto const& [key, val] : shaderProgramIds)
+			{
+				glDeleteProgram(val);
+			}
+			shaderProgramIds.clear();
+		}
+		LoadShader("Assets/Shaders/Lighting/lighting.vert", "Assets/Shaders/Lighting/lighting.frag", "lighting");
 		LoadShader("Assets/Shaders/SkyBoxShader.vert", "Assets/Shaders/SkyBoxShader.frag", "skybox");
 		LoadShader("Assets/Shaders/Deffered/geomerty.vert", "Assets/Shaders/Deffered/geomerty.frag", "geomerty");
 		LoadShader("Assets/Shaders/SSAO/ssao.vert", "Assets/Shaders/SSAO/ssao.frag", "ssao");
 		LoadShader("Assets/Shaders/Texture_Render/Texture_Render.vert", "Assets/Shaders/Texture_Render/Texture_Render.frag", "screen");
 		LoadShader("Assets/Shaders/Transparent/transparent.vert", "Assets/Shaders/Transparent/transparent.frag", "transparent");
+		LoadShader("Assets/Shaders/Shadow/depth.vert", "Assets/Shaders/Shadow/depth.frag", "Assets/Shaders/Shadow/depth.gs", "shadow");
 
+		UseProgram(GetProgramID("lighting"));
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 2);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPBR"), 3);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "ssaoTexture"), 4);
 
+		UseProgram(GetProgramID("transparent"));
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 0);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPositionTexture"), 1);
+
+		UseProgram(GetProgramID("geomerty"));
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "DiffuseTextureSampler"), 0);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "NormalTextureSampler"), 1);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "RoughnessTextureSampler"), 2);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "MetalicTextureSampler"), 3);
+
+		MatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "MVP");
+		ViewMatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "V");
+		ModelMatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "M");
+		LightID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "LightPosition_worldspace");
+		ModelView3x3MatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "MV3x3");
+		P = glGetUniformLocation(Renderer::GetCurrentProgramID(), "P");
+		V = glGetUniformLocation(Renderer::GetCurrentProgramID(), "V");
+
+		UseProgram(GetProgramID("ssao"));
+		glUniform3fv(glGetUniformLocation(GetCurrentProgramID(), "samples"), (GLsizei)ssaoKernel.size(), glm::value_ptr(ssaoKernel[0]));
+		glUniform1f(glGetUniformLocation(GetCurrentProgramID(), "ScreenWidth"), SCREENWIDTH);
+		glUniform1f(glGetUniformLocation(GetCurrentProgramID(), "ScreenHeight"), SCREENHEIGHT);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "texNoise"), 2);
+
+		std::cout << "Done loading shaders \n";
+	}
+
+	
+	int Renderer::init() {
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
+		glEnable(GL_CULL_FACE);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		//SSAO
+		std::uniform_real_distribution<float> randomFloats(0.0, 1.0); // random floats between [0.0, 1.0]
+		std::default_random_engine generator;
+		for (unsigned int i = 0; i < 64; ++i)
+		{
+			glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
+			sample = glm::normalize(sample);
+			sample *= randomFloats(generator);
+			float scale = float(i) / 64.0f;
+
+			// scale samples s.t. they're more aligned to center of kernel
+			scale = 0.1f + (scale * scale) * (0.1f - 0.1f);
+
+			sample *= scale;
+			ssaoKernel.push_back(sample);
+		}
+
+		for (unsigned int i = 0; i < 16; i++)
+		{
+			glm::vec3 noise(
+				randomFloats(generator) * 2.0 - 1.0,
+				randomFloats(generator) * 2.0 - 1.0,
+				0.0f);
+			ssaoNoise.push_back(noise);
+		}
+
+		LoadAllShaders();
 
 		// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
 		glGenFramebuffers(1, &FramebufferName);
@@ -196,8 +261,6 @@ namespace Renderer
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, gAlbeido, 0);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, gPBR, 0);
 
-
-
 		// Set the list of draw buffers.
 		glDrawBuffers(4, DrawBuffers); // "1" is the size of DrawBuffer
 
@@ -218,69 +281,6 @@ namespace Renderer
 		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
 
-		UseProgram(GetProgramID("lighting"));
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 2);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPBR"), 3);
-
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "ssaoTexture"), 4);
-
-
-		UseProgram(GetProgramID("transparent"));
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 0);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPositionTexture"), 1);
-
-
-		UseProgram(GetProgramID("geomerty"));
-
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "DiffuseTextureSampler"), 0);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "NormalTextureSampler"), 1);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "RoughnessTextureSampler"), 2);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "MetalicTextureSampler"), 3);
-
-		MatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "MVP");
-		ViewMatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "V");
-		ModelMatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "M");
-		LightID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "LightPosition_worldspace");
-		ModelView3x3MatrixID = glGetUniformLocation(Renderer::GetCurrentProgramID(), "MV3x3");
-		P = glGetUniformLocation(Renderer::GetCurrentProgramID(), "P");
-		V = glGetUniformLocation(Renderer::GetCurrentProgramID(), "V");
-
-
-		//SSAO
-		std::uniform_real_distribution<float> randomFloats(0.0, 1.0); // random floats between [0.0, 1.0]
-		std::default_random_engine generator;
-		for (unsigned int i = 0; i < 64; ++i)
-		{
-			glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
-			sample = glm::normalize(sample);
-			sample *= randomFloats(generator);
-			float scale = float(i) / 64.0f;
-
-			// scale samples s.t. they're more aligned to center of kernel
-			scale = 0.1f + (scale * scale) * (0.1f - 0.1f);
-
-			sample *= scale;
-			ssaoKernel.push_back(sample);
-		}
-
-		for (unsigned int i = 0; i < 16; i++)
-		{
-			glm::vec3 noise(
-				randomFloats(generator) * 2.0 - 1.0,
-				randomFloats(generator) * 2.0 - 1.0,
-				0.0f);
-			ssaoNoise.push_back(noise);
-		}
-
-		UseProgram(GetProgramID("ssao"));
-		glUniform3fv(glGetUniformLocation(GetCurrentProgramID(), "samples"), (GLsizei)ssaoKernel.size(), glm::value_ptr(ssaoKernel[0]));
-		glUniform1f(glGetUniformLocation(GetCurrentProgramID(), "ScreenWidth"), SCREENWIDTH);
-		glUniform1f(glGetUniformLocation(GetCurrentProgramID(), "ScreenHeight"), SCREENHEIGHT);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "texNoise"), 2);
 
 
 		glGenTextures(1, &noiseTexture);
@@ -301,8 +301,6 @@ namespace Renderer
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
-
-
 		return 0;
 	}
 
@@ -329,6 +327,7 @@ namespace Renderer
 		std::vector<float> LightRadius;
 		std::vector<float> LightCutoff;
 		std::vector<float> LightOuterCutOff;
+		std::vector<GLuint> depthMap;
 
 
 		for (const auto& light : lights) {
@@ -340,6 +339,7 @@ namespace Renderer
 			LightRadius.push_back(light.radius);
 			LightCutoff.push_back(light.cutoff);
 			LightOuterCutOff.push_back(light.outercutoff);
+			depthMap.push_back(light.depthCubemap);
 		}
 
 		
@@ -364,6 +364,15 @@ namespace Renderer
 		glUniform1fv(LightCutoffLoc, (GLsizei)lights.size(), &LightCutoff[0]);
 		glUniform1fv(LightOuterCutOffLoc, (GLsizei)lights.size(), &LightOuterCutOff[0]);
 
+
+		// Upload depth maps (cubemap for shadow mapping)
+		for (int i = 0; i < lights.size(); i++) {
+			glActiveTexture(GL_TEXTURE5 + i); // Activate texture unit i
+			glBindTexture(GL_TEXTURE_CUBE_MAP, depthMap[i]); // Bind the depth cubemap to the texture unit
+			GLuint depthMapLoc = glGetUniformLocation(GetCurrentProgramID(), ("depthMap[" + std::to_string(i) + "]").c_str());
+			glUniform1i(depthMapLoc, 5 + i); // Assign the texture unit to the samplerCube array in the shader
+		}
+
 	}
 
 	void Renderer::setMat4(GLuint id, glm::mat4& mat4) {
@@ -387,6 +396,10 @@ namespace Renderer
 		shaderProgramIds[name] = LoadShaders::LoadShaders(vertex, fragment); 
 		return shaderProgramIds[name];
 	} 
+	int Renderer::LoadShader(const char* vertex, const char* fragment, const char* geomtery, const char* name) {
+		shaderProgramIds[name] = LoadShaders::LoadShaders(vertex, fragment,geomtery);
+		return shaderProgramIds[name];
+	}
 
 	void Renderer::RenderText(const char* text,int x, int y, int size) {
 		Renderer::UseProgram(Text2D::GetProgramID());

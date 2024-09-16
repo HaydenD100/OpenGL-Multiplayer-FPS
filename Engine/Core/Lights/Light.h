@@ -1,8 +1,10 @@
 #pragma once
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
 #include <map>
+#include <vector>
+
+#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -29,10 +31,22 @@ struct Light
 	float cutoff;
 	float outercutoff;
 
+	//shadowStuff
+	unsigned int depthCubemap;
+	unsigned int depthMapFBO;
+	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	std::vector<glm::mat4> shadowTransforms;
+	float aspect;
+	float near;
+	float far;
+	glm::mat4 shadowProj;
+
+
 	Light(glm::vec3 position, glm::vec3 direction, glm::vec3 colour, float cutoff, float outercutoff, float linear, float quadratic);
-
-
 	Light(glm::vec3 position, glm::vec3 colour, float linear, float quadratic);
+
+	void SetUpShadows();
+	void GenerateShadows();
 };
 
 

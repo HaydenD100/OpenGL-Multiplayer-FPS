@@ -129,7 +129,6 @@ namespace AudioManager {
 		vel.x = Velocity.x;
 		vel.y = Velocity.y;
 		vel.z = Velocity.z;
-
 	}
 	
 	void AudioManager::Update() {

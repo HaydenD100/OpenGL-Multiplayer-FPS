@@ -222,6 +222,9 @@
     <None Include="Assets\Shaders\SSAO\blur.frag" />
     <None Include="Assets\Shaders\Transparent\transparent.vert" />
     <None Include="Assets\Shaders\Transparent\transparent.frag" />
+    <None Include="Assets\Shaders\Shadow\depth.vert" />
+    <None Include="Assets\Shaders\Shadow\depth.frag" />
+    <None Include="Assets\Shaders\Shadow\depth.gs" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

@@ -2,11 +2,55 @@
 #include "Engine/Loaders/Loader.hpp"
 #include "Engine/Loaders/vboindexer.h"
 #include "Engine/Loaders/stb_image.h"
-
 #include "Engine/Core/AssetManager.h"
+
+#include <random>
+#include <iostream>
+#include <glm/gtx/rotate_vector.hpp>
+
 
 btVector3 glmToBtVector3(const glm::vec3& vec) {
     return btVector3(vec.x, vec.y, vec.z);
+}
+
+float getRandomFloat(float min, float max) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(min, max);
+    return static_cast<float>(dis(gen));
+}
+
+glm::vec3 offsetRayWithinAngle(const glm::vec3& rayDir, float maxOffsetAngle) {
+    // Generate a random angle within the range [0, maxOffsetAngle] (in radians)
+    float offsetAngle = getRandomFloat(0.0f, maxOffsetAngle);
+
+    // Generate a random azimuthal angle between 0 and 2 * pi for full rotation
+    float azimuthalAngle = getRandomFloat(0.0f, glm::two_pi<float>());
+
+    // Create a random axis perpendicular to the ray direction using azimuthal angle
+    glm::vec3 randomAxis = glm::normalize(glm::cross(rayDir, glm::vec3(cos(azimuthalAngle), sin(azimuthalAngle), 0.0f)));
+
+    // Rotate the ray direction by the random angle around the random axis
+    glm::vec3 offsetDir = glm::rotate(rayDir, offsetAngle, randomAxis);
+
+    return glm::normalize(offsetDir); // Return the normalized direction
+}
+
+
+// Function to generate a random vector with an angle from 0 to maxAngle
+glm::vec3 randomVector(float maxAngle) {
+    // Generate a random angle between 0 and maxAngle (in radians)
+    float theta = getRandomFloat(0.0f, maxAngle);
+    // Generate a random azimuthal angle between 0 and 2 * pi
+    float phi = getRandomFloat(0.0f, glm::two_pi<float>());
+
+    // Convert spherical coordinates to Cartesian coordinates
+    float x = sin(theta) * cos(phi);
+    float y = sin(theta) * sin(phi);
+    float z = cos(theta);
+
+    // Return the unit vector (it will have a magnitude of 1)
+    return glm::normalize(glm::vec3(x, y, z));
 }
 
 glm::vec3 btToGlmVector3(const btVector3& vec) {

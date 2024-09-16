@@ -73,8 +73,8 @@ namespace Camera
 		return glm::normalize(lRayDir_world);
 	}
 	
-	btCollisionWorld::ClosestRayResultCallback Camera::GetRayHit() {
-		glm::vec3 out_end = Camera::position + ComputeRay() * 1000.0f;
+	btCollisionWorld::ClosestRayResultCallback Camera::GetRayHit(float Maxoffset) {
+		glm::vec3 out_end = Camera::position + offsetRayWithinAngle(ComputeRay(), Maxoffset) * 1000.0f;
 
 		btCollisionWorld::ClosestRayResultCallback RayCallback(
 			btVector3(Camera::position.x, Camera::position.y, Camera::position.z),

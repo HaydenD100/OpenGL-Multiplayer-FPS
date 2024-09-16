@@ -23,5 +23,5 @@ namespace Camera
 	glm::vec3 GetRotation();
 
 	glm::vec3 ComputeRay();
-	btCollisionWorld::ClosestRayResultCallback GetRayHit();
+	btCollisionWorld::ClosestRayResultCallback GetRayHit(float Maxoffset = 0);
 }

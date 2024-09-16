@@ -31,8 +31,12 @@ private:
 
 namespace Renderer
 {
-    int init(const char* vertex, const char* fragment, const char* name);
+    int init();
     int LoadShader(const char* vertex, const char* fragment, const char* name);
+    int LoadShader(const char* vertex, const char* fragment, const char* gemotery, const char* name);
+
+    void LoadAllShaders();
+
 
     void ClearScreen();
     void UseProgram(int ProgramID);

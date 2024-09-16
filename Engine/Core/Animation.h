@@ -72,6 +72,7 @@ private:
 namespace AnimationManager
 {
 	void AddAnimation(Animation animation);
+	void ClearAnimations();
 	void Play(std::string Name, std::string ObjectName);
 	void Stop(std::string Name);
 	void Pause(std::string Name);

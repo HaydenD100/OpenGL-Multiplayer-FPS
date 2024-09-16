@@ -4,42 +4,45 @@ Scene::Scene() {
 
 }
 
-void Scene::Load() { 
-	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png",0,0);
-	AssetManager::AddTexture("red_glass", "Assets/Textures/red_glass.png", 0, 0);
+void Scene::LoadAssets() {
+	AssetManager::ClearAssets();
+	AnimationManager::ClearAnimations();
 
-	AssetManager::AddTexture("crate", "Assets/Textures/crate.png",0.7,0);
-	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png",0.5,0);
-	AssetManager::AddTexture("sand", "Assets/Textures/sandyGround.png", "Assets/Normals/sand_normal.png",0.9,0);
-	AssetManager::AddTexture("concrete", "Assets/Textures/fence.png", "Assets/Normals/fence_normal.png",0.9,0);
-	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png",0.5,0.5);
-	AssetManager::AddTexture("door", "Assets/Textures/door.png","Assets/Normals/door_normal.png",0.6,0);
-	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png",0.4,0.4);
-	AssetManager::AddTexture("drawer", "Assets/Textures/drawerred.png", "Assets/Normals/drawer_normal.png",0.7,0);
-	AssetManager::AddTexture("lamp", "Assets/Textures/lamp.png", "Assets/Normals/lamp_normal.png",0.7,0.1);
-	AssetManager::AddTexture("beige_wall", "Assets/Textures/beige_wall.jpg", "Assets/Normals/beige_wall_normal.jpg",0.7,0);
-	AssetManager::AddTexture("wooden_floor", "Assets/Textures/wooden_floor.jpg", "Assets/Normals/wooden_floor_normal.jpg",0.2,0.2);
+	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
+	AssetManager::AddTexture("red_glass", "Assets/Textures/red_glass.png", 0, 0);
+	AssetManager::AddTexture("crate", "Assets/Textures/crate.png", 0.7, 0);
+	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png", 0.5, 0);
+	AssetManager::AddTexture("sand", "Assets/Textures/sandyGround.png", "Assets/Normals/sand_normal.png", 0.9, 0);
+	AssetManager::AddTexture("concrete", "Assets/Textures/fence.png", "Assets/Normals/fence_normal.png", 0.9, 0);
+	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png", 0.5, 0.5);
+	AssetManager::AddTexture("door", "Assets/Textures/door.png", "Assets/Normals/door_normal.png", 0.6, 0);
+	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png", 0.4, 0.4);
+	AssetManager::AddTexture("drawer", "Assets/Textures/drawerred.png", "Assets/Normals/drawer_normal.png", 0.7, 0);
+	AssetManager::AddTexture("lamp", "Assets/Textures/lamp.png", "Assets/Normals/lamp_normal.png", 0.7, 0.1);
+	AssetManager::AddTexture("beige_wall", "Assets/Textures/beige_wall.jpg", "Assets/Normals/beige_wall_normal.jpg", 0.7, 0);
+	AssetManager::AddTexture("wooden_floor", "Assets/Textures/wooden_floor.jpg", "Assets/Normals/wooden_floor_normal.jpg", 0.2, 0.2);
+	AssetManager::AddTexture("shotgun", "Assets/Textures/remington.png", "Assets/Normals/remington_normal.png", "Assets/Roughness/remington_roughness.png","Assets/Metalic/remington_metallic.png");
 
 	// TODO: not currently working
 	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
-
 	//Loads Mode
-	models["fence1"] = Model("Assets/Objects/fence1.fbx", AssetManager::GetTexture("concrete"));
-	models["fence2"] = Model("Assets/Objects/fence2.fbx", AssetManager::GetTexture("concrete"));
-	models["fence3"] = Model("Assets/Objects/fence3.fbx", AssetManager::GetTexture("concrete"));
-	models["floor"] = Model("Assets/Objects/FBX/floor.fbx", AssetManager::GetTexture("sand"));
-	models["slope"] = Model("Assets/Objects/FBX/slope.fbx", AssetManager::GetTexture("sand"));
-	models["crate"] = Model("Assets/Objects/FBX/crate.fbx", AssetManager::GetTexture("crate"));
-	models["cube"] = Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("red_glass"));
+	AssetManager::AddModel("fence1", Model("Assets/Objects/fence1.fbx", AssetManager::GetTexture("concrete")));
+	AssetManager::AddModel("fence2", Model("Assets/Objects/fence2.fbx", AssetManager::GetTexture("concrete")));
+	AssetManager::AddModel("fence3", Model("Assets/Objects/fence3.fbx", AssetManager::GetTexture("concrete")));
+	AssetManager::AddModel("floor", Model("Assets/Objects/FBX/floor.fbx", AssetManager::GetTexture("sand")));
+	AssetManager::AddModel("slope", Model("Assets/Objects/FBX/slope.fbx", AssetManager::GetTexture("sand")));
+	AssetManager::AddModel("crate", Model("Assets/Objects/FBX/crate.fbx", AssetManager::GetTexture("crate")));
+	AssetManager::AddModel("cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("red_glass")));
+	AssetManager::AddModel("glock", Model("Assets/Objects/FBX/glock17.fbx", "Assets/Objects/glock17_convex.obj", AssetManager::GetTexture("glock")));
+	AssetManager::AddModel("ak47", Model("Assets/Objects/FBX/ak47.fbx", "Assets/Objects/ak47_convex.obj", AssetManager::GetTexture("ak47")));
+	AssetManager::AddModel("door", Model(Mesh("Assets/Objects/door.obj"), AssetManager::GetTexture("door")));
+	AssetManager::AddModel("door_frame", Model(Mesh("Assets/Objects/door_frame.obj"), AssetManager::GetTexture("door")));
+	AssetManager::AddModel("player", Model("Assets/Objects/FBX/player.fbx", AssetManager::GetTexture("uvmap")));
+	AssetManager::AddModel("map_floor", Model("Assets/Objects/Map1/floors.fbx", AssetManager::GetTexture("wooden_floor")));
+	AssetManager::AddModel("map_walls", Model("Assets/Objects/Map1/walls.fbx", AssetManager::GetTexture("beige_wall")));
+	AssetManager::AddModel("map_ceiling", Model("Assets/Objects/Map1/ceiling.fbx", AssetManager::GetTexture("beige_wall")));
+	AssetManager::AddModel("shotgun", Model("Assets/Objects/fbx/remington.fbx", "Assets/Objects/shotgun_convex.obj", AssetManager::GetTexture("shotgun")));
 
-	models["glock"] = Model("Assets/Objects/FBX/glock17.fbx", "Assets/Objects/glock17_convex.obj", AssetManager::GetTexture("glock"));
-	models["ak47"] = Model("Assets/Objects/FBX/ak47.fbx", "Assets/Objects/ak47_convex.obj", AssetManager::GetTexture("ak47"));
-	models["door"] = Model(Mesh("Assets/Objects/door.obj"), AssetManager::GetTexture("door"));
-	models["door_frame"] = Model(Mesh("Assets/Objects/door_frame.obj"), AssetManager::GetTexture("door"));
-	models["player"] = Model("Assets/Objects/FBX/player.fbx", AssetManager::GetTexture("uvmap"));
-	models["map_floor"] = Model("Assets/Objects/Map1/floors.fbx", AssetManager::GetTexture("wooden_floor"));
-	models["map_walls"] = Model("Assets/Objects/Map1/walls.fbx", AssetManager::GetTexture("beige_wall"));
-	models["map_ceiling"] = Model("Assets/Objects/Map1/ceiling.fbx", AssetManager::GetTexture("beige_wall"));
 
 
 	AnimationManager::AddAnimation(Animation("Assets/Objects/FBX/ak47.fbx", "ak47_reload"));
@@ -47,37 +50,44 @@ void Scene::Load() {
 	AnimationManager::AddAnimation(Animation("Assets/Animations/door_close.fbx", "door_close"));
 
 
+
+}
+
+
+void Scene::Load() { 
+	LoadAssets();
+
+
 	WeaponManager::Init();
 
-	AssetManager::AddGameObject("map1_floor", &models["map_floor"], glm::vec3(0, 1.6, 0), true, 0, Concave);
-	AssetManager::AddGameObject("map1_walls", &models["map_walls"], glm::vec3(0, 1.6, 0), true, 0, Concave);
-	AssetManager::AddGameObject("map1_ceiling", &models["map_ceiling"], glm::vec3(0, 1.6, 0), true, 0, Convex);
+	AssetManager::AddGameObject("map1_floor", AssetManager::GetModel("map_floor"), glm::vec3(0, 1.6, 0), true, 0, Concave);
+	AssetManager::AddGameObject("map1_walls", AssetManager::GetModel("map_walls"), glm::vec3(0, 1.6, 0), true, 0, Concave);
+	AssetManager::AddGameObject("map1_ceiling", AssetManager::GetModel("map_ceiling"), glm::vec3(0, 1.6, 0), true, 0, Convex);
 
-	AssetManager::AddGameObject("red_glass", &models["cube"], glm::vec3(-7, 2, 6), true, 0, Convex);
+
+	AssetManager::AddGameObject("red_glass", AssetManager::GetModel("cube"), glm::vec3(-7, 2, 6), true, 0, Convex);
 	AssetManager::GetGameObject("red_glass")->SetShaderType("Transparent");
 
-	AssetManager::AddGameObject("red_glass1", &models["cube"], glm::vec3(-9, 2, 8), true, 0, Convex);
+	AssetManager::AddGameObject("red_glass1", AssetManager::GetModel("cube"), glm::vec3(-9, 2, 8), true, 0, Convex);
 	AssetManager::GetGameObject("red_glass1")->SetShaderType("Transparent");
 
-	AssetManager::AddGameObject("floor", &models["floor"], glm::vec3(0, 0, 0), true, 0, Box);
-	
+	AssetManager::AddGameObject("floor", AssetManager::GetModel("floor"), glm::vec3(0, 0, 0), true, 0, Box);
 
-	crates.push_back(Crate(glm::vec3(1, 10, 1), "crate1", &models["crate"]));
-	crates.push_back(Crate(glm::vec3(1, 12, 0.5), "crate2", &models["crate"])); 
-	crates.push_back(Crate(glm::vec3(-10, 2, 14), "crate3", &models["crate"]));
+	crates.push_back(Crate(glm::vec3(1, 10, 1), "crate1", AssetManager::GetModel("crate")));
+	crates.push_back(Crate(glm::vec3(1, 12, 0.5), "crate2", AssetManager::GetModel("crate")));
+	crates.push_back(Crate(glm::vec3(-10, 2, 14), "crate3", AssetManager::GetModel("crate")));
 
+	gunPickUps.push_back(GunPickUp("ak47", "ak47_pickup", AssetManager::GetModel("ak47"), glm::vec3(1, 30, 1)));
+	gunPickUps.push_back(GunPickUp("glock", "glock_pickup", AssetManager::GetModel("glock"), glm::vec3(1, 25, 0)));
 
-	gunPickUps.push_back(GunPickUp("ak47", "ak47_pickup", &models["ak47"], glm::vec3(1, 30, 1)));
-	gunPickUps.push_back(GunPickUp("glock", "glock_pickup", &models["glock"], glm::vec3(1, 25, 0)));
+	doors.push_back(Door("door1", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-10.6, 0, 0.05)));
+	doors.push_back(Door("door2", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-10.6, 0, 9.95)));
 
-	doors.push_back(Door("door1", &models["door"], &models["door_frame"], glm::vec3(-10.6, 0, 0.05)));
-	doors.push_back(Door("door2", &models["door"], &models["door_frame"], glm::vec3(-10.6, 0, 9.95)));
-
-	doors.push_back(Door("door3", &models["door"], &models["door_frame"], glm::vec3(-12.3, 0, 4.6)));
+	doors.push_back(Door("door3", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-12.3, 0, 4.6)));
 	AssetManager::GetGameObject("door3_door")->SetRotationY(1.5708f);
 	AssetManager::GetGameObject("door3_frame")->SetRotationY(1.5708f);
 
-	doors.push_back(Door("door4", &models["door"], &models["door_frame"], glm::vec3(-10, 0, 4.6)));
+	doors.push_back(Door("door4", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-10, 0, 4.6)));
 	AssetManager::GetGameObject("door4_door")->SetRotationY(1.5708f);
 	AssetManager::GetGameObject("door4_frame")->SetRotationY(1.5708f);
 
@@ -183,10 +193,9 @@ void Scene::RenderObjects(GLuint programid) {
 
 		glUniformMatrix3fv(glGetUniformLocation(programid, "normalMatrix3"), 1, GL_FALSE, &normalMatrix[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);
-
 		gameobjectRender->RenderObject(programid);
 	}
-	/*
+	
 	
 	for (int i = 0; i < AssetManager::GetDecalsSize(); i++) {
 		Decal* decal = AssetManager::GetDecal(i);
@@ -195,7 +204,7 @@ void Scene::RenderObjects(GLuint programid) {
 		glm::mat4 ModelMatrix = decal->GetModel();
 		Renderer::setMat4(glGetUniformLocation(Renderer::GetCurrentProgramID(), "M"), ModelMatrix);
 		decal->RenderDecal(programid);
-	}*/
+	}
 }
 
 void Scene::AddGunPickUp(GunPickUp gunpickup) {
@@ -236,9 +245,7 @@ Crate* Scene::GetCrate(std::string name) {
 	}
 	return nullptr;
 }
-Model* Scene::GetModel(std::string name) {
-	return &models[name];
-}
+
 std::vector<Light> Scene::getLights() {
 	return lights;
 }

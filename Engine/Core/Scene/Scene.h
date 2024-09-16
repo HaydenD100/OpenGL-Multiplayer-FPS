@@ -33,9 +33,10 @@ public:
 
 	void AddGunPickUp(GunPickUp gunpickup);
 
+	void LoadAssets();
+
 	int GetGunPickUpSize();
 	Crate* GetCrate(std::string name);
-	Model* GetModel(std::string name);
 	std::vector<Light> getLights();
 
 	SkyBox GetSkyBox();
@@ -52,7 +53,6 @@ private:
 	std::vector<Light> lights;
 
 	//holds the models
-	std::map<std::string, Model> models;
 
 	GLuint ModelMatrixId;
 };

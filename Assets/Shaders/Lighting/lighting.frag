@@ -9,7 +9,6 @@ uniform sampler2D gPostion;    // View-space position
 uniform sampler2D gNormal;     // View-space normal
 uniform sampler2D gAlbeido;
 uniform sampler2D gPBR;
-
 uniform sampler2D ssaoTexture;
 
 uniform vec3 LightColors[MAXLIGHTS];
@@ -20,6 +19,10 @@ uniform float LightQuadratics[MAXLIGHTS];
 uniform float LightRadius[MAXLIGHTS];
 uniform float LightCutOff[MAXLIGHTS];
 uniform float LightOuterCutOff[MAXLIGHTS];
+uniform samplerCube depthMap[MAXLIGHTS];
+//change later
+float far_plane = 25;
+
 
 
 
@@ -68,6 +71,27 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
+
+
+
+float ShadowCalculation(vec3 fragPos, int i)
+{
+    // get vector between fragment position and light position
+    vec3 fragToLight = fragPos - LightPositions_worldspace[i];
+    // use the light to fragment vector to sample from the depth map    
+    float closestDepth = texture(depthMap[i], fragToLight).r;
+    // it is currently in linear range between [0,1]. Re-transform back to original value
+    closestDepth *= far_plane;
+    // now get current linear depth as the length between the fragment and light position
+    float currentDepth = length(fragToLight);
+    // now test for shadows
+    float bias = 0.05; 
+    float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0;
+    // display closestDepth as debug (to visualize depth cubemap)
+    //FragColor = vec4(vec3(closestDepth / far_plane), 1.0);    
+    return closestDepth;
+} 
+
 void main()
 {
     // Retrieve data from G-buffer
@@ -136,7 +160,7 @@ void main()
         float NdotL = max(dot(N, L), 0.0);        
 
         // add to outgoing radiance Lo
-        Lo +=  (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+        Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
         
     }
 

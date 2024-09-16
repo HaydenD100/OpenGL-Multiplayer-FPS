@@ -31,12 +31,12 @@ namespace Player
 	double footstepTime = 0;
 	double footstep_interval = 0.5;
 
-	std::string inv[2] = { "ak47","glock" };
+	std::string inv[3] = { "ak47","glock","shotgun"};
 
 	void Player::Init() {
 		srand((unsigned int)time(nullptr));
-		AssetManager::AddGameObject(GameObject("player", SceneManager::GetCurrentScene()->GetModel("player"), glm::vec3(0, 10, 5), false, 1, Capsule, 0.5, 2.2, 0.5));
-		AssetManager::AddGameObject(GameObject("player_head", SceneManager::GetCurrentScene()->GetModel("player"), glm::vec3(0, 10, 5), false, 0, Sphere, 0, 0, 0));
+		AssetManager::AddGameObject(GameObject("player", AssetManager::GetModel("player") , glm::vec3(0, 10, 5), false, 1, Capsule, 0.5, 2.2, 0.5));
+		AssetManager::AddGameObject(GameObject("player_head", AssetManager::GetModel("player"), glm::vec3(0, 10, 5), false, 0, Sphere, 0, 0, 0));
 		GameObject* player_head = AssetManager::GetGameObject("player_head");
 		GameObject* player_body = AssetManager::GetGameObject("player");
 
@@ -93,19 +93,23 @@ namespace Player
 			WeaponManager::GetGunByName(gunName)->Shoot();
 			verticalAngle += WeaponManager::GetGunByName(gunName)->recoil;
 			horizontalAngle += (float)rand() / RAND_MAX / WeaponManager::GetGunByName(gunName)->recoilY;
-			btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit();
-			if (hit.m_collisionObject != nullptr) {
-				GameObject* gameobject = AssetManager::GetGameObject(hit.m_collisionObject->getUserIndex());
-				if (gameobject != nullptr)
-				{
-					btRigidBody* body = gameobject->GetRigidBody();
-					body->applyImpulse(2 * glmToBtVector3(Camera::ComputeRay()),  body->getWorldTransform().inverse() * hit.m_hitPointWorld );
-					glm::vec4 worldPositionHomogeneous(glm::vec3(hit.m_hitPointWorld.getX(), hit.m_hitPointWorld.getY(), hit.m_hitPointWorld.getZ()), 1.0f);
-					glm::vec4 localPositionHomogeneous = glm::inverse(gameobject->GetModelMatrix()) * worldPositionHomogeneous;
-					glm::vec3 vec3local = glm::vec3(localPositionHomogeneous.x, localPositionHomogeneous.y, localPositionHomogeneous.z);
 
-					if (body->getBroadphaseHandle()->m_collisionFilterGroup == GROUP_STATIC)
-						AssetManager::AddDecal(vec3local, glm::vec3(hit.m_hitNormalWorld.getX(), hit.m_hitNormalWorld.getY(), hit.m_hitNormalWorld.getZ()), glm::vec3(0.025, 0.025, 0.025), AssetManager::GetTexture("bullet_hole"),gameobject);
+			for (int i = 0; i < WeaponManager::GetGunByName(gunName)->bulletsPerShot; i++) {
+				float maxSpread = WeaponManager::GetGunByName(gunName)->spread;
+				btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit(maxSpread);
+				if (hit.m_collisionObject != nullptr) {
+					GameObject* gameobject = AssetManager::GetGameObject(hit.m_collisionObject->getUserIndex());
+					if (gameobject != nullptr)
+					{
+						btRigidBody* body = gameobject->GetRigidBody();
+						body->applyImpulse(2 * glmToBtVector3(Camera::ComputeRay()), body->getWorldTransform().inverse() * hit.m_hitPointWorld);
+						glm::vec4 worldPositionHomogeneous(glm::vec3(hit.m_hitPointWorld.getX(), hit.m_hitPointWorld.getY(), hit.m_hitPointWorld.getZ()), 1.0f);
+						glm::vec4 localPositionHomogeneous = glm::inverse(gameobject->GetModelMatrix()) * worldPositionHomogeneous;
+						glm::vec3 vec3local = glm::vec3(localPositionHomogeneous.x, localPositionHomogeneous.y, localPositionHomogeneous.z);
+
+						if (body->getBroadphaseHandle()->m_collisionFilterGroup == GROUP_STATIC)
+							AssetManager::AddDecal(vec3local, glm::vec3(hit.m_hitNormalWorld.getX(), hit.m_hitNormalWorld.getY(), hit.m_hitNormalWorld.getZ()), glm::vec3(0.025, 0.025, 0.025), AssetManager::GetTexture("bullet_hole"), gameobject);
+					}
 				}
 			}
 		}
@@ -155,7 +159,6 @@ namespace Player
 			WeaponManager::GetGunByName(gunName)->Update(deltaTime, reloading, aiming);
 
 		bool IsGrounded = OnGround();
-		std::cout << IsGrounded << " \n";
 		if (IsGrounded) {
 			player->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
 			player->GetRigidBody()->setLinearVelocity(btVector3(player->GetRigidBody()->getLinearVelocity().x() * 0.0, 0, player->GetRigidBody()->getLinearVelocity().z() * 0.0));
@@ -288,17 +291,21 @@ namespace Player
 		if (Input::KeyPressed('2')) {
 			SelectWeapon(inv[1]);
 		}
+		if (Input::KeyPressed('3')) {
+			SelectWeapon(inv[2]);
+		}
 		
 		horizontalAngle += mouseSpeed * float(SCREENWIDTH / 2 - Input::GetMouseX());
 
 		if ((Input::KeyDown('w') || Input::KeyDown('a') || Input::KeyDown('s') || Input::KeyDown('d')) && footstepTime + footstep_interval < glfwGetTime() ) {
-			AudioManager::PlaySound("foot_step" + std::to_string((rand() % 4) + 1), AssetManager::GetGameObject("player")->getPosition());
+			AudioManager::PlaySound("foot_step" + std::to_string((rand() % 4) + 1), player->getPosition());
 			footstepTime = glfwGetTime();
 		}
 
 		if(GetInteractingWithName() != "Nothing")
 			std::cout << GetInteractingWithName() << "\n";
 
+		//AudioManager::UpdateListener(player->getPosition(), Camera::GetDirection(), btToGlmVector3(player->GetRigidBody()->getLinearVelocity()));
 	}
 	
 	glm::vec3 Player::getPosition() {

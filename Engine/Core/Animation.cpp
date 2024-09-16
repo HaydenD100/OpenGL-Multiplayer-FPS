@@ -53,8 +53,8 @@ Animation::Animation(const char* path, std::string Name) {
 				keyframes.push_back(KeyFrame(position, glmQuat, scale, duration));
 
 				glm::vec3 testrot = glm::eulerAngles(glmQuat);
-				std::cout << "pos: " << positionKey.x << " y: " << positionKey.y << " z: " << positionKey.z << "\n";
-				std::cout << "rot: " << testrot.x << " y: " << testrot.y << " z: " << testrot.z << "\n";
+				//std::cout << "pos: " << positionKey.x << " y: " << positionKey.y << " z: " << positionKey.z << "\n";
+				//std::cout << "rot: " << testrot.x << " y: " << testrot.y << " z: " << testrot.z << "\n";
 
 
 			}
@@ -93,6 +93,7 @@ void Animation::Stop() {
 	gameObject = nullptr;
 }
 
+
 void Animation::Start() {
 	playing = true;
 	initalPosition = gameObject->getPosition();
@@ -126,8 +127,8 @@ void Animation::TransformObject() {
 	animationTransform.position = initalPosition + glm::mix(startingPosition, keyframes[currentKeyFrame].position, t);
 	animationTransform.rotation = initalRotation + glm::eulerAngles(glm::slerp(startingRotation, keyframes[currentKeyFrame].rotation, t));
 
-	std::cout << "pos: " << keyframes[currentKeyFrame].position.x << " y: " << keyframes[currentKeyFrame].position.y << " z: " << keyframes[currentKeyFrame].position.z << "\n";
-	std::cout << "rot: " << animationTransform.rotation.x << " y: " << animationTransform.rotation.y << " z: " << animationTransform.rotation.z << "\n";
+	//std::cout << "pos: " << keyframes[currentKeyFrame].position.x << " y: " << keyframes[currentKeyFrame].position.y << " z: " << keyframes[currentKeyFrame].position.z << "\n";
+	//std::cout << "rot: " << animationTransform.rotation.x << " y: " << animationTransform.rotation.y << " z: " << animationTransform.rotation.z << "\n";
 
 	gameObject->SetTransform(animationTransform);
 }
@@ -154,6 +155,10 @@ namespace AnimationManager
 	void AnimationManager::AddAnimation(Animation animation) {
 		animations.push_back(animation);
 	}
+	void ClearAnimations() {
+		animations.clear();
+	}
+
 	
 	void AnimationManager::Play(std::string Name,std::string ObjectName) {
 		GameObject* gameobject = AssetManager::GetGameObject(ObjectName);

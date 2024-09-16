@@ -2,15 +2,22 @@
 
 namespace AssetManager
 {
-	std::vector<GameObject> GameObjects;
+				std::vector<GameObject> GameObjects;
 	std::vector<Texture> Textures;
 	std::vector<Decal> Decals;
+	std::map<std::string, Model> models;
+
 
 	std::string path;
 
 	void AssetManager::Init() {
 		Textures.clear();
 		GameObjects.clear();
+	}
+
+	void AssetManager::ClearAssets() {
+		Textures.clear();
+		models.clear();
 	}
 
 	void AssetManager::LoadAssets(const char* loadJson) {
@@ -140,6 +147,17 @@ namespace AssetManager
 		Decals.push_back(Decal(position, normal, scale, texture, parent));
 		return Decals.size() - 1;
 	}
+	Model* AssetManager::GetModel(std::string name) {
+		return &models[name];
+	}
+	Model* AssetManager::AddModel(std::string name, const char* path, Texture* texture) {
+		models[name] = Model(path, texture);
+		return &models[name];
+	}
+	Model* AssetManager::AddModel(std::string name, Model model) {
+		models[name] = model;
+		return &models[name];
+	}
 	
 	Decal* GetDecal(int index) {
 		return &Decals[index];
@@ -171,9 +189,10 @@ namespace AssetManager
 
 	void AssetManager::RemoveGameObject(std::string name) {
 		for (int i = 0; i < GameObjects.size(); i++) {
-			if (GameObjects[i].GetName() == name)
+			if (GameObjects[i].GetName() == name) {
 				PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(GameObjects[i].GetRigidBody());
 				GameObjects.erase(GameObjects.begin() + i);
+			}
 		}
 	}
 	

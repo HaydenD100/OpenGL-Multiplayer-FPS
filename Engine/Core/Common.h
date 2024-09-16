@@ -123,5 +123,10 @@ glm::quat ConvertBlenderQuaternionToOpenGL(const glm::quat& blenderQuat);
 
 glm::vec3 ConvertBlenderScaleToOpenGL(const glm::vec3& blenderScale);
 
+float getRandomFloat(float min, float max);
+
+// Function to generate a random vector with an angle from 0 to maxAngle
+glm::vec3 randomVector(float maxAngle);
+glm::vec3 offsetRayWithinAngle(const glm::vec3& rayDir, float maxOffsetAngle);
 
 // TODO: I do want to add a mesh instead of storing all the obj info in GameObject this will also make it easy to allow multiple GameObjects to use the same mesh without loading a model each time
