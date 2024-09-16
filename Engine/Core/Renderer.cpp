@@ -461,15 +461,6 @@ namespace Renderer
 
 
 		std::vector<Decal>* decals = AssetManager::GetAllDecals();
-		std::sort(decals->begin(), decals->end(),
-			[&cameraPosition](const Decal a, const Decal b) {
-				// Calculate the distance from the camera for each object
-				float distanceA = glm::length(a.GetPosition() - cameraPosition);
-				float distanceB = glm::length(b.GetPosition() - cameraPosition);
-
-				return distanceA > distanceB; // Sort by descending distance (farthest first)
-			});
-
 
 		for (int i = 0; i < decals->size(); i++) {
 			Decal& decal = (*decals)[i];
