@@ -436,8 +436,21 @@ namespace Renderer
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
+
+
 		std::vector<GameObject*> needRendering = SceneManager::GetCurrentScene()->NeedRenderingObjects();
+
+		glm::vec3 cameraPosition = Camera::GetPosition(); // Camera position
+
+		std::sort(needRendering.begin(), needRendering.end(),
+			[&cameraPosition](const GameObject* a, const GameObject* b) {
+				// Calculate the distance from the camera for each object
+				float distanceA = glm::length(a->GetPosition() - cameraPosition);
+				float distanceB = glm::length(b->GetPosition() - cameraPosition);
+
+				return distanceA > distanceB; // Sort by descending distance (farthest first)
+			});
+		
 		for (int i = 0; i < needRendering.size(); i++) {
 			glm::mat4 ModelMatrix = needRendering[i]->GetModelMatrix();
 			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;

@@ -90,6 +90,10 @@ public:
 	btCollisionShape* GetCollisionShape();
 	btConvexHullShape* GetConvexHull();
 
+	glm::vec3 GetPosition() const {
+		return btToGlmVector3(body->getWorldTransform().getOrigin());
+	}
+
 private:
 	Transform transform = Transform();
 	Model* model = nullptr;

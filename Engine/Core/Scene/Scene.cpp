@@ -10,6 +10,8 @@ void Scene::LoadAssets() {
 
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
 	AssetManager::AddTexture("red_glass", "Assets/Textures/red_glass.png", 0, 0);
+	AssetManager::AddTexture("green_glass", "Assets/Textures/green_glass.png", 0, 0);
+
 	AssetManager::AddTexture("crate", "Assets/Textures/crate.png", 0.7, 0);
 	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png", 0.5, 0);
 	AssetManager::AddTexture("sand", "Assets/Textures/sandyGround.png", "Assets/Normals/sand_normal.png", 0.9, 0);
@@ -33,6 +35,8 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("slope", Model("Assets/Objects/FBX/slope.fbx", AssetManager::GetTexture("sand")));
 	AssetManager::AddModel("crate", Model("Assets/Objects/FBX/crate.fbx", AssetManager::GetTexture("crate")));
 	AssetManager::AddModel("cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("red_glass")));
+	AssetManager::AddModel("cube1", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("green_glass")));
+
 	AssetManager::AddModel("glock", Model("Assets/Objects/FBX/glock17.fbx", "Assets/Objects/glock17_convex.obj", AssetManager::GetTexture("glock")));
 	AssetManager::AddModel("ak47", Model("Assets/Objects/FBX/ak47.fbx", "Assets/Objects/ak47_convex.obj", AssetManager::GetTexture("ak47")));
 	AssetManager::AddModel("door", Model(Mesh("Assets/Objects/door.obj"), AssetManager::GetTexture("door")));
@@ -68,7 +72,7 @@ void Scene::Load() {
 	AssetManager::AddGameObject("red_glass", AssetManager::GetModel("cube"), glm::vec3(-7, 2, 6), true, 0, Convex);
 	AssetManager::GetGameObject("red_glass")->SetShaderType("Transparent");
 
-	AssetManager::AddGameObject("red_glass1", AssetManager::GetModel("cube"), glm::vec3(-9, 2, 8), true, 0, Convex);
+	AssetManager::AddGameObject("red_glass1", AssetManager::GetModel("cube1"), glm::vec3(-6, 2, 8), true, 0, Convex);
 	AssetManager::GetGameObject("red_glass1")->SetShaderType("Transparent");
 
 	AssetManager::AddGameObject("floor", AssetManager::GetModel("floor"), glm::vec3(0, 0, 0), true, 0, Box);
