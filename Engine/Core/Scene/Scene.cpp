@@ -14,7 +14,9 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("green_glass", "Assets/Textures/green_glass.png", 0, 0);
 
 	AssetManager::AddTexture("crate", "Assets/Textures/crate.png", 0.7, 0);
-	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png", 0.5, 0);
+	AssetManager::AddTexture("window", "Assets/Textures/window.png", 0.7, 0);
+
+	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png","Assets/Normals/window_normal.png", 0.5, 0);
 	AssetManager::AddTexture("sand", "Assets/Textures/sandyGround.png", "Assets/Normals/sand_normal.png", 0.9, 0);
 	AssetManager::AddTexture("concrete", "Assets/Textures/fence.png", "Assets/Normals/fence_normal.png", 0.9, 0);
 	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png", 0.5, 0.5);
@@ -29,6 +31,10 @@ void Scene::LoadAssets() {
 	// TODO: not currently working
 	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
 	//Loads Mode
+	AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("red_glass")));
+	AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("red_glass")));
+
+
 	AssetManager::AddModel("fence1", Model("Assets/Objects/fence1.fbx", AssetManager::GetTexture("concrete")));
 	AssetManager::AddModel("fence2", Model("Assets/Objects/fence2.fbx", AssetManager::GetTexture("concrete")));
 	AssetManager::AddModel("fence3", Model("Assets/Objects/fence3.fbx", AssetManager::GetTexture("concrete")));
@@ -68,6 +74,12 @@ void Scene::Load() {
 	AssetManager::AddGameObject("map1_floor", AssetManager::GetModel("map_floor"), glm::vec3(0, 1.6, 0), true, 0, Concave);
 	AssetManager::AddGameObject("map1_walls", AssetManager::GetModel("map_walls"), glm::vec3(0, 1.6, 0), true, 0, Concave);
 	AssetManager::AddGameObject("map1_ceiling", AssetManager::GetModel("map_ceiling"), glm::vec3(0, 1.6, 0), true, 0, Convex);
+
+	AssetManager::AddGameObject("window1", AssetManager::GetModel("window"), glm::vec3(-11, 2, 14),true, 0,Concave);
+	AssetManager::GetGameObject("window1")->SetShaderType("Transparent");
+	AssetManager::AddGameObject("window_glass1", AssetManager::GetModel("window_glass"), glm::vec3(-11, 2, 14), true, 0, Concave);
+	AssetManager::GetGameObject("window_glass1")->SetShaderType("Transparent");
+	AssetManager::GetGameObject("window_glass1")->SetRotationX(1.5f);
 
 
 	AssetManager::AddGameObject("red_glass", AssetManager::GetModel("cube"), glm::vec3(-7, 2, 6), true, 0, Convex);

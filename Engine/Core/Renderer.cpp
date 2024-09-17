@@ -449,6 +449,8 @@ namespace Renderer
 
 				return distanceA > distanceB; // Sort by descending distance (farthest first)
 			});
+
+
 		
 		for (int i = 0; i < needRendering.size(); i++) {
 			glm::mat4 ModelMatrix = needRendering[i]->GetModelMatrix();

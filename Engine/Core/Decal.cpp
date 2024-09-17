@@ -9,7 +9,7 @@ Decal::Decal(glm::vec3 position, glm::vec3 normal, glm::vec3 scale, Texture* tex
 	glm::vec3 rotationAxis = glm::cross(normal, up);
 	float angle = acos(glm::dot(normal, up));
 
-	transform.position = position;
+	transform.position = position + (normal * 0.01f);
 	transform.rotation = (rotationAxis * -angle);
 
 	transform.scale = scale;
