@@ -31,7 +31,7 @@ namespace Player
 	double footstepTime = 0;
 	double footstep_interval = 0.5;
 
-	std::string inv[3] = { "ak47","glock","shotgun"};
+	std::string inv[3] = {"ak47","glock","shotgun"};
 
 	void Player::Init() {
 		srand((unsigned int)time(nullptr));
@@ -112,7 +112,6 @@ namespace Player
 							glm::vec3 normal = glm::vec3(hit.m_hitNormalWorld.getX(), hit.m_hitNormalWorld.getY(), hit.m_hitNormalWorld.getZ());
 							glm::mat4 rotation_matrix = glm::mat4_cast(glm::quat(gameobject->getRotation()));
 							normal = glm::vec3(glm::inverse(rotation_matrix) * glm::vec4(normal, 0));
-							std::cout << normal.x << " " << normal.y << " " << normal.z << "\n";
 							AssetManager::AddDecal(vec3local, normal, glm::vec3(0.025, 0.025, 0.025), AssetManager::GetTexture("bullet_hole"), gameobject);
 						}
 					}

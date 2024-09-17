@@ -31,7 +31,7 @@ void Scene::LoadAssets() {
 	// TODO: not currently working
 	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
 	//Loads Mode
-	AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("red_glass")));
+	AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 	AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("red_glass")));
 
 
@@ -76,7 +76,6 @@ void Scene::Load() {
 	AssetManager::AddGameObject("map1_ceiling", AssetManager::GetModel("map_ceiling"), glm::vec3(0, 1.6, 0), true, 0, Convex);
 
 	AssetManager::AddGameObject("window1", AssetManager::GetModel("window"), glm::vec3(-11, 2, 14),true, 0,Concave);
-	AssetManager::GetGameObject("window1")->SetShaderType("Transparent");
 	AssetManager::AddGameObject("window_glass1", AssetManager::GetModel("window_glass"), glm::vec3(-11, 2, 14), true, 0, Concave);
 	AssetManager::GetGameObject("window_glass1")->SetShaderType("Transparent");
 	AssetManager::GetGameObject("window_glass1")->SetRotationX(1.5f);
@@ -192,7 +191,6 @@ void Scene::Update(float deltaTime) {
 
 void Scene::RenderObjects(GLuint programid) {
 	NeedRendering.clear();
-
 	glm::mat4 ViewMatrix = Camera::getViewMatrix();
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
 		GameObject* gameobjectRender = AssetManager::GetGameObject(i);
@@ -200,6 +198,7 @@ void Scene::RenderObjects(GLuint programid) {
 			continue;
 
 		if (gameobjectRender->GetShaderType() != "Default") {
+			//make guns render on top;
 			NeedRendering.push_back(gameobjectRender);
 			continue;
 		}
@@ -212,7 +211,7 @@ void Scene::RenderObjects(GLuint programid) {
 		glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);
 		gameobjectRender->RenderObject(programid);
 	}
-	
+
 	
 }
 

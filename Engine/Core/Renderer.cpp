@@ -436,8 +436,6 @@ namespace Renderer
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-
 		std::vector<GameObject*> needRendering = SceneManager::GetCurrentScene()->NeedRenderingObjects();
 		glm::vec3 cameraPosition = Camera::GetPosition(); // Camera position
 
@@ -450,9 +448,13 @@ namespace Renderer
 				return distanceA > distanceB; // Sort by descending distance (farthest first)
 			});
 
-
-		
+		std::vector<GameObject*> overlay; 
 		for (int i = 0; i < needRendering.size(); i++) {
+			if (needRendering[i]->GetShaderType() == "Overlay") {
+				overlay.push_back(needRendering[i]);
+				continue;
+			}
+
 			glm::mat4 ModelMatrix = needRendering[i]->GetModelMatrix();
 			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;
 			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
@@ -461,9 +463,7 @@ namespace Renderer
 			needRendering[i]->RenderObject(programid);
 		}
 
-
 		std::vector<Decal>* decals = AssetManager::GetAllDecals();
-
 		for (int i = 0; i < decals->size(); i++) {
 			Decal& decal = (*decals)[i];
 			if (decal.CheckParentIsNull())
@@ -472,8 +472,23 @@ namespace Renderer
 			Renderer::setMat4(glGetUniformLocation(Renderer::GetCurrentProgramID(), "M"), ModelMatrix);
 			decal.RenderDecal(programid);
 		}
-
 		glDisable(GL_BLEND);
+
+
+		programid = Renderer::GetProgramID("geomerty");
+		Renderer::UseProgram(programid);
+
+		glClear(GL_DEPTH_BUFFER_BIT);
+		for (int i = 0; i < overlay.size(); i++) {
+			glm::mat4 ModelMatrix = overlay[i]->GetModelMatrix();
+			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;
+			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
+
+			glUniformMatrix3fv(glGetUniformLocation(programid, "normalMatrix3"), 1, GL_FALSE, &normalMatrix[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);
+			overlay[i]->RenderObject(programid);
+		}
+
 
 		glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);

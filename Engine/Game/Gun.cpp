@@ -50,14 +50,20 @@ namespace WeaponManager
 		AssetManager::AddGameObject(GameObject("glock", AssetManager::GetModel("glock"), glm::vec3(0.2, -0.25, 0.2), false, 0, Convex));
 		AssetManager::GetGameObject("glock")->SetRender(false);
 		AssetManager::GetGameObject("glock")->SetParentName("player_head");
+		AssetManager::GetGameObject("glock")->SetShaderType("Overlay");
+
 
 		AssetManager::AddGameObject(GameObject("ak47", AssetManager::GetModel("ak47"), glm::vec3(0.2, -0.25, -0.2), false, 0, Convex));
 		AssetManager::GetGameObject("ak47")->SetRender(false);
 		AssetManager::GetGameObject("ak47")->SetParentName("player_head");
+		AssetManager::GetGameObject("ak47")->SetShaderType("Overlay");
+
 
 		AssetManager::AddGameObject("shotgun", AssetManager::GetModel("shotgun"), glm::vec3(-3, 2, 3), true, 0, Convex);
 		AssetManager::GetGameObject("shotgun")->SetRender(false);
 		AssetManager::GetGameObject("shotgun")->SetParentName("player_head");
+		AssetManager::GetGameObject("shotgun")->SetShaderType("Overlay");
+
 
 		
 		AudioManager::AddSound("Assets/Audio/shotgun_fire.wav", "shotgun_fire1", AssetManager::GetGameObject("shotgun")->getPosition(), 5, 0.2f);
