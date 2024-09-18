@@ -53,6 +53,7 @@ namespace WeaponManager
 class GunPickUp
 {
 public:
+	static int GunPickUpCount;
 	GunPickUp(std::string GunName, std::string ObjectName, Model* model, glm::vec3 position);
 	GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force);
 	void Update();

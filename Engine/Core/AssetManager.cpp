@@ -1,9 +1,9 @@
 #include "AssetManager.h"
-#define MAXDECALS 100
+#define MAXDECALS 200
 
 namespace AssetManager
 {
-	//will replace the decals starting from 0 if the max decals has been reached, replacing the oldest decals
+	//will replace the decals starting from 0 if the max decals has been reached, replacing the oldest decals to make room for the new decals
 	int nextDecalSpot = 0;
 
 	std::vector<GameObject> GameObjects;

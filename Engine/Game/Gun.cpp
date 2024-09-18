@@ -144,16 +144,18 @@ GunPickUp::GunPickUp(std::string GunName, std::string ObjectName, Model* model, 
 	gunName = GunName;
 	objectName = ObjectName;
 	AssetManager::AddGameObject(objectName, model, position, false,1,Convex);
+	GunPickUpCount++;
 }
 
 // TODO: fix throwing weapon
 GunPickUp::GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force) {
 	//TODO: instead of using a random number i should have a static varible that goes up by one
-	objectName = GunName + "_pickup" + std::to_string(rand());
+	objectName = GunName + "_pickup" + std::to_string(GunPickUpCount);
 	gunName = GunName;
 	int index = AssetManager::AddGameObject(objectName, AssetManager::GetModel(GunName), position, false, 1, Convex);
+	GunPickUpCount++;
 
-	//AssetManager::GetGameObject(index)->GetRigidBody()->applyCentralImpulse(glmToBtVector3(force));
+	AssetManager::GetGameObject(index)->GetRigidBody()->applyCentralImpulse(glmToBtVector3(force));
 }
 
 void GunPickUp::Update() {
@@ -172,3 +174,5 @@ bool GunPickUp::Interact() {
 	AudioManager::PlaySound("item_pickup", Player::getPosition());
 	return true;
 }
+
+int GunPickUp::GunPickUpCount = 0;
