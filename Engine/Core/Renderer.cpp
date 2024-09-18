@@ -189,6 +189,8 @@ namespace Renderer
 		glDepthFunc(GL_LESS);
 		glEnable(GL_CULL_FACE);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 
 		//SSAO
 		std::uniform_real_distribution<float> randomFloats(0.0, 1.0); // random floats between [0.0, 1.0]
@@ -414,16 +416,12 @@ namespace Renderer
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//this needs to stay here ill figure out why later
 		GLuint programid = Renderer::GetProgramID("geomerty");
 		Renderer::UseProgram(programid);
 		glUniformMatrix4fv(P, 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
 		glUniformMatrix4fv(V, 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
 
 		SceneManager::Render(programid);
-		newTime = glfwGetTime();
-		//std::cout << "Geometry:" << (newTime - time) * 1000 << "ms" << std::endl;
-		time = newTime;
 
 		programid = Renderer::GetProgramID("transparent");
 		Renderer::UseProgram(programid);
@@ -592,7 +590,6 @@ namespace Renderer
 	}
 
 	void Renderer::SwapBuffers(GLFWwindow* window) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

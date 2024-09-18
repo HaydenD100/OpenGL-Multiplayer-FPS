@@ -2,7 +2,7 @@
 out vec4 FragColor;
 
 in vec2 UV;
-#define MAXLIGHTS 60
+#define MAXLIGHTS 128
 
 
 uniform sampler2D gPostion;    // View-space position

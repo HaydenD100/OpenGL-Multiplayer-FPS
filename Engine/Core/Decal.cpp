@@ -72,9 +72,6 @@ void Decal::RenderDecal(GLuint& programID) {
 
 		glUniform1f(glGetUniformLocation(programID, "Roughness"), texture->GetRoughness());
 		glUniform1f(glGetUniformLocation(programID, "Metalic"), texture->GetMetalic());
-
-
-
 	}
 	
 	// 1st attribute buffer : vertices

@@ -146,17 +146,13 @@ GunPickUp::GunPickUp(std::string GunName, std::string ObjectName, Model* model, 
 	AssetManager::AddGameObject(objectName, model, position, false,1,Convex);
 }
 
-// TODO: Doesn't work
+// TODO: fix throwing weapon
 GunPickUp::GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force) {
-	gunName = GunName;
-	//Somtimes an error string to long happens randomly, its because of this and idk how to fix it, Maybe change character set to multi byte on visual studio?
 	objectName = GunName + "_pickup" + std::to_string(rand());
-	GameObject* gameobject = AssetManager::GetGameObject(GunName);
-	Model* model_pointer = gameobject->GetModel();
-	btConvexHullShape* collider = gameobject->GetConvexHull();
-	int index = AssetManager::AddGameObject(GameObject(objectName, model_pointer, position, false, 1, collider));
-	AssetManager::GetGameObject(index)->GetRigidBody()->applyCentralImpulse(glmToBtVector3(force));
-	
+	gunName = GunName;
+	int index = AssetManager::AddGameObject(objectName, AssetManager::GetModel(GunName), position, false, 1, Convex);
+
+	//AssetManager::GetGameObject(index)->GetRigidBody()->applyCentralImpulse(glmToBtVector3(force));
 }
 
 void GunPickUp::Update() {

@@ -121,7 +121,7 @@ void Scene::Load() {
 	};
 	sky = SkyBox(faces);
 
-	// MAX LIGHTS BY DEFAULT IS 60 if you want more lights go to lighting.frag and change MAXLIGHTS
+	// MAX LIGHTS BY DEFAULT IS 128 if you want more lights go to lighting.frag and change MAXLIGHTS
 	{
 		Light light(glm::vec3(-11, 3, 15), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.032);
 		lights.push_back(light);

@@ -227,7 +227,7 @@ namespace Player
 		movement.x = movement.x * speed;
 		movement.z = movement.z * speed;
 
-		//fallout4 did it so why not?? TODO:: fix delta time
+		//fallout4 did it so why not? TODO:: fix delta time
 		movement.x = movement.x * 0.003f;
 		movement.z = movement.z * 0.003f;
 
@@ -237,18 +237,14 @@ namespace Player
 		if (movement.z > MaxSpeed) movement.z = MaxSpeed;
 		if (movement.z < -MaxSpeed) movement.z = -MaxSpeed;
 		*/
-
 		
 		player->GetRigidBody()->setLinearVelocity(glmToBtVector3(movement));
-		
 		if (Input::KeyPressed('e')) {
 			btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit();
 			if (hit.m_collisionObject != nullptr) {
 				GameObject* gameobject = AssetManager::GetGameObject(hit.m_collisionObject->getUserIndex());
-				
-				if (gameobject != nullptr && glm::distance(gameobject->getPosition(), getPosition()) <= interactDistance) 
+				if (gameobject != nullptr && glm::distance(gameobject->getPosition(), getPosition()) <= interactDistance)
 					interactingWithName = gameobject->GetName();
-				
 			}
 		}
 		
@@ -283,7 +279,7 @@ namespace Player
 			}
 			
 			if (Input::KeyPressed('q') && !reloading) {
-				SceneManager::GetCurrentScene()->AddGunPickUp(GunPickUp(getCurrentGun(),getPosition() + glm::vec3(0,1,0) + Camera::GetDirection(), Camera::GetDirection() * 7.0f));
+				SceneManager::GetCurrentScene()->AddGunPickUp(GunPickUp(getCurrentGun(), getPosition() + glm::vec3(0, 1, 0) + Camera::GetDirection(), Camera::GetDirection() * 7.0f));
 				AssetManager::GetGameObject(gunName)->SetRender(false);
 				gunName = "nothing";
 			}
