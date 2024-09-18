@@ -28,6 +28,8 @@ namespace Engine
 		*/
 
 		//init Engine comps
+		AssetManager::Init();
+
 		Input::Init();
 		Input::HideCursor();
 		Text2D::initText2D("Assets/Fonts/Holstein.DDS");

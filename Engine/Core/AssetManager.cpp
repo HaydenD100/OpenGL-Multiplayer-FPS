@@ -1,8 +1,12 @@
 #include "AssetManager.h"
+#define MAXDECALS 100
 
 namespace AssetManager
 {
-				std::vector<GameObject> GameObjects;
+	//will replace the decals starting from 0 if the max decals has been reached, replacing the oldest decals
+	int nextDecalSpot = 0;
+
+	std::vector<GameObject> GameObjects;
 	std::vector<Texture> Textures;
 	std::vector<Decal> Decals;
 	std::map<std::string, Model> models;
@@ -13,6 +17,10 @@ namespace AssetManager
 	void AssetManager::Init() {
 		Textures.clear();
 		GameObjects.clear();
+		Decals.clear();
+
+		Decals.reserve(MAXDECALS);
+		Decals.resize(MAXDECALS);
 	}
 
 	void AssetManager::ClearAssets() {
@@ -144,7 +152,13 @@ namespace AssetManager
 	}
 
 	size_t AddDecal(glm::vec3 position, glm::vec3 normal, glm::vec3 scale, Texture* texture, GameObject* parent) {
-		Decals.push_back(Decal(position, normal, scale, texture, parent));
+		if (nextDecalSpot < MAXDECALS) {
+			Decals[nextDecalSpot] = Decal(position, normal, scale, texture, parent);
+			nextDecalSpot++;
+		}
+		else
+			nextDecalSpot = 0;
+		
 		return Decals.size() - 1;
 	}
 	Model* AssetManager::GetModel(std::string name) {
