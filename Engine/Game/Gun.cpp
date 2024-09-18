@@ -148,6 +148,7 @@ GunPickUp::GunPickUp(std::string GunName, std::string ObjectName, Model* model, 
 
 // TODO: fix throwing weapon
 GunPickUp::GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force) {
+	//TODO: instead of using a random number i should have a static varible that goes up by one
 	objectName = GunName + "_pickup" + std::to_string(rand());
 	gunName = GunName;
 	int index = AssetManager::AddGameObject(objectName, AssetManager::GetModel(GunName), position, false, 1, Convex);
