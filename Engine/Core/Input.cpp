@@ -73,6 +73,14 @@ namespace Input
         return rightMousePressed;
     }
 
+    float GetMouseOffsetX() {
+        return (float)mouseOffsetX;
+    }
+
+    float GetMouseOffsetY() {
+        return (float)mouseOffsetY;
+    }
+
     void Input::Init() {
         double x, y;
         window = Backend::GetWindowPointer();

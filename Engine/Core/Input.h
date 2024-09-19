@@ -22,6 +22,8 @@ namespace Input
 	bool RightMouseDown();
 	bool LeftMousePressed();
 	bool RightMousePressed();
+	float GetMouseOffsetX();
+	float GetMouseOffsetY();
 
 	void DisableCursor();
 	void HideCursor();

@@ -7,6 +7,7 @@ namespace Camera
 {
 	glm::vec3 position = glm::vec3(0, 0, 5);
 	glm::vec3 direction = glm::vec3(0, 0, 0);
+	glm::vec3 right = glm::vec3(0, 0, 0);
 
 	// horizontal angle : toward -Z
 	float horizontalAngle = 3.14f;
@@ -21,6 +22,10 @@ namespace Camera
 	glm::vec3 Camera::GetPosition() {
 		return position;
 	}
+	glm::vec3 Camera::GetRight() {
+		return right;
+	}
+
 	
 	glm::mat4 Camera::getViewMatrix() {
 		return ViewMatrix;
@@ -102,7 +107,7 @@ namespace Camera
 		);
 		
 		// Right vector
-		glm::vec3 right = glm::vec3(
+		right = glm::vec3(
 			sin(horizontalAngle - 3.14f / 2.0f),
 			0,
 			cos(horizontalAngle - 3.14f / 2.0f)

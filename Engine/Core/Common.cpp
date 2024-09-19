@@ -36,6 +36,22 @@ glm::vec3 offsetRayWithinAngle(const glm::vec3& rayDir, float maxOffsetAngle) {
     return glm::normalize(offsetDir); // Return the normalized direction
 }
 
+// Interpolates from 'start' to 'end' based on a speed factor 'interpSeed', clamping the result at the target.
+float finlerpTo(float start, float end, float deltaTime, float interpSeed) {
+    // Calculate the maximum step we can take towards the target using the speed (interpSeed)
+    float step = interpSeed * deltaTime;
+
+    // Determine the direction of interpolation (positive or negative)
+    if (start < end) {
+        // Move towards the target with the speed but clamp it to the maximum possible value (end)
+        return std::min(start + step, end);
+    }
+    else {
+        // Move towards the target in reverse if start > end, clamping to the minimum (end)
+        return std::max(start - step, end);
+    }
+}
+
 
 // Function to generate a random vector with an angle from 0 to maxAngle
 glm::vec3 randomVector(float maxAngle) {

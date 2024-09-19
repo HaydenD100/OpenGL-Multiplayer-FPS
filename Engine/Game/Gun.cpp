@@ -29,6 +29,33 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 	else {
 		gun->setPosition(weaponOffSet + (direction * -kickbackOffset * deltaTime));
 		//gun->SetRotationX(0);
+
+		static glm::vec3 swayPosition;
+
+		//TokyoSpliffs code
+		float xSwayTarget = 0.0f;
+		float ySwayTarget = 0.0f;
+
+
+		if (Input::GetMouseOffsetX() < 0) {
+			xSwayTarget = 2.5f;
+		}
+		if (Input::GetMouseOffsetX() > 0) {
+			xSwayTarget = -2.5f;
+		}
+		if (Input::GetMouseOffsetY() < 0) {
+			ySwayTarget = 0.5f;
+		}
+		if (Input::GetMouseOffsetY() > 0) {
+			ySwayTarget = -0.5f;
+		}
+
+		float speed = 0.2f;
+
+		swayPosition.x = finlerpTo(swayPosition.x, xSwayTarget, deltaTime, speed);
+		swayPosition.y = finlerpTo(swayPosition.y, ySwayTarget, deltaTime, speed);
+
+		gun->addPosition(swayPosition);
 	}
 	
 
@@ -57,7 +84,7 @@ namespace WeaponManager
 		AssetManager::AddGameObject(GameObject("ak47", AssetManager::GetModel("ak47"), glm::vec3(0.2, -0.25, -0.2), false, 0, Convex));
 		AssetManager::GetGameObject("ak47")->SetRender(false);
 		AssetManager::GetGameObject("ak47")->SetParentName("player_head");
-		AssetManager::GetGameObject("ak47")->SetShaderType("Overlay");
+		AssetManager::GetGameObject("ak47")->SetShaderType("Overlay"); 
 
 
 		AssetManager::AddGameObject("shotgun", AssetManager::GetModel("shotgun"), glm::vec3(-3, 2, 3), true, 0, Convex);

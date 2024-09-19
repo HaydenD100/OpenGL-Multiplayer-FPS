@@ -18,6 +18,7 @@ namespace Camera
 	void SetVerticalAngle(float angle);
 	void SetPosition(glm::vec3 pos);
 	glm::vec3 GetDirection();
+	glm::vec3 GetRight();
 	void Update(float dt);
 
 	glm::vec3 GetRotation();
