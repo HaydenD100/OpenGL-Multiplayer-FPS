@@ -1,5 +1,4 @@
 #include "AssetManager.h"
-#define MAXDECALS 200
 
 namespace AssetManager
 {

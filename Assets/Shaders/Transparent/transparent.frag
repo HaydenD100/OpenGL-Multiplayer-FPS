@@ -12,6 +12,7 @@ uniform sampler2D DiffuseTextureSampler;
 
 void main()
 {    
+
     float alpha = texture(DiffuseTextureSampler, UV).a;
     vec3 MaterialDiffuseColor = texture(DiffuseTextureSampler, UV).rgb;
     gAlbedoSpec = vec4(MaterialDiffuseColor, alpha); // RGB for Albedo, R for Specular Intensity

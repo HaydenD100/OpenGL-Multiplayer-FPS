@@ -23,6 +23,10 @@
 #define RATIO 16.0f/9.0f
 #define WINDOWTITILE "Engine 2.0"
 
+//Rendering stuff
+#define MAXDECALS 75
+
+
 
 
 

@@ -1,5 +1,6 @@
 #include "Gun.h"
 #include "Engine/Core/Scene/SceneManager.h"
+#include <sstream>
 
 void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 	GameObject* gun = AssetManager::GetGameObject(gunModel);
@@ -66,7 +67,7 @@ namespace WeaponManager
 
 
 		
-		AudioManager::AddSound("Assets/Audio/shotgun_fire.wav", "shotgun_fire1", AssetManager::GetGameObject("shotgun")->getPosition(), 5, 0.2f);
+		AudioManager::AddSound("Assets/Audio/shotgun_fire.wav", "shotgun_fire1", AssetManager::GetGameObject("shotgun")->getPosition(), 5, 0.4f);
 		AudioManager::AddSound("Assets/Audio/ak47_fire1.wav", "ak47_fire1", AssetManager::GetGameObject("ak47")->getPosition(), 5,0.5f);
 		AudioManager::AddSound("Assets/Audio/ak47_fire2.wav", "ak47_fire2", AssetManager::GetGameObject("ak47")->getPosition(), 5, 0.5f);
 		AudioManager::AddSound("Assets/Audio/ak47_fire3.wav", "ak47_fire3", AssetManager::GetGameObject("ak47")->getPosition(), 5, 0.5f);
@@ -149,8 +150,9 @@ GunPickUp::GunPickUp(std::string GunName, std::string ObjectName, Model* model, 
 
 // TODO: fix throwing weapon
 GunPickUp::GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force) {
-	//TODO: instead of using a random number i should have a static varible that goes up by one
-	objectName = GunName + "_pickup" + std::to_string(GunPickUpCount);
+	std::stringstream myString;
+	myString << GunName << "_pickup" << GunPickUpCount;
+	objectName = myString.str();
 	gunName = GunName;
 	int index = AssetManager::AddGameObject(objectName, AssetManager::GetModel(GunName), position, false, 1, Convex);
 	GunPickUpCount++;
