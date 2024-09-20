@@ -16,6 +16,9 @@ enum GunType
 
 struct Gun
 {
+
+	static glm::vec3 swayPosition;
+
 	std::string name;
 	int ammo;
 	double firerate;

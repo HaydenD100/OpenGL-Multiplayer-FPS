@@ -28,9 +28,6 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 	}
 	else {
 		gun->setPosition(weaponOffSet + (direction * -kickbackOffset * deltaTime));
-		//gun->SetRotationX(0);
-
-		static glm::vec3 swayPosition;
 
 		//TokyoSpliffs code
 		float xSwayTarget = 0.0f;
@@ -50,11 +47,9 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 			ySwayTarget = -0.5f;
 		}
 
-		float speed = 0.5f;
-
+		float speed = 2.0f;
 		swayPosition.x = finlerpTo(swayPosition.x, xSwayTarget, 1/60, speed);
 		swayPosition.y = finlerpTo(swayPosition.y, ySwayTarget, 1/60, speed);
-
 		gun->addPosition(swayPosition);
 	}
 	
@@ -186,6 +181,8 @@ GunPickUp::GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force) {
 
 	AssetManager::GetGameObject(index)->GetRigidBody()->applyCentralImpulse(glmToBtVector3(force));
 }
+
+glm::vec3 Gun::swayPosition = glm::vec3(0);
 
 void GunPickUp::Update() {
 	
