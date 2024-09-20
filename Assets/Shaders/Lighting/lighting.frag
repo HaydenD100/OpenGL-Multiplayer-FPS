@@ -94,6 +94,11 @@ float ShadowCalculation(vec3 fragPos, int i)
 
 void main()
 {
+
+    float threshold = 0.0009; // Distance threshold
+    if (length(UV - vec2(0.5, 0.5)) <= threshold) {
+        FragColor = vec4(1);
+    } else{
     // Retrieve data from G-buffer
     vec3 FragPos_view = vec3(texture(gPostion, UV).rgb); // View-space position
     vec3 Normal_view = normalize(vec3(texture(gNormal, UV).rgb)); // View-space normal
@@ -174,4 +179,5 @@ void main()
     color = color / (color + vec3(1.0));
     // gamma    
     FragColor = vec4(color, alpha);
+    }
 }

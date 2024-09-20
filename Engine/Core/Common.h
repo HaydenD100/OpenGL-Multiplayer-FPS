@@ -13,6 +13,10 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
 #include "Engine/Core/Texture.h"
+#include "Engine/Core/Mesh.h"
+#include "Engine/Core/Model.h"
+
+
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -45,71 +49,6 @@ struct Transform{
         m = glm::scale(m, scale);
         return m;
     }
-};
-
-
-
-struct Mesh {
-    Mesh(const char* path);
-    Mesh(std::vector<glm::vec3> vertices,
-    std::vector<glm::vec3> normals,
-    std::vector<glm::vec2> UV,
-    std::vector<unsigned short> indices,
-    std::vector<glm::vec3> tangets,
-    std::vector<glm::vec3> bitTangents);
-
-    void Render();
-    glm::vec3 GetVertices(int index);
-
-    std::vector<unsigned short> indices;
-    std::vector<glm::vec3> indexed_vertices;
-    std::vector<glm::vec2> indexed_uvs;
-    std::vector<glm::vec3> indexed_normals;
-    std::vector<glm::vec3> indexed_tangents;
-    std::vector<glm::vec3> indexed_bitangents;
-
-
-private:
-    GLuint vertexbuffer;
-    GLuint uvbuffer;
-    GLuint normalbuffer;
-    GLuint elementbuffer;
-    GLuint tangentbuffer;
-    GLuint bitangentbuffer;
-
-};
-
-class Model {
-public:
-    Model() = default;
-    Model(Mesh mesh, Texture* texture);
-    Model(const char* path, Texture* texture);
-    Model(const char* path, const char* collisonShapePath, Texture* texture);
-    void AddMesh(Mesh mesh);
-    void SetMesh(int mesh);
-    Mesh* GetCurrentMesh();
-    std::vector<Mesh>* GetAllMeshes();
-    Mesh* GetMesh(int i);
-    size_t GetMeshSize();
-    const char* GetTextureName();
-    void RenderModel(GLuint& programID);
-    void RenderAllMeshes(bool state);
-    bool RenderAll();
-
-    std::vector<glm::vec3> GetColliderShapeVerticies();
-    size_t GetColliderShapeVerticiesSize();
-
-private:
-    bool renderAllMeshes = true;
-    std::vector<Mesh> meshes;
-    int currentMesh = 0;
-    Texture* texture = nullptr;
-
-    //for collison shape
-    std::vector<glm::vec3> collison_shape_vertices;
-
-    void processNode(aiNode* node, const aiScene* scene);
-    Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 };
 
 btVector3 glmToBtVector3(const glm::vec3& vec);

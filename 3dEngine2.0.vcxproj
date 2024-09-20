@@ -172,11 +172,13 @@
     <ClCompile Include="Engine\Loaders\ShaderLoader.cpp" />
     <ClCompile Include="Engine\Loaders\stb_image.cpp" />
     <ClCompile Include="Engine\Loaders\vboindexer.cpp" />
+    <ClCompile Include="Engine\Core\Model.cpp" />
     <ClCompile Include="Engine\Physics\BulletPhysics.cpp" />
     <ClCompile Include="Engine\Physics\Physics.cpp" />
     <ClCompile Include="Engine\Core\Lights\light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Physics\NividaPhysics.cpp" />
+    <ClCompile Include="Engine\Core\Mesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Saves\mainScene.json" />
@@ -214,6 +216,7 @@
     <ClInclude Include="Engine\Core\Decal.h" />
     <ClInclude Include="Engine\Core\GameObject.h" />
     <ClInclude Include="Engine\Core\Input.h" />
+    <ClInclude Include="Engine\Core\Model.h" />
     <ClInclude Include="Engine\Core\Renderer.h" />
     <ClInclude Include="Engine\Core\Scene\Scene.h" />
     <ClInclude Include="Engine\Core\Scene\SceneManager.h" />
@@ -236,6 +239,7 @@
     <ClInclude Include="Engine\Physics\Physics.h" />
     <ClInclude Include="Engine\Core\Lights\light.h" />
     <ClInclude Include="Engine\Physics\NividaPhysics.h" />
+    <ClInclude Include="Engine\Core\Mesh.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="github\screenshots\3DEngine.png" />

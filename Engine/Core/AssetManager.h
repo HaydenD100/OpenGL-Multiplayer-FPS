@@ -53,6 +53,8 @@ namespace AssetManager
 	void RemoveGameObject(int index);
 	void ClearAssets();
 
+	Texture* GetMissingTexture();
+
 	void CleanUp();
 
 	GameObject* GetGameObject(std::string name);

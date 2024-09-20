@@ -10,6 +10,8 @@ namespace AssetManager
 	std::vector<Decal> Decals;
 	std::map<std::string, Model> models;
 
+	Texture missing_texture;
+
 
 	std::string path;
 
@@ -20,6 +22,8 @@ namespace AssetManager
 
 		Decals.reserve(MAXDECALS);
 		Decals.resize(MAXDECALS);
+
+		Texture("missing_texture", "Assets/Textures/missing_texture.png", 0, 0);
 	}
 
 	void AssetManager::ClearAssets() {
@@ -198,6 +202,10 @@ namespace AssetManager
 		Textures.push_back(Texture(name, path, normalPath, RoughnessPath, MetalicPath));
 		return Textures.size() - 1;
 	}
+	Texture* GetMissingTexture() {
+		return &missing_texture;
+	}
+
 
 
 	void AssetManager::RemoveGameObject(std::string name) {

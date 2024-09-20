@@ -487,7 +487,7 @@ btConvexHullShape* GameObject::GetConvexHull() {
 }
 
 const char* GameObject::GetTextureName() {
-	return model->GetTextureName();
+	return "null";
 }
 
 bool GameObject::CanSave() {

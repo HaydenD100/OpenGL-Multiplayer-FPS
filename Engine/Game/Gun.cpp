@@ -50,10 +50,10 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 			ySwayTarget = -0.5f;
 		}
 
-		float speed = 0.2f;
+		float speed = 0.5f;
 
-		swayPosition.x = finlerpTo(swayPosition.x, xSwayTarget, deltaTime, speed);
-		swayPosition.y = finlerpTo(swayPosition.y, ySwayTarget, deltaTime, speed);
+		swayPosition.x = finlerpTo(swayPosition.x, xSwayTarget, 1/60, speed);
+		swayPosition.y = finlerpTo(swayPosition.y, ySwayTarget, 1/60, speed);
 
 		gun->addPosition(swayPosition);
 	}
