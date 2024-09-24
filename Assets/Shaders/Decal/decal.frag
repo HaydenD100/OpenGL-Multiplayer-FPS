@@ -48,7 +48,7 @@ void main () {
     vec3 FragPos = worldSpacePosition.xyz;
 
     vec4 localpos = inverseM * vec4(FragPos,1);
-
+     
     float d = length(FragPos - DecalCenterPosition);
 	if (d > 0.5)	
 		discard;
