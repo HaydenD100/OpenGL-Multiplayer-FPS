@@ -173,7 +173,7 @@ GunPickUp::GunPickUp(std::string GunName, std::string ObjectName, Model* model, 
 // TODO: fix throwing weapon
 GunPickUp::GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force) {
 	std::stringstream myString;
-	myString << GunName << "_pickup" << GunPickUpCount;
+	myString << GunPickUpCount;
 	objectName = myString.str();
 	gunName = GunName;
 	int index = AssetManager::AddGameObject(objectName, AssetManager::GetModel(GunName), position, false, 1, Convex);

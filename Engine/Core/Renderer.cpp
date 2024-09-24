@@ -188,6 +188,8 @@ namespace Renderer
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 2);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gDepth"), 3);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "decalTexture"), 4);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "decalNormal"), 5);
+
 		glUniform2f(glGetUniformLocation(GetCurrentProgramID(), "resolution"), SCREENWIDTH, SCREENHEIGHT);
 
 

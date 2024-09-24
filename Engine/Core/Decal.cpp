@@ -63,6 +63,8 @@ void Decal::RenderDecal(GLuint& programID) {
 	if (texture != nullptr) {
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, texture->GetTexture());
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, texture->GetTextureNormal());
 	}
 
 	
