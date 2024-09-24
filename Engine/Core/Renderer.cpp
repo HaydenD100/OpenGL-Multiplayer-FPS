@@ -146,6 +146,8 @@ namespace Renderer
 		LoadShader("Assets/Shaders/Texture_Render/Texture_Render.vert", "Assets/Shaders/Texture_Render/Texture_Render.frag", "screen");
 		LoadShader("Assets/Shaders/Transparent/transparent.vert", "Assets/Shaders/Transparent/transparent.frag", "transparent");
 		LoadShader("Assets/Shaders/Shadow/depth.vert", "Assets/Shaders/Shadow/depth.frag", "Assets/Shaders/Shadow/depth.gs", "shadow");
+		LoadShader("Assets/Shaders/Decal/decal.vert", "Assets/Shaders/Decal/decal.frag", "decal");
+
 
 		UseProgram(GetProgramID("lighting"));
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
@@ -180,6 +182,15 @@ namespace Renderer
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "texNoise"), 2);
 
+		UseProgram(GetProgramID("decal"));
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 2);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gDepth"), 3);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "decalTexture"), 4);
+		glUniform2f(glGetUniformLocation(GetCurrentProgramID(), "resolution"), SCREENWIDTH, SCREENHEIGHT);
+
+
 		std::cout << "Done loading shaders \n";
 	}
 
@@ -188,6 +199,7 @@ namespace Renderer
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);  // Cull back-facing triangles
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
@@ -226,7 +238,7 @@ namespace Renderer
 
 		glGenTextures(1, &gPosition);
 		glBindTexture(GL_TEXTURE_2D, gPosition);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
@@ -250,7 +262,7 @@ namespace Renderer
 
 		glGenTextures(1, &depthTexture);
 		glBindTexture(GL_TEXTURE_2D, depthTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, SCREENWIDTH, SCREENHEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, SCREENWIDTH, SCREENHEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -461,15 +473,41 @@ namespace Renderer
 			needRendering[i]->RenderObject(programid);
 		}
 
+		programid = Renderer::GetProgramID("decal");
+		Renderer::UseProgram(programid);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gPosition);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, gNormal);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, gAlbeido);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, depthTexture);
+		glUniformMatrix4fv(glGetUniformLocation(programid, "P"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(programid, "V"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(programid, "inverseV"), 1, GL_FALSE, &glm::inverse(Camera::getViewMatrix())[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(programid, "inverseP"), 1, GL_FALSE, &glm::inverse(Camera::getProjectionMatrix())[0][0]);
+
+
+
+		glDisable(GL_DEPTH_TEST);
+
 		std::vector<Decal>* decals = AssetManager::GetAllDecals();
 		for (int i = 0; i < decals->size(); i++) {
 			Decal& decal = (*decals)[i];
 			if (decal.CheckParentIsNull())
 				continue;
 			glm::mat4 ModelMatrix = decal.GetModel();
+			glm::vec3 size = decal.GetScale();
 			Renderer::setMat4(glGetUniformLocation(Renderer::GetCurrentProgramID(), "M"), ModelMatrix);
+			glUniformMatrix4fv(glGetUniformLocation(programid, "inverseM"), 1, GL_FALSE, &glm::inverse(ModelMatrix)[0][0]);
+
+			Renderer::setVec3(glGetUniformLocation(Renderer::GetCurrentProgramID(), "size"), size);
 			decal.RenderDecal(programid);
 		}
+
+		glEnable(GL_DEPTH_TEST);
+
 		glDisable(GL_BLEND);
 
 

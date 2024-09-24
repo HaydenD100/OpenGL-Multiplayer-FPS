@@ -7,7 +7,7 @@ Decal::Decal(glm::vec3 position, glm::vec3 normal, glm::vec3 scale, Texture* tex
 
 	glm::vec3 up(0, 1, 0);
 	glm::vec3 rotationAxis = glm::cross(normal, up);
-	float angle = acos(glm::dot(normal, up));
+	float angle = acos(glm::dot(normal, up));	
 
 	transform.position = position + (normal * 0.01f);
 	transform.rotation = (rotationAxis * -angle);
@@ -61,18 +61,10 @@ void Decal::RenderDecal(GLuint& programID) {
 	glUseProgram(programID);
 
 	if (texture != nullptr) {
-		glActiveTexture(GL_TEXTURE0);
+		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, texture->GetTexture());
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture->GetTextureNormal());
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, texture->GetTextureRoughness());
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, texture->GetTextureMetalic());
-
-		glUniform1f(glGetUniformLocation(programID, "Roughness"), texture->GetRoughness());
-		glUniform1f(glGetUniformLocation(programID, "Metalic"), texture->GetMetalic());
 	}
+
 	
 	// 1st attribute buffer : vertices
 	glEnableVertexAttribArray(0);
@@ -151,3 +143,8 @@ void Decal::RenderDecal(GLuint& programID) {
 	glDisableVertexAttribArray(3);
 	glDisableVertexAttribArray(4);
 }
+
+glm::vec3 Decal::GetScale() {
+	return transform.scale;
+}
+
