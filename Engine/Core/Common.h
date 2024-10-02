@@ -5,6 +5,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "bullet/btBulletDynamicsCommon.h"
+#include <array>     // For std::array
+#include <glm/vec3.hpp>  // For glm::vec3
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -13,8 +15,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
 #include "Engine/Core/Texture.h"
-#include "Engine/Core/Mesh.h"
-#include "Engine/Core/Model.h"
+
 
 
 
@@ -49,7 +50,98 @@ struct Transform{
         m = glm::scale(m, scale);
         return m;
     }
+	glm::mat4 to_mat4() const {
+		glm::mat4 m = glm::translate(glm::mat4(1), position);
+		m *= glm::mat4_cast(glm::quat(rotation));
+		m = glm::scale(m, scale);
+		return m;
+	}
+
+	glm::vec3 getRight() const
+	{
+		return to_mat4()[0];
+	}
+
+
+	glm::vec3 getUp() const
+	{
+		return to_mat4()[1];
+	}
+
+	glm::vec3 getBackward() const
+	{
+		return to_mat4()[2];
+	}
+
+	glm::vec3 getForward() const
+	{
+		return -to_mat4()[2];
+	}
 };
+
+//LearnOpenGl code
+struct Plane
+{
+    glm::vec3 normal = { 0.f, 1.f, 0.f }; // unit vector
+    float     distance = 0.f;        // Distance with origin
+
+    Plane() = default;
+
+    Plane(const glm::vec3& p1, const glm::vec3& norm)
+        : normal(glm::normalize(norm)),
+        distance(glm::dot(normal, p1))
+    {}
+
+    float getSignedDistanceToPlane(const glm::vec3& point) const
+    {
+        return glm::dot(normal, point) - distance;
+    }
+};
+struct Frustum
+{
+    Plane topFace;
+    Plane bottomFace;
+
+    Plane rightFace;
+    Plane leftFace;
+
+    Plane farFace;
+    Plane nearFace;
+};
+struct BoundingVolume
+{
+    virtual bool isOnFrustum(const Frustum& camFrustum, const Transform& transform) const = 0;
+    virtual bool isOnOrForwardPlane(const Plane& plane) const = 0;
+
+    bool isOnFrustum(const Frustum& camFrustum) const
+    {
+        return (isOnOrForwardPlane(camFrustum.leftFace) &&
+            isOnOrForwardPlane(camFrustum.rightFace) &&
+            isOnOrForwardPlane(camFrustum.topFace) &&
+            isOnOrForwardPlane(camFrustum.bottomFace) &&
+            isOnOrForwardPlane(camFrustum.nearFace) &&
+            isOnOrForwardPlane(camFrustum.farFace));
+    }
+};
+
+struct AABB : public BoundingVolume
+{
+    glm::vec3 center{ 0.f, 0.f, 0.f };
+    glm::vec3 extents{ 0.f, 0.f, 0.f };
+
+    AABB() = default;
+    AABB(const glm::vec3& min, const glm::vec3& max);
+    AABB(const glm::vec3& inCenter, float iI, float iJ, float iK);
+
+    std::array<glm::vec3, 8> getVertice() const;
+
+    bool isOnOrForwardPlane(const Plane& plane) const final;
+    bool isOnFrustum(const Frustum& camFrustum, const Transform& transform) const final;
+};
+
+
+Frustum createFrustumFromCamera(float aspect, float fovY, float zNear, float zFar);
+
 
 btVector3 glmToBtVector3(const glm::vec3& vec);
 

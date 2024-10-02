@@ -499,6 +499,9 @@ namespace Renderer
 			Decal& decal = (*decals)[i];
 			if (decal.CheckParentIsNull())
 				continue;
+			if (!decal.GetAABB()->isOnFrustum(Camera::GetFrustum(), decal.getTransform()))
+				continue;
+
 			glm::mat4 ModelMatrix = decal.GetModel();
 			glm::vec3 size = decal.GetScale();
 			Renderer::setMat4(glGetUniformLocation(Renderer::GetCurrentProgramID(), "M"), ModelMatrix);

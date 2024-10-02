@@ -6,6 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Input.h"
+#include "Common.h"
 #include "Physics/Physics.h"
 
 namespace Camera
@@ -19,6 +20,10 @@ namespace Camera
 	void SetPosition(glm::vec3 pos);
 	glm::vec3 GetDirection();
 	glm::vec3 GetRight();
+	glm::vec3 GetUp();
+	Frustum GetFrustum();
+	
+
 	void Update(float dt);
 
 	glm::vec3 GetRotation();

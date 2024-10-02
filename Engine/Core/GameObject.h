@@ -14,6 +14,7 @@
 #include "../Loaders/vboindexer.h"
 #include "../Loaders/Loader.hpp"
 #include "Engine/Physics/BulletPhysics.h"
+#include "Engine/Core/Model.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -59,6 +60,9 @@ public:
 	void SetRotationX(float rotation);
 	void SetRotationY(float rotation);
 	void SetRotationZ(float rotation);
+
+	Transform getTransform();
+	
 
 	void SetTransform(Transform transform);
 	 

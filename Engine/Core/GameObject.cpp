@@ -48,6 +48,8 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
 
 	setPosition(position);
+
+
 }
 
 GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, btCollisionShape* shape) {
@@ -516,5 +518,9 @@ void GameObject::SetShaderType(std::string shaderType) {
 std::string GameObject::GetShaderType() {
 	return shaderType;
 }
+Transform GameObject::getTransform() {
+	return transform;
+}
+
 
 

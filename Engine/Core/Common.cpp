@@ -3,6 +3,8 @@
 #include "Engine/Loaders/vboindexer.h"
 #include "Engine/Loaders/stb_image.h"
 #include "Engine/Core/AssetManager.h"
+#include "Engine/Core/Camera.h"
+
 
 #include <random>
 #include <iostream>
@@ -131,3 +133,89 @@ glm::mat4 worldToLocal(btVector3 position, btVector3 rotation) {
     m = glm::scale(m, glm::vec3(1, 1, 1));
     return m;
 }
+
+Frustum createFrustumFromCamera(float aspect, float fovY, float zNear, float zFar)
+{
+    Frustum frustum;
+    const float halfVSide = zFar * tanf(fovY * .5f);
+    const float halfHSide = halfVSide * aspect;
+    const glm::vec3 frontMultFar = zFar * Camera::GetDirection();
+
+    frustum.nearFace = { Camera::GetPosition() + zNear * Camera::GetDirection(), Camera::GetDirection() };
+    frustum.farFace = { Camera::GetPosition() + frontMultFar, -Camera::GetDirection() };
+    frustum.rightFace = { Camera::GetPosition(), glm::cross(frontMultFar - Camera::GetRight() * halfHSide, Camera::GetUp()) };
+    frustum.leftFace = { Camera::GetPosition(), glm::cross(Camera::GetUp(), frontMultFar + Camera::GetRight() * halfHSide) };
+    frustum.topFace = { Camera::GetPosition(), glm::cross(Camera::GetRight(), frontMultFar - Camera::GetUp() * halfVSide) };
+    frustum.bottomFace = { Camera::GetPosition(), glm::cross(frontMultFar + Camera::GetUp() * halfVSide, Camera::GetRight()) };
+    return frustum;
+}
+
+AABB::AABB(const glm::vec3& min, const glm::vec3& max)
+    : center{ (max + min) * 0.5f }, extents{ max.x - center.x, max.y - center.y, max.z - center.z }
+{
+}
+
+AABB::AABB(const glm::vec3& inCenter, float iI, float iJ, float iK)
+    : center{ inCenter }, extents{ iI, iJ, iK }
+{
+}
+
+std::array<glm::vec3, 8> AABB::getVertice() const
+{
+    std::array<glm::vec3, 8> vertice;
+    vertice[0] = { center.x - extents.x, center.y - extents.y, center.z - extents.z };
+    vertice[1] = { center.x + extents.x, center.y - extents.y, center.z - extents.z };
+    vertice[2] = { center.x - extents.x, center.y + extents.y, center.z - extents.z };
+    vertice[3] = { center.x + extents.x, center.y + extents.y, center.z - extents.z };
+    vertice[4] = { center.x - extents.x, center.y - extents.y, center.z + extents.z };
+    vertice[5] = { center.x + extents.x, center.y - extents.y, center.z + extents.z };
+    vertice[6] = { center.x - extents.x, center.y + extents.y, center.z + extents.z };
+    vertice[7] = { center.x + extents.x, center.y + extents.y, center.z + extents.z };
+    return vertice;
+}
+
+bool AABB::isOnOrForwardPlane(const Plane& plane) const
+{
+    // Compute the projection interval radius of b onto L(t) = b.c + t * p.n
+    const float r = extents.x * std::abs(plane.normal.x) +
+        extents.y * std::abs(plane.normal.y) +
+        extents.z * std::abs(plane.normal.z);
+
+    return -r <= plane.getSignedDistanceToPlane(center);
+}
+
+bool AABB::isOnFrustum(const Frustum& camFrustum, const Transform& transform) const
+{
+    // Get global scale thanks to our transform
+    const glm::vec3 globalCenter{ transform.to_mat4() * glm::vec4(center, 1.f) };
+
+    // Scaled orientation
+    const glm::vec3 right = transform.getRight() * extents.x;
+    const glm::vec3 up = transform.getUp() * extents.y;
+    const glm::vec3 forward = transform.getForward() * extents.z;
+
+    const float newIi = std::abs(glm::dot(glm::vec3{ 1.f, 0.f, 0.f }, right)) +
+        std::abs(glm::dot(glm::vec3{ 1.f, 0.f, 0.f }, up)) +
+        std::abs(glm::dot(glm::vec3{ 1.f, 0.f, 0.f }, forward));
+
+    const float newIj = std::abs(glm::dot(glm::vec3{ 0.f, 1.f, 0.f }, right)) +
+        std::abs(glm::dot(glm::vec3{ 0.f, 1.f, 0.f }, up)) +
+        std::abs(glm::dot(glm::vec3{ 0.f, 1.f, 0.f }, forward));
+
+    const float newIk = std::abs(glm::dot(glm::vec3{ 0.f, 0.f, 1.f }, right)) +
+        std::abs(glm::dot(glm::vec3{ 0.f, 0.f, 1.f }, up)) +
+        std::abs(glm::dot(glm::vec3{ 0.f, 0.f, 1.f }, forward));
+
+    const AABB globalAABB(globalCenter, newIi, newIj, newIk);
+
+    return (globalAABB.isOnOrForwardPlane(camFrustum.leftFace) &&
+        globalAABB.isOnOrForwardPlane(camFrustum.rightFace) &&
+        globalAABB.isOnOrForwardPlane(camFrustum.topFace) &&
+        globalAABB.isOnOrForwardPlane(camFrustum.bottomFace) &&
+        globalAABB.isOnOrForwardPlane(camFrustum.nearFace) &&
+        globalAABB.isOnOrForwardPlane(camFrustum.farFace));
+}
+
+
+
+

@@ -115,6 +115,7 @@ Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std:
     glBufferData(GL_ARRAY_BUFFER, indexed_bitangents.size() * sizeof(glm::vec3), &indexed_bitangents[0], GL_STATIC_DRAW);
 }
 
+
 void Mesh::Render(GLuint programID) {
     Texture* currentTexture = texture;
     if (texture == nullptr) {
@@ -221,6 +222,14 @@ void Mesh::SetName(std::string name) {
 const char* Mesh::GetTextureName() {
     return texture->GetName();
 }
+size_t Mesh::VerticiesSize() {
+    return indexed_vertices.size();
+}
+glm::vec3 Mesh::GetVertex(int i) {
+    return indexed_vertices[i];
+}
+
+
 
 
 

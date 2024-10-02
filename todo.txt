@@ -3,3 +3,4 @@ Todo
 - Particle System, would be good for glass/explosives
 - Better UI, add support for Dear MyGui
 - Pre computed shadow maps and reflection textures
+- animations

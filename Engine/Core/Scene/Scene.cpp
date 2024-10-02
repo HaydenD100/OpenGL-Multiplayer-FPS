@@ -194,14 +194,16 @@ void Scene::RenderObjects(GLuint programid) {
 	glm::mat4 ViewMatrix = Camera::getViewMatrix();
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
 		GameObject* gameobjectRender = AssetManager::GetGameObject(i);
-		if (!gameobjectRender->ShouldRender())
+		
+		if (!gameobjectRender->ShouldRender()) 
 			continue;
-
 		if (gameobjectRender->GetShaderType() != "Default") {
 			//make guns render on top;
 			NeedRendering.push_back(gameobjectRender);
 			continue;
 		}
+		if (!gameobjectRender->GetModel()->GetAABB()->isOnFrustum(Camera::GetFrustum(), gameobjectRender->getTransform()))
+			continue;
 
 		glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
 		glm::mat4 modelViewMatrix = ViewMatrix * ModelMatrix;
@@ -211,7 +213,6 @@ void Scene::RenderObjects(GLuint programid) {
 		glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);
 		gameobjectRender->RenderObject(programid);
 	}
-
 	
 }
 

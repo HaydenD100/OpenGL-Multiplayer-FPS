@@ -8,16 +8,19 @@ namespace Camera
 	glm::vec3 position = glm::vec3(0, 0, 5);
 	glm::vec3 direction = glm::vec3(0, 0, 0);
 	glm::vec3 right = glm::vec3(0, 0, 0);
+	glm::vec3 up = glm::vec3(0, 0, 0);
+	Frustum frustrum;
 
 	// horizontal angle : toward -Z
 	float horizontalAngle = 3.14f;
 	float verticalAngle = 0.0f;
-	float initialFoV = 45.0f;
+	float initialFoV = 50.0f;
 	float maxAngle = 1.5;
 	float mouseSpeed = 0.005f;
 	
 	glm::mat4 ViewMatrix;
-	glm::mat4 ProjectionMatrix;
+	glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(initialFoV), RATIO, 0.1f, 100.0f);
+
 
 	glm::vec3 Camera::GetPosition() {
 		return position;
@@ -25,6 +28,13 @@ namespace Camera
 	glm::vec3 Camera::GetRight() {
 		return right;
 	}
+	glm::vec3 Camera::GetUp() {
+		return up;
+	}
+	Frustum Camera::GetFrustum() {
+		return frustrum;
+	}
+
 
 	
 	glm::mat4 Camera::getViewMatrix() {
@@ -91,6 +101,7 @@ namespace Camera
 		return RayCallback;
 	}
 
+
 	void Camera::Update(float dt) {
 		if (verticalAngle <= maxAngle && verticalAngle >= -maxAngle)
 			verticalAngle += mouseSpeed * float(SCREENHEIGHT / 2 - Input::GetMouseY());
@@ -105,26 +116,23 @@ namespace Camera
 			sin(verticalAngle),
 			cos(verticalAngle) * cos(horizontalAngle)
 		);
-		
 		// Right vector
 		right = glm::vec3(
 			sin(horizontalAngle - 3.14f / 2.0f),
 			0,
 			cos(horizontalAngle - 3.14f / 2.0f)
 		);
-		
 		// Up vector
-		glm::vec3 up = glm::cross(right, direction);
-
-		// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-		ProjectionMatrix = glm::perspective(initialFoV, RATIO, 0.1f, 100.0f);
-		
+		up = glm::cross(right, direction);
+		// Projection matrix
 		// Camera matrix
 		ViewMatrix = glm::lookAt(
 			position,           // Camera is here
 			position + direction, // and looks here : at the same position, plus "direction"
 			up                  // Head is up (set to 0,-1,0 to look upside-down)
 		);
+
+		frustrum = createFrustumFromCamera(SCREENWIDTH/SCREENHEIGHT, glm::radians(initialFoV + 30), 0.1f, 100.0f);
 	}
 	
 	glm::vec3 Camera::GetDirection() {
@@ -140,3 +148,5 @@ namespace Camera
 
 	}
 }
+
+

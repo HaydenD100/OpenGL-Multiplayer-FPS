@@ -42,7 +42,7 @@ namespace Engine
 		SceneManager::LoadScene(0);
 		float endLoadTime = glfwGetTime() - startLoadTime;
 		std::cout << "Load took " << endLoadTime << "s \n";
-		EditorManager::Init();
+		//EditorManager::Init();
 
 		// For speed computation
 		double lastTimeDT = glfwGetTime();
@@ -64,7 +64,6 @@ namespace Engine
 			}
 			// Update Managers
 			Input::Update();
-			//Renderer::ClearScreen();
 
 			//TO DO :: Editing
 			if (Editing)
@@ -76,7 +75,6 @@ namespace Engine
 				//Reloads Shaders
 				if (Input::KeyDown('h'))
 					Renderer::LoadAllShaders();
-
 				
 				Input::CenterMouse();
 				SceneManager::Update(dt);

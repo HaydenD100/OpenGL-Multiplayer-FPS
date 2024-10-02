@@ -3,10 +3,14 @@
 #include "Engine/Loaders/vboindexer.h"
 #include "Engine/Loaders/stb_image.h"
 #include "Engine/Core/AssetManager.h"
+#include "Engine/Core/Camera.h"
+
 
 Model::Model(Mesh mesh, Texture* texture) {
     mesh.SetTexture(texture);
     meshes.push_back(mesh);
+    aabb = generateAABB();
+
 }
 
 //Right now this can only load files that support tanget and bit tanget fbx is the most common
@@ -22,6 +26,7 @@ Model::Model(const char* path, Texture* texture) {
     std::cout << "Assimp: Loading Model " << path << std::endl;
     processNode(scene->mRootNode, scene, texture);
 
+    aabb = generateAABB();
 }
 Model::Model(const char* path, const char* collisonShapePath, Texture* texture) {
     Assimp::Importer import;
@@ -39,6 +44,7 @@ Model::Model(const char* path, const char* collisonShapePath, Texture* texture) 
     std::vector<glm::vec2> uvs;
     std::vector<glm::vec3> normals;
     Loader::loadOBJ(collisonShapePath, collison_shape_vertices, uvs, normals);
+    aabb = generateAABB();
 }
 
 
@@ -199,6 +205,8 @@ void Model::RenderModel(GLuint& programID) {
     {
         for (int i = 0; i < meshes.size(); i++)
             meshes[i].Render(programID);
+        
+            
     }
     else
         meshes[currentMesh].Render(programID);
@@ -210,3 +218,29 @@ size_t Model::GetColliderShapeVerticiesSize() {
 std::vector<glm::vec3> Model::GetColliderShapeVerticies() {
     return collison_shape_vertices;
 }
+AABB* Model::GetAABB() {
+    return &aabb;
+}
+
+
+AABB Model::generateAABB()
+{
+    glm::vec3 minAABB = glm::vec3(std::numeric_limits<float>::max());
+    glm::vec3 maxAABB = glm::vec3(std::numeric_limits<float>::min());
+    for (int i = 0; i < meshes.size(); i++)
+    {
+        for (int a = 0; a < meshes[i].VerticiesSize(); a++)
+        {
+            glm::vec3 vertexpos = meshes[i].GetVertex(a);
+            minAABB.x = std::min(minAABB.x, vertexpos.x);
+            minAABB.y = std::min(minAABB.y, vertexpos.y);
+            minAABB.z = std::min(minAABB.z, vertexpos.z);
+
+            maxAABB.x = std::max(maxAABB.x, vertexpos.x);
+            maxAABB.y = std::max(maxAABB.y, vertexpos.y);
+            maxAABB.z = std::max(maxAABB.z, vertexpos.z);
+        }
+    }
+    return AABB(minAABB, maxAABB);
+}
+

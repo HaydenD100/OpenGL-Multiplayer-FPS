@@ -20,6 +20,7 @@
 #include <assimp/postprocess.h>
 #include "Engine/Loaders/vboindexer.h"
 struct Mesh {
+public:
     Mesh(const char* path);
     Mesh(std::vector<glm::vec3> vertices,
         std::vector<glm::vec3> normals,
@@ -34,6 +35,8 @@ struct Mesh {
     std::string GetName();
     void SetName(std::string name);
     void SetTexture(Texture* texture);
+    size_t VerticiesSize();
+    glm::vec3 GetVertex(int i);
 
 
     std::vector<unsigned short> indices;

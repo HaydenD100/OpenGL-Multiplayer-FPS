@@ -149,4 +149,31 @@ void Decal::RenderDecal(GLuint& programID) {
 glm::vec3 Decal::GetScale() {
 	return transform.scale;
 }
+Transform Decal::getTransform() {
+	return transform;
+}
+
+AABB* Decal::GetAABB() {
+	return &aabb;
+}
+
+
+
+AABB Decal::generateAABB()
+{
+	glm::vec3 minAABB = glm::vec3(std::numeric_limits<float>::max());
+	glm::vec3 maxAABB = glm::vec3(std::numeric_limits<float>::min());
+	for (int i = 0; i < indexed_vertices.size(); i++)
+	{
+		glm::vec3 vertexpos = indexed_vertices[i];
+		minAABB.x = std::min(minAABB.x, vertexpos.x);
+		minAABB.y = std::min(minAABB.y, vertexpos.y);
+		minAABB.z = std::min(minAABB.z, vertexpos.z);
+
+		maxAABB.x = std::max(maxAABB.x, vertexpos.x);
+		maxAABB.y = std::max(maxAABB.y, vertexpos.y);
+		maxAABB.z = std::max(maxAABB.z, vertexpos.z);
+	}
+	return AABB(minAABB, maxAABB);
+}
 

@@ -17,11 +17,16 @@ public:
     glm::vec3 GetScale();
     bool CheckParentIsNull();
     void RenderDecal(GLuint& programID);
+    Transform getTransform();
+    AABB* GetAABB();
 
     glm::vec3 GetPosition() const {
         return transform.position;
     }
-private:    
+private:  
+    AABB aabb;
+    AABB generateAABB();
+
     Texture* texture = nullptr;
     glm::vec3 normal = glm::vec3(0, 0, 0);
     GameObject* parent = nullptr;
