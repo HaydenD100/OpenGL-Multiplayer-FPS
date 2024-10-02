@@ -132,7 +132,7 @@ namespace Camera
 			up                  // Head is up (set to 0,-1,0 to look upside-down)
 		);
 
-		frustrum = createFrustumFromCamera(SCREENWIDTH/SCREENHEIGHT, glm::radians(initialFoV + 30), 0.1f, 100.0f);
+		frustrum = createFrustumFromCamera(SCREENWIDTH/SCREENHEIGHT, glm::radians(initialFoV + 30), 0.01f, 100.0f);
 	}
 	
 	glm::vec3 Camera::GetDirection() {

@@ -460,6 +460,10 @@ namespace Renderer
 				return distanceA > distanceB; // Sort by descending distance (farthest first)
 			});
 
+		GLuint modelmatloc = glGetUniformLocation(programid, "M");
+		GLuint modelmat3x3loc = glGetUniformLocation(programid, "normalMatrix3");
+
+
 		std::vector<GameObject*> overlay; 
 		for (int i = 0; i < needRendering.size(); i++) {
 			if (needRendering[i]->GetShaderType() == "Overlay") {
@@ -470,19 +474,13 @@ namespace Renderer
 			glm::mat4 ModelMatrix = needRendering[i]->GetModelMatrix();
 			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;
 			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
-			glUniformMatrix3fv(glGetUniformLocation(programid, "normalMatrix3"), 1, GL_FALSE, &normalMatrix[0][0]);
-			glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]); 
+			glUniformMatrix3fv(modelmat3x3loc, 1, GL_FALSE, &normalMatrix[0][0]);
+			glUniformMatrix4fv(modelmatloc, 1, GL_FALSE, &ModelMatrix[0][0]);
 			needRendering[i]->RenderObject(programid);
 		}
 
 		programid = Renderer::GetProgramID("decal");
 		Renderer::UseProgram(programid);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gPosition);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, gNormal);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, gAlbeido);
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, depthTexture);
 		glUniformMatrix4fv(glGetUniformLocation(programid, "P"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
@@ -497,17 +495,24 @@ namespace Renderer
 		std::vector<Decal>* decals = AssetManager::GetAllDecals();
 		for (int i = 0; i < decals->size(); i++) {
 			Decal& decal = (*decals)[i];
-			if (decal.CheckParentIsNull())
-				continue;
-			if (!decal.GetAABB()->isOnFrustum(Camera::GetFrustum(), decal.getTransform()))
+
+			// Skip decals with null parents or those outside the camera frustum
+			if (decal.CheckParentIsNull() || !decal.GetAABB()->isOnFrustum(Camera::GetFrustum(), decal.getTransform()))
 				continue;
 
+			// Retrieve model matrix and size
 			glm::mat4 ModelMatrix = decal.GetModel();
 			glm::vec3 size = decal.GetScale();
-			Renderer::setMat4(glGetUniformLocation(Renderer::GetCurrentProgramID(), "M"), ModelMatrix);
-			glUniformMatrix4fv(glGetUniformLocation(programid, "inverseM"), 1, GL_FALSE, &glm::inverse(ModelMatrix)[0][0]);
 
-			Renderer::setVec3(glGetUniformLocation(Renderer::GetCurrentProgramID(), "size"), size);
+			// Set model matrix and its inverse (computed per decal)
+			glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);
+			glm::mat4 inverseModelMatrix = glm::inverse(ModelMatrix);
+			glUniformMatrix4fv(glGetUniformLocation(programid, "inverseM"), 1, GL_FALSE, &inverseModelMatrix[0][0]);
+
+			// Set decal size
+			Renderer::setVec3(glGetUniformLocation(programid, "size"), size);
+
+			// Render the decal
 			decal.RenderDecal(programid);
 		}
 
