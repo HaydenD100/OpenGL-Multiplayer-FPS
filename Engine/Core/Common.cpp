@@ -137,7 +137,6 @@ glm::mat4 worldToLocal(btVector3 position, btVector3 rotation) {
 Frustum createFrustumFromCamera(float aspect, float fovY, float zNear, float zFar)
 {
     Frustum frustum;
-    Frustum frustum;
     const float halfVSide = zFar * tanf(fovY * .5f);
     const float halfHSide = halfVSide * aspect;
     const glm::vec3 frontMultFar = zFar * Camera::GetDirection();

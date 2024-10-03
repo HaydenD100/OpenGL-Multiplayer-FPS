@@ -31,6 +31,7 @@ namespace AssetManager
 		models.clear();
 	}
 
+	//TODO fix this
 	void AssetManager::LoadAssets(const char* loadJson) {
 		std::ifstream f(loadJson);
 		json data = json::parse(f);
