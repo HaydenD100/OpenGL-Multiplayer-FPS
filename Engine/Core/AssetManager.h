@@ -29,10 +29,20 @@ namespace AssetManager
 	size_t AddGameObject(GameObject gameobject);
 	unsigned long long AddGameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape);
 
-	unsigned long long AddDecal(glm::vec3 position, glm::vec3 normal, glm::vec3 scale, Texture* texture,
-	                            GameObject* parent);
+	unsigned long long AddDecal(std::string name, Texture* texture);
+	Decal* GetDecal(std::string name);
 	Decal* GetDecal(int index);
+	size_t DecalSize();
+
+
 	std::vector<Decal>* GetAllDecals();
+	void ClearAllDecalInstances();
+
+	unsigned long long AddDecalInstance(glm::vec3 position, glm::vec3 normal, glm::vec3 scale, Decal* decal, GameObject* Parent);
+	DecalInstance* GetDecalInstance(int index);
+	std::vector<DecalInstance>* GetAllDecalInstances();
+	size_t DecalInstanceSize();
+
 
 	size_t AddTexture(Texture texture);
 	size_t AddTexture(const char* name, const char* path, float roughness, float metalic);

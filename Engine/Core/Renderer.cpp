@@ -1,6 +1,8 @@
 #include "Renderer.h"
 #include "Scene/SceneManager.h"
 #include "Engine/Core/Common.h"
+#include "Engine/Core/DecalInstance.h"
+
 #include <random>
 
 
@@ -183,12 +185,10 @@ namespace Renderer
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "texNoise"), 2);
 
 		UseProgram(GetProgramID("decal"));
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 2);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "decalTexture"), 1);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "decalNormal"), 2);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gDepth"), 3);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "decalTexture"), 4);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "decalNormal"), 5);
+
 
 		glUniform2f(glGetUniformLocation(GetCurrentProgramID(), "resolution"), SCREENWIDTH, SCREENHEIGHT);
 
@@ -491,28 +491,22 @@ namespace Renderer
 
 
 		glDisable(GL_DEPTH_TEST);
-
-		std::vector<Decal>* decals = AssetManager::GetAllDecals();
+		std::vector<DecalInstance>* decals = AssetManager::GetAllDecalInstances();
 		for (int i = 0; i < decals->size(); i++) {
-			Decal& decal = (*decals)[i];
+			DecalInstance& decal = (*decals)[i];
 
 			// Skip decals with null parents or those outside the camera frustum
 			if (decal.CheckParentIsNull() || !decal.GetAABB()->isOnFrustum(Camera::GetFrustum(), decal.getTransform()))
 				continue;
+			decal.GetDecal()->AddInstace(&decal);
+		}
 
-			// Retrieve model matrix and size
-			glm::mat4 ModelMatrix = decal.GetModel();
-			glm::vec3 size = decal.GetScale();
+		glm::vec3 size = glm::vec3(0.5);
+		Renderer::setVec3(glGetUniformLocation(programid, "size"), size);
 
-			// Set model matrix and its inverse (computed per decal)
-			glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);
-			glm::mat4 inverseModelMatrix = glm::inverse(ModelMatrix);
-			glUniformMatrix4fv(glGetUniformLocation(programid, "inverseM"), 1, GL_FALSE, &inverseModelMatrix[0][0]);
-
-			// Set decal size
-			Renderer::setVec3(glGetUniformLocation(programid, "size"), size);
-
-			// Render the decal
+		std::vector<Decal>* decalsToBeRendered = AssetManager::GetAllDecals();
+		for (int i = 0; i < decalsToBeRendered->size(); i++) {
+			Decal& decal = (*decalsToBeRendered)[i];			
 			decal.RenderDecal(programid);
 		}
 
@@ -566,10 +560,6 @@ namespace Renderer
 
 		glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
 		glDisableVertexAttribArray(0);
-
-		newTime = glfwGetTime();
-		//std::cout << "SSAO:" << (newTime - time) * 1000 << "ms" << std::endl;
-		time = newTime;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);

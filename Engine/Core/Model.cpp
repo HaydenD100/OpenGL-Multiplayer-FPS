@@ -205,8 +205,6 @@ void Model::RenderModel(GLuint& programID) {
     {
         for (int i = 0; i < meshes.size(); i++)
             meshes[i].Render(programID);
-        
-            
     }
     else
         meshes[currentMesh].Render(programID);

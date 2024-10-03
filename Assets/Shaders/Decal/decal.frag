@@ -3,13 +3,13 @@ layout (location = 1) out vec4 gNormalBuffer;
 layout (location = 2) out vec4 gAlbedoSpec;  // Stores both albedo and specular in one vector
 
 in vec3 DecalCenterPosition;
+in mat4 inverseM;
 
 uniform sampler2D gDepth;  // Depth buffer (remove unused uniforms)
 uniform sampler2D decalTexture;
 
 uniform mat4 inverseP;
 uniform mat4 inverseV;
-uniform mat4 inverseM;
 
 uniform vec2 resolution;
 uniform vec3 size;

@@ -1,13 +1,17 @@
 #include "AssetManager.h"
+#include "Engine/Core/DecalInstance.h"
 
 namespace AssetManager
 {
 	//will replace the decals starting from 0 if the max decals has been reached, replacing the oldest decals to make room for the new decals
+	//setting this number to anything hire then 0 will reserve the first n spots for decals that wont be replaced
 	int nextDecalSpot = 0;
 
 	std::vector<GameObject> GameObjects;
 	std::vector<Texture> Textures;
 	std::vector<Decal> Decals;
+	std::vector<DecalInstance> DecalInstances;
+
 	std::map<std::string, Model> models;
 
 	Texture missing_texture;
@@ -19,9 +23,10 @@ namespace AssetManager
 		Textures.clear();
 		GameObjects.clear();
 		Decals.clear();
+		DecalInstances.clear();
 
-		Decals.reserve(MAXDECALS);
-		Decals.resize(MAXDECALS);
+		DecalInstances.reserve(MAXDECALS);
+		DecalInstances.resize(MAXDECALS);
 
 		Texture("missing_texture", "Assets/Textures/missing_texture.png", 0, 0);
 	}
@@ -155,16 +160,54 @@ namespace AssetManager
 		return GameObjects.size() - 1;
 	}
 
-	size_t AddDecal(glm::vec3 position, glm::vec3 normal, glm::vec3 scale, Texture* texture, GameObject* parent) {
+	size_t AddDecal(std::string name, Texture* texture) {
+		Decals.push_back(Decal(name, texture));
+		return Decals.size() - 1;
+	}
+	Decal* GetDecal(std::string name) {
+		for (int i = 0; i < Decals.size(); i++) {
+			if (Decals[i].GetName() == name)
+				return &Decals[i];
+		}
+		return nullptr;
+	}
+	Decal* GetDecal(int index) {
+		return &Decals[index];
+	}
+	size_t DecalSize() {
+		return Decals.size();
+	}
+	void ClearAllDecalInstances() {
+		for (int i = 0; i < Decals.size(); i++) {
+			Decals[i].ClearInstace();
+		}
+	}
+
+
+	unsigned long long AddDecalInstance(glm::vec3 position, glm::vec3 normal, glm::vec3 scale, Decal* decal, GameObject* Parent) {
 		if (nextDecalSpot < MAXDECALS) {
-			Decals[nextDecalSpot] = Decal(position, normal, scale, texture, parent);
+			DecalInstances[nextDecalSpot] = DecalInstance(position, normal, scale, decal, Parent);
 			nextDecalSpot++;
+			std::cout << nextDecalSpot << std::endl;
 		}
 		else
 			nextDecalSpot = 0;
-		
+
 		return Decals.size() - 1;
+		
 	}
+	DecalInstance* GetDecalInstance(int index){
+		return &DecalInstances[index];
+	}
+
+	std::vector<DecalInstance>* GetAllDecalInstances() {
+		return &DecalInstances;
+	}
+	size_t DecalInstanceSize() {
+		return DecalInstances.size();
+	}
+
+
 	Model* AssetManager::GetModel(std::string name) {
 		return &models[name];
 	}
@@ -177,9 +220,7 @@ namespace AssetManager
 		return &models[name];
 	}
 	
-	Decal* GetDecal(int index) {
-		return &Decals[index];
-	}
+
 
 	std::vector<Decal>* GetAllDecals() {
 		return &Decals;

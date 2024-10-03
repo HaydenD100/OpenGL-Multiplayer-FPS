@@ -7,30 +7,30 @@
 #include "Engine/Physics/BulletPhysics.h"
 #include "Engine/Core/GameObject.h"
 
+
+class DecalInstance;
+
 class Decal
 {
 public:
     Decal() = default;
-    Decal(glm::vec3 position, glm::vec3 normal, glm::vec3 scale, Texture* texture, GameObject* Parent);
-    glm::mat4 GetModel();
-    glm::vec3 GetNormal();
-    glm::vec3 GetScale();
-    bool CheckParentIsNull();
+    Decal(std::string name, Texture* texture);
+
     void RenderDecal(GLuint& programID);
-    Transform getTransform();
-    AABB* GetAABB();
+    size_t getVerticesSize();
+    std::vector<glm::vec3> getVerticies();
+    glm::vec3 GetVertex(int i);
+    std::string GetName();
+    void AddInstace(DecalInstance* instance);
+    void ClearInstace();
 
-    glm::vec3 GetPosition() const {
-        return transform.position;
-    }
+
 private:  
-    AABB aabb;
-    AABB generateAABB();
-
+    std::string name;
     Texture* texture = nullptr;
-    glm::vec3 normal = glm::vec3(0, 0, 0);
-    GameObject* parent = nullptr;
-    Transform transform;
+
+    std::vector<glm::mat4> instancesModel;
+
 
     std::vector<glm::vec3> indexed_vertices = {
         // Front face
@@ -143,4 +143,8 @@ private:
     GLuint VertexArrayID;
     GLuint tangentbuffer;
     GLuint bitangentbuffer;
+
+    GLuint instanceBuffer;
+
 };
+

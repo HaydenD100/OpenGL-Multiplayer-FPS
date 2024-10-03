@@ -155,6 +155,7 @@
     <ClCompile Include="Engine\Core\Camera.cpp" />
     <ClCompile Include="Engine\Core\Common.cpp" />
     <ClCompile Include="Engine\Core\Decal.cpp" />
+    <ClCompile Include="Engine\Core\DecalInstance.cpp" />
     <ClCompile Include="Engine\Core\GameObject.cpp" />
     <ClCompile Include="Engine\Core\Input.cpp" />
     <ClCompile Include="Engine\Core\Renderer.cpp" />
@@ -216,6 +217,7 @@
     <ClInclude Include="Engine\Core\Camera.h" />
     <ClInclude Include="Engine\Core\Common.h" />
     <ClInclude Include="Engine\Core\Decal.h" />
+    <ClInclude Include="Engine\Core\DecalInstance.h" />
     <ClInclude Include="Engine\Core\GameObject.h" />
     <ClInclude Include="Engine\Core\Input.h" />
     <ClInclude Include="Engine\Core\Model.h" />

@@ -54,6 +54,8 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("map_ceiling", Model("Assets/Objects/Map1/ceiling.fbx", AssetManager::GetTexture("beige_wall")));
 	AssetManager::AddModel("shotgun", Model("Assets/Objects/fbx/remington.fbx", "Assets/Objects/shotgun_convex.obj", AssetManager::GetTexture("shotgun")));
 
+	AssetManager::AddDecal("bullet_hole", AssetManager::GetTexture("bullet_hole"));
+
 
 
 	AnimationManager::AddAnimation(Animation("Assets/Objects/FBX/ak47.fbx", "ak47_reload"));
