@@ -160,8 +160,8 @@ namespace AssetManager
 		return GameObjects.size() - 1;
 	}
 
-	size_t AddDecal(std::string name, Texture* texture) {
-		Decals.push_back(Decal(name, texture));
+	size_t AddDecal(std::string name, Texture* texture, glm::vec3 size) {
+		Decals.push_back(Decal(name, texture,size));
 		return Decals.size() - 1;
 	}
 	Decal* GetDecal(std::string name) {
@@ -184,11 +184,10 @@ namespace AssetManager
 	}
 
 
-	unsigned long long AddDecalInstance(glm::vec3 position, glm::vec3 normal, glm::vec3 scale, Decal* decal, GameObject* Parent) {
+	unsigned long long AddDecalInstance(glm::vec3 position, glm::vec3 normal, Decal* decal, GameObject* Parent) {
 		if (nextDecalSpot < MAXDECALS) {
-			DecalInstances[nextDecalSpot] = DecalInstance(position, normal, scale, decal, Parent);
+			DecalInstances[nextDecalSpot] = DecalInstance(position, normal, decal, Parent);
 			nextDecalSpot++;
-			std::cout << nextDecalSpot << std::endl;
 		}
 		else
 			nextDecalSpot = 0;

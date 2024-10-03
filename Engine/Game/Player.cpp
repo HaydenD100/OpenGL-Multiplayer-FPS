@@ -109,7 +109,7 @@ namespace Player
 						glm::vec3 normal = glm::vec3(hit.m_hitNormalWorld.getX(), hit.m_hitNormalWorld.getY(), hit.m_hitNormalWorld.getZ());
 						glm::mat4 rotation_matrix = glm::mat4_cast(glm::quat(gameobject->getRotation()));
 						normal = glm::vec3(glm::inverse(rotation_matrix) * glm::vec4(normal, 0));
-						AssetManager::AddDecalInstance(vec3local, normal, glm::vec3(0.02, 0.005, 0.02), AssetManager::GetDecal("bullet_hole"), gameobject);
+						AssetManager::AddDecalInstance(vec3local, normal, AssetManager::GetDecal("bullet_hole"), gameobject);
 					}
 				}
 			}

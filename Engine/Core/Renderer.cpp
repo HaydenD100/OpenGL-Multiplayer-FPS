@@ -501,12 +501,14 @@ namespace Renderer
 			decal.GetDecal()->AddInstace(&decal);
 		}
 
-		glm::vec3 size = glm::vec3(0.5);
-		Renderer::setVec3(glGetUniformLocation(programid, "size"), size);
+		GLuint sizeLoc = glGetUniformLocation(programid, "size");
 
 		std::vector<Decal>* decalsToBeRendered = AssetManager::GetAllDecals();
 		for (int i = 0; i < decalsToBeRendered->size(); i++) {
-			Decal& decal = (*decalsToBeRendered)[i];			
+			Decal& decal = (*decalsToBeRendered)[i];	
+			glm::vec3 size = decal.GetSize();
+
+			Renderer::setVec3(sizeLoc, size);
 			decal.RenderDecal(programid);
 		}
 

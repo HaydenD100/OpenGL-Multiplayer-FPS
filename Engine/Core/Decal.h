@@ -14,7 +14,7 @@ class Decal
 {
 public:
     Decal() = default;
-    Decal(std::string name, Texture* texture);
+    Decal(std::string name, Texture* texture, glm::vec3 size);
 
     void RenderDecal(GLuint& programID);
     size_t getVerticesSize();
@@ -24,10 +24,13 @@ public:
     void AddInstace(DecalInstance* instance);
     void ClearInstace();
 
+    glm::vec3 GetSize();
+
 
 private:  
     std::string name;
     Texture* texture = nullptr;
+    glm::vec3 size;
 
     std::vector<glm::mat4> instancesModel;
 

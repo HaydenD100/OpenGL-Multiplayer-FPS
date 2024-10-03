@@ -2,7 +2,7 @@
 #include "Engine/Core/Decal.h"
 
 
-DecalInstance::DecalInstance(glm::vec3 position, glm::vec3 normal, glm::vec3 scale, Decal* decal, GameObject* Parent) {
+DecalInstance::DecalInstance(glm::vec3 position, glm::vec3 normal, Decal* decal, GameObject* Parent) {
 	this->decal = decal;
 	this->normal = normal;
 	parent = Parent;
@@ -14,7 +14,7 @@ DecalInstance::DecalInstance(glm::vec3 position, glm::vec3 normal, glm::vec3 sca
 	transform.position = position + (normal * 0.01f);
 	transform.rotation = (rotationAxis * -angle);
 
-	transform.scale = scale;
+	transform.scale = decal->GetSize();
 
 }
 

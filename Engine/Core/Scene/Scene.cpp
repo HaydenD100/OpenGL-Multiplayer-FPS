@@ -54,7 +54,7 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("map_ceiling", Model("Assets/Objects/Map1/ceiling.fbx", AssetManager::GetTexture("beige_wall")));
 	AssetManager::AddModel("shotgun", Model("Assets/Objects/fbx/remington.fbx", "Assets/Objects/shotgun_convex.obj", AssetManager::GetTexture("shotgun")));
 
-	AssetManager::AddDecal("bullet_hole", AssetManager::GetTexture("bullet_hole"));
+	AssetManager::AddDecal("bullet_hole", AssetManager::GetTexture("bullet_hole"), glm::vec3(0.02, 0.005, 0.02));
 
 
 

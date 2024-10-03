@@ -64,10 +64,5 @@ void Door::Update(float deltaTime) {
 		rotation = 0;
 		return;
 	}
-	
-	std::cout << rotation << std::endl;
-
 	AssetManager::GetGameObject(name + "_door")->setRotation(door_rotation + glm::vec3(0,rotation,0));
-
-	
 }

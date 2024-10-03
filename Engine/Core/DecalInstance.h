@@ -12,7 +12,7 @@ class Decal;
 class DecalInstance {
 public:
     DecalInstance() = default;
-    DecalInstance(glm::vec3 position, glm::vec3 normal, glm::vec3 scale, Decal* decal, GameObject* Parent);
+    DecalInstance(glm::vec3 position, glm::vec3 normal, Decal* decal, GameObject* Parent);
 
     Transform getTransform();
     bool CheckParentIsNull();

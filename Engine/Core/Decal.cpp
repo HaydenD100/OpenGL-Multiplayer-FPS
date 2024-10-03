@@ -2,9 +2,10 @@
 #include "DecalInstance.h"
 
 
-Decal::Decal(std::string name, Texture* texture) {
+Decal::Decal(std::string name, Texture* texture, glm::vec3 size) {
     this->texture = texture;
 	this->name = name;
+	this->size = size;
 
 	glGenBuffers(1, &instanceBuffer);
 
@@ -38,6 +39,10 @@ void Decal::AddInstace(DecalInstance* instance) {
 void Decal::ClearInstace() {
 	instancesModel.clear();
 }
+glm::vec3 Decal::GetSize() {
+	return size;
+}
+
 
 
 
