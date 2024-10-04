@@ -512,7 +512,7 @@ namespace Renderer
 		}
 		glDisable(GL_BLEND);
 
-
+		
 		programid = Renderer::GetProgramID("geomerty");
 		Renderer::UseProgram(programid);
 
@@ -526,8 +526,6 @@ namespace Renderer
 			glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);
 			overlay[i]->RenderObject(programid);
 		}
-
-
 		glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

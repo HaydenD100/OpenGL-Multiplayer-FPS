@@ -141,7 +141,7 @@ Frustum createFrustumFromCamera(float aspect, float fovY, float zNear, float zFa
     const float halfHSide = halfVSide * aspect;
     const glm::vec3 frontMultFar = zFar * Camera::GetDirection();
 
-    frustum.nearFace = { Camera::GetPosition() + zNear * Camera::GetDirection(), Camera::GetDirection() };
+    frustum.nearFace = { Camera::GetPosition() + zNear * Camera::GetDirection(), Camera::GetDirection()};
     frustum.farFace = { Camera::GetPosition() + frontMultFar, -Camera::GetDirection() };
     frustum.rightFace = { Camera::GetPosition(), glm::cross(frontMultFar - Camera::GetRight() * halfHSide, Camera::GetUp()) };
     frustum.leftFace = { Camera::GetPosition(), glm::cross(Camera::GetUp(), frontMultFar + Camera::GetRight() * halfHSide) };

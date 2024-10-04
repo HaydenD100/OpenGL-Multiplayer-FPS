@@ -3,6 +3,11 @@ https://github.com/HaydenD100/3dEngine2.0
 
 ## Changelog
 
+### 3D Engine 2.0 2024/October/04
+A couple additions and optimizations were added  to the rendering pipeline including, Screen Space Decals as well as dynamic decals seen on the physic object (wooden box). Transparency is also added which was removed originally when I migrated from a forward renderer to a deferred renderer. Lots of optimizations were also added including Frustum culling which only sends objects that are visible to the camera to the GPU as well as instacing decals which limits the draw calls.
+![screenshot](https://github.com/HaydenD100/3dEngine2.0/blob/Bullet3-physics/github/screenshots/ssd.png)
+
+
 ### 3D Engine 2.0 2024/August/20
 The Rendering pipeline is now using Physically Based Rendering (PBR), PBR is a rendering method that is based off the The microfacet model, this model explains that all surfaces are made out of bumps and are never completely flat, the Normal of a surface is just the average between those bumps, The roughness value allows you to tell the renderer how bumpy this surface is, PBR also allows metallic materials that reflect more light.  This allows materials to have Metallic and Roughness values instead of just the specular map I was using before, This makes the lighting feel realistic as the roughness and metallic values are based on real values. Other changes have been switching to HDR color values; this makes brighter areas brighter because we don't have to clamp the colors to LDR (0-1). Gamma correction was also added to make color consistent over all screens. 
 ![screenshot](https://github.com/HaydenD100/3dEngine2.0/blob/Bullet3-physics/github/screenshots/PBRHallwayLight_copy.png)

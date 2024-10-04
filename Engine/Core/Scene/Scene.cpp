@@ -12,6 +12,10 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
 	AssetManager::AddTexture("red_glass", "Assets/Textures/red_glass.png", 0, 0);
 	AssetManager::AddTexture("green_glass", "Assets/Textures/green_glass.png", 0, 0);
+	AssetManager::AddTexture("panda", "Assets/Textures/panda_decal.png", 0, 0);
+	AssetManager::AddTexture("flower", "Assets/Textures/flower_decal.png", 0, 0);
+
+
 
 	AssetManager::AddTexture("crate", "Assets/Textures/crate.png", 0.7, 0);
 	AssetManager::AddTexture("window", "Assets/Textures/window.png", 0.7, 0);
@@ -55,6 +59,10 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("shotgun", Model("Assets/Objects/fbx/remington.fbx", "Assets/Objects/shotgun_convex.obj", AssetManager::GetTexture("shotgun")));
 
 	AssetManager::AddDecal("bullet_hole", AssetManager::GetTexture("bullet_hole"), glm::vec3(0.02, 0.005, 0.02));
+	AssetManager::AddDecal("panda_decal", AssetManager::GetTexture("panda"), glm::vec3(1, 0.1, 1));
+	AssetManager::AddDecal("flower_decal", AssetManager::GetTexture("flower"), glm::vec3(1, 0.1, 1));
+
+
 
 
 
@@ -154,6 +162,7 @@ void Scene::Load() {
 		Light light(glm::vec3(-1, 2, -1), glm::vec3(0, 1, 1) * 4.0f, 0.09, 0.0320);
 		lights.push_back(light);
 	}
+
 	
 	Player::Init();
 	Player::setPosition(glm::vec3(0, 10, 0));

@@ -32,6 +32,9 @@ namespace Player
 	double footstep_interval = 0.5;
 
 	std::string inv[3] = {"ak47","glock","shotgun"};
+	std::string decal_inv[2] = { "flower_decal","panda_decal"};
+	int decal_index = 0;
+
 
 	void Player::Init() {
 		srand((unsigned int)time(nullptr));
@@ -120,6 +123,25 @@ namespace Player
 		}
 		
 		WeaponManager::GetGunByName(gunName)->lastTimeShot = glfwGetTime();
+	}
+	void Player::Graffite() {
+		btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit();
+		if (hit.m_collisionObject != nullptr) {
+			GameObject* gameobject = AssetManager::GetGameObject(hit.m_collisionObject->getUserIndex());
+			if (gameobject != nullptr)
+			{
+				btRigidBody* body = gameobject->GetRigidBody();
+				glm::vec4 worldPositionHomogeneous(glm::vec3(hit.m_hitPointWorld.getX(), hit.m_hitPointWorld.getY(), hit.m_hitPointWorld.getZ()), 1.0f);
+				glm::vec4 localPositionHomogeneous = glm::inverse(gameobject->GetModelMatrix()) * worldPositionHomogeneous;
+				glm::vec3 vec3local = glm::vec3(localPositionHomogeneous.x, localPositionHomogeneous.y, localPositionHomogeneous.z);
+				glm::vec3 normal = glm::vec3(hit.m_hitNormalWorld.getX(), hit.m_hitNormalWorld.getY(), hit.m_hitNormalWorld.getZ());
+				glm::mat4 rotation_matrix = glm::mat4_cast(glm::quat(gameobject->getRotation()));
+				normal = glm::vec3(glm::inverse(rotation_matrix) * glm::vec4(normal, 0));
+
+				AssetManager::AddDecalInstance(vec3local, normal, AssetManager::GetDecal(decal_inv[decal_index]), gameobject);
+
+			}
+		}
 	}
 	
 	bool Player::OnGround() {
@@ -242,6 +264,15 @@ namespace Player
 				if (gameobject != nullptr && glm::distance(gameobject->getPosition(), getPosition()) <= interactDistance)
 					interactingWithName = gameobject->GetName();
 			}
+		}
+		if (Input::KeyPressed('g')) {
+			Graffite();
+		}
+		if (Input::KeyPressed('t')) {
+			if (decal_index == 2 - 1)
+				decal_index = 0;
+			else
+				decal_index++;
 		}
 		
 		if (Input::KeyPressed('r') && !reloading && !aiming) {
