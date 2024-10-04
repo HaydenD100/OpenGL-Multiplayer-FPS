@@ -62,6 +62,6 @@ public:
 	void Update();
 	bool Interact();
 private:
-	std::string gunName;
-	std::string objectName;
+	std::string gunName = "";
+	std::string objectName = "Unkown";
 };

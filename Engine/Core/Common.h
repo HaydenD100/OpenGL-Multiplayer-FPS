@@ -168,3 +168,4 @@ glm::vec3 randomVector(float maxAngle);
 glm::vec3 offsetRayWithinAngle(const glm::vec3& rayDir, float maxOffsetAngle);
 
 float finlerpTo(float start, float end, float deltaTime, float interpSeed);
+

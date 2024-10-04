@@ -1,6 +1,8 @@
 #include "Engine.h"
 #include "Engine/Physics/BulletPhysics.h"
 #include "Editor/EditorManager.h"
+#include <ctime>
+#include <iostream>
 
 
 //rewrite of my first 3D Engine
@@ -49,6 +51,7 @@ namespace Engine
 		double previousTime = glfwGetTime();
 		int frameCount = 0;
 		int FPS = 0;
+
 
 		while (Backend::IsWindowOpen()) {
 			// Delta time stuff

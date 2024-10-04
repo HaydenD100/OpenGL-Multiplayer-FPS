@@ -490,7 +490,6 @@ namespace Renderer
 
 
 
-		glDisable(GL_DEPTH_TEST);
 		std::vector<DecalInstance>* decals = AssetManager::GetAllDecalInstances();
 		for (int i = 0; i < decals->size(); i++) {
 			DecalInstance& decal = (*decals)[i];
@@ -511,9 +510,6 @@ namespace Renderer
 			Renderer::setVec3(sizeLoc, size);
 			decal.RenderDecal(programid);
 		}
-
-		glEnable(GL_DEPTH_TEST);
-
 		glDisable(GL_BLEND);
 
 
