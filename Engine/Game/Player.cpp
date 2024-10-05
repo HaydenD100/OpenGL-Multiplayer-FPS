@@ -32,7 +32,8 @@ namespace Player
 	double footstep_interval = 0.5;
 
 	std::string inv[3] = {"ak47","glock","shotgun"};
-	std::string decal_inv[2] = { "flower_decal","panda_decal"};
+	const int decal_count = 5;
+	std::string decal_inv[decal_count] = { "flower_decal","panda_decal","pizza_decal","tank_decal", "freaky_decal"};
 	int decal_index = 0;
 
 
@@ -269,7 +270,7 @@ namespace Player
 			Graffite();
 		}
 		if (Input::KeyPressed('t')) {
-			if (decal_index == 2 - 1)
+			if (decal_index == decal_count -1)
 				decal_index = 0;
 			else
 				decal_index++;

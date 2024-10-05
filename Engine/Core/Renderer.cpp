@@ -423,9 +423,6 @@ namespace Renderer
 	}
 
 	void Renderer::RenderScene() {
-		float time = glfwGetTime();
-		float newTime = 0;
-		//std::cout << "-------------- Renderer Time ms-------------------- \n";
 		glEnable(GL_DEPTH_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
@@ -437,6 +434,41 @@ namespace Renderer
 
 		SceneManager::Render(programid);
 
+
+		//-----------------------------------------Decal---------------------------------------
+		glEnable(GL_BLEND);
+
+		programid = Renderer::GetProgramID("decal");
+		Renderer::UseProgram(programid);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, depthTexture);
+		glUniformMatrix4fv(glGetUniformLocation(programid, "P"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(programid, "V"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(programid, "inverseV"), 1, GL_FALSE, &glm::inverse(Camera::getViewMatrix())[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(programid, "inverseP"), 1, GL_FALSE, &glm::inverse(Camera::getProjectionMatrix())[0][0]);
+
+		std::vector<DecalInstance>* decals = AssetManager::GetAllDecalInstances();
+		for (int i = 0; i < decals->size(); i++) {
+			DecalInstance& decal = (*decals)[i];
+
+			// Skip decals with null parents or those outside the camera frustum
+			if (decal.CheckParentIsNull() || !decal.GetAABB()->isOnFrustum(Camera::GetFrustum(), decal.getTransform()))
+				continue;
+			decal.GetDecal()->AddInstace(&decal);
+		}
+
+		GLuint sizeLoc = glGetUniformLocation(programid, "size");
+
+		std::vector<Decal>* decalsToBeRendered = AssetManager::GetAllDecals();
+		for (int i = 0; i < decalsToBeRendered->size(); i++) {
+			Decal& decal = (*decalsToBeRendered)[i];
+			glm::vec3 size = decal.GetSize();
+
+			Renderer::setVec3(sizeLoc, size);
+			decal.RenderDecal(programid);
+		}
+
+		//-----------------------------------------Transaprent stuff---------------------------------------
 		programid = Renderer::GetProgramID("transparent");
 		Renderer::UseProgram(programid);
 		glActiveTexture(GL_TEXTURE0);
@@ -445,15 +477,12 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, gPosition);
 		glUniformMatrix4fv(glGetUniformLocation(programid, "P"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(programid, "V"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
-
-		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		std::vector<GameObject*> needRendering = SceneManager::GetCurrentScene()->NeedRenderingObjects();
 		glm::vec3 cameraPosition = Camera::GetPosition(); // Camera position
 
 		std::sort(needRendering.begin(), needRendering.end(),
 			[&cameraPosition](const GameObject* a, const GameObject* b) {
-				// Calculate the distance from the camera for each object
 				float distanceA = glm::length(a->GetPosition() - cameraPosition);
 				float distanceB = glm::length(b->GetPosition() - cameraPosition);
 
@@ -478,41 +507,9 @@ namespace Renderer
 			glUniformMatrix4fv(modelmatloc, 1, GL_FALSE, &ModelMatrix[0][0]);
 			needRendering[i]->RenderObject(programid);
 		}
-
-		programid = Renderer::GetProgramID("decal");
-		Renderer::UseProgram(programid);
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, depthTexture);
-		glUniformMatrix4fv(glGetUniformLocation(programid, "P"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(programid, "V"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(programid, "inverseV"), 1, GL_FALSE, &glm::inverse(Camera::getViewMatrix())[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(programid, "inverseP"), 1, GL_FALSE, &glm::inverse(Camera::getProjectionMatrix())[0][0]);
-
-
-
-		std::vector<DecalInstance>* decals = AssetManager::GetAllDecalInstances();
-		for (int i = 0; i < decals->size(); i++) {
-			DecalInstance& decal = (*decals)[i];
-
-			// Skip decals with null parents or those outside the camera frustum
-			if (decal.CheckParentIsNull() || !decal.GetAABB()->isOnFrustum(Camera::GetFrustum(), decal.getTransform()))
-				continue;
-			decal.GetDecal()->AddInstace(&decal);
-		}
-
-		GLuint sizeLoc = glGetUniformLocation(programid, "size");
-
-		std::vector<Decal>* decalsToBeRendered = AssetManager::GetAllDecals();
-		for (int i = 0; i < decalsToBeRendered->size(); i++) {
-			Decal& decal = (*decalsToBeRendered)[i];	
-			glm::vec3 size = decal.GetSize();
-
-			Renderer::setVec3(sizeLoc, size);
-			decal.RenderDecal(programid);
-		}
 		glDisable(GL_BLEND);
 
-		
+		//---------------------------------------------------Overlay-------------------------------------
 		programid = Renderer::GetProgramID("geomerty");
 		Renderer::UseProgram(programid);
 
@@ -530,7 +527,7 @@ namespace Renderer
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//ssao pass
+		//---------------------------------------------------SSAO-------------------------------------
 		programid = Renderer::GetProgramID("ssao");
 		Renderer::UseProgram(programid);
 
@@ -554,15 +551,14 @@ namespace Renderer
 			(void*)0            // array buffer offset
 		);
 
-		glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glDisableVertexAttribArray(0);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-		//RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
-
+		//---------------------------------------------------Lighting-------------------------------------
 		programid = GetProgramID("lighting");
 		glUseProgram(programid);
 		glActiveTexture(GL_TEXTURE0);
@@ -593,14 +589,9 @@ namespace Renderer
 			(void*)0            // array buffer offset
 		);
 
-		glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glDisableVertexAttribArray(0);
 		glDisable(GL_DEPTH_TEST);
-
-		newTime = glfwGetTime();
-		//std::cout << "Light:" << (newTime - time) * 1000 << "ms" << std::endl;
-		time = newTime;
-
 	}
 
 

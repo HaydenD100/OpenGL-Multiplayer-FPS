@@ -14,7 +14,11 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("green_glass", "Assets/Textures/green_glass.png", 0, 0);
 	AssetManager::AddTexture("panda", "Assets/Textures/panda_decal.png", 0, 0);
 	AssetManager::AddTexture("flower", "Assets/Textures/flower_decal.png", 0, 0);
+	AssetManager::AddTexture("freaky", "Assets/Textures/freaky_decal.png", 0, 0);
 
+
+	AssetManager::AddTexture("pizza", "Assets/Textures/pizza_decal.png", 0, 0);
+	AssetManager::AddTexture("tank", "Assets/Textures/tank_decal.png", 0, 0);
 
 
 	AssetManager::AddTexture("crate", "Assets/Textures/crate.png", 0.7, 0);
@@ -61,6 +65,10 @@ void Scene::LoadAssets() {
 	AssetManager::AddDecal("bullet_hole", AssetManager::GetTexture("bullet_hole"), glm::vec3(0.02, 0.005, 0.02));
 	AssetManager::AddDecal("panda_decal", AssetManager::GetTexture("panda"), glm::vec3(1, 0.1, 1));
 	AssetManager::AddDecal("flower_decal", AssetManager::GetTexture("flower"), glm::vec3(1, 0.1, 1));
+	AssetManager::AddDecal("tank_decal", AssetManager::GetTexture("tank"), glm::vec3(1, 0.1, 1));
+	AssetManager::AddDecal("pizza_decal", AssetManager::GetTexture("pizza"), glm::vec3(1, 0.1, 1));
+	AssetManager::AddDecal("freaky_decal", AssetManager::GetTexture("freaky"), glm::vec3(1, 0.1, 1));
+
 
 
 

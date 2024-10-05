@@ -5,7 +5,7 @@ https://github.com/HaydenD100/3dEngine2.0
 
 ### 3D Engine 2.0 2024/October/04
 A couple additions and optimizations were added  to the rendering pipeline including, Screen Space Decals as well as dynamic decals seen on the physic object (wooden box). Transparency is also added which was removed originally when I migrated from a forward renderer to a deferred renderer. Lots of optimizations were also added including Frustum culling which only sends objects that are visible to the camera to the GPU as well as instacing decals which limits the draw calls.
-![screenshot](https://github.com/HaydenD100/3dEngine2.0/blob/Bullet3-physics/github/screenshots/ssd.png)
+![screenshot](https://github.com/HaydenD100/3dEngine2.0/blob/Bullet3-physics/github/screenshots/decalSSD.png)
 
 
 ### 3D Engine 2.0 2024/August/20

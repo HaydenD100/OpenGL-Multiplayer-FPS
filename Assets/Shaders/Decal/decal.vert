@@ -15,6 +15,7 @@ uniform mat4 P; // Projection matrix
 void main()
 {
     gl_Position = P * V * instanceModelMatrix * vec4(vertexPosition_modelspace, 1.0);
+    //maybe do this cpu side
     inverseM = inverse(instanceModelMatrix);
 
     // Compute the transformed vertex position in one go
