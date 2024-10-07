@@ -16,6 +16,7 @@ DecalInstance::DecalInstance(glm::vec3 position, glm::vec3 normal, Decal* decal,
 
 	transform.scale = decal->GetSize();
 
+	aabb = generateAABB();
 }
 
 bool DecalInstance::CheckParentIsNull() {

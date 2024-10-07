@@ -29,6 +29,7 @@ public:
 private:
     Decal* decal;
     AABB aabb;
+    //this is specific to the decal
     AABB generateAABB();
     glm::vec3 normal = glm::vec3(0, 0, 0);
     GameObject* parent = nullptr;

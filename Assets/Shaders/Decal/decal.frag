@@ -7,6 +7,7 @@ in mat4 inverseM;
 
 uniform sampler2D gDepth;  // Depth buffer (remove unused uniforms)
 uniform sampler2D decalTexture;
+uniform sampler2D decalNormal;
 
 uniform mat4 inverseP;
 uniform mat4 inverseV;
@@ -28,16 +29,21 @@ void main() {
     vec3 FragPos = worldSpacePosition.xyz;
     // Calculate the distance from the decal center and discard if out of bounds
     float d = length(FragPos - DecalCenterPosition);
-    if (d > size.x || d > size.z)
+
+    //becuase its a circle this gives a little room
+    if (d > size.x * 1.2 || d > size.z * 1.2)
         discard;
     else{
         // Convert to local space for decal operations
         vec4 localPos = inverseM * vec4(FragPos, 1.0);
+
         // Compute texture coordinates in local space (XZ plane)
         vec2 textureCoordinate = (localPos.xz * 0.5) + 0.5;
         textureCoordinate = clamp(textureCoordinate, 0.0, 1.0);
         // Sample and assign decal texture
         vec4 decalTex = texture(decalTexture, textureCoordinate);
+        if(decalTex.a == 0)
+            discard;
         gAlbedoSpec = decalTex;
         //add normal
         //if(decalTex.a == 0){

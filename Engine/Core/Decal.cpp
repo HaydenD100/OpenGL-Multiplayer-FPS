@@ -54,8 +54,8 @@ void Decal::RenderDecal(GLuint& programID) {
 	if (texture != nullptr) {
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, texture->GetTexture());
-		//glActiveTexture(GL_TEXTURE2);
-		//glBindTexture(GL_TEXTURE_2D, texture->GetTextureNormal());
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, texture->GetTextureNormal());
 	}	
 	
 	glEnableVertexAttribArray(0);
