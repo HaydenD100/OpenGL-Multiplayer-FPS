@@ -1,4 +1,4 @@
-#version 330 core
+#version 430 core
 layout (location = 1) out vec4 gNormalBuffer;
 layout (location = 2) out vec4 gAlbedoSpec;  // Stores both albedo and specular in one vector
 

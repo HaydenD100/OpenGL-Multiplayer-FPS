@@ -69,17 +69,9 @@ void Scene::LoadAssets() {
 	AssetManager::AddDecal("pizza_decal", AssetManager::GetTexture("pizza"), glm::vec3(1, 0.1, 1));
 	AssetManager::AddDecal("freaky_decal", AssetManager::GetTexture("freaky"), glm::vec3(1, 0.1, 1));
 
-
-
-
-
-
 	AnimationManager::AddAnimation(Animation("Assets/Objects/FBX/ak47.fbx", "ak47_reload"));
 	AnimationManager::AddAnimation(Animation("Assets/Animations/door_open.fbx", "door_open"));
 	AnimationManager::AddAnimation(Animation("Assets/Animations/door_close.fbx", "door_close"));
-
-
-
 }
 
 

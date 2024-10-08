@@ -27,7 +27,7 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 		AssetManager::GetGameObject(gunModel)->setPosition(aimingPosition);
 	}
 	else {
-		gun->setPosition(weaponOffSet + (direction * -kickbackOffset * deltaTime));
+		gun->setPosition(weaponOffSet + (direction * -kickbackOffset * 1.0f/60.0f));
 
 		//TokyoSpliffs code
 		float xSwayTarget = 0.0f;
@@ -170,8 +170,9 @@ GunPickUp::GunPickUp(std::string GunName, std::string ObjectName, Model* model, 
 	GunPickUpCount++;
 }
 
-// TODO: fix throwing weapon
 GunPickUp::GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force) {
+
+	//STILL GIVING ERROR STING TO LONG ERROR NOT SURE WHY NOT SURE HOW TO FIX
 	std::string temp = std::to_string(GunPickUpCount);
 	std::cout << temp << "\n";
 	objectName = temp;
