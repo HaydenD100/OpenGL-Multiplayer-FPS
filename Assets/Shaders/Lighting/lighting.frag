@@ -140,7 +140,7 @@ void main() {
         vec3 kD = (1.0 - kS) * (1.0 - metallic);
         float NdotL = max(dot(N, L), 0.0);
         float shadow = ShadowCalculation(FragPos , i);
-        Lo += ((kD * albedo) * (1.0f - shadow) / PI + specular) * radiance * NdotL;
+        Lo += ((kD * albedo) * (1.0f - shadow) / PI + specular) * radiance * NdotL * (1.0f - shadow);
 
     }
 
