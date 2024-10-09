@@ -242,7 +242,7 @@
     <None Include="Assets\Shaders\Transparent\transparent.frag" />
     <None Include="Assets\Shaders\Shadow\depth.vert" />
     <None Include="Assets\Shaders\Shadow\depth.frag" />
-    <None Include="Assets\Shaders\Shadow\depth.gs" />
+    <None Include="Assets\Shaders\Shadow\depth.geom" />
     <None Include="Assets\Shaders\Decal\decal.vert" />
     <None Include="Assets\Shaders\Decal\decal.frag" />
   </ItemGroup>

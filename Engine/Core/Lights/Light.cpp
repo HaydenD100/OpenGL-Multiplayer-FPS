@@ -39,12 +39,9 @@ Light::Light(glm::vec3 position, glm::vec3 colour, float linear, float quadratic
 
 void Light::SetUpShadows() {
 	glGenTextures(1, &depthCubemap);
-	glGenFramebuffers(1, &depthMapFBO);
-
 	glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
 	for (unsigned int i = 0; i < 6; ++i)
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT,
-			SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -52,6 +49,7 @@ void Light::SetUpShadows() {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+	glGenFramebuffers(1, &depthMapFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubemap, 0);
 	glDrawBuffer(GL_NONE);
@@ -76,26 +74,27 @@ void Light::SetUpShadows() {
 	shadowTransforms.push_back(shadowProj *
 		glm::lookAt(position, position + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
 
-}
+} 
 
 
 void Light::GenerateShadows() {
+	glEnable(GL_DEPTH_TEST);
 	Renderer::UseProgram(Renderer::GetProgramID("shadow"));
 	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
 	for (unsigned int i = 0; i < 6; ++i) {
 		std::string pos = "shadowMatrices[" + std::to_string(i) + "]";
 		glUniformMatrix4fv(glGetUniformLocation(Renderer::GetCurrentProgramID(), pos.c_str()), 1, GL_FALSE, &shadowTransforms[i][0][0]);
 	}
-	glUniform1f(glGetUniformLocation(Renderer::GetCurrentProgramID(), "far_plane"), far);
+	glUniform1f(glGetUniformLocation(Renderer::GetCurrentProgramID(), "far_plane"), 25);
 	Renderer::setVec3(glGetUniformLocation(Renderer::GetCurrentProgramID(), "lightPos"), position);
 
-	SceneManager::GetCurrentScene()->RenderObjects(Renderer::GetCurrentProgramID());
-
+	SceneManager::GetCurrentScene()->RenderAllObjects(Renderer::GetCurrentProgramID());
+	glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	std::cout << "Generated shadows \n";
+	//std::cout << "Generated shadows \n";
 }
 

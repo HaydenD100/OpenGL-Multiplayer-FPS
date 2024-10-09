@@ -91,91 +91,140 @@ namespace LoadShaders
 		return ProgramID;
 	}
 
-	GLuint LoadShaders::LoadShaders(const char* vertexPath, const char* fragmentPath, const char* geometryPath) {
-		// 1. retrieve the vertex/fragment source code from filePath
-		std::string vertexCode;
-		std::string fragmentCode;
-		std::string geometryCode;
-		std::ifstream vShaderFile;
-		std::ifstream fShaderFile;
-		std::ifstream gShaderFile;
-		// ensure ifstream objects can throw exceptions:
-		vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-		fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-		gShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-		try
-		{
-			// open files
-			vShaderFile.open(vertexPath);
-			fShaderFile.open(fragmentPath);
-			std::stringstream vShaderStream, fShaderStream;
-			// read file's buffer contents into streams
-			vShaderStream << vShaderFile.rdbuf();
-			fShaderStream << fShaderFile.rdbuf();
-			// close file handlers
-			vShaderFile.close();
-			fShaderFile.close();
-			// convert stream into string
-			vertexCode = vShaderStream.str();
-			fragmentCode = fShaderStream.str();
-			// if geometry shader path is present, also load a geometry shader
-			if (geometryPath != nullptr)
-			{
-				gShaderFile.open(geometryPath);
-				std::stringstream gShaderStream;
-				gShaderStream << gShaderFile.rdbuf();
-				gShaderFile.close();
-				geometryCode = gShaderStream.str();
+	GLuint LoadShaders::LoadShaders(const char* vertex_file_path, const char* fragment_file_path, const char* geometry_file_path) {
+		// Create the shaders
+		GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+		GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
+		GLuint GeometryShaderID = 0;  // Will be created later if needed
+
+		// Read the Vertex Shader code from the file
+		std::string VertexShaderCode;
+		std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
+		if (VertexShaderStream.is_open()) {
+			std::stringstream sstr;
+			sstr << VertexShaderStream.rdbuf();
+			VertexShaderCode = sstr.str();
+			VertexShaderStream.close();
+		}
+		else {
+			printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", vertex_file_path);
+			getchar();
+			return 0;
+		}
+
+		// Read the Fragment Shader code from the file
+		std::string FragmentShaderCode;
+		std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
+		if (FragmentShaderStream.is_open()) {
+			std::stringstream sstr;
+			sstr << FragmentShaderStream.rdbuf();
+			FragmentShaderCode = sstr.str();
+			FragmentShaderStream.close();
+		}
+		else {
+			printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", fragment_file_path);
+			getchar();
+			return 0;
+		}
+
+		// Optionally read the Geometry Shader code from the file
+		std::string GeometryShaderCode;
+		if (geometry_file_path) { // Check if geometry shader path is provided
+			std::ifstream GeometryShaderStream(geometry_file_path, std::ios::in);
+			if (GeometryShaderStream.is_open()) {
+				std::stringstream sstr;
+				sstr << GeometryShaderStream.rdbuf();
+				GeometryShaderCode = sstr.str();
+				GeometryShaderStream.close();
+				GeometryShaderID = glCreateShader(GL_GEOMETRY_SHADER); // Create geometry shader
 			}
-
-			std::cout << "loaded shaders " << vertexPath << "\n";
+			else {
+				printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", geometry_file_path);
+			}
 		}
-		catch (std::ifstream::failure& e)
-		{
-			std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << std::endl;
+
+		GLint Result = GL_FALSE;
+		int InfoLogLength;
+
+		// Compile Vertex Shader
+		printf("Compiling shader : %s\n", vertex_file_path);
+		char const* VertexSourcePointer = VertexShaderCode.c_str();
+		glShaderSource(VertexShaderID, 1, &VertexSourcePointer, nullptr);
+		glCompileShader(VertexShaderID);
+
+		// Check Vertex Shader
+		glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
+		glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+		if (InfoLogLength > 0) {
+			std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
+			glGetShaderInfoLog(VertexShaderID, InfoLogLength, nullptr, &VertexShaderErrorMessage[0]);
+			printf("%s\n", &VertexShaderErrorMessage[0]);
 		}
-		const char* vShaderCode = vertexCode.c_str();
-		const char* fShaderCode = fragmentCode.c_str();
-		// 2. compile shaders
-		unsigned int vertex, fragment;
-		// vertex shader
-		vertex = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertex, 1, &vShaderCode, NULL);
-		glCompileShader(vertex);
-		checkCompileErrors(vertex, "VERTEX");
 
-		// fragment Shader
-		fragment = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragment, 1, &fShaderCode, NULL);
-		glCompileShader(fragment);
-		checkCompileErrors(fragment, "FRAGMENT");
+		// Compile Fragment Shader
+		printf("Compiling shader : %s\n", fragment_file_path);
+		char const* FragmentSourcePointer = FragmentShaderCode.c_str();
+		glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, nullptr);
+		glCompileShader(FragmentShaderID);
 
-		// if geometry shader is given, compile geometry shader
-		unsigned int geometry;
-		if (geometryPath != nullptr)
-		{
-			const char* gShaderCode = geometryCode.c_str();
-			geometry = glCreateShader(GL_GEOMETRY_SHADER);
-			glShaderSource(geometry, 1, &gShaderCode, NULL);
-			glCompileShader(geometry);
-			checkCompileErrors(geometry, "GEOMETRY");
-
+		// Check Fragment Shader
+		glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
+		glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+		if (InfoLogLength > 0) {
+			std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
+			glGetShaderInfoLog(FragmentShaderID, InfoLogLength, nullptr, &FragmentShaderErrorMessage[0]);
+			printf("%s\n", &FragmentShaderErrorMessage[0]);
 		}
-		// shader Program
-		GLuint ID = glCreateProgram();
-		glAttachShader(ID, vertex);
-		glAttachShader(ID, fragment);
-		if (geometryPath != nullptr)
-			glAttachShader(ID, geometry);
-		glLinkProgram(ID);
-		// delete the shaders as they're linked into our program now and no longer necessary
-		glDeleteShader(vertex);
-		glDeleteShader(fragment);
-		if (geometryPath != nullptr)
-			glDeleteShader(geometry);
 
+		// Compile Geometry Shader (if provided)
+		if (GeometryShaderID) {
+			printf("Compiling shader : %s\n", geometry_file_path);
+			char const* GeometrySourcePointer = GeometryShaderCode.c_str();
+			glShaderSource(GeometryShaderID, 1, &GeometrySourcePointer, nullptr);
+			glCompileShader(GeometryShaderID);
 
-		return ID;
+			// Check Geometry Shader
+			glGetShaderiv(GeometryShaderID, GL_COMPILE_STATUS, &Result);
+			glGetShaderiv(GeometryShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+			if (InfoLogLength > 0) {
+				std::vector<char> GeometryShaderErrorMessage(InfoLogLength + 1);
+				glGetShaderInfoLog(GeometryShaderID, InfoLogLength, nullptr, &GeometryShaderErrorMessage[0]);
+				printf("%s\n", &GeometryShaderErrorMessage[0]);
+			}
+		}
+
+		// Link the program
+		printf("Linking program\n");
+		GLuint ProgramID = glCreateProgram();
+		glAttachShader(ProgramID, VertexShaderID);
+		glAttachShader(ProgramID, FragmentShaderID);
+		if (GeometryShaderID) {
+			glAttachShader(ProgramID, GeometryShaderID); // Attach geometry shader if loaded
+		}
+		glLinkProgram(ProgramID);
+
+		// Check the program
+		glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
+		glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+		if (InfoLogLength > 0) {
+			std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
+			glGetProgramInfoLog(ProgramID, InfoLogLength, nullptr, &ProgramErrorMessage[0]);
+			printf("%s\n", &ProgramErrorMessage[0]);
+		}
+
+		glDetachShader(ProgramID, VertexShaderID);
+		glDetachShader(ProgramID, FragmentShaderID);
+		if (GeometryShaderID) {
+			glDetachShader(ProgramID, GeometryShaderID); // Detach geometry shader if attached
+		}
+
+		glDeleteShader(VertexShaderID);
+		glDeleteShader(FragmentShaderID);
+		if (GeometryShaderID) {
+			glDeleteShader(GeometryShaderID); // Delete geometry shader if created
+		}
+
+		return ProgramID;
 	}
 
 	void checkCompileErrors(GLuint shader, std::string type)

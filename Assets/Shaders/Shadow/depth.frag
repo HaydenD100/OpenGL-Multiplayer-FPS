@@ -13,7 +13,6 @@ uniform sampler2D MetalicTextureSampler;
 uniform float Roughness;
 uniform float Metalic;
 
-
 void main()
 {
     float lightDistance = length(FragPos.xyz - lightPos);
@@ -21,7 +20,5 @@ void main()
     // map to [0;1] range by dividing by far_plane
     lightDistance = lightDistance / far_plane;
     // write this as modified depth
-    //gl_FragDepth = lightDistance;
-    gl_FragDepth = 0.5;
-
+    gl_FragDepth =  lightDistance;
 }

@@ -147,7 +147,7 @@ namespace Renderer
 		LoadShader("Assets/Shaders/SSAO/ssao.vert", "Assets/Shaders/SSAO/ssao.frag", "ssao");
 		LoadShader("Assets/Shaders/Texture_Render/Texture_Render.vert", "Assets/Shaders/Texture_Render/Texture_Render.frag", "screen");
 		LoadShader("Assets/Shaders/Transparent/transparent.vert", "Assets/Shaders/Transparent/transparent.frag", "transparent");
-		LoadShader("Assets/Shaders/Shadow/depth.vert", "Assets/Shaders/Shadow/depth.frag", "Assets/Shaders/Shadow/depth.gs", "shadow");
+		LoadShader("Assets/Shaders/Shadow/depth.vert", "Assets/Shaders/Shadow/depth.frag","Assets/Shaders/Shadow/depth.geom", "shadow");
 		LoadShader("Assets/Shaders/Decal/decal.vert", "Assets/Shaders/Decal/decal.frag", "decal");
 
 
@@ -157,6 +157,14 @@ namespace Renderer
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 2);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPBR"), 3);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "ssaoTexture"), 4);
+		for (int i = 0; i < 26; i++) {
+			GLuint depthMapLoc = glGetUniformLocation(GetCurrentProgramID(), ("depthMap[" + std::to_string(i) + "]").c_str());
+			glUniform1i(depthMapLoc, 5 + i); // Assign the texture unit to the samplerCube array in the shader
+			GLuint binding = GL_TEXTURE5 + i;
+			
+		}
+
+
 
 		UseProgram(GetProgramID("transparent"));
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 0);
@@ -343,7 +351,6 @@ namespace Renderer
 		std::vector<float> LightRadius;
 		std::vector<float> LightCutoff;
 		std::vector<float> LightOuterCutOff;
-		std::vector<GLuint> depthMap;
 
 
 		for (const auto& light : lights) {
@@ -355,7 +362,6 @@ namespace Renderer
 			LightRadius.push_back(light.radius);
 			LightCutoff.push_back(light.cutoff);
 			LightOuterCutOff.push_back(light.outercutoff);
-			depthMap.push_back(light.depthCubemap);
 		}
 
 		
@@ -384,9 +390,7 @@ namespace Renderer
 		// Upload depth maps (cubemap for shadow mapping)
 		for (int i = 0; i < lights.size(); i++) {
 			glActiveTexture(GL_TEXTURE5 + i); // Activate texture unit i
-			glBindTexture(GL_TEXTURE_CUBE_MAP, depthMap[i]); // Bind the depth cubemap to the texture unit
-			GLuint depthMapLoc = glGetUniformLocation(GetCurrentProgramID(), ("depthMap[" + std::to_string(i) + "]").c_str());
-			glUniform1i(depthMapLoc, 5 + i); // Assign the texture unit to the samplerCube array in the shader
+			glBindTexture(GL_TEXTURE_CUBE_MAP, lights[i].depthCubemap); // Bind the depth cubemap to the texture unit
 		}
 
 	}
@@ -561,6 +565,8 @@ namespace Renderer
 		//---------------------------------------------------Lighting-------------------------------------
 		programid = GetProgramID("lighting");
 		glUseProgram(programid);
+		SetLights(SceneManager::GetCurrentScene()->getLights());
+
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, gPosition);
 		glActiveTexture(GL_TEXTURE1);
@@ -576,7 +582,6 @@ namespace Renderer
 		glUniformMatrix4fv(glGetUniformLocation(programid, "inverseV"), 1, GL_FALSE, &glm::inverse(Camera::getViewMatrix())[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(programid, "V"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
 
-		SetLights(SceneManager::GetCurrentScene()->getLights());
 		
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);

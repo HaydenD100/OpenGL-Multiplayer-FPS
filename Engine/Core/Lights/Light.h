@@ -32,8 +32,9 @@ struct Light
 	float outercutoff;
 
 	//shadowStuff
-	unsigned int depthCubemap;
-	unsigned int depthMapFBO;
+	GLuint depthCubemap = 0;
+	GLuint depthMapFBO = 0 ;
+
 	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 	std::vector<glm::mat4> shadowTransforms;
 	float aspect;

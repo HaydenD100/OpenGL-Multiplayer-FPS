@@ -2,7 +2,8 @@
 out vec4 FragColor;
 
 in vec2 UV;
-#define MAXLIGHTS 128
+//becuase we are binding cubemaps per light and the max texture bindings is 32 we have to limit the lights to 26
+#define MAXLIGHTS 26
 
 uniform sampler2D gPostion;    // View-space position
 uniform sampler2D gNormal;     // View-space normal
@@ -26,6 +27,35 @@ uniform mat4 V; // View matrix
 
 const float PI = 3.14159265359;
 const float far_plane = 25.0; // Constant, moved outside main
+vec3 gridSamplingDisk[20] = vec3[]
+(
+   vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
+   vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+   vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
+   vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
+   vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
+);
+
+float ShadowCalculation(vec3 fragPos, int index)
+{
+    vec3 fragToLight = fragPos - LightPositions_worldspace[index];
+    float currentDepth = length(fragToLight);
+    float shadow = 0.0;
+    float bias = 0.15;
+    int samples = 20;
+    float viewDistance = length(viewPos - fragPos);
+    float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
+    for(int i = 0; i < samples; ++i)
+    {
+        float closestDepth = texture(depthMap[index], fragToLight + gridSamplingDisk[i] * diskRadius).r;
+        closestDepth *= far_plane;   // undo mapping [0;1]
+        if(currentDepth - bias > closestDepth)
+            shadow += 1.0;
+    }
+    shadow /= float(samples);  
+    
+    return shadow;
+}
 
 // ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness) {
@@ -57,13 +87,8 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 // ----------------------------------------------------------------------------
-float ShadowCalculation(vec3 fragPos, int i) {
-    vec3 fragToLight = fragPos - LightPositions_worldspace[i];
-    float closestDepth = texture(depthMap[i], fragToLight).r * far_plane;
-    float currentDepth = length(fragToLight);
-    float bias = 0.05; 
-    return currentDepth - bias > closestDepth ? 1.0 : 0.0;
-}
+
+
 
 void main() {
     float threshold = 0.0009; // Distance threshold
@@ -114,8 +139,9 @@ void main() {
         vec3 kS = F;
         vec3 kD = (1.0 - kS) * (1.0 - metallic);
         float NdotL = max(dot(N, L), 0.0);
+        float shadow = ShadowCalculation(FragPos , i);
+        Lo += ((kD * albedo) * (1.0f - shadow) / PI + specular) * radiance * NdotL;
 
-        Lo += (kD * albedo / PI + specular) * radiance * NdotL;
     }
 
     vec3 ambient = vec3(0.8) * ao;

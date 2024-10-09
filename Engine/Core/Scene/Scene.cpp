@@ -133,24 +133,24 @@ void Scene::Load() {
 
 	// MAX LIGHTS BY DEFAULT IS 128 if you want more lights go to lighting.frag and change MAXLIGHTS
 	{
-		Light light(glm::vec3(-11, 3, 15), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.032);
+		Light light(glm::vec3(-11, 2, 15), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.032);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-11, 3, 6), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.032);
+		Light light(glm::vec3(-11, 2, 6), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.032);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-15, 3, 5), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.032);
+		Light light(glm::vec3(-15, 2, 5), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.032);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-7.5, 3, 5), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.032);
+		Light light(glm::vec3(-7.5, 2, 5), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.032);
 		lights.push_back(light);
 	}
 
 	{
-		Light light(glm::vec3(-2.5, 3, -5), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.0320);
+		Light light(glm::vec3(-2.5, 2, -5), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.0320);
 		lights.push_back(light);
 	}
 	
@@ -178,6 +178,9 @@ void Scene::Load() {
 }
 
 void Scene::Update(float deltaTime) {
+	for (int i = 0; i < lights.size(); i++) {
+		lights[i].GenerateShadows();
+	}
 	Player::Update(deltaTime);
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
 		AssetManager::GetGameObject(i)->Update();
@@ -230,25 +233,22 @@ void Scene::RenderObjects(GLuint programid) {
 void Scene::AddGunPickUp(GunPickUp gunpickup) {
 	gunPickUps.push_back(gunpickup);
 }
-void Scene::RenderObjects(const char* shaderName) {
-	glm::mat4 ProjectionMatrix = Camera::getProjectionMatrix();
+void Scene::RenderAllObjects(GLuint programid) {
+	NeedRendering.clear();
 	glm::mat4 ViewMatrix = Camera::getViewMatrix();
-	glm::mat4 PV = ProjectionMatrix * ViewMatrix;
-
-	GLuint programid = Renderer::GetProgramID(shaderName);
-
-	Renderer::SetLights(lights);
-
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
 		GameObject* gameobjectRender = AssetManager::GetGameObject(i);
 
 		if (!gameobjectRender->ShouldRender())
 			continue;
+		if (gameobjectRender->GetShaderType() != "Default") {
+			//make guns render on top;
+			NeedRendering.push_back(gameobjectRender);
+			continue;
+		}
 
 		glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
-
-		Renderer::setMat4(ModelMatrixId, ModelMatrix);
-		//Renderers model
+		glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);
 		gameobjectRender->RenderObject(programid);
 	}
 }

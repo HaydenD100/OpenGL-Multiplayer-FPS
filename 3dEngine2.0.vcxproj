@@ -192,7 +192,7 @@
     <None Include="Assets\Shaders\Lighting\lighting.frag" />
     <None Include="Assets\Shaders\Lighting\lighting.vert" />
     <None Include="Assets\Shaders\Shadow\depth.frag" />
-    <None Include="Assets\Shaders\Shadow\depth.gs" />
+    <None Include="Assets\Shaders\Shadow\depth.geom" />
     <None Include="Assets\Shaders\Shadow\depth.vert" />
     <None Include="Assets\Shaders\SkyBoxShader.frag" />
     <None Include="Assets\Shaders\SkyBoxShader.vert" />
