@@ -179,7 +179,8 @@ void Scene::Load() {
 
 void Scene::Update(float deltaTime) {
 	for (int i = 0; i < lights.size(); i++) {
-		lights[i].GenerateShadows();
+		if(glm::distance(lights[i].position,Player::getPosition()) < 15)
+			lights[i].GenerateShadows();
 	}
 	Player::Update(deltaTime);
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
