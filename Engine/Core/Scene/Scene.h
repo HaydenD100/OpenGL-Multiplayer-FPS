@@ -34,7 +34,7 @@ public:
 	void AddGunPickUp(GunPickUp gunpickup);
 
 	void LoadAssets();
-
+ 
 	int GetGunPickUpSize();
 	Crate* GetCrate(std::string name);
 	std::vector<Light> getLights();

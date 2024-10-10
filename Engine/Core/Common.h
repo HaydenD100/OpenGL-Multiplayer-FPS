@@ -29,7 +29,7 @@
 #define WINDOWTITILE "Engine 2.0"
 
 //Rendering stuff
-#define MAXDECALS 75
+#define MAXDECALS 3000
 
 
 

@@ -119,9 +119,7 @@ namespace Renderer
 	GLuint gPBR;
 
 
-
-
-	GLuint depthrenderbuffer;
+	GLuint depthrenderbuffer = 0;
 	GLenum DrawBuffers[4] = { GL_COLOR_ATTACHMENT0,GL_COLOR_ATTACHMENT1,GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
 	GLuint quad_vertexbuffer;
 	GLuint depthTexture;
@@ -131,7 +129,11 @@ namespace Renderer
 	std::vector<glm::vec3> ssaoNoise;
 	unsigned int noiseTexture;
 	unsigned int ssaoColorBuffer;
+
 	GLuint ssaoFBO = 0;
+
+	GLuint bloomFBO = 0;
+	GLuint bloomTexture;
 
 	void Renderer::LoadAllShaders() {
 		if (shaderProgramIds.size() > 0) {
@@ -149,6 +151,8 @@ namespace Renderer
 		LoadShader("Assets/Shaders/Transparent/transparent.vert", "Assets/Shaders/Transparent/transparent.frag", "transparent");
 		LoadShader("Assets/Shaders/Shadow/depth.vert", "Assets/Shaders/Shadow/depth.frag","Assets/Shaders/Shadow/depth.geom", "shadow");
 		LoadShader("Assets/Shaders/Decal/decal.vert", "Assets/Shaders/Decal/decal.frag", "decal");
+		LoadShader("Assets/Shaders/Bloom/bloom.vert", "Assets/Shaders/Bloom/bloom.frag", "bloom");
+
 
 
 		UseProgram(GetProgramID("lighting"));
@@ -325,6 +329,18 @@ namespace Renderer
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
+
+		glGenFramebuffers(1, &bloomFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, bloomFBO);
+
+		glGenTextures(1, &bloomTexture);
+		glBindTexture(GL_TEXTURE_2D, bloomTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bloomTexture, 0);
+
 		return 0;
 	}
 

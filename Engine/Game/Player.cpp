@@ -206,6 +206,7 @@ namespace Player
 		
 		forward = Camera::GetRotation();
 		forward.y = 0;
+		forward = glm::normalize(forward);
 		
 		// Right vector
 		glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0,1,0)));

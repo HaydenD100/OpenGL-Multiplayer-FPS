@@ -245,6 +245,8 @@
     <None Include="Assets\Shaders\Shadow\depth.geom" />
     <None Include="Assets\Shaders\Decal\decal.vert" />
     <None Include="Assets\Shaders\Decal\decal.frag" />
+    <None Include="Assets\Shaders\Bloom\bloom.vert" />
+    <None Include="Assets\Shaders\Bloom\bloom.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

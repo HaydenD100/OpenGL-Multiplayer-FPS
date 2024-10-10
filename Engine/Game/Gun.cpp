@@ -139,7 +139,7 @@ namespace WeaponManager
 		shotgun.ammo = 6;
 		shotgun.reloadtime = 2.5;
 		shotgun.firerate = 150;
-		shotgun.currentammo = 6;
+		shotgun.currentammo = 300;
 		shotgun.damage = 45;
 		shotgun.type = Semi;
 		shotgun.recoil = 0.05f;
@@ -173,9 +173,10 @@ GunPickUp::GunPickUp(std::string GunName, std::string ObjectName, Model* model, 
 GunPickUp::GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force) {
 
 	//STILL GIVING ERROR STING TO LONG ERROR NOT SURE WHY NOT SURE HOW TO FIX
-	std::string temp = std::to_string(GunPickUpCount);
-	std::cout << temp << "\n";
-	objectName = temp;
+	std::stringstream ss;
+	ss << GunPickUpCount;
+	ss << "_pickup";
+	objectName = ss.str();
 	gunName = GunName;
 	int index = AssetManager::AddGameObject(objectName, AssetManager::GetModel(GunName), position, false, 1, Convex);
 	GunPickUpCount++;
