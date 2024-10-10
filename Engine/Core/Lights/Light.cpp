@@ -98,3 +98,6 @@ void Light::GenerateShadows() {
 	//std::cout << "Generated shadows \n";
 }
 
+void Light::IsDynamic(bool isDynamic) {
+	Dynamic = isDynamic;
+}

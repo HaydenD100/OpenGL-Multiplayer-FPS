@@ -30,6 +30,9 @@ struct Light
 	float radius;
 	float cutoff;
 	float outercutoff;
+	float aspect;
+	float near;
+	float far;
 
 	//shadowStuff
 	GLuint depthCubemap = 0;
@@ -37,15 +40,17 @@ struct Light
 
 	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 	std::vector<glm::mat4> shadowTransforms;
-	float aspect;
-	float near;
-	float far;
 	glm::mat4 shadowProj;
+
+	bool Dynamic = true;
+	//if the player is within this distance it will update the shadows if Dynamic = true;
+	float updateDistance = 15;
 
 
 	Light(glm::vec3 position, glm::vec3 direction, glm::vec3 colour, float cutoff, float outercutoff, float linear, float quadratic);
 	Light(glm::vec3 position, glm::vec3 colour, float linear, float quadratic);
 
+	void IsDynamic(bool isDynamic);
 	void SetUpShadows();
 	void GenerateShadows();
 };

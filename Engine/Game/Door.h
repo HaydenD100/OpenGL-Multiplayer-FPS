@@ -9,11 +9,12 @@
 class Door
 {
 public:
-	Door(std::string Name, Model* foor, Model* frame, glm::vec3 position);
+	Door(std::string Name, Model* foor, Model* frame, glm::vec3 position, glm::vec3  GameObjectRotation, bool inWards = true);
 	void Interact();
 	void Update(float deltaTime);
 
 private:
+	float direction;
 	std::string name;
 	bool opened;
 	bool opening;
