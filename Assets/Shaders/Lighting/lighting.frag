@@ -140,11 +140,12 @@ void main() {
         vec3 kD = (1.0 - kS) * (1.0 - metallic);
         float NdotL = max(dot(N, L), 0.0);
         float shadow = ShadowCalculation(FragPos , i);
+        //the 1.3 makes it a little brighter
         Lo += ((kD * albedo) * (1.0f - shadow) / PI + specular) * radiance * NdotL * (1.0f - shadow);
 
     }
 
-    vec3 ambient = vec3(0.8) * ao;
+    vec3 ambient = vec3(1.5) * ao;
     vec3 color = ambient * Lo;
 
     // HDR and gamma correction
