@@ -97,12 +97,22 @@ void main() {
         return;
     }
 
+
+
     // Retrieve data from G-buffer
     vec3 FragPos_view = texture(gPostion, UV).rgb;
     vec3 Normal_view = normalize(texture(gNormal, UV).rgb);
 
+
     vec3 albedo = texture(gAlbeido, UV).rgb;
     float alpha = texture(gAlbeido, UV).a;
+
+    float skybox = texture(gPBR, UV).z;
+
+    if(skybox == 1){
+        FragColor = vec4(albedo, 1);
+        return; // Stop further execution and write this color to the framebuffer
+    }
 
     float metallic  = texture(gPBR, UV).y;
     float roughness = texture(gPBR, UV).x;
@@ -150,5 +160,6 @@ void main() {
 
     // HDR and gamma correction
     color = color / (color + vec3(1.0));
+    //color = vec3(skybox);
     FragColor = vec4(color, alpha);
 }

@@ -40,7 +40,7 @@ void main()
     // store the fragment position vector in the first gbuffer texture
     gPosition = FragPos;
     // also store the per-fragment normals into the gbuffer
-    gPBR = vec4(MaterialRoughness,MaterialMetalic,1,1);
+    gPBR = vec4(MaterialRoughness,MaterialMetalic,0,0);
     gNormal = vec4(transformedNormal, 0);
     gAlbedo = vec4(MaterialDiffuseColor, 1); // RGB for Albedo, R for Specular Intensity
 

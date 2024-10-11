@@ -168,6 +168,10 @@ namespace Renderer
 			
 		}
 
+		UseProgram(GetProgramID("skybox"));
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "skybox"), 0);
+
+
 
 
 		UseProgram(GetProgramID("transparent"));
@@ -447,6 +451,9 @@ namespace Renderer
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
+
 		GLuint programid = Renderer::GetProgramID("geomerty");
 		Renderer::UseProgram(programid);
 		glUniformMatrix4fv(P, 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
@@ -618,7 +625,7 @@ namespace Renderer
 
 	
 	void Renderer::RendererSkyBox(glm::mat4 view, glm::mat4 projection, SkyBox skybox) {
-		/*
+		
 		glDepthMask(GL_FALSE);
 		UseProgram(GetProgramID("skybox"));
 		GLuint projectionid = glGetUniformLocation(GetProgramID("skybox"), "projection");
@@ -628,11 +635,11 @@ namespace Renderer
 
 		setMat4(viewid, viewWithoutTranslation);
 		setMat4(projectionid, projection);
-		*/
-		//glBindVertexArray(skybox.GetSkyBoxVAO());
-		//glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetTextureID());
-		//glDrawArrays(GL_TRIANGLES, 0, 36);
-		//glDepthMask(GL_TRUE);
+		glBindVertexArray(skybox.GetSkyBoxVAO());
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetTextureID());
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDepthMask(GL_TRUE);
 	}
 
 	void Renderer::SwapBuffers(GLFWwindow* window) {
