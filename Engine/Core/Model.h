@@ -19,6 +19,11 @@
 #include <assimp/postprocess.h>
 #include "Engine/Core/Common.h"
 
+struct BoneInfo {
+    int id;
+    glm::mat4 offset;
+
+};
 
 class Model {
 public:
@@ -43,6 +48,8 @@ public:
     std::vector<glm::vec3> GetColliderShapeVerticies();
     size_t GetColliderShapeVerticiesSize();
 
+    auto& GetBoneInfoMap() { return m_BoneInfoMap; }
+    int& GetBoneCount() { return m_BoneCounter; }
 
 private:
     AABB aabb;
@@ -50,6 +57,9 @@ private:
     std::vector<Mesh> meshes;
     int currentMesh = 0;
     std::string name;
+
+    std::map<std::string, BoneInfo> m_BoneInfoMap; //
+    int m_BoneCounter = 0;
 
     //for collison shape
     std::vector<glm::vec3> collison_shape_vertices;

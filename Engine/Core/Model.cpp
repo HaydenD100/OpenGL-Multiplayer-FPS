@@ -58,6 +58,10 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scenem) {
     std::vector<unsigned short> indices;
     std::vector<glm::vec3> tangents;
     std::vector<glm::vec3> bitTangents;
+    std::vector<glm::ivec4> jointIDs;
+    std::vector<glm::vec4> Weights;
+
+
 
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
@@ -66,7 +70,11 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scenem) {
         vector.x = mesh->mVertices[i].x;
         vector.y = mesh->mVertices[i].y;
         vector.z = mesh->mVertices[i].z;
+        
         vertices.push_back(vector);
+        jointIDs.push_back(glm::ivec4(-1));
+        Weights.push_back(glm::vec4(0.0f));
+
         // normals
         if (mesh->HasNormals())
         {
@@ -110,6 +118,40 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scenem) {
             indices.push_back(face.mIndices[j]);
     }
 
+    for (int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
+    {
+        int boneID = -1;
+        std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
+        if (m_BoneInfoMap.find(boneName) == m_BoneInfoMap.end())
+        {
+            BoneInfo newBoneInfo;
+            newBoneInfo.id = m_BoneCounter;
+            newBoneInfo.offset = ConvertMatrixToGLMFormat(
+                mesh->mBones[boneIndex]->mOffsetMatrix);
+            m_BoneInfoMap[boneName] = newBoneInfo;
+            boneID = m_BoneCounter;
+            m_BoneCounter++;
+        }
+        else
+        {
+            boneID = m_BoneInfoMap[boneName].id;
+        }
+        assert(boneID != -1);
+        auto weights = mesh->mBones[boneIndex]->mWeights;
+        int numWeights = mesh->mBones[boneIndex]->mNumWeights;
+
+        for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex)
+        {
+            int vertexId = weights[weightIndex].mVertexId;
+            float weight = weights[weightIndex].mWeight;
+            assert(vertexId <= vertices.size());
+            jointIDs[vertexId] = glm::ivec4(boneID);
+            Weights[vertexId] = glm::vec4(weight);
+        }
+    }
+
+
+
     //Computer tanget and bit-tangent if model doesnt have them
     //TODO: Fix this because it keeps trying to access memory past vertcies size
     if (!mesh->HasTangentsAndBitangents())
@@ -148,8 +190,10 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scenem) {
             bitTangents.push_back(bitangent);
         }
     }
-    return Mesh(vertices, normals, UV, indices, tangents, bitTangents);
+    return Mesh(vertices, normals, UV, indices, tangents, bitTangents, jointIDs,Weights);
 }
+
+
 void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
     // process all the node's meshes (if any)
     for (unsigned int i = 0; i < node->mNumMeshes; i++)

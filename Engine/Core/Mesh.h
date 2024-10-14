@@ -28,6 +28,14 @@ public:
         std::vector<unsigned short> indices,
         std::vector<glm::vec3> tangets,
         std::vector<glm::vec3> bitTangents);
+    Mesh(std::vector<glm::vec3> vertices,
+        std::vector<glm::vec3> normals,
+        std::vector<glm::vec2> UV,
+        std::vector<unsigned short> indices,
+        std::vector<glm::vec3> tangets,
+        std::vector<glm::vec3> bitTangents,
+        std::vector<glm::ivec4> jointIDs,
+    std::vector<glm::vec4> weights);
 
     void Render(GLuint programID);
     glm::vec3 GetVertices(int index);
@@ -45,6 +53,8 @@ public:
     std::vector<glm::vec3> indexed_normals;
     std::vector<glm::vec3> indexed_tangents;
     std::vector<glm::vec3> indexed_bitangents;
+    std::vector<glm::ivec4> indexed_jointIDs;
+    std::vector<glm::vec4> indexed_weights;
 
 
 private:
@@ -56,5 +66,7 @@ private:
     GLuint elementbuffer;
     GLuint tangentbuffer;
     GLuint bitangentbuffer;
+    GLuint jointIdbuffer;
+    GLuint Weightbuffer;
 
 };

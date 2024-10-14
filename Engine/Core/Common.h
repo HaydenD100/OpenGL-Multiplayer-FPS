@@ -171,3 +171,9 @@ glm::vec3 offsetRayWithinAngle(const glm::vec3& rayDir, float maxOffsetAngle);
 
 float finlerpTo(float start, float end, float deltaTime, float interpSeed);
 
+glm::mat4 ConvertMatrixToGLMFormat(const aiMatrix4x4& from);
+
+glm::vec3 GetGLMVec(const aiVector3D& vec);
+
+glm::quat GetGLMQuat(const aiQuaternion& quat);
+

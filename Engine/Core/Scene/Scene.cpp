@@ -36,6 +36,8 @@ void Scene::LoadAssets() {
 	// TODO: not currently working
 	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
 	//Loads Mode
+	AssetManager::AddModel("anim_test", Model("Assets/Objects/FBX/vamp_run.dae", AssetManager::GetTexture("uvmap")));
+
 	AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 	AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("glass")));
 
@@ -78,6 +80,8 @@ void Scene::Load() {
 
 	WeaponManager::Init();
 
+	AssetManager::AddGameObject("anim_test", AssetManager::GetModel("anim_test"), glm::vec3(0, 1, 0), true, 0, None);
+
 	AssetManager::AddGameObject("map1_floor", AssetManager::GetModel("map_floor"), glm::vec3(0, 1.6, 0), true, 0, Concave);
 	AssetManager::AddGameObject("map1_walls", AssetManager::GetModel("map_walls"), glm::vec3(0, 1.6, 0), true, 0, Concave);
 	AssetManager::AddGameObject("map1_ceiling", AssetManager::GetModel("map_ceiling"), glm::vec3(0, 1.6, 0), true, 0, Convex);
@@ -103,11 +107,12 @@ void Scene::Load() {
 	gunPickUps.push_back(GunPickUp("ak47", "ak47_pickup", AssetManager::GetModel("ak47"), glm::vec3(1, 30, 1)));
 	gunPickUps.push_back(GunPickUp("glock", "glock_pickup", AssetManager::GetModel("glock"), glm::vec3(1, 25, 0)));
 
+	/*
 	doors.push_back(Door("door1", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-10.6, 0, 0.05), glm::vec3(0, 0, 0)));
 	doors.push_back(Door("door2", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-10.6, 0, 9.95), glm::vec3(0, 0, 0)));
 	doors.push_back(Door("door3", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-12.3, 0, 4.6), glm::vec3(0, 1.5708f, 0), false));
 	doors.push_back(Door("door4", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-10, 0, 4.6), glm::vec3(0,1.5708f,0)));
-
+	*/
 
 
 
@@ -154,6 +159,11 @@ void Scene::Load() {
 		Light light(glm::vec3(-1, 2, -1), glm::vec3(0, 1, 1) * 4.0f, 0.09, 0.0320);
 		lights.push_back(light);
 	}
+	{
+		Light light(glm::vec3(-1, 10, -1), glm::vec3(1, 1, 1) * 50.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+
 
 	
 	Player::Init();
@@ -164,12 +174,15 @@ void Scene::Load() {
 
 
 	ModelMatrixId = glGetUniformLocation(Renderer::GetCurrentProgramID(), "model");
+	running = SkinnedAnimation("Assets/Objects/FBX/vamp_run.dae", AssetManager::GetModel("anim_test"));
+	animatior = Animator(&running, "anim_test");
 
 
 	glBindVertexArray(sky.GetSkyBoxVAO());
 }
 
 void Scene::Update(float deltaTime) {
+	animatior.UpdateAnimation(deltaTime);
 	for (int i = 0; i < lights.size(); i++) {
 		if(glm::distance(lights[i].position,Player::getPosition()) < lights[i].updateDistance || lights[i].Dynamic)
 			lights[i].GenerateShadows();
@@ -212,6 +225,12 @@ void Scene::RenderObjects(GLuint programid) {
 		if (!gameobjectRender->GetModel()->GetAABB()->isOnFrustum(Camera::GetFrustum(), gameobjectRender->getTransform()))
 			continue;
 
+		auto transforms = animatior.GetFinalBoneMatrices(gameobjectRender->GetName());
+		for (int i = 0; i < transforms.size(); ++i) {
+			std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
+			Renderer::setMat4(glGetUniformLocation(programid, pos.c_str()), transforms[i]);
+		}
+
 		glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
 		glm::mat4 modelViewMatrix = ViewMatrix * ModelMatrix;
 		glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
@@ -220,7 +239,7 @@ void Scene::RenderObjects(GLuint programid) {
 		glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);
 		gameobjectRender->RenderObject(programid);
 	}
-	
+
 }
 
 void Scene::AddGunPickUp(GunPickUp gunpickup) {
@@ -269,3 +288,7 @@ SkyBox Scene::GetSkyBox() {
 std::vector<GameObject*> Scene::NeedRenderingObjects() {
 	return NeedRendering;
 }
+Animator* Scene::GetAnimator() {
+	return &animatior;
+}
+

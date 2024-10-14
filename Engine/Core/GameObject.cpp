@@ -217,6 +217,9 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 		dimensions = maxPoint - minPoint;
 		collider = new btCapsuleShape(btScalar(dimensions.x / 2), (btScalar(dimensions.y / 2)));
 	}
+	else {
+		collider = new btBoxShape(btVector3(btScalar(0), btScalar(0), btScalar(0)));
+	}
 
 	PhysicsManagerBullet::AddColliderShape(collider);
 	bool isDynamic = (mass != 0.f);

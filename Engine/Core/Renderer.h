@@ -13,6 +13,8 @@
 #include "Engine/Core/Lights/Light.h"
 #include "Engine/Core/Texture.h"
 
+#include "Engine/Core/SkinnedAnimatior.h"
+
 
 
 

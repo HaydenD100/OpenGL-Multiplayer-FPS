@@ -20,6 +20,8 @@
 #include "Engine/Core/Lights/Light.h"
 #include "Engine/Physics/BulletPhysics.h"
 #include "Engine/Core/Animation.h"
+#include "Engine/Core/SkinnedAnimatior.h"
+
  
 class Scene
 {
@@ -40,12 +42,19 @@ public:
 	std::vector<Light> getLights();
 
 	SkyBox GetSkyBox();
+	
+	Animator* GetAnimator();
 
 	std::vector<GameObject*> NeedRenderingObjects();
 
 private:
 	std::vector<GameObject*> NeedRendering;
 	SkyBox sky = SkyBox();
+
+	Animator animatior;	
+	SkinnedAnimation running;
+
+	
 	// Objects
 	std::vector<Door> doors;
 	std::vector<Crate> crates;

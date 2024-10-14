@@ -115,6 +115,59 @@ Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std:
     glBufferData(GL_ARRAY_BUFFER, indexed_bitangents.size() * sizeof(glm::vec3), &indexed_bitangents[0], GL_STATIC_DRAW);
 }
 
+Mesh::Mesh(std::vector<glm::vec3> vertices,
+    std::vector<glm::vec3> normals,
+    std::vector<glm::vec2> UV,
+    std::vector<unsigned short> indices,
+    std::vector<glm::vec3> tangets,
+    std::vector<glm::vec3> bitTangents,
+    std::vector<glm::ivec4> jointIDs,
+    std::vector<glm::vec4> weights) {
+
+    this->indexed_vertices = vertices;
+    this->indexed_normals = normals;
+    this->indexed_uvs = UV;
+    this->indexed_bitangents = bitTangents;
+    this->indexed_tangents = tangets;
+    this->indices = indices;
+    this->indexed_jointIDs = jointIDs;
+    this->indexed_weights = weights;
+
+    glGenBuffers(1, &vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(glm::vec3), &indexed_vertices[0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &uvbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+    glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(glm::vec2), &indexed_uvs[0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &normalbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+    glBufferData(GL_ARRAY_BUFFER, indexed_normals.size() * sizeof(glm::vec3), &indexed_normals[0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &elementbuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &tangentbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, tangentbuffer);
+    glBufferData(GL_ARRAY_BUFFER, indexed_tangents.size() * sizeof(glm::vec3), &indexed_tangents[0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &bitangentbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, bitangentbuffer);
+    glBufferData(GL_ARRAY_BUFFER, indexed_bitangents.size() * sizeof(glm::vec3), &indexed_bitangents[0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &jointIdbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, jointIdbuffer);
+    glBufferData(GL_ARRAY_BUFFER, indexed_jointIDs.size() * sizeof(glm::ivec4), &indexed_jointIDs[0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &Weightbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, Weightbuffer);
+    glBufferData(GL_ARRAY_BUFFER, weights.size() * sizeof(glm::vec4), &indexed_weights[0], GL_STATIC_DRAW);
+
+
+}
+
 
 void Mesh::Render(GLuint programID) {
     Texture* currentTexture = texture;
@@ -193,7 +246,33 @@ void Mesh::Render(GLuint programID) {
         0,                                // stride
         (void*)0                          // array buffer offset
     );
+    
+    
+    // 5th attribute buffer : boneid
+    glEnableVertexAttribArray(5);
+    glBindBuffer(GL_ARRAY_BUFFER, jointIdbuffer);
+    glVertexAttribPointer(
+        5,                                // attribute
+        4,                                // size
+        GL_FLOAT,                         // type
+        GL_FALSE,                         // normalized?
+        0,                                // stride
+        (void*)0                          // array buffer offset
+    );
 
+    // 7th attribute buffer : weights
+    glEnableVertexAttribArray(6);
+    glBindBuffer(GL_ARRAY_BUFFER, Weightbuffer);
+    glVertexAttribPointer(
+        6,                                // attribute
+        4,                                // size
+        GL_FLOAT,                         // type
+        GL_FALSE,                         // normalized?
+        0,                                // stride
+        (void*)0                          // array buffer offset
+    );
+    
+    
     // Index buffer
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 

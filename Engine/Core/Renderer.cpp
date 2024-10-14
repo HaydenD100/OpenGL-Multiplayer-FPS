@@ -469,7 +469,6 @@ namespace Renderer
 
 		SceneManager::Render(programid);
 
-
 		//-----------------------------------------Decal---------------------------------------
 		glEnable(GL_BLEND);
 
@@ -491,7 +490,6 @@ namespace Renderer
 				continue;
 			decal.GetDecal()->AddInstace(&decal);
 		}
-
 		GLuint sizeLoc = glGetUniformLocation(programid, "size");
 
 		std::vector<Decal>* decalsToBeRendered = AssetManager::GetAllDecals();
@@ -546,8 +544,8 @@ namespace Renderer
 
 		//---------------------------------------------------Overlay-------------------------------------
 		programid = Renderer::GetProgramID("geomerty");
-		Renderer::UseProgram(programid);
 
+		Renderer::UseProgram(programid);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		for (int i = 0; i < overlay.size(); i++) {
 			glm::mat4 ModelMatrix = overlay[i]->GetModelMatrix();
@@ -558,6 +556,7 @@ namespace Renderer
 			glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);
 			overlay[i]->RenderObject(programid);
 		}
+
 		glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -613,7 +612,7 @@ namespace Renderer
 		glUniformMatrix4fv(glGetUniformLocation(programid, "inverseV"), 1, GL_FALSE, &glm::inverse(Camera::getViewMatrix())[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(programid, "V"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
 
-		
+
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
 		glVertexAttribPointer(
