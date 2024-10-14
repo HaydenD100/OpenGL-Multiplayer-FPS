@@ -5,6 +5,7 @@ layout (location = 2) out vec4 gAlbedoSpec;  // Stores both albedo and specular 
 
 #define MAXLIGHTS 26
 
+//transparent
 
 in vec2 UV;
 in mat3 TBN; // Tangent-Bitangent-Normal matrix\
@@ -147,12 +148,13 @@ void main() {
         float NdotL = max(dot(N, L), 0.0);
         float shadow = ShadowCalculation(FragPos.xyz , i);
         //the 1.3 makes it a little brighter
-        Lo += ((kD * albedo) * (1.0f - shadow) / PI + specular) * radiance * NdotL * (1.0f - shadow);
+        Lo += ((kD * albedo)  / PI + specular) * radiance * NdotL * (1.0f - shadow);
 
     }
 
-    vec3 ambient = (vec3(10) * albedo);
-    vec3 color = ambient * Lo;
+    vec3 ambient = (vec3(0.5) * albedo);
+    vec3 color = Lo * 2;
+    color += ambient;
 
     // HDR
     color = color / (color + vec3(1.0));
