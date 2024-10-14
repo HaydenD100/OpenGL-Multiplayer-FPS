@@ -10,20 +10,15 @@ void Scene::LoadAssets() {
 	//Thank you to tokyo splif for some of the models and sounds
 
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
-	AssetManager::AddTexture("red_glass", "Assets/Textures/red_glass.png", 0, 0);
-	AssetManager::AddTexture("green_glass", "Assets/Textures/green_glass.png", 0, 0);
+	AssetManager::AddTexture("red_glass", "Assets/Textures/red_glass.png", 0.1, 0.9);
+	AssetManager::AddTexture("green_glass", "Assets/Textures/green_glass.png", 0.1, 0.9);
 	AssetManager::AddTexture("panda", "Assets/Textures/panda_decal.png", 0, 0);
 	AssetManager::AddTexture("flower", "Assets/Textures/flower_decal.png", 0, 0);
 	AssetManager::AddTexture("freaky", "Assets/Textures/freaky_decal.png", 0, 0);
-
-
 	AssetManager::AddTexture("pizza", "Assets/Textures/pizza_decal.png", 0, 0);
 	AssetManager::AddTexture("tank", "Assets/Textures/tank_decal.png", 0, 0);
-
-
 	AssetManager::AddTexture("crate", "Assets/Textures/crate.png", 0.7, 0);
 	AssetManager::AddTexture("window", "Assets/Textures/window.png", 0.7, 0);
-
 	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png","Assets/Normals/window_normal.png", 0.5, 0);
 	AssetManager::AddTexture("sand", "Assets/Textures/sandyGround.png", "Assets/Normals/sand_normal.png", 0.9, 0);
 	AssetManager::AddTexture("concrete", "Assets/Textures/fence.png", "Assets/Normals/fence_normal.png", 0.9, 0);
@@ -35,12 +30,14 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("beige_wall", "Assets/Textures/beige_wall.jpg", "Assets/Normals/beige_wall_normal.jpg", 0.7, 0);
 	AssetManager::AddTexture("wooden_floor", "Assets/Textures/wooden_floor.jpg", "Assets/Normals/wooden_floor_normal.jpg", 0.2, 0.2);
 	AssetManager::AddTexture("shotgun", "Assets/Textures/remington.png", "Assets/Normals/remington_normal.png", "Assets/Roughness/remington_roughness.png","Assets/Metalic/remington_metallic.png");
+	AssetManager::AddTexture("glass", "Assets/Textures/glass.png", 0.1, 1);
+
 
 	// TODO: not currently working
 	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
 	//Loads Mode
 	AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
-	AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("red_glass")));
+	AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("glass")));
 
 
 	AssetManager::AddModel("fence1", Model("Assets/Objects/fence1.fbx", AssetManager::GetTexture("concrete")));
@@ -88,7 +85,7 @@ void Scene::Load() {
 	AssetManager::AddGameObject("window1", AssetManager::GetModel("window"), glm::vec3(-11, 2, 14),true, 0,Concave);
 	AssetManager::AddGameObject("window_glass1", AssetManager::GetModel("window_glass"), glm::vec3(-11, 2, 14), true, 0, Concave);
 	AssetManager::GetGameObject("window_glass1")->SetShaderType("Transparent");
-	AssetManager::GetGameObject("window_glass1")->SetRotationX(1.5f);
+	AssetManager::GetGameObject("window_glass1")->SetRotationX(1.5708f);
 
 
 	AssetManager::AddGameObject("red_glass", AssetManager::GetModel("cube"), glm::vec3(-7, 2, 6), true, 0, Convex);
@@ -99,8 +96,8 @@ void Scene::Load() {
 
 	AssetManager::AddGameObject("floor", AssetManager::GetModel("floor"), glm::vec3(0, 0, 0), true, 0, Box);
 
-	crates.push_back(Crate(glm::vec3(1, 10, 1), "crate1", AssetManager::GetModel("crate")));
-	crates.push_back(Crate(glm::vec3(1, 12, 0.5), "crate2", AssetManager::GetModel("crate")));
+	crates.push_back(Crate(glm::vec3(1, 2, 1), "crate1", AssetManager::GetModel("crate")));
+	crates.push_back(Crate(glm::vec3(-3, 2, -3), "crate2", AssetManager::GetModel("crate")));
 	crates.push_back(Crate(glm::vec3(-10, 2, 14), "crate3", AssetManager::GetModel("crate")));
 
 	gunPickUps.push_back(GunPickUp("ak47", "ak47_pickup", AssetManager::GetModel("ak47"), glm::vec3(1, 30, 1)));

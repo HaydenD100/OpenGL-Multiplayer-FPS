@@ -87,50 +87,9 @@ namespace AssetManager
 		
 		// name,parentname,pos,rotation,scale,indices,indexvert,indexuv,indexnormal,texturename
 		for (int i = 0; i < GameObjects.size(); i++) {
-			if (!GameObjects[i].CanSave())
-				continue;
-			std::vector<float> verticies;
-			std::vector<float> Uvs;
-			std::vector<float> normals;
-			std::vector<glm::vec3> indexed_vertices = GameObjects[i].getIndexedVerticies();
-			std::vector<glm::vec2> indexed_uvs = GameObjects[i].getIndexedUvs();
-			std::vector<glm::vec3> indexed_normals = GameObjects[i].getIndexedNormals();
-
-			for (int vert = 0; vert < indexed_vertices.size(); vert++) {
-				verticies.push_back(indexed_vertices[vert].x);
-				verticies.push_back(indexed_vertices[vert].y);
-				verticies.push_back(indexed_vertices[vert].z);
-			}
 			
-			for (int uvs = 0; uvs < indexed_uvs.size(); uvs++) {
-				Uvs.push_back(indexed_uvs[uvs].x);
-				Uvs.push_back(indexed_uvs[uvs].y);
-			}
 			
-			for (int normal = 0; normal < indexed_normals.size(); normal++) {
-				normals.push_back(indexed_normals[normal].x);
-				normals.push_back(indexed_normals[normal].y);
-				normals.push_back(indexed_normals[normal].z);
-			}
-			
-			json gameobject = { GameObjects[i].GetName(),
-				GameObjects[i].GetParentName(),
-				GameObjects[i].getPosition().x,
-				GameObjects[i].getPosition().y,
-				GameObjects[i].getPosition().z,
-				GameObjects[i].getRotation().x,
-				GameObjects[i].getRotation().y,
-				GameObjects[i].getRotation().z,
-				GameObjects[i].getScale().x,
-				GameObjects[i].getScale().y,
-				GameObjects[i].getScale().z,
-				GameObjects[i].getIndices(),
-				verticies, Uvs, normals,
-				GameObjects[i].GetTextureName(),
-				true
-			};
-			
-			SerializedGameObjects.push_back(gameobject);
+			//SerializedGameObjects.push_back(gameobject);
 		}
 		
 		save["GameObjects"] = SerializedGameObjects;

@@ -155,11 +155,10 @@ void main() {
 
     }
 
-    vec3 ambient = vec3(1.5) * ao;
+    vec3 ambient = (vec3(1) * ao);
     vec3 color = ambient * Lo;
 
     // HDR and gamma correction
     color = color / (color + vec3(1.0));
-    //color = vec3(skybox);
     FragColor = vec4(color, alpha);
 }

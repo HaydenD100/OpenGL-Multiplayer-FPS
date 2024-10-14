@@ -20,6 +20,11 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include "Loaders/nlohmann/json.hpp"
+
+
+//Just a little reminder that scaling will scale the model but not the collider or the AABB from frustum culling yet
+
 class GameObject
 {
 public:
@@ -94,6 +99,8 @@ public:
 	btCollisionShape* GetCollisionShape();
 	btConvexHullShape* GetConvexHull();
 
+
+
 	glm::vec3 GetPosition() const {
 		return btToGlmVector3(body->getWorldTransform().getOrigin());
 	}
@@ -114,6 +121,7 @@ private:
 	btTransform Btransform;
 	btRigidBody* body;
 	
+	//canSave is used for json
 	bool canSave = false;
 	bool render = true;
 	bool shouldDelete = false;

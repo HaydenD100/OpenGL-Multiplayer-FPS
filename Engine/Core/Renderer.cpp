@@ -175,8 +175,16 @@ namespace Renderer
 
 
 		UseProgram(GetProgramID("transparent"));
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gAlbeido"), 0);
-		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPositionTexture"), 1);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "DiffuseTextureSampler"), 0);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "NormalTextureSampler"), 1);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "RoughnessTextureSampler"), 2);
+		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "MetalicTextureSampler"), 3);
+		for (int i = 0; i < 26; i++) {
+			GLuint depthMapLoc = glGetUniformLocation(GetCurrentProgramID(), ("depthMap[" + std::to_string(i) + "]").c_str());
+			glUniform1i(depthMapLoc, 5 + i); // Assign the texture unit to the samplerCube array in the shader
+			GLuint binding = GL_TEXTURE5 + i;
+
+		}
 
 		UseProgram(GetProgramID("geomerty"));
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "DiffuseTextureSampler"), 0);
@@ -498,12 +506,12 @@ namespace Renderer
 		//-----------------------------------------Transaprent stuff---------------------------------------
 		programid = Renderer::GetProgramID("transparent");
 		Renderer::UseProgram(programid);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gAlbeido);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, gPosition);
+		SetLights(SceneManager::GetCurrentScene()->getLights());
+
 		glUniformMatrix4fv(glGetUniformLocation(programid, "P"), 1, GL_FALSE, &Camera::getProjectionMatrix()[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(programid, "V"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
+		glUniform3fv(glGetUniformLocation(programid, "viewPos"), 1, &Camera::GetPosition()[0]);
+
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		std::vector<GameObject*> needRendering = SceneManager::GetCurrentScene()->NeedRenderingObjects();
 		glm::vec3 cameraPosition = Camera::GetPosition(); // Camera position

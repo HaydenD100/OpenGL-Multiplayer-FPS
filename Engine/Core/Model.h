@@ -38,6 +38,7 @@ public:
     void RenderModel(GLuint& programID);
     void RenderAllMeshes(bool state);
     bool RenderAll();
+    std::string GetName();
 
     std::vector<glm::vec3> GetColliderShapeVerticies();
     size_t GetColliderShapeVerticiesSize();
@@ -48,6 +49,7 @@ private:
     bool renderAllMeshes = true;
     std::vector<Mesh> meshes;
     int currentMesh = 0;
+    std::string name;
 
     //for collison shape
     std::vector<glm::vec3> collison_shape_vertices;

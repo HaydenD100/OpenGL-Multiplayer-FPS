@@ -7,6 +7,7 @@
 
 
 Model::Model(Mesh mesh, Texture* texture) {
+
     mesh.SetTexture(texture);
     meshes.push_back(mesh);
     aabb = generateAABB();
@@ -15,6 +16,7 @@ Model::Model(Mesh mesh, Texture* texture) {
 
 //Right now this can only load files that support tanget and bit tanget fbx is the most common
 Model::Model(const char* path, Texture* texture) {
+
     Assimp::Importer import;
     const aiScene * scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
@@ -29,6 +31,7 @@ Model::Model(const char* path, Texture* texture) {
     aabb = generateAABB();
 }
 Model::Model(const char* path, const char* collisonShapePath, Texture* texture) {
+
     Assimp::Importer import;
     const aiScene * scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
@@ -242,3 +245,7 @@ AABB Model::generateAABB()
     return AABB(minAABB, maxAABB);
 }
 
+
+std::string Model::GetName() {
+    return name;
+}

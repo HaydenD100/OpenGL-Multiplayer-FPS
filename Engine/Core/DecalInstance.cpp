@@ -49,8 +49,6 @@ Decal* DecalInstance::GetDecal() {
 }
 
 
-
-
 AABB DecalInstance::generateAABB()
 {
 	glm::vec3 minAABB = glm::vec3(std::numeric_limits<float>::max());
