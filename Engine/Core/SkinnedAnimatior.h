@@ -89,8 +89,7 @@ public:
         if (boneInfoMap.find(nodeName) != boneInfoMap.end())
         {
             int indexBone = boneInfoMap[nodeName].id;
-            glm::mat4 offset = boneInfoMap[nodeName].offset;
-            currentAnimationInstances[index].m_FinalBoneMatrices[indexBone] = globalTransformation * offset;
+            currentAnimationInstances[index].m_FinalBoneMatrices[indexBone] = currentAnimationInstances[index].Animation->GetInverseGlobal() * globalTransformation * boneInfoMap[nodeName].offset;
         }
 
         for (int i = 0; i < node->childrenCount; i++)

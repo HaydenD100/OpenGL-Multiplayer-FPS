@@ -25,21 +25,11 @@ void main()
 {	vec4 viewPos;
 
     if(boneIds.x != -1){
-        vec4 totalPosition = vec4(0.0f);
-        for(int i = 0 ; i < MAX_BONE_INFLUENCE ; i++)
-        {
-            if(boneIds[i] == -1) 
-                continue;
-            if(boneIds[i] >=MAX_BONES) 
-            {
-                totalPosition = vec4(vertexPosition_modelspace,1.0f);
-                break;
-            }
-            vec4 localPosition = finalBonesMatrices[boneIds[i]] * vec4(vertexPosition_modelspace,1.0f);
-            totalPosition += localPosition * weights[i];
-            vec3 localNormal = mat3(finalBonesMatrices[boneIds[i]]) * vertexNormal_modelspace;
-        }
-        viewPos = V * M * totalPosition;
+        mat4 BoneTransform = finalBonesMatrices[boneIds[0]] * weights[0];
+        BoneTransform     += finalBonesMatrices[boneIds[1]] * weights[1];
+        BoneTransform     += finalBonesMatrices[boneIds[2]] * weights[2];
+        BoneTransform     += finalBonesMatrices[boneIds[3]] * weights[3];
+        viewPos = V * M * BoneTransform * vec4(vertexPosition_modelspace,1);
     }
     else{
         viewPos = V * M * vec4(vertexPosition_modelspace,1.0f);

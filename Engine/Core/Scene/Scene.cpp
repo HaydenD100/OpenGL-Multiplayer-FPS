@@ -36,7 +36,7 @@ void Scene::LoadAssets() {
 	// TODO: not currently working
 	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
 	//Loads Mode
-	AssetManager::AddModel("anim_test", Model("Assets/Objects/FBX/run1.dae", AssetManager::GetTexture("uvmap")));
+	AssetManager::AddModel("anim_test", Model("Assets/Objects/FBX/run1.dae.dae", AssetManager::GetTexture("uvmap")));
 
 	AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 	AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("glass")));
@@ -108,12 +108,12 @@ void Scene::Load() {
 	gunPickUps.push_back(GunPickUp("ak47", "ak47_pickup", AssetManager::GetModel("ak47"), glm::vec3(1, 30, 1)));
 	gunPickUps.push_back(GunPickUp("glock", "glock_pickup", AssetManager::GetModel("glock"), glm::vec3(1, 25, 0)));
 
-	/*
+	
 	doors.push_back(Door("door1", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-10.6, 0, 0.05), glm::vec3(0, 0, 0)));
 	doors.push_back(Door("door2", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-10.6, 0, 9.95), glm::vec3(0, 0, 0)));
 	doors.push_back(Door("door3", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-12.3, 0, 4.6), glm::vec3(0, 1.5708f, 0), false));
 	doors.push_back(Door("door4", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-10, 0, 4.6), glm::vec3(0,1.5708f,0)));
-	*/
+	
 
 
 

@@ -80,6 +80,22 @@ Mesh::Mesh(const char* path) {
     glBufferData(GL_ARRAY_BUFFER, indexed_bitangents.size() * sizeof(glm::vec3), &indexed_bitangents[0], GL_STATIC_DRAW);
 
 
+
+
+    for (unsigned int i = 0; i < indexed_vertices.size(); i++)
+    {
+        indexed_jointIDs.push_back(glm::ivec4(-1));
+        indexed_weights.push_back(glm::vec4(0.0f));
+    }
+    glGenBuffers(1, &jointIdbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, jointIdbuffer);
+    glBufferData(GL_ARRAY_BUFFER, indexed_jointIDs.size() * sizeof(glm::ivec4), &indexed_jointIDs[0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &Weightbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, Weightbuffer);
+    glBufferData(GL_ARRAY_BUFFER, indexed_weights.size() * sizeof(glm::vec4), &indexed_weights[0], GL_STATIC_DRAW);
+
+
 }
 
 Mesh::Mesh(std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<glm::vec2> UV, std::vector<unsigned short> indices, std::vector<glm::vec3> tangets, std::vector<glm::vec3> bitTangents) {
@@ -163,7 +179,7 @@ Mesh::Mesh(std::vector<glm::vec3> vertices,
 
     glGenBuffers(1, &Weightbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, Weightbuffer);
-    glBufferData(GL_ARRAY_BUFFER, weights.size() * sizeof(glm::vec4), &indexed_weights[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, indexed_weights.size() * sizeof(glm::vec4), &indexed_weights[0], GL_STATIC_DRAW);
 
 
 }

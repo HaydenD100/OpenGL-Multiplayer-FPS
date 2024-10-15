@@ -26,6 +26,7 @@ public:
         auto animation = scene->mAnimations[0];
         m_Duration = animation->mDuration;
         m_TicksPerSecond = animation->mTicksPerSecond;
+        m_GlobalInversetransform = glm::inverse(ConvertMatrixToGLMFormat(scene->mRootNode->mTransformation));
         ReadHeirarchyData(m_RootNode, scene->mRootNode);
         ReadMissingBones(animation, *model);
     }
@@ -52,6 +53,8 @@ public:
     inline float GetDuration() { return m_Duration; }
 
     inline const AssimpNodeData& GetRootNode() { return m_RootNode; }
+
+    inline const glm::mat4 GetInverseGlobal() { return m_GlobalInversetransform; }
 
     inline const std::map<std::string, BoneInfo>& GetBoneIDMap()
     {
@@ -107,4 +110,5 @@ private:
     std::vector<Bone> m_Bones;
     AssimpNodeData m_RootNode;
     std::map<std::string, BoneInfo> m_BoneInfoMap;
+    glm::mat4 m_GlobalInversetransform;
 };
