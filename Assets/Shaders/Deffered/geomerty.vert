@@ -17,7 +17,7 @@ uniform mat4 M;
 uniform mat4 P;
 uniform mat3 normalMatrix3;
 
-const int MAX_BONES = 100;
+const int MAX_BONES = 200;
 const int MAX_BONE_INFLUENCE = 4;
 uniform mat4 finalBonesMatrices[MAX_BONES];
 

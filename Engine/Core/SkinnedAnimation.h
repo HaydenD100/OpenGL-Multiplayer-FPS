@@ -19,6 +19,9 @@ public:
     {
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
+        if (scene) {
+            std::cout << "ERROR " << animationPath << "\n";
+        }
         assert(scene && scene->mRootNode);
         auto animation = scene->mAnimations[0];
         m_Duration = animation->mDuration;
@@ -74,8 +77,10 @@ private:
                 boneInfoMap[boneName].id = boneCount;
                 boneCount++;
             }
-            m_Bones.push_back(Bone(channel->mNodeName.data,
-                boneInfoMap[channel->mNodeName.data].id, channel));
+  
+            m_Bones.push_back(Bone(channel->mNodeName.data,boneInfoMap[channel->mNodeName.data].id, channel));
+
+
         }
 
         m_BoneInfoMap = boneInfoMap;

@@ -60,7 +60,7 @@ public:
         m_LocalTransform(1.0f)
     {
         m_NumPositions = channel->mNumPositionKeys;
-
+  
         for (int positionIndex = 0; positionIndex < m_NumPositions; ++positionIndex)
         {
             aiVector3D aiPosition = channel->mPositionKeys[positionIndex].mValue;

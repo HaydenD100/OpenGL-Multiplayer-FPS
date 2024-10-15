@@ -29,6 +29,8 @@ Model::Model(const char* path, Texture* texture) {
     processNode(scene->mRootNode, scene, texture);
 
     aabb = generateAABB();
+
+    std::cout << "Bones" << m_BoneCounter << "\n";
 }
 Model::Model(const char* path, const char* collisonShapePath, Texture* texture) {
 
@@ -118,6 +120,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scenem) {
             indices.push_back(face.mIndices[j]);
     }
 
+    // Update jointIDs and Weights to handle up to 4 bone influences
     for (int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
     {
         int boneID = -1;
@@ -126,8 +129,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scenem) {
         {
             BoneInfo newBoneInfo;
             newBoneInfo.id = m_BoneCounter;
-            newBoneInfo.offset = ConvertMatrixToGLMFormat(
-                mesh->mBones[boneIndex]->mOffsetMatrix);
+            newBoneInfo.offset = ConvertMatrixToGLMFormat(mesh->mBones[boneIndex]->mOffsetMatrix);
             m_BoneInfoMap[boneName] = newBoneInfo;
             boneID = m_BoneCounter;
             m_BoneCounter++;
@@ -144,16 +146,24 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scenem) {
         {
             int vertexId = weights[weightIndex].mVertexId;
             float weight = weights[weightIndex].mWeight;
-            assert(vertexId <= vertices.size());
-            jointIDs[vertexId] = glm::ivec4(boneID);
-            Weights[vertexId] = glm::vec4(weight);
+            assert(vertexId < vertices.size());
+
+            // Find the first empty slot (where jointID is -1)
+            for (int i = 0; i < 4; ++i)
+            {
+                if (jointIDs[vertexId][i] == -1)
+                {
+                    jointIDs[vertexId][i] = boneID;
+                    Weights[vertexId][i] = weight;
+                    break;
+                }
+            }
         }
     }
 
 
 
     //Computer tanget and bit-tangent if model doesnt have them
-    //TODO: Fix this because it keeps trying to access memory past vertcies size
     if (!mesh->HasTangentsAndBitangents())
     {
         for (int i = 0; i < vertices.size() - 2; i += 3) {

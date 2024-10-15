@@ -36,7 +36,7 @@ void Scene::LoadAssets() {
 	// TODO: not currently working
 	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
 	//Loads Mode
-	AssetManager::AddModel("anim_test", Model("Assets/Objects/FBX/vamp_run.dae", AssetManager::GetTexture("uvmap")));
+	AssetManager::AddModel("anim_test", Model("Assets/Objects/FBX/run1.dae", AssetManager::GetTexture("uvmap")));
 
 	AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 	AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("glass")));
@@ -80,7 +80,8 @@ void Scene::Load() {
 
 	WeaponManager::Init();
 
-	AssetManager::AddGameObject("anim_test", AssetManager::GetModel("anim_test"), glm::vec3(0, 1, 0), true, 0, None);
+	AssetManager::AddGameObject("anim_test", AssetManager::GetModel("anim_test"), glm::vec3(0, 1, -3), true, 0, None);
+	AssetManager::GetGameObject("anim_test")->SetScale(0.25);
 
 	AssetManager::AddGameObject("map1_floor", AssetManager::GetModel("map_floor"), glm::vec3(0, 1.6, 0), true, 0, Concave);
 	AssetManager::AddGameObject("map1_walls", AssetManager::GetModel("map_walls"), glm::vec3(0, 1.6, 0), true, 0, Concave);
@@ -174,7 +175,7 @@ void Scene::Load() {
 
 
 	ModelMatrixId = glGetUniformLocation(Renderer::GetCurrentProgramID(), "model");
-	running = SkinnedAnimation("Assets/Objects/FBX/vamp_run.dae", AssetManager::GetModel("anim_test"));
+	running = SkinnedAnimation("Assets/Objects/FBX/run1.dae", AssetManager::GetModel("anim_test"));
 	animatior = Animator(&running, "anim_test");
 
 
