@@ -23,6 +23,7 @@ public:
             std::cout << "ERROR " << animationPath << "\n";
         }
         assert(scene && scene->mRootNode);
+        std::cout << "Aniamtions: " << scene->mNumAnimations << "\n";
         auto animation = scene->mAnimations[0];
         m_Duration = animation->mDuration;
         m_TicksPerSecond = animation->mTicksPerSecond;

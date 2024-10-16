@@ -75,7 +75,6 @@ public:
         glm::mat4 nodeTransform = node->transformation;
 
         Bone* Bone = currentAnimationInstances[index].Animation->FindBone(nodeName);
-
         
         if (Bone)
         {
@@ -89,7 +88,9 @@ public:
         if (boneInfoMap.find(nodeName) != boneInfoMap.end())
         {
             int indexBone = boneInfoMap[nodeName].id;
-            currentAnimationInstances[index].m_FinalBoneMatrices[indexBone] = currentAnimationInstances[index].Animation->GetInverseGlobal() * globalTransformation * boneInfoMap[nodeName].offset;
+            currentAnimationInstances[index].m_FinalBoneMatrices[indexBone] = globalTransformation * boneInfoMap[nodeName].offset;
+            //TODO :: make this work so the root transformation dosent need to be an idenity matrix 
+            //currentAnimationInstances[index].m_FinalBoneMatrices[indexBone] = currentAnimationInstances[index].Animation->GetInverseGlobal() * globalTransformation * boneInfoMap[nodeName].offset;
         }
 
         for (int i = 0; i < node->childrenCount; i++)

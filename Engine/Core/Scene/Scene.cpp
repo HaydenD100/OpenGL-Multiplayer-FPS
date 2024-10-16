@@ -36,7 +36,7 @@ void Scene::LoadAssets() {
 	// TODO: not currently working
 	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
 	//Loads Mode
-	AssetManager::AddModel("anim_test", Model("Assets/Objects/FBX/run1.dae.dae", AssetManager::GetTexture("uvmap")));
+	AssetManager::AddModel("anim_test", Model("Assets/Objects/FBX/run1.dae", AssetManager::GetTexture("uvmap")));
 
 	AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 	AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("glass")));
@@ -258,6 +258,12 @@ void Scene::RenderAllObjects(GLuint programid) {
 			//make guns render on top;
 			NeedRendering.push_back(gameobjectRender);
 			continue;
+		}
+
+		auto transforms = animatior.GetFinalBoneMatrices(gameobjectRender->GetName());
+		for (int i = 0; i < transforms.size(); ++i) {
+			std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
+			Renderer::setMat4(glGetUniformLocation(programid, pos.c_str()), transforms[i]);
 		}
 
 		glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
