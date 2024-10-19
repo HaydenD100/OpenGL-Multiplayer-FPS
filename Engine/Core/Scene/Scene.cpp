@@ -36,7 +36,6 @@ void Scene::LoadAssets() {
 	// TODO: not currently working
 	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
 	//Loads Mode
-	AssetManager::AddModel("anim_test", Model("Assets/Objects/FBX/glock17_shoot.dae", AssetManager::GetTexture("uvmap")));
 
 	AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 	AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("glass")));
@@ -52,7 +51,7 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("cube1", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("green_glass")));
 
 	AssetManager::AddModel("glock", Model("Assets/Objects/FBX/glock17.fbx", "Assets/Objects/glock17_convex.obj", AssetManager::GetTexture("glock")));
-	AssetManager::AddModel("glockhand", Model("Assets/Objects/FBX/glock17_shoot.dae", AssetManager::GetTexture("glock")));
+	AssetManager::AddModel("glockhand", Model("Assets/Objects/FBX/glock17_shoot1.dae", AssetManager::GetTexture("glock")));
 	AssetManager::GetModel("glockhand")->GetMeshByName("Arms_L_R_Mesh_002-mesh")->SetTexture(AssetManager::GetTexture("uvmap"));
 
 	AssetManager::AddModel("ak47", Model("Assets/Objects/FBX/ak47.fbx", "Assets/Objects/ak47_convex.obj", AssetManager::GetTexture("ak47")));
@@ -83,8 +82,6 @@ void Scene::Load() {
 
 	WeaponManager::Init();
 
-	AssetManager::AddGameObject("anim_test1", AssetManager::GetModel("anim_test1"), glm::vec3(0, 1, -3), true, 0, None);
-	AssetManager::AddGameObject(GameObject("glock1", AssetManager::GetModel("glockhand"), glm::vec3(5, 1, -5), false, 0, Convex));
 
 	AssetManager::AddGameObject("map1_floor", AssetManager::GetModel("map_floor"), glm::vec3(0, 1.6, 0), true, 0, Concave);
 	AssetManager::AddGameObject("map1_walls", AssetManager::GetModel("map_walls"), glm::vec3(0, 1.6, 0), true, 0, Concave);
@@ -229,10 +226,18 @@ void Scene::RenderObjects(GLuint programid) {
 			continue;
 
 		auto transforms = animatior.GetFinalBoneMatrices(gameobjectRender->GetName());
-		for (int i = 0; i < transforms.size(); ++i) {
-			std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
-			Renderer::setMat4(glGetUniformLocation(programid, pos.c_str()), transforms[i]);
+		if (transforms.size() > 0) {
+			glUniform1i(glGetUniformLocation(programid, "animated"), true);
+
+			for (int i = 0; i < transforms.size(); ++i) {
+				std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
+				Renderer::setMat4(glGetUniformLocation(programid, pos.c_str()), transforms[i]);
+			}
 		}
+		else
+			glUniform1i(glGetUniformLocation(programid, "animated"), false);
+
+		
 
 		glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
 		glm::mat4 modelViewMatrix = ViewMatrix * ModelMatrix;
@@ -263,10 +268,16 @@ void Scene::RenderAllObjects(GLuint programid) {
 		}
 
 		auto transforms = animatior.GetFinalBoneMatrices(gameobjectRender->GetName());
-		for (int i = 0; i < transforms.size(); ++i) {
-			std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
-			Renderer::setMat4(glGetUniformLocation(programid, pos.c_str()), transforms[i]);
+		if (transforms.size() > 0) {
+			glUniform1i(glGetUniformLocation(programid, "animated"), true);
+
+			for (int i = 0; i < transforms.size(); ++i) {
+				std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
+				Renderer::setMat4(glGetUniformLocation(programid, pos.c_str()), transforms[i]);
+			}
 		}
+		else
+			glUniform1i(glGetUniformLocation(programid, "animated"), false);
 
 		glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
 		glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);

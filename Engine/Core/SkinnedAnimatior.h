@@ -19,8 +19,11 @@ public:
     Animator() {
         m_FinalBoneMatrices1.reserve(100);
 
-        for (int i = 0; i < 100; i++)
-            m_FinalBoneMatrices1.push_back(glm::mat4(1.0f));
+        for (int i = 0; i < 100; i++) {
+            glm::mat4 modelMatrix;
+            modelMatrix = glm::rotate(modelMatrix, -glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
+            m_FinalBoneMatrices1.push_back(modelMatrix);
+        }
     }
     Animator(SkinnedAnimation* Animation, std::string GameObjectname)
     {
@@ -50,7 +53,6 @@ public:
                     currentAnimationInstances[i].isPlaying = false;
                     currentAnimationInstances[i].m_CurrentTime = 0;
                     CalculateBoneTransform(&currentAnimationInstances[i].Animation->GetRootNode(), glm::mat4(1.0f), i);
-                    std::cout << currentAnimationInstances[i].GameObjectName << "\n";
                     continue;
                 }
                 currentAnimationInstances[i].m_CurrentTime = fmod(currentAnimationInstances[i].m_CurrentTime, currentAnimationInstances[i].Animation->GetDuration());
@@ -74,6 +76,7 @@ public:
                 return;
             }
         }
+        std::cout << "Created new Animation \n";
         AnimationInstance temp;
         temp.Animation = pAnimation;
         temp.m_CurrentTime = 0.0;
@@ -86,6 +89,7 @@ public:
         temp.GameObjectName = GameObjectname;
         for (int i = 0; i < 100; i++)
             temp.m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
+           
 
         currentAnimationInstances.push_back(temp);
     }
@@ -122,12 +126,21 @@ public:
     std::vector<glm::mat4> GetFinalBoneMatrices(std::string gameObjectname)
     {
         for (int i = 0; i < currentAnimationInstances.size(); i++) {
+            if (currentAnimationInstances[i].GameObjectName == gameObjectname && currentAnimationInstances[i].isPlaying)
+            {
+                return currentAnimationInstances[i].m_FinalBoneMatrices;
+            }            
+        }
+        //a hack for now but i want to fix it, issue is all the animations were exported as blender foward y up z and opengl is forward -z and up y and reexporting them to the corrent forward and up messes up and aninatmion
+        //this right now isnt slow but i have to fix it before i add more animations
+        for (int i = 0; i < currentAnimationInstances.size(); i++) {
             if (currentAnimationInstances[i].GameObjectName == gameObjectname)
             {
                 return currentAnimationInstances[i].m_FinalBoneMatrices;
             }
         }
-        return m_FinalBoneMatrices1;
+        std::vector<glm::mat4> zero;
+        return zero;
     }
 
 

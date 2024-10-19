@@ -2,6 +2,8 @@
 #include "Engine/Core/Scene/SceneManager.h"
 #include <sstream>
 
+
+
 void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 	GameObject* gun = AssetManager::GetGameObject(gunModel);
 	gun->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
@@ -22,11 +24,8 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 		cos(verticalAngle) * cos(horizontalAngle)
 	);
 	
-	if (isReloading) {
-		if(!AnimationManager::IsAnimationPlaying("ak47_reload"))
-			AnimationManager::Play("ak47_reload", Player::getCurrentGun());
-	}
-	else if (aiming) {
+
+	if (aiming) {
 		AssetManager::GetGameObject(gunModel)->setPosition(aimingPosition);
 	}
 	else {
@@ -62,13 +61,20 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 	}
 }
 
+void Gun::Reload() {
+	if(hasAnimations)
+		SceneManager::GetCurrentScene()->GetAnimator()->PlayAnimation(&reloadAnim, "glock", false);
+	else
+		AnimationManager::Play("ak47_reload", Player::getCurrentGun());
+
+}
+
 void Gun::Shoot(){
 	int randomnum = (rand() % firesounds) + 1;
 	AudioManager::PlaySound(gunsShotName + std::to_string(randomnum));
 
 	if (hasAnimations) {
 		SceneManager::GetCurrentScene()->GetAnimator()->PlayAnimation(&shootAnim, "glock", false);
-		std::cout << name << " :Name \n";
 	}
 	else 
 		kickbackOffset += kickback;
@@ -118,8 +124,10 @@ namespace WeaponManager
 		glock.name = "glock";
 		glock.ammo = 18;
 		glock.reloadtime = 1.5;
-		glock.firerate = 250;
-		glock.shootAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_shoot.dae", AssetManager::GetModel("glockhand"));
+		glock.firerate = 250; 
+		glock.shootAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_shoot1.dae", AssetManager::GetModel("glockhand"));
+		glock.reloadAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_reload.dae", AssetManager::GetModel("glockhand"));
+
 		glock.hasAnimations = true;
 		glock.currentammo = 18;
 		glock.damage = 10;

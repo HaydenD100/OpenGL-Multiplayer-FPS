@@ -11,11 +11,12 @@ uniform mat4 M;
 const int MAX_BONES = 200;
 const int MAX_BONE_INFLUENCE = 4;
 uniform mat4 finalBonesMatrices[MAX_BONES];
+uniform bool animated;
 
 
 void main()
 {
-    if(boneIds.x != -1){
+    if(animated){
         mat4 BoneTransform = finalBonesMatrices[boneIds[0]] * weights[0];
         BoneTransform     += finalBonesMatrices[boneIds[1]] * weights[1];
         BoneTransform     += finalBonesMatrices[boneIds[2]] * weights[2];

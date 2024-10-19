@@ -25,7 +25,7 @@ uniform bool animated;
 void main()
 {	vec4 viewPos;
 
-    if(boneIds.x != -1){
+    if(animated){
         mat4 BoneTransform = finalBonesMatrices[boneIds[0]] * weights[0];
         BoneTransform     += finalBonesMatrices[boneIds[1]] * weights[1];
         BoneTransform     += finalBonesMatrices[boneIds[2]] * weights[2];

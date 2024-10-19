@@ -280,6 +280,8 @@ namespace Player
 		if (Input::KeyPressed('r') && !reloading && !aiming) {
 			reloading = true;
 			reloadingTime = glfwGetTime();
+			WeaponManager::GetGunByName(gunName)->Reload();
+
 		}
 
 		if (Input::RightMouseDown() && !reloading) {
@@ -293,8 +295,6 @@ namespace Player
 			if (glfwGetTime() - reloadingTime > WeaponManager::GetGunByName(gunName)->reloadtime && reloading)
 			{
 				reloading = false;
-				AnimationManager::Stop("ak47_reload");
-
 				WeaponManager::GetGunByName(gunName)->currentammo = WeaponManager::GetGunByName(gunName)->ammo;
 				WeaponManager::GetGunByName(gunName)->down = 1;
 			}

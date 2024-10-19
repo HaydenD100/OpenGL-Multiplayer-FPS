@@ -24,12 +24,15 @@ public:
         }
         assert(scene && scene->mRootNode);
         std::cout << "Aniamtions: " << scene->mNumAnimations << "\n";
-        auto animation = scene->mAnimations[0];
-        m_Duration = animation->mDuration;
-        m_TicksPerSecond = animation->mTicksPerSecond;
-        m_GlobalInversetransform = glm::inverse(ConvertMatrixToGLMFormat(scene->mRootNode->mTransformation));
-        ReadHeirarchyData(m_RootNode, scene->mRootNode);
-        ReadMissingBones(animation, *model);
+        if (scene->mNumAnimations) {
+            auto animation = scene->mAnimations[0];
+            m_Duration = animation->mDuration;
+            m_TicksPerSecond = animation->mTicksPerSecond;
+            m_GlobalInversetransform = glm::inverse(ConvertMatrixToGLMFormat(scene->mRootNode->mTransformation));
+            ReadHeirarchyData(m_RootNode, scene->mRootNode);
+            ReadMissingBones(animation, *model);
+        }
+        
     }
 
     ~SkinnedAnimation()

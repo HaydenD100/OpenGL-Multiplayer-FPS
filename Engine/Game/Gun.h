@@ -39,6 +39,7 @@ struct Gun
 	bool hasAnimations = false;
 	SkinnedAnimation shootAnim;
 	SkinnedAnimation reloadAnim;
+	bool reloadPlaying = false;
 
 	glm::vec3 weaponOffSet = glm::vec3(-0.3, -0.25, 0.5);
 	glm::vec3 aimingPosition = glm::vec3(0, -0.2, 0.5);
@@ -50,6 +51,8 @@ struct Gun
 	float spread = 0;
 	void Update(float deltaTime, bool isReloading, bool aiming);
 	void Shoot();
+	void Reload();
+
 
 	//startingPos
 };
