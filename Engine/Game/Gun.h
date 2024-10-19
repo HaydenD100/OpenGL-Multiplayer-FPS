@@ -6,6 +6,7 @@
 #include "Engine/Core/GameObject.h"
 #include "Engine/Game/Player.h"
 #include "Engine/Core/AssetManager.h"
+#include "Engine/Core/SkinnedAnimatior.h"
 
 enum GunType
 {
@@ -32,6 +33,12 @@ struct Gun
 	std::string gunModel;
 	std::string gunsShotName;
 	GunType type;
+
+
+	//animations
+	bool hasAnimations = false;
+	SkinnedAnimation shootAnim;
+	SkinnedAnimation reloadAnim;
 
 	glm::vec3 weaponOffSet = glm::vec3(-0.3, -0.25, 0.5);
 	glm::vec3 aimingPosition = glm::vec3(0, -0.2, 0.5);

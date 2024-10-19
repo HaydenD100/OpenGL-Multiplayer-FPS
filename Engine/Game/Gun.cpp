@@ -6,9 +6,12 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 	GameObject* gun = AssetManager::GetGameObject(gunModel);
 	gun->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
 	gun->GetRigidBody()->setLinearVelocity(btVector3(0, 0, 0));
-	kickbackOffset *= 0.96f;
-	if (kickbackOffset < 0.01)
-		kickbackOffset = 0;
+	if (! hasAnimations) {
+		kickbackOffset *= 0.96f;
+		if (kickbackOffset < 0.01)
+			kickbackOffset = 0;
+	}
+	
 
 	float verticalAngle = -gun->getRotation().x;
 	float horizontalAngle = gun->getRotation().y;
@@ -59,10 +62,16 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 	}
 }
 
-void Gun::Shoot() {
+void Gun::Shoot(){
 	int randomnum = (rand() % firesounds) + 1;
 	AudioManager::PlaySound(gunsShotName + std::to_string(randomnum));
-	kickbackOffset += kickback;
+
+	if (hasAnimations) {
+		SceneManager::GetCurrentScene()->GetAnimator()->PlayAnimation(&shootAnim, "glock", false);
+		std::cout << name << " :Name \n";
+	}
+	else 
+		kickbackOffset += kickback;
 }
 
 namespace WeaponManager
@@ -70,7 +79,7 @@ namespace WeaponManager
 	std::vector<Gun> guns;
 
 	void WeaponManager::Init() {
-		AssetManager::AddGameObject(GameObject("glock", AssetManager::GetModel("glock"), glm::vec3(0.2, -0.25, 0.2), false, 0, Convex));
+		AssetManager::AddGameObject(GameObject("glock", AssetManager::GetModel("glockhand"), glm::vec3(5, 0, -5), false, 0, Convex));
 		AssetManager::GetGameObject("glock")->SetRender(false);
 		AssetManager::GetGameObject("glock")->SetParentName("player_head");
 		AssetManager::GetGameObject("glock")->SetShaderType("Overlay");
@@ -100,11 +109,18 @@ namespace WeaponManager
 		AudioManager::AddSound("Assets/Audio/glock_fire4.wav", "glock_fire4", AssetManager::GetGameObject("glock")->getPosition(), 5, 0.5f);
 		AudioManager::AddSound("Assets/Audio/dry_fire.wav", "dry_fire", AssetManager::GetGameObject("glock")->getPosition(), 5, 0.2f);
 		
+
+
+		//running = 
+		//animatior = Animator(&running, "anim_test")
+
 		Gun glock;
 		glock.name = "glock";
 		glock.ammo = 18;
 		glock.reloadtime = 1.5;
 		glock.firerate = 250;
+		glock.shootAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_shoot.dae", AssetManager::GetModel("glockhand"));
+		glock.hasAnimations = true;
 		glock.currentammo = 18;
 		glock.damage = 10;
 		glock.type = Semi;

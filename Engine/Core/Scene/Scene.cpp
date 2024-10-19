@@ -36,7 +36,7 @@ void Scene::LoadAssets() {
 	// TODO: not currently working
 	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
 	//Loads Mode
-	AssetManager::AddModel("anim_test", Model("Assets/Objects/FBX/run1.dae", AssetManager::GetTexture("uvmap")));
+	AssetManager::AddModel("anim_test", Model("Assets/Objects/FBX/glock17_shoot.dae", AssetManager::GetTexture("uvmap")));
 
 	AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 	AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("glass")));
@@ -52,6 +52,9 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("cube1", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("green_glass")));
 
 	AssetManager::AddModel("glock", Model("Assets/Objects/FBX/glock17.fbx", "Assets/Objects/glock17_convex.obj", AssetManager::GetTexture("glock")));
+	AssetManager::AddModel("glockhand", Model("Assets/Objects/FBX/glock17_shoot.dae", AssetManager::GetTexture("glock")));
+	AssetManager::GetModel("glockhand")->GetMeshByName("Arms_L_R_Mesh_002-mesh")->SetTexture(AssetManager::GetTexture("uvmap"));
+
 	AssetManager::AddModel("ak47", Model("Assets/Objects/FBX/ak47.fbx", "Assets/Objects/ak47_convex.obj", AssetManager::GetTexture("ak47")));
 	AssetManager::AddModel("door", Model(Mesh("Assets/Objects/door.obj"), AssetManager::GetTexture("door")));
 	AssetManager::AddModel("door_frame", Model(Mesh("Assets/Objects/door_frame.obj"), AssetManager::GetTexture("door")));
@@ -80,8 +83,8 @@ void Scene::Load() {
 
 	WeaponManager::Init();
 
-	AssetManager::AddGameObject("anim_test", AssetManager::GetModel("anim_test"), glm::vec3(0, 1, -3), true, 0, None);
-	AssetManager::GetGameObject("anim_test")->SetScale(0.25);
+	AssetManager::AddGameObject("anim_test1", AssetManager::GetModel("anim_test1"), glm::vec3(0, 1, -3), true, 0, None);
+	AssetManager::AddGameObject(GameObject("glock1", AssetManager::GetModel("glockhand"), glm::vec3(5, 1, -5), false, 0, Convex));
 
 	AssetManager::AddGameObject("map1_floor", AssetManager::GetModel("map_floor"), glm::vec3(0, 1.6, 0), true, 0, Concave);
 	AssetManager::AddGameObject("map1_walls", AssetManager::GetModel("map_walls"), glm::vec3(0, 1.6, 0), true, 0, Concave);
@@ -175,8 +178,7 @@ void Scene::Load() {
 
 
 	ModelMatrixId = glGetUniformLocation(Renderer::GetCurrentProgramID(), "model");
-	running = SkinnedAnimation("Assets/Objects/FBX/run1.dae", AssetManager::GetModel("anim_test"));
-	animatior = Animator(&running, "anim_test");
+	animatior = Animator();
 
 
 	glBindVertexArray(sky.GetSkyBoxVAO());

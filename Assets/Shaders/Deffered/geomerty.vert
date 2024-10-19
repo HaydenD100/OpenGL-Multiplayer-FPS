@@ -20,6 +20,7 @@ uniform mat3 normalMatrix3;
 const int MAX_BONES = 200;
 const int MAX_BONE_INFLUENCE = 4;
 uniform mat4 finalBonesMatrices[MAX_BONES];
+uniform bool animated;
 
 void main()
 {	vec4 viewPos;

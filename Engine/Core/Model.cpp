@@ -18,6 +18,7 @@ Model::Model(Mesh mesh, Texture* texture) {
 Model::Model(const char* path, Texture* texture) {
 
     Assimp::Importer import;
+
     const aiScene * scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -35,6 +36,7 @@ Model::Model(const char* path, Texture* texture) {
 Model::Model(const char* path, const char* collisonShapePath, Texture* texture) {
 
     Assimp::Importer import;
+
     const aiScene * scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -44,7 +46,6 @@ Model::Model(const char* path, const char* collisonShapePath, Texture* texture) 
     }
     std::cout << "Assimp: Loading Model " << path << std::endl;
     processNode(scene->mRootNode, scene, texture);
-
     //Ill make a new loadObj that dosent next uvs and normals but this is just for testing right now
     std::vector<glm::vec2> uvs;
     std::vector<glm::vec3> normals;
@@ -212,6 +213,7 @@ void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
         Mesh model_mesh = processMesh(mesh, scene);
         model_mesh.SetTexture(texture);
         model_mesh.SetName(mesh->mName.C_Str());
+        std::cout << mesh->mName.C_Str() << std::endl;
         meshes.push_back(model_mesh);
     }
     // then do the same for each of its children

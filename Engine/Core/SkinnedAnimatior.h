@@ -10,12 +10,18 @@ struct AnimationInstance {
     float m_CurrentTime;
     
     bool isPlaying = true;
+    bool loop = false;
 };
 
 class Animator
 {
 public:
-    Animator() = default;
+    Animator() {
+        m_FinalBoneMatrices1.reserve(100);
+
+        for (int i = 0; i < 100; i++)
+            m_FinalBoneMatrices1.push_back(glm::mat4(1.0f));
+    }
     Animator(SkinnedAnimation* Animation, std::string GameObjectname)
     {
         AnimationInstance temp;
@@ -39,6 +45,14 @@ public:
             if (currentAnimationInstances[i].Animation && currentAnimationInstances[i].isPlaying)
             {
                 currentAnimationInstances[i].m_CurrentTime += currentAnimationInstances[i].Animation->GetTicksPerSecond() * dt;
+                if (currentAnimationInstances[i].m_CurrentTime > currentAnimationInstances[i].Animation->GetDuration() && !currentAnimationInstances[i].loop) {
+
+                    currentAnimationInstances[i].isPlaying = false;
+                    currentAnimationInstances[i].m_CurrentTime = 0;
+                    CalculateBoneTransform(&currentAnimationInstances[i].Animation->GetRootNode(), glm::mat4(1.0f), i);
+                    std::cout << currentAnimationInstances[i].GameObjectName << "\n";
+                    continue;
+                }
                 currentAnimationInstances[i].m_CurrentTime = fmod(currentAnimationInstances[i].m_CurrentTime, currentAnimationInstances[i].Animation->GetDuration());
                 CalculateBoneTransform(&currentAnimationInstances[i].Animation->GetRootNode(), glm::mat4(1.0f), i);
             }
@@ -46,12 +60,17 @@ public:
         
     }
 
-    void PlayAnimation(SkinnedAnimation* pAnimation, std::string GameObjectname)
+    void PlayAnimation(SkinnedAnimation* pAnimation, std::string GameObjectname, bool loop = true)
     {
         for (int i = 0; i < currentAnimationInstances.size(); i++) {
-            if (currentAnimationInstances[i].Animation == pAnimation && currentAnimationInstances[i].GameObjectName == GameObjectname)
+            //so you cant have mutliple isntances of the same animation and object
+            if (currentAnimationInstances[i].Animation == pAnimation && currentAnimationInstances[i].GameObjectName == GameObjectname && currentAnimationInstances[i].loop == loop)
             {
-                currentAnimationInstances[i].isPlaying = true;
+                //reset the animation if its already playing
+                if (currentAnimationInstances[i].isPlaying == true)
+                    currentAnimationInstances[i].m_CurrentTime = 0;
+                else
+                    currentAnimationInstances[i].isPlaying = true;
                 return;
             }
         }
@@ -60,12 +79,15 @@ public:
         temp.m_CurrentTime = 0.0;
         temp.m_FinalBoneMatrices.reserve(100);
         temp.GameObjectName = GameObjectname;
+        temp.loop = loop;
+        temp.isPlaying = true;
 
+        temp.m_FinalBoneMatrices.reserve(100);
+        temp.GameObjectName = GameObjectname;
         for (int i = 0; i < 100; i++)
             temp.m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
 
         currentAnimationInstances.push_back(temp);
-
     }
 
     void CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform, int index)
@@ -105,8 +127,7 @@ public:
                 return currentAnimationInstances[i].m_FinalBoneMatrices;
             }
         }
-        std::vector <glm::mat4> zero;
-        return zero;
+        return m_FinalBoneMatrices1;
     }
 
 
@@ -121,4 +142,6 @@ public:
 private:
     std::vector<AnimationInstance> currentAnimationInstances;
     float m_DeltaTime;
+    std::vector<glm::mat4> m_FinalBoneMatrices1;
+
 };

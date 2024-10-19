@@ -19,7 +19,7 @@ public:
     {
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
-        if (scene) {
+        if (!scene) {
             std::cout << "ERROR " << animationPath << "\n";
         }
         assert(scene && scene->mRootNode);

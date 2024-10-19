@@ -532,6 +532,11 @@ namespace Renderer
 				overlay.push_back(needRendering[i]);
 				continue;
 			}
+			auto transforms = SceneManager::GetCurrentScene()->GetAnimator()->GetFinalBoneMatrices(needRendering[i]->GetName());
+			for (int i = 0; i < transforms.size(); ++i) {
+				std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
+				Renderer::setMat4(glGetUniformLocation(programid, pos.c_str()), transforms[i]);
+			}
 
 			glm::mat4 ModelMatrix = needRendering[i]->GetModelMatrix();
 			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;
@@ -551,6 +556,12 @@ namespace Renderer
 			glm::mat4 ModelMatrix = overlay[i]->GetModelMatrix();
 			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;
 			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
+
+			auto transforms = SceneManager::GetCurrentScene()->GetAnimator()->GetFinalBoneMatrices(overlay[i]->GetName());
+			for (int i = 0; i < transforms.size(); ++i) {
+				std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
+				Renderer::setMat4(glGetUniformLocation(programid, pos.c_str()), transforms[i]);
+			}
 
 			glUniformMatrix3fv(glGetUniformLocation(programid, "normalMatrix3"), 1, GL_FALSE, &normalMatrix[0][0]);
 			glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);
