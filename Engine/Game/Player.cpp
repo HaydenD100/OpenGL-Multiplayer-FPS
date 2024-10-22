@@ -31,7 +31,7 @@ namespace Player
 	double footstepTime = 0;
 	double footstep_interval = 0.5;
 
-	std::string inv[3] = {"ak47","glock","shotgun"};
+	std::string inv[4] = {"ak47","glock","shotgun", "double_barrel"};
 	const int decal_count = 5;
 	std::string decal_inv[decal_count] = { "flower_decal","panda_decal","pizza_decal","tank_decal", "freaky_decal"};
 	int decal_index = 0;
@@ -314,6 +314,7 @@ namespace Player
 			}
 		}
 		
+		//optimize this
 		if (Input::KeyPressed('1')) {
 			SelectWeapon(inv[0]);
 		}
@@ -323,6 +324,9 @@ namespace Player
 		}
 		if (Input::KeyPressed('3')) {
 			SelectWeapon(inv[2]);
+		}
+		if (Input::KeyPressed('4')) {
+			SelectWeapon(inv[3]);
 		}
 		
 		horizontalAngle += mouseSpeed * float(SCREENWIDTH / 2 - Input::GetMouseX());

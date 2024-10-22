@@ -15,7 +15,7 @@ class SkinnedAnimation
 public:
     SkinnedAnimation() = default;
 
-    SkinnedAnimation(const std::string& animationPath, Model* model)
+    SkinnedAnimation(const std::string& animationPath, Model* model, int index = 0)
     {
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
@@ -23,9 +23,9 @@ public:
             std::cout << "ERROR " << animationPath << "\n";
         }
         assert(scene && scene->mRootNode);
-        std::cout << "Aniamtions: " << scene->mNumAnimations << "\n";
+        std::cout << "Aniamtions: " << scene->mNumAnimations << " For" << animationPath << "\n";
         if (scene->mNumAnimations) {
-            auto animation = scene->mAnimations[0];
+            auto animation = scene->mAnimations[index];
             m_Duration = animation->mDuration;
             m_TicksPerSecond = animation->mTicksPerSecond;
             m_GlobalInversetransform = glm::inverse(ConvertMatrixToGLMFormat(scene->mRootNode->mTransformation));

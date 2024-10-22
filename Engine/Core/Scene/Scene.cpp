@@ -54,6 +54,9 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("glockhand", Model("Assets/Objects/FBX/glock17_shoot1.dae", AssetManager::GetTexture("glock")));
 	AssetManager::GetModel("glockhand")->GetMeshByName("Arms_L_R_Mesh_002-mesh")->SetTexture(AssetManager::GetTexture("uvmap"));
 
+	AssetManager::AddModel("double_barrel", Model("Assets/Objects/FBX/db_shoot.dae", AssetManager::GetTexture("uvmap")));
+	//AssetManager::GetModel("doublebarrel")->GetMeshByName("Arms_L_R_Mesh_002-mesh")->SetTexture(AssetManager::GetTexture("uvmap"));
+
 	AssetManager::AddModel("ak47", Model("Assets/Objects/FBX/ak47.fbx", "Assets/Objects/ak47_convex.obj", AssetManager::GetTexture("ak47")));
 	AssetManager::AddModel("door", Model(Mesh("Assets/Objects/door.obj"), AssetManager::GetTexture("door")));
 	AssetManager::AddModel("door_frame", Model(Mesh("Assets/Objects/door_frame.obj"), AssetManager::GetTexture("door")));
@@ -100,6 +103,8 @@ void Scene::Load() {
 	AssetManager::GetGameObject("red_glass1")->SetShaderType("Transparent");
 
 	AssetManager::AddGameObject("floor", AssetManager::GetModel("floor"), glm::vec3(0, 0, 0), true, 0, Box);
+	//AssetManager::AddGameObject("db", AssetManager::GetModel("doublebarrel"), glm::vec3(0, 2, 0), true, 0, Box);
+
 
 	crates.push_back(Crate(glm::vec3(1, 2, 1), "crate1", AssetManager::GetModel("crate")));
 	crates.push_back(Crate(glm::vec3(-3, 2, -3), "crate2", AssetManager::GetModel("crate")));

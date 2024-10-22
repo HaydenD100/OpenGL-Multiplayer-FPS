@@ -63,7 +63,7 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 
 void Gun::Reload() {
 	if(hasAnimations)
-		SceneManager::GetCurrentScene()->GetAnimator()->PlayAnimation(&reloadAnim, "glock", false);
+		SceneManager::GetCurrentScene()->GetAnimator()->PlayAnimation(&reloadAnim, name, false);
 	else
 		AnimationManager::Play("ak47_reload", Player::getCurrentGun());
 
@@ -74,7 +74,7 @@ void Gun::Shoot(){
 	AudioManager::PlaySound(gunsShotName + std::to_string(randomnum));
 
 	if (hasAnimations) {
-		SceneManager::GetCurrentScene()->GetAnimator()->PlayAnimation(&shootAnim, "glock", false);
+		SceneManager::GetCurrentScene()->GetAnimator()->PlayAnimation(&shootAnim, name, false);
 	}
 	else 
 		kickbackOffset += kickback;
@@ -97,10 +97,15 @@ namespace WeaponManager
 		AssetManager::GetGameObject("ak47")->SetShaderType("Overlay"); 
 
 
-		AssetManager::AddGameObject("shotgun", AssetManager::GetModel("shotgun"), glm::vec3(-3, 2, 3), true, 0, Convex);
+		AssetManager::AddGameObject("shotgun", AssetManager::GetModel("shotgun"), glm::vec3(-3, 2, 3), false, 0, Convex);
 		AssetManager::GetGameObject("shotgun")->SetRender(false);
 		AssetManager::GetGameObject("shotgun")->SetParentName("player_head");
 		AssetManager::GetGameObject("shotgun")->SetShaderType("Overlay");
+
+		AssetManager::AddGameObject("double_barrel", AssetManager::GetModel("double_barrel"), glm::vec3(-3, 2, 3), false, 0, Box);
+		AssetManager::GetGameObject("double_barrel")->SetRender(false);
+		AssetManager::GetGameObject("double_barrel")->SetParentName("player_head");
+		AssetManager::GetGameObject("double_barrel")->SetShaderType("Overlay");
 
 
 		
@@ -158,6 +163,8 @@ namespace WeaponManager
 		ak47.aimingPosition = glm::vec3(0, -0.2, 0.7);
 		guns.emplace_back(ak47);
 
+
+
 		Gun shotgun;
 		shotgun.name = "shotgun";
 		shotgun.ammo = 6;
@@ -177,6 +184,31 @@ namespace WeaponManager
 		shotgun.weaponOffSet = glm::vec3(-0.3, -0.25, 0.9);
 		shotgun.aimingPosition = glm::vec3(0, -0.2, 0.7);
 		guns.emplace_back(shotgun);
+
+		Gun doublebarrel;
+		doublebarrel.name = "double_barrel";
+		doublebarrel.ammo = 2;
+		doublebarrel.reloadtime = 2;
+		doublebarrel.firerate = 100;
+		doublebarrel.currentammo = 2;
+		doublebarrel.damage = 45;
+		doublebarrel.type = Semi;
+		doublebarrel.recoil = 0.05f;
+		doublebarrel.recoilY = 200;
+		doublebarrel.kickback = 2;
+
+		doublebarrel.shootAnim = SkinnedAnimation("Assets/Objects/FBX/db_shoot.dae", AssetManager::GetModel("double_barrel"), 1);
+		doublebarrel.reloadAnim = SkinnedAnimation("Assets/Objects/FBX/db_reload.dae", AssetManager::GetModel("double_barrel"));
+		doublebarrel.hasAnimations = true;
+
+		doublebarrel.firesounds = 1;
+		doublebarrel.bulletsPerShot = 12;
+		doublebarrel.spread = 0.10f;
+		doublebarrel.gunModel = "double_barrel";
+		doublebarrel.gunsShotName = "shotgun_fire";
+		doublebarrel.weaponOffSet = glm::vec3(-0.3, -0.2f, 1.5);
+		doublebarrel.aimingPosition = glm::vec3(0, -0.2, 0.7);
+		guns.emplace_back(doublebarrel);
 	}
 	
 	Gun* WeaponManager::GetGunByName(std::string name) {
