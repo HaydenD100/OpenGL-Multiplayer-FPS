@@ -166,6 +166,8 @@ namespace Player
 		return false;
 	}
 
+
+	//TODO :: This is a mess I should clean this up at somepoint
 	void Player::Update(float deltaTime) {
 		GameObject* player =  AssetManager::GetGameObject("player");
 
@@ -277,7 +279,7 @@ namespace Player
 				decal_index++;
 		}
 		
-		if (Input::KeyPressed('r') && !reloading && !aiming) {
+		if (Input::KeyPressed('r') && !reloading && !aiming && gunName != "nothing") {
 			reloading = true;
 			reloadingTime = glfwGetTime();
 			WeaponManager::GetGunByName(gunName)->Reload();
@@ -367,9 +369,9 @@ namespace Player
 		if (reloading || weaponName == gunName)
 			return false;
 		if (gunName != "nothing")
-			AssetManager::GetGameObject(WeaponManager::GetGunByName(gunName)->gunModel)->SetRender(false);
+			AssetManager::GetGameObject(WeaponManager::GetGunByName(gunName)->name)->SetRender(false);
 		gunName = weaponName;
-		AssetManager::GetGameObject(WeaponManager::GetGunByName(gunName)->gunModel)->SetRender(true);
+		AssetManager::GetGameObject(WeaponManager::GetGunByName(gunName)->name)->SetRender(true);
 		AudioManager::PlaySound("item_pickup", getPosition());
 		return true;
 	}

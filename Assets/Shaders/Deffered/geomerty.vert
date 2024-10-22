@@ -31,19 +31,24 @@ void main()
         BoneTransform     += finalBonesMatrices[boneIds[2]] * weights[2];
         BoneTransform     += finalBonesMatrices[boneIds[3]] * weights[3];
         viewPos = V * M * BoneTransform * vec4(vertexPosition_modelspace,1);
+
+        mat3 normalMatrix = transpose(inverse(mat3(V * M)));
+        vec3 normal = normalize(normalMatrix * mat3(BoneTransform)  * vertexNormal_modelspace);
+        vec3 tangent = normalize(normalMatrix * mat3(BoneTransform)  * vertexTangent_modelspace);
+        vec3 bitangent = normalize(normalMatrix * mat3(BoneTransform)  * vertexBitangent_modelspace);
+
+        TBN = mat3(tangent, bitangent, normal); // Construct TBN matrix for transforming the normal map
     }
     else{
         viewPos = V * M * vec4(vertexPosition_modelspace,1.0f);
+        mat3 normalMatrix = transpose(inverse(mat3(V * M)));
+        vec3 normal = normalize(normalMatrix * vertexNormal_modelspace);
+        vec3 tangent = normalize(normalMatrix * vertexTangent_modelspace);
+        vec3 bitangent = normalize(normalMatrix * vertexBitangent_modelspace);
+
+        TBN = mat3(tangent, bitangent, normal); // Construct TBN matrix for transforming the normal map
     }
     FragPos = viewPos.xyz; 
     UV = vertexUV;
-    mat3 normalMatrix = transpose(inverse(mat3(V * M)));
-    vec3 normal = normalize(normalMatrix * vertexNormal_modelspace);
-    vec3 tangent = normalize(normalMatrix * vertexTangent_modelspace);
-    vec3 bitangent = normalize(normalMatrix * vertexBitangent_modelspace);
-
-    TBN = mat3(tangent, bitangent, normal); // Construct TBN matrix for transforming the normal map
-
-    
     gl_Position = P * viewPos;
 }

@@ -102,7 +102,7 @@ namespace WeaponManager
 		AssetManager::GetGameObject("shotgun")->SetParentName("player_head");
 		AssetManager::GetGameObject("shotgun")->SetShaderType("Overlay");
 
-		AssetManager::AddGameObject("double_barrel", AssetManager::GetModel("double_barrel"), glm::vec3(-3, 2, 3), false, 0, Box);
+		AssetManager::AddGameObject("double_barrel", AssetManager::GetModel("double_barrel_hand"), glm::vec3(-3, 2, 3), false, 0, Convex);
 		AssetManager::GetGameObject("double_barrel")->SetRender(false);
 		AssetManager::GetGameObject("double_barrel")->SetParentName("player_head");
 		AssetManager::GetGameObject("double_barrel")->SetShaderType("Overlay");
@@ -171,7 +171,7 @@ namespace WeaponManager
 		shotgun.reloadtime = 2.5;
 		shotgun.firerate = 150;
 		shotgun.currentammo = 6;
-		shotgun.damage = 45;
+		shotgun.damage = 10;
 		shotgun.type = Semi;
 		shotgun.recoil = 0.05f;
 		shotgun.recoilY = 200;
@@ -191,19 +191,19 @@ namespace WeaponManager
 		doublebarrel.reloadtime = 2;
 		doublebarrel.firerate = 100;
 		doublebarrel.currentammo = 2;
-		doublebarrel.damage = 45;
+		doublebarrel.damage = 25;
 		doublebarrel.type = Semi;
-		doublebarrel.recoil = 0.05f;
-		doublebarrel.recoilY = 200;
+		doublebarrel.recoil = 0.07f;
+		doublebarrel.recoilY = 250;
 		doublebarrel.kickback = 2;
 
-		doublebarrel.shootAnim = SkinnedAnimation("Assets/Objects/FBX/db_shoot.dae", AssetManager::GetModel("double_barrel"), 1);
-		doublebarrel.reloadAnim = SkinnedAnimation("Assets/Objects/FBX/db_reload.dae", AssetManager::GetModel("double_barrel"));
+		doublebarrel.shootAnim = SkinnedAnimation("Assets/Objects/FBX/db_shoot.dae", AssetManager::GetModel("double_barrel_hand"), 1);
+		doublebarrel.reloadAnim = SkinnedAnimation("Assets/Objects/FBX/db_reload.dae", AssetManager::GetModel("double_barrel_hand"),0);
 		doublebarrel.hasAnimations = true;
 
 		doublebarrel.firesounds = 1;
 		doublebarrel.bulletsPerShot = 12;
-		doublebarrel.spread = 0.10f;
+		doublebarrel.spread = 0.15f;
 		doublebarrel.gunModel = "double_barrel";
 		doublebarrel.gunsShotName = "shotgun_fire";
 		doublebarrel.weaponOffSet = glm::vec3(-0.3, -0.2f, 1.5);

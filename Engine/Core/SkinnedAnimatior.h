@@ -20,8 +20,8 @@ public:
         m_FinalBoneMatrices1.reserve(100);
 
         for (int i = 0; i < 100; i++) {
-            glm::mat4 modelMatrix;
-            modelMatrix = glm::rotate(modelMatrix, -glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
+            glm::mat4 modelMatrix = glm::mat4(1);
+            //modelMatrix = glm::rotate(modelMatrix, -glm::half_pi<float>(), glm::vec3(1.0f, 0.0f, 0.0f));
             m_FinalBoneMatrices1.push_back(modelMatrix);
         }
     }
