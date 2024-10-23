@@ -91,7 +91,7 @@ namespace WeaponManager
 		AssetManager::GetGameObject("glock")->SetShaderType("Overlay");
 
 
-		AssetManager::AddGameObject(GameObject("ak47", AssetManager::GetModel("ak47"), glm::vec3(0.2, -0.25, -0.2), false, 0, Convex));
+		AssetManager::AddGameObject(GameObject("ak47", AssetManager::GetModel("ak47hand"), glm::vec3(0.2, -0.25, -0.2), false, 0, Convex));
 		AssetManager::GetGameObject("ak47")->SetRender(false);
 		AssetManager::GetGameObject("ak47")->SetParentName("player_head");
 		AssetManager::GetGameObject("ak47")->SetShaderType("Overlay"); 
@@ -119,12 +119,7 @@ namespace WeaponManager
 		AudioManager::AddSound("Assets/Audio/glock_fire3.wav", "glock_fire3", AssetManager::GetGameObject("glock")->getPosition(), 5, 0.5f);
 		AudioManager::AddSound("Assets/Audio/glock_fire4.wav", "glock_fire4", AssetManager::GetGameObject("glock")->getPosition(), 5, 0.5f);
 		AudioManager::AddSound("Assets/Audio/dry_fire.wav", "dry_fire", AssetManager::GetGameObject("glock")->getPosition(), 5, 0.2f);
-		
-
-
-		//running = 
-		//animatior = Animator(&running, "anim_test")
-
+	
 		Gun glock;
 		glock.name = "glock";
 		glock.ammo = 18;
@@ -141,7 +136,7 @@ namespace WeaponManager
 		glock.recoilY = 100;
 		glock.kickback = 3;
 		glock.weaponOffSet = glm::vec3(-0.3, -0.2f, 0.9);
-		glock.aimingPosition = glm::vec3(0,-0.2, 0.7);
+		glock.aimingPosition = glm::vec3(0.15,-0.2, 0.7);
 		glock.gunModel = "glock"; 
 		glock.gunsShotName = "glock_fire";
 		guns.emplace_back(glock);
@@ -157,14 +152,19 @@ namespace WeaponManager
 		ak47.recoil = 0.03f;
 		ak47.recoilY = 175;
 		ak47.kickback = 2;
+
+		ak47.shootAnim = SkinnedAnimation("Assets/Objects/FBX/ak47_shoot.dae", AssetManager::GetModel("ak47hand"), 0);
+		ak47.reloadAnim = SkinnedAnimation("Assets/Objects/FBX/ak47_reload.dae", AssetManager::GetModel("ak47hand"), 0);
+		ak47.hasAnimations = true;
+
 		ak47.gunModel = "ak47";
 		ak47.gunsShotName = "ak47_fire";
 		ak47.weaponOffSet = glm::vec3(-0.3, -0.25, 0.9);
-		ak47.aimingPosition = glm::vec3(0, -0.2, 0.7);
+		ak47.aimingPosition = glm::vec3(0, -0.32, 0.7);
 		guns.emplace_back(ak47);
 
 
-
+		//removing this for now
 		Gun shotgun;
 		shotgun.name = "shotgun";
 		shotgun.ammo = 6;
@@ -206,7 +206,7 @@ namespace WeaponManager
 		doublebarrel.spread = 0.15f;
 		doublebarrel.gunModel = "double_barrel";
 		doublebarrel.gunsShotName = "shotgun_fire";
-		doublebarrel.weaponOffSet = glm::vec3(-0.3, -0.2f, 1.5);
+		doublebarrel.weaponOffSet = glm::vec3(-0.27, -0.2f, 1.5);
 		doublebarrel.aimingPosition = glm::vec3(0, -0.2, 0.7);
 		guns.emplace_back(doublebarrel);
 	}
@@ -229,15 +229,17 @@ GunPickUp::GunPickUp(std::string GunName, std::string ObjectName, Model* model, 
 GunPickUp::GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force) {
 
 	//STILL GIVING ERROR STING TO LONG ERROR NOT SURE WHY NOT SURE HOW TO FIX
+	objectName.reserve(100);
+
 	std::stringstream ss;
 	ss << Player::getPosition().x;
 	ss << Camera::GetDirection().y;
 	ss << GunName;
 	objectName = ss.str();
 	gunName = GunName;
-	int index = AssetManager::AddGameObject(objectName, AssetManager::GetModel(GunName), position, false, 1, Convex);
+	AssetManager::AddGameObject(objectName, AssetManager::GetModel(GunName), position, false, 1, Convex);
 	GunPickUpCount++;
-	AssetManager::GetGameObject(index)->GetRigidBody()->applyCentralImpulse(glmToBtVector3(force));
+	AssetManager::GetGameObject(objectName)->GetRigidBody()->applyCentralImpulse(glmToBtVector3(force));
 }
 
 glm::vec3 Gun::swayPosition = glm::vec3(0);

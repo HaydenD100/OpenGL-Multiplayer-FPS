@@ -176,6 +176,7 @@
     <ClCompile Include="Engine\Loaders\stb_image.cpp" />
     <ClCompile Include="Engine\Loaders\vboindexer.cpp" />
     <ClCompile Include="Engine\Core\Model.cpp" />
+    <ClCompile Include="Engine\Pathfinding\Pathfinding.cpp" />
     <ClCompile Include="Engine\Physics\BulletPhysics.cpp" />
     <ClCompile Include="Engine\Physics\Physics.cpp" />
     <ClCompile Include="Engine\Core\Lights\light.cpp" />
@@ -246,6 +247,7 @@
     <ClInclude Include="Engine\Loaders\ShaderLoader.hpp" />
     <ClInclude Include="Engine\Loaders\stb_image.h" />
     <ClInclude Include="Engine\Loaders\vboindexer.h" />
+    <ClInclude Include="Engine\Pathfinding\Pathfinding.h" />
     <ClInclude Include="Engine\Physics\BulletPhysics.h" />
     <ClInclude Include="Engine\Physics\Physics.h" />
     <ClInclude Include="Engine\Core\Lights\light.h" />
