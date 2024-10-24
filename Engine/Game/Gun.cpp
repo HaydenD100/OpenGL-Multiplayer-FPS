@@ -61,6 +61,11 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 	}
 }
 
+void Gun::Equip() {
+	if (hasAnimations)
+		SceneManager::GetCurrentScene()->GetAnimator()->PlayAnimation(&equipAnim, name, false);
+}
+
 void Gun::Reload() {
 	if(hasAnimations)
 		SceneManager::GetCurrentScene()->GetAnimator()->PlayAnimation(&reloadAnim, name, false);
@@ -127,6 +132,7 @@ namespace WeaponManager
 		glock.firerate = 250; 
 		glock.shootAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_shoot1.dae", AssetManager::GetModel("glockhand"));
 		glock.reloadAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_reload.dae", AssetManager::GetModel("glockhand"));
+		glock.equipAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_equip.dae", AssetManager::GetModel("glockhand"));
 
 		glock.hasAnimations = true;
 		glock.currentammo = 18;
@@ -155,6 +161,7 @@ namespace WeaponManager
 
 		ak47.shootAnim = SkinnedAnimation("Assets/Objects/FBX/ak47_shoot.dae", AssetManager::GetModel("ak47hand"), 0);
 		ak47.reloadAnim = SkinnedAnimation("Assets/Objects/FBX/ak47_reload.dae", AssetManager::GetModel("ak47hand"), 0);
+		ak47.equipAnim = SkinnedAnimation("Assets/Objects/FBX/ak47_equip.dae", AssetManager::GetModel("ak47hand"), 0);
 		ak47.hasAnimations = true;
 
 		ak47.gunModel = "ak47";
@@ -199,6 +206,7 @@ namespace WeaponManager
 
 		doublebarrel.shootAnim = SkinnedAnimation("Assets/Objects/FBX/db_shoot.dae", AssetManager::GetModel("double_barrel_hand"), 1);
 		doublebarrel.reloadAnim = SkinnedAnimation("Assets/Objects/FBX/db_reload.dae", AssetManager::GetModel("double_barrel_hand"),0);
+		doublebarrel.equipAnim = SkinnedAnimation("Assets/Objects/FBX/db_equip.dae", AssetManager::GetModel("double_barrel_hand"), 1);
 		doublebarrel.hasAnimations = true;
 
 		doublebarrel.firesounds = 1;

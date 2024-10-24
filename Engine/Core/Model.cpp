@@ -30,8 +30,6 @@ Model::Model(const char* path, Texture* texture) {
     processNode(scene->mRootNode, scene, texture);
 
     aabb = generateAABB();
-
-    std::cout << "Bones" << m_BoneCounter << "\n";
 }
 Model::Model(const char* path, const char* collisonShapePath, Texture* texture) {
 
@@ -213,7 +211,6 @@ void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
         Mesh model_mesh = processMesh(mesh, scene);
         model_mesh.SetTexture(texture);
         model_mesh.SetName(mesh->mName.C_Str());
-        std::cout << mesh->mName.C_Str() << std::endl;
         meshes.push_back(model_mesh);
     }
     // then do the same for each of its children

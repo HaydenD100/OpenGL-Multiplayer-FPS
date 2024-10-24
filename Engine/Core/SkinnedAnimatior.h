@@ -52,7 +52,7 @@ public:
 
                     currentAnimationInstances[i].isPlaying = false;
                     currentAnimationInstances[i].m_CurrentTime = 0;
-                    CalculateBoneTransform(&currentAnimationInstances[i].Animation->GetRootNode(), glm::mat4(1.0f), i);
+                    //CalculateBoneTransform(&currentAnimationInstances[i].Animation->GetRootNode(), glm::mat4(1.0f), i);
                     continue;
                 }
                 currentAnimationInstances[i].m_CurrentTime = fmod(currentAnimationInstances[i].m_CurrentTime, currentAnimationInstances[i].Animation->GetDuration());

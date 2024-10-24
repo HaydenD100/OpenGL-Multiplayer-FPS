@@ -218,12 +218,15 @@ void Scene::Load() {
 }
 
 void Scene::Update(float deltaTime) {
+	Player::Update(deltaTime);
 	animatior.UpdateAnimation(deltaTime);
+
+
 	for (int i = 0; i < lights.size(); i++) {
 		if(glm::distance(lights[i].position,Player::getPosition()) < lights[i].updateDistance || lights[i].Dynamic)
 			lights[i].GenerateShadows();
 	}
-	Player::Update(deltaTime);
+
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
 		AssetManager::GetGameObject(i)->Update();
 	}
@@ -232,11 +235,13 @@ void Scene::Update(float deltaTime) {
 		doors[door].Interact();
 		doors[door].Update(deltaTime);
 	}
+
 	for (int gun = 0; gun < gunPickUps.size(); gun++) {
 		gunPickUps[gun].Update();
 		if (gunPickUps[gun].Interact() && Player::getCurrentGun() == "nothing")
 			gunPickUps.erase(gunPickUps.begin() + gun);
 	}
+
 	for (int crate = 0; crate < crates.size(); crate++) {
 		crates[crate].Update();
 	}

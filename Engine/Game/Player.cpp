@@ -373,6 +373,7 @@ namespace Player
 		gunName = weaponName;
 		AssetManager::GetGameObject(WeaponManager::GetGunByName(gunName)->name)->SetRender(true);
 		AudioManager::PlaySound("item_pickup", getPosition());
+		WeaponManager::GetGunByName(weaponName)->Equip();
 		return true;
 	}
 	
