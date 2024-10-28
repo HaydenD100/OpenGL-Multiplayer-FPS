@@ -48,46 +48,51 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
 
 	setPosition(position);
+	for (int i = 0; i < 100; i++)
+		m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
 
 
 }
 
 GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, btCollisionShape* shape) {
-	{
-		this->name = name;
-		this->model = model;
-		parentName = "";
-		canSave = save;
-		Btransform.setOrigin(glmToBtVector3(position));
-		collider = shape;
+	
+	this->name = name;
+	this->model = model;
+	parentName = "";
+	canSave = save;
+	Btransform.setOrigin(glmToBtVector3(position));
+	collider = shape;
 
-		bool isDynamic = (mass != 0.f);
+	bool isDynamic = (mass != 0.f);
 
-		btVector3 localInertia(0, 0, 0);
-		if (isDynamic)
-			collider->calculateLocalInertia(btScalar(mass), localInertia);
+	btVector3 localInertia(0, 0, 0);
+	if (isDynamic)
+		collider->calculateLocalInertia(btScalar(mass), localInertia);
 
-		Btransform.setIdentity();
-		Btransform.setOrigin(btVector3(position.x, position.y, position.z));
+	Btransform.setIdentity();
+	Btransform.setOrigin(btVector3(position.x, position.y, position.z));
 
-		// Using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
-		btDefaultMotionState* myMotionState = new btDefaultMotionState(Btransform);
-		btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, collider, localInertia);
-		body = new btRigidBody(rbInfo);
+	// Using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
+	btDefaultMotionState* myMotionState = new btDefaultMotionState(Btransform);
+	btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, collider, localInertia);
+	body = new btRigidBody(rbInfo);
 
 
-		body->setActivationState(DISABLE_DEACTIVATION);
-		body->setFriction(0.7f);
-		body->setUserIndex(-1);
+	body->setActivationState(DISABLE_DEACTIVATION);
+	body->setFriction(0.7f);
+	body->setUserIndex(-1);
 
-		// Add the body to the dynamics world
-		if (mass != 0)
-			PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_DYNAMIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
-		else
-			PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
+	// Add the body to the dynamics world
+	if (mass != 0)
+		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_DYNAMIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
+	else
+		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
 
-		setPosition(position);
-	}
+	setPosition(position);
+
+	for (int i = 0; i < 100; i++)
+		m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
+	
 }
 
 
@@ -148,7 +153,7 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	}
 	else if (shape == Concave) {
 
-		btTriangleMesh*	triangleShape = new btTriangleMesh();
+		btTriangleMesh* triangleShape = new btTriangleMesh();
 
 
 		for (int i = 0; i < model->GetAllMeshes()->size(); i++) {
@@ -173,7 +178,7 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 			if (!model->RenderAll())
 				break;
 		}
-		
+
 		triangleCollison = new btBvhTriangleMeshShape(triangleShape, true);
 
 
@@ -251,14 +256,16 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	body->setActivationState(DISABLE_DEACTIVATION);
 	body->setFriction(0.7f);
 	body->setUserIndex(-1);
-	
+
 	// Add the body to the dynamics world
 	if (mass != 0)
 		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_DYNAMIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
 	else
 		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
-	
+
 	setPosition(position);
+	for (int i = 0; i < 100; i++)
+		m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
 }
 
 
@@ -275,7 +282,7 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	else
 		collider = new btBoxShape(btVector3(btScalar(width / 2), btScalar(height / 2), btScalar(depth / 2)));
 
-	if(width == 0 || height == 0 || depth == 0)
+	if (width == 0 || height == 0 || depth == 0)
 		collider = new btEmptyShape();
 
 	PhysicsManagerBullet::AddColliderShape(collider);
@@ -295,14 +302,16 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	body->setActivationState(DISABLE_DEACTIVATION);
 	body->setFriction(0.7f);
 	body->setUserIndex(-1);
-	
+
 	// Add the body to the dynamics world
 	if (mass != 0)
 		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_DYNAMIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
 	else
 		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
-	
+
 	setPosition(position);
+	for (int i = 0; i < 100; i++)
+		m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
 }
 
 
@@ -331,7 +340,7 @@ glm::mat4 GameObject::GetModelMatrix() {
 			matrix = parent->GetModelMatrix() * transform.to_mat4();
 		}
 	}
-	
+
 	return  matrix;
 }
 
@@ -363,7 +372,7 @@ void GameObject::RenderObject(GLuint& programID) {
 void GameObject::setPosition(glm::vec3 position) {
 	transform.position = position;
 	btTransform& t = body->getWorldTransform();
-	t.setOrigin(btVector3(position.x,position.y,position.z));
+	t.setOrigin(btVector3(position.x, position.y, position.z));
 	body->getMotionState()->setWorldTransform(t);
 }
 
@@ -523,6 +532,12 @@ std::string GameObject::GetShaderType() {
 }
 Transform GameObject::getTransform() {
 	return transform;
+}
+std::vector<glm::mat4>  GameObject::GetFinalBoneMatricies() {
+	return m_FinalBoneMatrices;
+}
+void GameObject::SetFinalBoneMatricies(int index, glm::mat4 mat) {
+	m_FinalBoneMatrices[index] = mat;
 }
 
 

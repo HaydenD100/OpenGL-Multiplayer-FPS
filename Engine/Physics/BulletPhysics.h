@@ -2,6 +2,7 @@
 #include "bullet/btBulletDynamicsCommon.h"
 #include "bullet/LinearMath/btVector3.h"
 #include "bullet/LinearMath/btAlignedObjectArray.h"
+#include "Engine/Core/Debug/BulletDebug.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>

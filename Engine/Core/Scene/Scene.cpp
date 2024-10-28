@@ -49,7 +49,9 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 	AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("glass")));
 
+	AssetManager::AddModel("swat", Model("Assets/Objects/FBX/swat_death.dae", AssetManager::GetTexture("uvmap")));
 
+	
 	AssetManager::AddModel("fence1", Model("Assets/Objects/fence1.fbx", AssetManager::GetTexture("concrete")));
 	AssetManager::AddModel("fence2", Model("Assets/Objects/fence2.fbx", AssetManager::GetTexture("concrete")));
 	AssetManager::AddModel("fence3", Model("Assets/Objects/fence3.fbx", AssetManager::GetTexture("concrete")));
@@ -102,9 +104,11 @@ void Scene::LoadAssets() {
 	AssetManager::AddDecal("pizza_decal", AssetManager::GetTexture("pizza"), glm::vec3(1, 0.1, 1));
 	AssetManager::AddDecal("freaky_decal", AssetManager::GetTexture("freaky"), glm::vec3(1, 0.1, 1));
 
-	AnimationManager::AddAnimation(Animation("Assets/Objects/FBX/ak47.fbx", "ak47_reload"));
+	//these are diffrent animations from skinnedanimation
 	AnimationManager::AddAnimation(Animation("Assets/Animations/door_open.fbx", "door_open"));
 	AnimationManager::AddAnimation(Animation("Assets/Animations/door_close.fbx", "door_close"));
+
+	
 }
 
 
@@ -148,8 +152,9 @@ void Scene::Load() {
 	doors.push_back(Door("door3", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-12.3, 0, 4.6), glm::vec3(0, 1.5708f, 0), false));
 	doors.push_back(Door("door4", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-10, 0, 4.6), glm::vec3(0,1.5708f,0)));
 	
-
-
+	
+	AssetManager::AddGameObject(GameObject("swat", AssetManager::GetModel("swat"), glm::vec3(0, 0, 0), false, 0,Capsule,0.5,2,0));
+	
 
 	// Sets renderer
 	Renderer::UseProgram(Renderer::GetProgramID("Texture"));
@@ -213,7 +218,10 @@ void Scene::Load() {
 	ModelMatrixId = glGetUniformLocation(Renderer::GetCurrentProgramID(), "model");
 	animatior = Animator();
 
-
+	swat_death = SkinnedAnimation("Assets/Objects/FBX/swat_death.dae", AssetManager::GetModel("swat"), 0);
+	animatior.PlayAnimation(&swat_death, "swat", false);
+	//TODO :: dosent work yet
+	PathFinding::Init();
 	glBindVertexArray(sky.GetSkyBoxVAO());
 }
 
@@ -266,8 +274,9 @@ void Scene::RenderObjects(GLuint programid) {
 		if (!gameobjectRender->GetModel()->GetAABB()->isOnFrustum(Camera::GetFrustum(), gameobjectRender->getTransform()))
 			continue;
 
-		auto transforms = animatior.GetFinalBoneMatrices(gameobjectRender->GetName());
-		if (transforms.size() > 0) {
+		//auto transforms = animatior.GetFinalBoneMatrices(gameobjectRender->GetName());
+		auto transforms = gameobjectRender->GetFinalBoneMatricies();
+		if (transforms[0] != glm::mat4(1)) {
 			glUniform1i(glGetUniformLocation(programid, "animated"), true);
 
 			for (int i = 0; i < transforms.size(); ++i) {
@@ -308,8 +317,9 @@ void Scene::RenderAllObjects(GLuint programid) {
 			continue;
 		}
 
-		auto transforms = animatior.GetFinalBoneMatrices(gameobjectRender->GetName());
-		if (transforms.size() > 0) {
+		//auto transforms = animatior.GetFinalBoneMatrices(gameobjectRender->GetName());
+		auto transforms = gameobjectRender->GetFinalBoneMatricies();
+		if (transforms[0] != glm::mat4(1)) {
 			glUniform1i(glGetUniformLocation(programid, "animated"), true);
 
 			for (int i = 0; i < transforms.size(); ++i) {

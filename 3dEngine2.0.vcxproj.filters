@@ -126,6 +126,9 @@
     <ClCompile Include="Engine\Pathfinding\Pathfinding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Core\Debug\BulletDebug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Scene\Scene.h">
@@ -245,6 +248,9 @@
     <ClInclude Include="Engine\Pathfinding\Pathfinding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Core\Debug\BulletDebug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\SkyBoxShader.vert" />
@@ -271,6 +277,8 @@
     <None Include="Assets\Shaders\Decal\decal.frag" />
     <None Include="Assets\Shaders\Bloom\bloom.vert" />
     <None Include="Assets\Shaders\Bloom\bloom.frag" />
+    <None Include="Assets\Shaders\Debug\debug.frag" />
+    <None Include="Assets\Shaders\Debug\debug.vert" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

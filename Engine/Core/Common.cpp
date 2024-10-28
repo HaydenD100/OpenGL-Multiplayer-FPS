@@ -234,3 +234,8 @@ glm::vec3 GetGLMVec(const aiVector3D& vec) {
 glm::quat GetGLMQuat(const aiQuaternion& quat) {
     return glm::quat(quat.w, quat.x, quat.y, quat.z); // glm::quat constructor uses (w, x, y, z)
 }
+double round_up(double value, int decimal_places) {
+    const double multiplier = std::pow(10.0, decimal_places);
+    return std::ceil(value * multiplier) / multiplier;
+}
+

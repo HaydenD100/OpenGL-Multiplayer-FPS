@@ -31,6 +31,15 @@ public:
             m_GlobalInversetransform = glm::inverse(ConvertMatrixToGLMFormat(scene->mRootNode->mTransformation));
             ReadHeirarchyData(m_RootNode, scene->mRootNode);
             ReadMissingBones(animation, *model);
+
+
+            //std::vector<float> boneLengths;
+            //calculateBoneLengths(scene->mRootNode, scene, boneLengths);
+
+            // Output the bone lengths
+            //for (float length : boneLengths) {
+                //std::cout << "Bone length: " << length << std::endl;
+            //}
         }
         
     }
@@ -106,6 +115,33 @@ private:
             AssimpNodeData newData;
             ReadHeirarchyData(newData, src->mChildren[i]);
             dest.children.push_back(newData);
+        }
+    }
+
+    //Not in use but i wnat to use it for ragdolls later on
+    // Recursive function to calculate bone lengths
+    void calculateBoneLengths(const aiNode* node, const aiScene* scene, std::vector<float>& boneLengths, const glm::mat4& parentTransform = glm::mat4(1.0f)) {
+        glm::mat4 nodeTransform = ConvertMatrixToGLMFormat(node->mTransformation);
+        glm::mat4 globalTransform = parentTransform * nodeTransform;
+
+        // Get the position of this node in world space (ignore rotation and scale)
+        glm::vec3 currentPos(globalTransform[3][0], globalTransform[3][1], globalTransform[3][2]);
+
+        for (unsigned int i = 0; i < node->mNumChildren; i++) {
+            const aiNode* childNode = node->mChildren[i];
+
+            glm::mat4 childTransform = ConvertMatrixToGLMFormat(childNode->mTransformation);
+            glm::mat4 childGlobalTransform = globalTransform * childTransform;
+
+            // Calculate the child's position in world space
+            glm::vec3 childPos(childGlobalTransform[3][0], childGlobalTransform[3][1], childGlobalTransform[3][2]);
+
+            // Calculate length between this node and its child
+            float length = glm::length(childPos - currentPos);
+            boneLengths.push_back(length);
+
+            // Recursive call for the child node
+            calculateBoneLengths(childNode, scene, boneLengths, globalTransform);
         }
     }
 

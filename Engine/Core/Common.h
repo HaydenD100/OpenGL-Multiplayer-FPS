@@ -177,3 +177,7 @@ glm::vec3 GetGLMVec(const aiVector3D& vec);
 
 glm::quat GetGLMQuat(const aiQuaternion& quat);
 
+double round_up(double value, int decimal_places);
+
+
+

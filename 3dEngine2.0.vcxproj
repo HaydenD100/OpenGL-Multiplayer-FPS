@@ -149,6 +149,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Core\Debug\BulletDebug.cpp" />
     <ClCompile Include="Editor\EditorManager.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Backend.cpp" />
@@ -191,6 +192,8 @@
     <None Include="Assets\Saves\mainScene.json" />
     <None Include="Assets\Shaders\Bloom\bloom.frag" />
     <None Include="Assets\Shaders\Bloom\bloom.vert" />
+    <None Include="Assets\Shaders\Debug\debug.frag" />
+    <None Include="Assets\Shaders\Debug\debug.vert" />
     <None Include="Assets\Shaders\Decal\decal.frag" />
     <None Include="Assets\Shaders\Decal\decal.vert" />
     <None Include="Assets\Shaders\Deffered\geomerty.frag" />
@@ -217,6 +220,7 @@
     <Text Include="todo.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Core\Debug\BulletDebug.h" />
     <ClInclude Include="Editor\EditorManager.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\Backend.h" />

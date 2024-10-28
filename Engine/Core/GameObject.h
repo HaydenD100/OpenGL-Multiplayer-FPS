@@ -99,7 +99,8 @@ public:
 	btCollisionShape* GetCollisionShape();
 	btConvexHullShape* GetConvexHull();
 
-
+	std::vector<glm::mat4> GetFinalBoneMatricies();
+	void SetFinalBoneMatricies(int index, glm::mat4 mat);
 
 	glm::vec3 GetPosition() const {
 		return btToGlmVector3(body->getWorldTransform().getOrigin());
@@ -125,5 +126,8 @@ private:
 	bool canSave = false;
 	bool render = true;
 	bool shouldDelete = false;
+
+	//change to this
+	std::vector<glm::mat4> m_FinalBoneMatrices;
 
 };

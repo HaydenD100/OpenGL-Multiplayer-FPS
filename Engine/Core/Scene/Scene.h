@@ -21,6 +21,7 @@
 #include "Engine/Physics/BulletPhysics.h"
 #include "Engine/Core/Animation.h"
 #include "Engine/Core/SkinnedAnimatior.h"
+#include "Engine/Pathfinding/Pathfinding.h"
 
  
 class Scene
@@ -64,4 +65,7 @@ private:
 	//holds the models
 
 	GLuint ModelMatrixId;
+
+	//temp
+	SkinnedAnimation swat_death;
 };

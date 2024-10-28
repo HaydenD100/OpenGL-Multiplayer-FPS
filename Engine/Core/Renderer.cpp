@@ -152,6 +152,8 @@ namespace Renderer
 		LoadShader("Assets/Shaders/Shadow/depth.vert", "Assets/Shaders/Shadow/depth.frag","Assets/Shaders/Shadow/depth.geom", "shadow");
 		LoadShader("Assets/Shaders/Decal/decal.vert", "Assets/Shaders/Decal/decal.frag", "decal");
 		LoadShader("Assets/Shaders/Bloom/bloom.vert", "Assets/Shaders/Bloom/bloom.frag", "bloom");
+		LoadShader("Assets/Shaders/Debug/debug.vert", "Assets/Shaders/Debug/debug.frag", "debug");
+
 
 
 
@@ -471,7 +473,6 @@ namespace Renderer
 
 		//-----------------------------------------Decal---------------------------------------
 		glEnable(GL_BLEND);
-
 		programid = Renderer::GetProgramID("decal");
 		Renderer::UseProgram(programid);
 		glActiveTexture(GL_TEXTURE3);
@@ -532,8 +533,10 @@ namespace Renderer
 				overlay.push_back(needRendering[i]);
 				continue;
 			}
-			auto transforms = SceneManager::GetCurrentScene()->GetAnimator()->GetFinalBoneMatrices(needRendering[i]->GetName());
-			if (transforms.size() > 0) {
+			//auto transforms = SceneManager::GetCurrentScene()->GetAnimator()->GetFinalBoneMatrices(needRendering[i]->GetName());
+			auto transforms = needRendering[i]->GetFinalBoneMatricies();
+
+			if (transforms[0] != glm::mat4(1)) {
 				glUniform1i(glGetUniformLocation(programid, "animated"), true);
 
 				for (int i = 0; i < transforms.size(); ++i) {
@@ -563,8 +566,10 @@ namespace Renderer
 			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;
 			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
 
-			auto transforms = SceneManager::GetCurrentScene()->GetAnimator()->GetFinalBoneMatrices(overlay[i]->GetName());
-			if (transforms.size() > 0) {
+			//auto transforms = SceneManager::GetCurrentScene()->GetAnimator()->GetFinalBoneMatrices(overlay[i]->GetName());
+			auto transforms = overlay[i]->GetFinalBoneMatricies();
+
+			if (transforms[0] != glm::mat4(1)) {
 				glUniform1i(glGetUniformLocation(programid, "animated"), true);
 
 				for (int i = 0; i < transforms.size(); ++i) {

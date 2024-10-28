@@ -4,7 +4,9 @@
 namespace PhysicsManagerBullet
 {
 	btAlignedObjectArray<btCollisionShape*> collisionShapes;
+
 	//std::vector<Collider> colliders;
+	// debugDrawer;
 
 	btDiscreteDynamicsWorld* dynamicsWorld;
 	btSequentialImpulseConstraintSolver* solver;
@@ -40,6 +42,10 @@ namespace PhysicsManagerBullet
 		dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
 
 		dynamicsWorld->setGravity(btVector3(0, -10, 0));
+
+		//debugDrawer = new DebugDrawer(Renderer::GetProgramID("debug"));
+		//dynamicsWorld->setDebugDrawer(debugDrawer);
+		//dynamicsWorld->debugDrawWorld();
 	}
 	
 	void Update(float deltaTime) {
