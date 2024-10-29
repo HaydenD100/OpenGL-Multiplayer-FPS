@@ -41,31 +41,20 @@ public:
 	int GetGunPickUpSize();
 	Crate* GetCrate(std::string name);
 	std::vector<Light> getLights();
-
 	SkyBox GetSkyBox();
-	
-	Animator* GetAnimator();
-
 	std::vector<GameObject*> NeedRenderingObjects();
 
 private:
 	std::vector<GameObject*> NeedRendering;
 	SkyBox sky = SkyBox();
 
-	Animator animatior;	
-	SkinnedAnimation running;
-
-	
 	// Objects
 	std::vector<Door> doors;
 	std::vector<Crate> crates;
 	std::vector<GunPickUp> gunPickUps;
 	std::vector<Light> lights;
 
-	//holds the models
-
+	//holds the model shader ID for Gemoetry
 	GLuint ModelMatrixId;
 
-	//temp
-	SkinnedAnimation swat_death;
 };

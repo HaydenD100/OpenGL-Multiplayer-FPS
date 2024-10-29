@@ -216,10 +216,10 @@ void Scene::Load() {
 
 
 	ModelMatrixId = glGetUniformLocation(Renderer::GetCurrentProgramID(), "model");
-	animatior = Animator();
+	Animator::Init();
 
-	swat_death = SkinnedAnimation("Assets/Objects/FBX/swat_death.dae", AssetManager::GetModel("swat"), 0);
-	animatior.PlayAnimation(&swat_death, "swat", false);
+	//swat_death = SkinnedAnimation("Assets/Objects/FBX/swat_death.dae", AssetManager::GetModel("swat"), 0);
+	//Animator::PlayAnimation(&swat_death, "swat", false);
 	//TODO :: dosent work yet
 	PathFinding::Init();
 	glBindVertexArray(sky.GetSkyBoxVAO());
@@ -227,7 +227,7 @@ void Scene::Load() {
 
 void Scene::Update(float deltaTime) {
 	Player::Update(deltaTime);
-	animatior.UpdateAnimation(deltaTime);
+	Animator::UpdateAnimation(deltaTime);
 
 
 	for (int i = 0; i < lights.size(); i++) {
@@ -274,7 +274,6 @@ void Scene::RenderObjects(GLuint programid) {
 		if (!gameobjectRender->GetModel()->GetAABB()->isOnFrustum(Camera::GetFrustum(), gameobjectRender->getTransform()))
 			continue;
 
-		//auto transforms = animatior.GetFinalBoneMatrices(gameobjectRender->GetName());
 		auto transforms = gameobjectRender->GetFinalBoneMatricies();
 		if (transforms[0] != glm::mat4(1)) {
 			glUniform1i(glGetUniformLocation(programid, "animated"), true);
@@ -358,8 +357,5 @@ SkyBox Scene::GetSkyBox() {
 }
 std::vector<GameObject*> Scene::NeedRenderingObjects() {
 	return NeedRendering;
-}
-Animator* Scene::GetAnimator() {
-	return &animatior;
 }
 

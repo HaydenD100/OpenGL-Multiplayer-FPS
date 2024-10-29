@@ -63,12 +63,12 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 
 void Gun::Equip() {
 	if (hasAnimations)
-		SceneManager::GetCurrentScene()->GetAnimator()->PlayAnimation(&equipAnim, name, false);
+		Animator::PlayAnimation(&equipAnim, name, false);
 }
 
 void Gun::Reload() {
 	if(hasAnimations)
-		SceneManager::GetCurrentScene()->GetAnimator()->PlayAnimation(&reloadAnim, name, false);
+		Animator::PlayAnimation(&reloadAnim, name, false);
 	else
 		AnimationManager::Play("ak47_reload", Player::getCurrentGun());
 
@@ -79,7 +79,7 @@ void Gun::Shoot(){
 	AudioManager::PlaySound(gunsShotName + std::to_string(randomnum));
 
 	if (hasAnimations) {
-		SceneManager::GetCurrentScene()->GetAnimator()->PlayAnimation(&shootAnim, name, false);
+		Animator::PlayAnimation(&shootAnim, name, false);
 	}
 	else 
 		kickbackOffset += kickback;

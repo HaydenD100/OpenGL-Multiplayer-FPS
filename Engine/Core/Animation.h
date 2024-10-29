@@ -15,10 +15,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-// TODO: This is still a work-in-progress and hasn't been implemented into the engine
-
-
-// Works but theres still some problems with FBX file types and stuff, also you cant scale becuase I havent added scaling the collider yet.
+//------------------IMPORTANT--------------------------
+//This and the Animation Manager should not be used for animations, this will only transform the gameobject over keyframes while the Skinned Animations and Animator use bones that will munipluate the verticies this was added before I implemented SkinnedAnimations
 
 struct KeyFrame
 {
