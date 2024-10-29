@@ -187,6 +187,8 @@
     <ClCompile Include="Engine\Core\Bone.cpp" />
     <ClCompile Include="Engine\Core\SkinnedAnimatior.cpp" />
     <ClCompile Include="Engine\Core\SkinnedAnimation.cpp" />
+    <ClCompile Include="Engine\Core\RagDoll.cpp" />
+    <ClCompile Include="Engine\Core\Networking\NetworkManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Saves\mainScene.json" />
@@ -260,6 +262,8 @@
     <ClInclude Include="Engine\Core\Bone.h" />
     <ClInclude Include="Engine\Core\SkinnedAnimatior.h" />
     <ClInclude Include="Engine\Core\SkinnedAnimation.h" />
+    <ClInclude Include="Engine\Core\RagDoll.h" />
+    <ClInclude Include="Engine\Core\Networking\NetworkManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="github\screenshots\3DEngine.png" />

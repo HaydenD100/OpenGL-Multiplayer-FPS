@@ -3,6 +3,7 @@
 #include "Editor/EditorManager.h"
 #include <ctime>
 #include <iostream>
+#include "Engine/Core/Networking/NetworkManager.h"
 
 
 //rewrite of my first 3D Engine
@@ -18,6 +19,15 @@ namespace Engine
 	bool Editing = false;
 
 	int Engine::Run() {
+
+		NetworkManager::Init();
+		std::cout << "1 for server 0 for client \n";
+		int temp;
+		std::cin >> temp;
+		if (temp)
+			NetworkManager::InitServer();
+		else
+			NetworkManager::InitClient();
 
 		//Im g
 		/*
@@ -68,46 +78,40 @@ namespace Engine
 			// Update Managers
 			Input::Update();
 
-			//TO DO :: Editing
-			if (Editing)
-			{
-				EditorManager::Update();
-			}
-			else {
-
-				//Reloads Shaders
-				if (Input::KeyDown('h'))
-					Renderer::LoadAllShaders();
+			//Reloads Shaders
+			if (Input::KeyDown('h'))
+				Renderer::LoadAllShaders();
 				
-				Input::CenterMouse();
-				SceneManager::Update(dt);
-				AnimationManager::Update(dt);
-				Camera::Update(dt);
-				//SceneManager::Render();
-				Renderer::RenderScene();
-				AudioManager::Update();
-				PhysicsManagerBullet::Update(dt);
-				std::ostringstream oss;
-				oss << "FPS: " << FPS;
-				Renderer::RenderText(oss.str().c_str(), 660, 585, 15);
+			Input::CenterMouse();
+			SceneManager::Update(dt);
+			AnimationManager::Update(dt);
+			Camera::Update(dt);
+			//SceneManager::Render();
+			Renderer::RenderScene();
+			AudioManager::Update();
+			PhysicsManagerBullet::Update(dt);
+			std::ostringstream oss;
+			oss << "FPS: " << FPS;
+			Renderer::RenderText(oss.str().c_str(), 660, 585, 15);
+			oss.str(""); oss.clear();
+			oss.precision(4);
+			oss << "Position: " << Player::getPosition().x << " y:" << Player::getPosition().y << " z:" << Player::getPosition().z << "\n";
+			Renderer::RenderText(oss.str().c_str(), 0, 560, 15);
+			if (Player::getCurrentGun() != "nothing") {
 				oss.str(""); oss.clear();
 				oss.precision(4);
-				oss << "Position: " << Player::getPosition().x << " y:" << Player::getPosition().y << " z:" << Player::getPosition().z << "\n";
-				Renderer::RenderText(oss.str().c_str(), 0, 560, 15);
-				if (Player::getCurrentGun() != "nothing") {
-					oss.str(""); oss.clear();
-					oss.precision(4);
-					oss << WeaponManager::GetGunByName(Player::getCurrentGun())->currentammo << "/" << WeaponManager::GetGunByName(Player::getCurrentGun())->ammo << "\n";
-					Renderer::RenderText(oss.str().c_str(), 700, 60, 15);
-				}
-				//AssetManager::CleanUp();
-
+				oss << WeaponManager::GetGunByName(Player::getCurrentGun())->currentammo << "/" << WeaponManager::GetGunByName(Player::getCurrentGun())->ammo << "\n";
+				Renderer::RenderText(oss.str().c_str(), 700, 60, 15);
 			}
+			//AssetManager::CleanUp();
+
+			
 			Renderer::SwapBuffers(Backend::GetWindowPointer());
 
 			
 		}
 
+		NetworkManager::CleanUp();
 		return 0;
 	}
 }
