@@ -8,11 +8,47 @@
 #include <stdio.h>
 #include <iostream>
 #include <thread>
+#include <queue>
 
 #pragma comment(lib, "Ws2_32.lib")
 
 #define DEFAULT_PORT "27015"
 #define DEFAULT_BUFLEN 512
+
+enum PacketType : uint8_t {
+	PlAYERPOSTION = 0b00000001,
+	SOUND = 0b00000010,
+	OBJECTPOSTIONS = 0b00000100,
+	CONTROL = 0b10000000,
+	MESSAGE = 0b00001000
+};
+
+struct Packet {
+	//type of packet for payload 
+	uint8_t type;
+	//size of playload
+	uint32_t size;
+
+	// Define payload types
+	struct PlayerPosition {
+		float x;
+		float y;
+		float z;
+		float rotation_x;
+		float rotation_y;
+		float rotation_z;
+	};
+
+	struct MessagePayload {
+		char message[256];  // Fixed-size buffer for the message
+	};
+
+	union Payload {
+		PlayerPosition position;
+		MessagePayload message;
+		Payload() {}
+	} payload;
+};
 
 namespace NetworkManager
 {
@@ -20,22 +56,24 @@ namespace NetworkManager
 	void CleanUp();
 
 	int InitServer();
-	//dont use this for now ill add this back with multithreading
 	int RunServer();
 
 	int CheckForDataFromClient();
-	int SendDataToClient(std::string message);
+	int SendDataToClient(const char* buffer);
 	int WaitForClient();
 
 	int CheckForDataFromServer();
-	int SendDataToServer(std::string message);
+	int SendDataToServer(const char* buffer);
 
-	int RunClient(SOCKET ConnectSocket);
+	int RunClient();
 	int InitClient();
 
 	int IsServer();
 
+	int SendPackets();
 
+	//packet sending
+	Packet SendPacketMessage(const char* message);
 
 };
 

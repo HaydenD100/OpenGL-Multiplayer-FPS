@@ -81,6 +81,9 @@ namespace Engine
 			//Reloads Shaders
 			if (Input::KeyDown('h'))
 				Renderer::LoadAllShaders();
+			if (Input::KeyDown('p') && !NetworkManager::IsServer())
+				NetworkManager::SendPacketMessage("this is a test");
+				
 				
 			Input::CenterMouse();
 			SceneManager::Update(dt);
@@ -108,6 +111,7 @@ namespace Engine
 			
 			Renderer::SwapBuffers(Backend::GetWindowPointer());
 
+			NetworkManager::SendPackets();
 			
 		}
 

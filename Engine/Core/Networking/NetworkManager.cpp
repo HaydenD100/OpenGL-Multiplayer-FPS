@@ -7,15 +7,16 @@ namespace NetworkManager
 	WSADATA wsaData;
 	int iResult;
 
-	//server stuff
 	SOCKET ListenSocket = INVALID_SOCKET;
 	SOCKET ClientSocket = INVALID_SOCKET;
+	SOCKET ConnectSocket = INVALID_SOCKET;
 	int isServer = 0;
 	int isRunning = 1;
 
 	std::thread netowrking_thread;
 
-
+	std::queue<Packet> out;
+	std::queue<Packet> in;
 
 	int Init() {
 		// Initialize Winsock
@@ -28,6 +29,11 @@ namespace NetworkManager
 	}
 	void CleanUp() {
 		isRunning = 0;
+		if (!isServer) {
+			// shutdown the connection for sending since no more data will be sent
+			// the client can still use the ConnectSocket for receiving data
+			iResult = shutdown(ConnectSocket, SD_SEND);
+		}
 		netowrking_thread.join();
 		// cleanup
 		closesocket(ClientSocket);
@@ -58,18 +64,6 @@ namespace NetworkManager
 					WSACleanup();
 					return 1;
 				}
-
-				/*
-				// Echo the buffer back to the sender
-				iSendResult = send(ClientSocket, recvbuf, iResult, 0);
-				if (iSendResult == SOCKET_ERROR) {
-					printf("send failed: %d\n", WSAGetLastError());
-					closesocket(ClientSocket);
-					WSACleanup();
-					return 1;
-				}
-				printf("Bytes sent: %d\n", iSendResult);
-				*/
 			}
 		} while (isRunning);
 
@@ -126,7 +120,7 @@ namespace NetworkManager
 			printf("Listen failed with error: %ld\n", WSAGetLastError());
 			closesocket(ListenSocket);
 			WSACleanup();
-			return 1;
+			return 1; 
 		}
 
 		netowrking_thread = std::thread(RunServer);
@@ -146,18 +140,20 @@ namespace NetworkManager
 		}
 	}
 
-	int RunClient(SOCKET ConnectSocket) {
+	int RunClient() {
 		std::cout << "Starting Client \n";
 
 		int recvbuflen = DEFAULT_BUFLEN;
-		std::string message = "Client Connected to server";
+		char message[DEFAULT_BUFLEN] = "Client Connected to server";
 		char recvbuf[DEFAULT_BUFLEN];
 
 		int iResult;
 
 		// Send an initial buffer
-		iResult = send(ConnectSocket, message.c_str(), (int)strlen(message.c_str()), 0);
-		printf("Bytes Sent: %ld\n", iResult);
+		//iResult = send(ConnectSocket, message.c_str(), (int)strlen(message.c_str()), 0);
+		//printf("Bytes Sent: %ld\n", iResult);
+
+		iResult = SendDataToServer(message);
 
 		if (iResult == SOCKET_ERROR) {
 			printf("send failed: %d\n", WSAGetLastError());
@@ -167,36 +163,19 @@ namespace NetworkManager
 		}
 
 		// Receive data until the server closes the connection
-		do {
-			message.clear();
-			std::cin >> message;
-			iResult = send(ConnectSocket, message.c_str(), (int)strlen(message.c_str()), 0);
-			printf("Bytes Sent: %ld\n", iResult);
-
-			if (iResult == SOCKET_ERROR) {
-				printf("send failed: %d\n", WSAGetLastError());
-				closesocket(ConnectSocket);
-				WSACleanup();
-				return 1;
-			}
+		while (isRunning) {
 			iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-			if (iResult > 0)
+			if (iResult > 0) {
 				printf("Bytes received: %d\n", iResult);
-			else if (iResult == 0)
-				printf("Connection closed\n");
-			else
-				printf("recv failed: %d\n", WSAGetLastError());
-		} while (iResult > 0 && isRunning);
+			}
 
-		// shutdown the connection for sending since no more data will be sent
-		// the client can still use the ConnectSocket for receiving data
-		iResult = shutdown(ConnectSocket, SD_SEND);
-		if (iResult == SOCKET_ERROR) {
-			printf("shutdown failed: %d\n", WSAGetLastError());
-			closesocket(ConnectSocket);
-			WSACleanup();
-			return 1;
+			/*
+			
+			*/
+
+
 		}
+
 	}
 
 	int InitClient() {
@@ -222,7 +201,7 @@ namespace NetworkManager
 			WSACleanup();
 			return 1;
 		}
-		SOCKET ConnectSocket = INVALID_SOCKET;
+		ConnectSocket = INVALID_SOCKET;
 
 		// Attempt to connect to the first address returned by
 		// the call to getaddrinfo
@@ -256,7 +235,7 @@ namespace NetworkManager
 		}
 
 		std::cout << "Connected to server \n";
-		netowrking_thread = std::thread(RunClient, ConnectSocket);
+		netowrking_thread = std::thread(RunClient);
 	}
 
 
@@ -283,15 +262,35 @@ namespace NetworkManager
 
 
 	}
-	int SendDataToClient(std::string message) {
-		int iSendResult;
-		iSendResult = send(ClientSocket, message.c_str(), (int)strlen(message.c_str()), 0);
-		if (iSendResult == SOCKET_ERROR) {
+	int SendDataToClient(const char* buffer) {
+		int recvbuflen = DEFAULT_BUFLEN;
+		int iResult;
+		iResult = send(ClientSocket, buffer, recvbuflen, 0);
+
+		if (iResult == SOCKET_ERROR) {
 			printf("send failed: %d\n", WSAGetLastError());
 			closesocket(ClientSocket);
 			WSACleanup();
 			return 1;
 		}
+
+		return iResult;
+	}
+	int SendDataToServer(const char* buffer) {
+		int recvbuflen = DEFAULT_BUFLEN;
+		int iResult;
+
+		// Send an initial buffer
+		iResult = send(ConnectSocket, buffer, recvbuflen, 0);
+		printf("Bytes Sent: %ld\n", iResult);
+
+		if (iResult == SOCKET_ERROR) {
+			printf("send failed: %d\n", WSAGetLastError());
+			closesocket(ConnectSocket);
+			WSACleanup();
+			return 1;
+		}
+		return iResult;
 	}
 
 	/*
@@ -307,27 +306,50 @@ namespace NetworkManager
 		else
 			printf("recv failed: %d\n", WSAGetLastError());
 	}
-	int SendDataToServer(std::string message) {
-		int recvbuflen = DEFAULT_BUFLEN;
-		int iResult;
-
-		// Send an initial buffer
-		iResult = send(ConnectSocket, message.c_str(), (int)strlen(message.c_str()), 0);
-		printf("Bytes Sent: %ld\n", iResult);
-
-		if (iResult == SOCKET_ERROR) {
-			printf("send failed: %d\n", WSAGetLastError());
-			closesocket(ConnectSocket);
-			WSACleanup();
-			return 1;
-		}
-	}
+	
 	*/
 	int IsServer() {
 		return isServer;
 	}
 
+	int SendPackets() {
+		while(out.size() > 0){
+			std::cout << out.size();
 
+			Packet packet = out.front();
+			out.pop();
+
+			char sendbuf[DEFAULT_BUFLEN] = { 0 };
+			std::memcpy(sendbuf, &packet.type, sizeof(packet.type));
+			std::memcpy(sendbuf + sizeof(packet.type), &packet.size, sizeof(packet.size));
+			switch (packet.type)
+			{
+			case MESSAGE:
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size),
+					packet.payload.message.message, packet.size);
+
+				break;
+			default:
+				break;
+			}
+			if (isServer)
+				SendDataToClient(sendbuf);
+
+			else
+				SendDataToServer(sendbuf);
+		}
+
+		return 0;
+	}
+
+	Packet SendPacketMessage(const char* message) {
+		Packet temp;
+		temp.type = MESSAGE;
+		temp.size = 256;
+		strcpy(temp.payload.message.message, message);
+
+		out.push(temp);
+	}
 
 
 };
