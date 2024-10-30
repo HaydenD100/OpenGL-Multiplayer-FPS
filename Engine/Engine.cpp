@@ -62,7 +62,8 @@ namespace Engine
 		int frameCount = 0;
 		int FPS = 0;
 
-
+		PlayerTwo::Init();
+		NetworkManager::LoadedIn();
 		while (Backend::IsWindowOpen()) {
 			// Delta time stuff
 			double currentTime = glfwGetTime();
@@ -110,7 +111,8 @@ namespace Engine
 			
 			Renderer::SwapBuffers(Backend::GetWindowPointer());
 
-			NetworkManager::SendPlayerData(Player::getPosition(), glm::vec3(AssetManager::GetGameObject("player")->getRotation().x, AssetManager::GetGameObject("player")->getRotation().y, AssetManager::GetGameObject("player")->getRotation().z));
+
+			NetworkManager::SendPlayerData(Player::getPosition(), glm::vec3(AssetManager::GetGameObject("player")->getRotation().x, AssetManager::GetGameObject("player")->getRotation().y, AssetManager::GetGameObject("player")->getRotation().z), Player::getCurrentGun(), Player::GetInteractingWithName());
 			NetworkManager::SendPackets();
 			
 		}

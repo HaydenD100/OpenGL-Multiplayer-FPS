@@ -51,7 +51,7 @@ void Scene::LoadAssets() {
 
 	AssetManager::AddModel("swat", Model("Assets/Objects/FBX/swat_death.dae", AssetManager::GetTexture("uvmap")));
 	
-	AssetManager::AddModel("playertwo", Model("Assets/Objects/FBX/capsule.fbx", AssetManager::GetTexture("uvmap")));
+	AssetManager::AddModel("playertwo", Model(Mesh("Assets/Objects/playerTwo.obj"), AssetManager::GetTexture("uvmap")));
 
 
 	AssetManager::AddModel("fence1", Model("Assets/Objects/fence1.fbx", AssetManager::GetTexture("concrete")));
@@ -141,7 +141,6 @@ void Scene::Load() {
 	//AssetManager::AddGameObject("db", AssetManager::GetModel("doublebarrel"), glm::vec3(0, 2, 0), true, 0, Box);
 
 
-	AssetManager::AddGameObject("PlayerTwo", AssetManager::GetModel("playertwo"), glm::vec3(0, 2, 0), true, 0, Convex);
 	
 	crates.push_back(Crate(glm::vec3(1, 2, 1), "crate1", AssetManager::GetModel("crate")));
 	crates.push_back(Crate(glm::vec3(-3, 2, -3), "crate2", AssetManager::GetModel("crate")));

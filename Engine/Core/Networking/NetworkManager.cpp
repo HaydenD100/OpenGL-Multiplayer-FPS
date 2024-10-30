@@ -12,6 +12,11 @@ namespace NetworkManager
 	SOCKET ConnectSocket = INVALID_SOCKET;
 	int isServer = 0;
 	int isRunning = 1;
+	int loadedIn = 0;
+
+	void LoadedIn() {
+		loadedIn = 1;
+	}
 
 	std::thread netowrking_thread;
 
@@ -55,52 +60,7 @@ namespace NetworkManager
 			memset(recvbuf, 0, sizeof(recvbuf));
 			iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 			if (iResult > 0) {
-				Packet packet;
-
-				switch (recvbuf[0])
-				{
-				case MESSAGE:
-					packet.type = MESSAGE;
-					std::memcpy(&packet.size, recvbuf + sizeof(packet.type), 2);
-					std::memcpy(&packet.payload.message.message, recvbuf + sizeof(packet.type) + sizeof(packet.size), packet.size);
-
-					in.push(packet);
-					/*
-					std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
-					std::cout << (int)packet.type << "\n";
-					std::cout << (int)packet.size << "\n";
-					std::cout << packet.payload.message.message << "\n";
-					*/
-
-					break;
-				case PlAYERDATA:
-					packet.type = PlAYERDATA;
-					std::memcpy(&packet.size, recvbuf + sizeof(packet.type), sizeof(packet.size));
-
-					//get floats
-					std::memcpy(&packet.payload.player.x, recvbuf + sizeof(packet.type) + sizeof(packet.size), sizeof(float));
-					std::memcpy(&packet.payload.player.y, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 1, sizeof(float));
-					std::memcpy(&packet.payload.player.z, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 2, sizeof(float));
-
-					std::memcpy(&packet.payload.player.rotation_x, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 3, sizeof(float));
-					std::memcpy(&packet.payload.player.rotation_y, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 4, sizeof(float));
-					std::memcpy(&packet.payload.player.rotation_z, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 5, sizeof(float));
-
-					in.push(packet);
-
-					/*
-					std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
-					std::cout << (int)packet.type << "\n";
-					std::cout << (int)packet.size << "\n";
-					std::cout << "x: " << packet.payload.player.x << " y: " << packet.payload.player.y << " z:" << packet.payload.player.z << "\n";
-					*/
-
-					break;
-				default:
-					break;
-				}
-				
-
+				ReceivePackets(recvbuf);
 			}
 		} while (isRunning);
 
@@ -203,50 +163,7 @@ namespace NetworkManager
 		while (isRunning) {
 			iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
 			if (iResult > 0) {
-				Packet packet;
-
-				switch (recvbuf[0])
-				{
-				case MESSAGE:
-					packet.type = MESSAGE;
-					std::memcpy(&packet.size, recvbuf + sizeof(packet.type), 2);
-					std::memcpy(&packet.payload.message.message, recvbuf + sizeof(packet.type) + sizeof(packet.size), packet.size);
-
-					in.push(packet);
-					/*
-					std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
-					std::cout << (int)packet.type << "\n";
-					std::cout << (int)packet.size << "\n";
-					std::cout << packet.payload.message.message << "\n";
-					*/
-
-					break;
-				case PlAYERDATA:
-					packet.type = PlAYERDATA;
-					std::memcpy(&packet.size, recvbuf + sizeof(packet.type), sizeof(packet.size));
-
-					//get floats
-					std::memcpy(&packet.payload.player.x, recvbuf + sizeof(packet.type) + sizeof(packet.size), sizeof(float));
-					std::memcpy(&packet.payload.player.y, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 1, sizeof(float));
-					std::memcpy(&packet.payload.player.z, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 2, sizeof(float));
-
-					std::memcpy(&packet.payload.player.rotation_x, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 3, sizeof(float));
-					std::memcpy(&packet.payload.player.rotation_y, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 4, sizeof(float));
-					std::memcpy(&packet.payload.player.rotation_z, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 5, sizeof(float));
-
-					in.push(packet);
-
-					/*
-					std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
-					std::cout << (int)packet.type << "\n";
-					std::cout << (int)packet.size << "\n";
-					std::cout << "x: " << packet.payload.player.x << " y: " << packet.payload.player.y << " z:" << packet.payload.player.z << "\n";
-					*/
-
-					break;
-				default:
-					break;
-				}
+				ReceivePackets(recvbuf);
 			}
 
 		}
@@ -358,7 +275,6 @@ namespace NetworkManager
 
 		// Send an initial buffer
 		iResult = send(ConnectSocket, buffer, recvbuflen, 0);
-		printf("Bytes Sent: %ld\n", iResult);
 
 		if (iResult == SOCKET_ERROR) {
 			printf("send failed: %d\n", WSAGetLastError());
@@ -369,21 +285,6 @@ namespace NetworkManager
 		return iResult;
 	}
 
-	/*
-	int CheckForDataFromServer() {
-		int iResult;
-		int recvbuflen = DEFAULT_BUFLEN;
-		char recvbuf[DEFAULT_BUFLEN];
-		iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-		if (iResult > 0)
-			printf("Bytes received: %d\n", iResult);
-		else if (iResult == 0)
-			printf("Connection closed\n");
-		else
-			printf("recv failed: %d\n", WSAGetLastError());
-	}
-	
-	*/
 	int IsServer() {
 		return isServer;
 	}
@@ -404,13 +305,21 @@ namespace NetworkManager
 			case PlAYERDATA:
 				// Calculate base offset for the payload
 				// Copy player position coordinates to send buffer
-				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size), &packet.payload.player.x, sizeof(float));         // Offset for x
-				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float), &packet.payload.player.y, sizeof(float));     // Offset for y
-				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 2, &packet.payload.player.z, sizeof(float));     // Offset for z
-				// Copy player rotation values to send buffer
-				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 3, &packet.payload.player.rotation_x, sizeof(float)); // Offset for rotation_x
-				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 4, &packet.payload.player.rotation_y, sizeof(float)); // Offset for rotation_y
-				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 5, &packet.payload.player.rotation_z, sizeof(float)); // Offset for rotation_z
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size), &packet.payload.player.x, sizeof(float));
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float), &packet.payload.player.y, sizeof(float));
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 2, &packet.payload.player.z, sizeof(float));
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 3, &packet.payload.player.rotation_x, sizeof(float));
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 4, &packet.payload.player.rotation_y, sizeof(float));
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 5, &packet.payload.player.rotation_z, sizeof(float));
+
+				// Copy interactingWithSize and currentGunSize
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 6, &packet.payload.player.interactingWithSize, sizeof(uint8_t));
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 6 + sizeof(uint8_t), &packet.payload.player.currentGunSize, sizeof(uint8_t));
+
+				// Copy interactingWith and currentGun strings based on calculated offsets
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 6 + sizeof(uint8_t) * 2, packet.payload.player.interactingWith, packet.payload.player.interactingWithSize);
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 6 + sizeof(uint8_t) * 2 + packet.payload.player.interactingWithSize, packet.payload.player.currentGun, packet.payload.player.currentGunSize);
+
 				break;
 
 			default:
@@ -427,8 +336,68 @@ namespace NetworkManager
 
 		return 0;
 	}
+	void ReceivePackets(char recvbuf[DEFAULT_BUFLEN]) {
+		Packet packet;
 
-	void SendPlayerData(glm::vec3 postion, glm::vec3 rotation) {
+		switch (recvbuf[0])
+		{
+		case MESSAGE:
+			packet.type = MESSAGE;
+			std::memcpy(&packet.size, recvbuf + sizeof(packet.type), 2);
+			std::memcpy(&packet.payload.message.message, recvbuf + sizeof(packet.type) + sizeof(packet.size), packet.size);
+
+			in.push(packet);
+			/*
+			std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
+			std::cout << (int)packet.type << "\n";
+			std::cout << (int)packet.size << "\n";
+			std::cout << packet.payload.message.message << "\n";
+			*/
+
+			break;
+		case PlAYERDATA:
+			packet.type = PlAYERDATA;
+			std::memcpy(&packet.size, recvbuf + sizeof(packet.type), sizeof(packet.size));
+
+			// Get floats
+			std::memcpy(&packet.payload.player.x, recvbuf + sizeof(packet.type) + sizeof(packet.size), sizeof(float));
+			std::memcpy(&packet.payload.player.y, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float), sizeof(float));
+			std::memcpy(&packet.payload.player.z, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 2, sizeof(float));
+			std::memcpy(&packet.payload.player.rotation_x, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 3, sizeof(float));
+			std::memcpy(&packet.payload.player.rotation_y, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 4, sizeof(float));
+			std::memcpy(&packet.payload.player.rotation_z, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 5, sizeof(float));
+
+			// Get interactingWithSize and currentGunSize
+			std::memcpy(&packet.payload.player.interactingWithSize, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 6, 1);
+			std::memcpy(&packet.payload.player.currentGunSize, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 6 + 1, 1);
+
+			// Get strings based on size
+			std::memcpy(packet.payload.player.interactingWith, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 6 + 2, packet.payload.player.interactingWithSize);
+			std::memcpy(packet.payload.player.currentGun, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 6 + 2 + packet.payload.player.interactingWithSize, packet.payload.player.currentGunSize);
+
+			// Ensure strings are null-terminated
+			packet.payload.player.interactingWith[packet.payload.player.interactingWithSize] = '\0';
+			packet.payload.player.currentGun[packet.payload.player.currentGunSize] = '\0';
+			in.push(packet);
+
+			
+			if (!isServer && packet.payload.player.interactingWith != "nothing") {
+				std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
+				std::cout << (int)packet.type << "\n";
+				std::cout << (int)packet.size << "\n";
+				std::cout << "x: " << packet.payload.player.x << " y: " << packet.payload.player.y << " z:" << packet.payload.player.z << "\n";
+				std::cout << packet.payload.player.interactingWith << "\n";
+			}
+			
+			
+
+			break;
+		default:
+			break;
+		}
+	}
+
+	void SendPlayerData(glm::vec3 postion, glm::vec3 rotation, std::string currentGun, std::string interactingWith) {
 		Packet temp;
 		temp.type = PlAYERDATA;
 		temp.size = sizeof(float) * 6;
@@ -439,6 +408,12 @@ namespace NetworkManager
 		temp.payload.player.rotation_x = rotation.x;
 		temp.payload.player.rotation_y = rotation.y;
 		temp.payload.player.rotation_z = rotation.z;
+
+		temp.payload.player.interactingWithSize = sizeof(interactingWith);
+		temp.payload.player.currentGunSize = sizeof(currentGun);
+		
+		strcpy(temp.payload.player.interactingWith, interactingWith.c_str());
+		strcpy(temp.payload.player.currentGun, currentGun.c_str());
 
 		out.push(temp);
 	}
@@ -454,6 +429,12 @@ namespace NetworkManager
 	void EvaulatePackets() {
 		//this is so it wont evaulate any more packets coming in
 		int current_in_size = in.size();
+
+		//needed
+		std::string playerInteractWith = "nothing";
+		std::string interact;
+		std::string currentgun;
+
 		while (current_in_size > 0) {
 			current_in_size--;
 			Packet packet = in.front();
@@ -464,13 +445,20 @@ namespace NetworkManager
 
 				break;
 			case PlAYERDATA:
-				AssetManager::GetGameObject("PlayerTwo")->setPosition(glm::vec3(packet.payload.player.x, packet.payload.player.y, packet.payload.player.z));
+				currentgun = std::string(packet.payload.player.currentGun, std::strlen(packet.payload.player.currentGun));
+				interact = std::string(packet.payload.player.interactingWith, std::strlen(packet.payload.player.interactingWith));
+				if (interact != "nothing")
+					playerInteractWith = packet.payload.player.interactingWith;
+
+				PlayerTwo::SetData(interact, currentgun, glm::vec3(packet.payload.player.x, packet.payload.player.y, packet.payload.player.z), glm::vec3(packet.payload.player.rotation_x, packet.payload.player.rotation_y, packet.payload.player.rotation_z));
 				break;
 
 			default:
 				break;
 			}
 		}
+		PlayerTwo::SetIneractingWith(playerInteractWith);
+
 	}
 
 

@@ -11,6 +11,7 @@ class Door
 public:
 	Door(std::string Name, Model* foor, Model* frame, glm::vec3 position, glm::vec3  GameObjectRotation, bool inWards = true);
 	void Interact();
+	void Open();
 	void Update(float deltaTime);
 
 private:

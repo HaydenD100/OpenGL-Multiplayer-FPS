@@ -195,7 +195,7 @@ namespace Player
 		quat.setEuler(0, player->getRotation().y, 0);
 		player->GetRigidBody()->getWorldTransform().setRotation(quat);
 
-		interactingWithName = "Nothing";
+		interactingWithName = "nothing";
 
 		if (verticalAngle <= maxAngle && verticalAngle >= -maxAngle)
 			verticalAngle += mouseSpeed * float(SCREENHEIGHT / 2 - Input::GetMouseY());
@@ -338,7 +338,7 @@ namespace Player
 			footstepTime = glfwGetTime();
 		}
 
-		if(GetInteractingWithName() != "Nothing")
+		if(GetInteractingWithName() != "nothing")
 			std::cout << GetInteractingWithName() << "\n";
 
 		//AudioManager::UpdateListener(player->getPosition(), Camera::GetDirection(), btToGlmVector3(player->GetRigidBody()->getLinearVelocity()));
@@ -380,5 +380,52 @@ namespace Player
 	void Player::SwitchWeapons(int index) {
 		AssetManager::GetGameObject(inv[index])->SetRender(false);
 		gunName = inv[index];
+	}
+}
+
+
+namespace PlayerTwo
+{
+	std::string objectName = "PlayerTwo";
+	std::string gunName = "nothing";
+	std::string interactingWithName = "nothing";
+
+	void PlayerTwo::Init() {
+		AssetManager::AddGameObject("PlayerTwo", AssetManager::GetModel("playertwo"), glm::vec3(0, 2, 0), false, 0, Convex);
+
+		AssetManager::AddGameObject(GameObject("glock_PlayerTwo", AssetManager::GetModel("glockhand"), glm::vec3(5, 0, -5), false, 0, Convex));
+		AssetManager::GetGameObject("glock_PlayerTwo")->SetRender(false);
+		AssetManager::GetGameObject("glock_PlayerTwo")->SetParentName("PlayerTwo");
+
+		AssetManager::AddGameObject(GameObject("ak47_PlayerTwo", AssetManager::GetModel("ak47hand"), glm::vec3(0.2, -0.25, -0.2), false, 0, Convex));
+		AssetManager::GetGameObject("ak47_PlayerTwo")->SetRender(false);
+		AssetManager::GetGameObject("ak47_PlayerTwo")->SetParentName("PlayerTwo");
+
+		AssetManager::AddGameObject("shotgun_PlayerTwo", AssetManager::GetModel("shotgun"), glm::vec3(-3, 2, 3), false, 0, Convex);
+		AssetManager::GetGameObject("shotgun_PlayerTwo")->SetRender(false);
+		AssetManager::GetGameObject("shotgun_PlayerTwo")->SetParentName("PlayerTwo");
+
+		AssetManager::AddGameObject("double_barrel_PlayerTwo", AssetManager::GetModel("double_barrel_hand"), glm::vec3(-3, 2, 3), false, 0, Convex);
+		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetRender(false);
+		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetParentName("PlayerTwo");
+
+	}
+	void PlayerTwo::SetData(std::string interact, std::string gunname, glm::vec3 position, glm::vec3 rotation) {
+		interactingWithName = interact;
+		gunName = gunname;
+
+		AssetManager::GetGameObject("PlayerTwo")->setPosition(position);
+		AssetManager::GetGameObject("PlayerTwo")->setRotation(rotation);
+
+	}
+	void PlayerTwo::Update() {
+
+	}
+
+	std::string PlayerTwo::GetInteractingWithName() {
+		return interactingWithName;
+	}
+	void PlayerTwo::SetIneractingWith(std::string interact) {
+		interactingWithName = interact;
 	}
 }

@@ -8,6 +8,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Engine/Core/AssetManager.h"
+#include "Engine/Game/Player.h"
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -42,6 +43,13 @@ struct Packet {
 		float rotation_x;
 		float rotation_y;
 		float rotation_z;
+
+		uint8_t interactingWithSize;
+		uint8_t currentGunSize;
+
+		char interactingWith[128];
+		char currentGun[64];
+
 	};
 
 	struct MessagePayload {
@@ -60,6 +68,8 @@ namespace NetworkManager
 	int Init();
 	void CleanUp();
 
+	void LoadedIn();
+
 	int InitServer();
 	int RunServer();
 
@@ -76,9 +86,10 @@ namespace NetworkManager
 	int IsServer();
 
 	int SendPackets();
+	void ReceivePackets(char recvbuf[DEFAULT_BUFLEN]);
 
 	//packet sending
-	void SendPlayerData(glm::vec3 postion, glm::vec3 rotation);
+	void SendPlayerData(glm::vec3 postion, glm::vec3 rotation, std::string currentGun, std::string interactingWith);
 	void SendPacketMessage(std::string message);
 
 	void EvaulatePackets();

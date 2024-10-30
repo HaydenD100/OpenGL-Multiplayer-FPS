@@ -32,3 +32,12 @@ namespace Player
 	void Shoot();
 	void Graffite();
 }
+
+namespace PlayerTwo
+{
+	void Init();
+	void SetData(std::string interact, std::string gunname, glm::vec3 position, glm::vec3 rotation);
+	void SetIneractingWith(std::string interact);
+	void Update();
+	std::string GetInteractingWithName();
+}

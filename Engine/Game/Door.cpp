@@ -22,8 +22,18 @@ Door::Door(std::string Name, Model* door, Model* frame, glm::vec3 position, glm:
 	opening = false;
 }
 
+void Door::Open() {
+	if (opening == false) {
+		opening = true;
+		if (!opened) 
+			AudioManager::PlaySound("door_open", door_position);
+		else 
+			AudioManager::PlaySound("door_close", door_position);
+	}
+}
+
 void Door::Interact() {
-	if (Player::GetInteractingWithName() == name + "_door" && opening == false) {
+	if ((Player::GetInteractingWithName() == name + "_door"  || PlayerTwo::GetInteractingWithName() == name + "_door")  && opening == false) {
 		opening = true;
 		if (!opened) {
 			//AnimationManager::Play("door_open", name + "_door");
