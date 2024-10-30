@@ -28,4 +28,6 @@ namespace Input
 	void DisableCursor();
 	void HideCursor();
 	void ShowCursor();
+
+	void windowFocusCallback(GLFWwindow* window, int focused);
 }

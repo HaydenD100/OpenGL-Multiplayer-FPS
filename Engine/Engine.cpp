@@ -81,9 +81,8 @@ namespace Engine
 			//Reloads Shaders
 			if (Input::KeyDown('h'))
 				Renderer::LoadAllShaders();
-			if (Input::KeyDown('p') && !NetworkManager::IsServer())
-				NetworkManager::SendPacketMessage("this is a test");
 				
+			NetworkManager::EvaulatePackets();
 				
 			Input::CenterMouse();
 			SceneManager::Update(dt);
@@ -111,6 +110,7 @@ namespace Engine
 			
 			Renderer::SwapBuffers(Backend::GetWindowPointer());
 
+			NetworkManager::SendPlayerData(Player::getPosition(), glm::vec3(AssetManager::GetGameObject("player")->getRotation().x, AssetManager::GetGameObject("player")->getRotation().y, AssetManager::GetGameObject("player")->getRotation().z));
 			NetworkManager::SendPackets();
 			
 		}

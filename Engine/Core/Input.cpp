@@ -19,6 +19,18 @@ namespace Input
     bool leftMouseDownLastFrame = false;
     bool rightMouseDownLastFrame = false;
 
+    bool isWindowFocused = true;
+
+    // Callback function for focus changes
+    void windowFocusCallback(GLFWwindow* window, int focused) {
+        if (focused == GLFW_TRUE) {
+            isWindowFocused = true;
+        }
+        else {
+            isWindowFocused = false;
+        }
+    }
+
     GLFWwindow* window;
 
     bool Input::KeyPressed(char c) {
@@ -89,6 +101,9 @@ namespace Input
         mouseOffsetY = y;
         mouseX = x;
         mouseY = y;
+
+
+        glfwSetWindowFocusCallback(window, windowFocusCallback);
     }
     
     void Input::Update() {
@@ -114,12 +129,14 @@ namespace Input
             keyDownLastFrame[i] = keyDown[i];
         }
 
-        double x, y;
-        glfwGetCursorPos(window, &x, &y);
-        mouseOffsetX = x - mouseX;
-        mouseOffsetY = y - mouseY;
-        mouseX = x;
-        mouseY = y;
+        if (isWindowFocused) {
+            double x, y;
+            glfwGetCursorPos(window, &x, &y);
+            mouseOffsetX = x - mouseX;
+            mouseOffsetY = y - mouseY;
+            mouseX = x;
+            mouseY = y;
+        }
 
         // Left mouse down/pressed
         leftMouseDown = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);

@@ -3,24 +3,29 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include "Engine/Core/AssetManager.h"
+
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdio.h>
 #include <iostream>
 #include <thread>
 #include <queue>
-
 #pragma comment(lib, "Ws2_32.lib")
 
 #define DEFAULT_PORT "27015"
 #define DEFAULT_BUFLEN 512
 
 enum PacketType : uint8_t {
-	PlAYERPOSTION = 0b00000001,
-	SOUND = 0b00000010,
-	OBJECTPOSTIONS = 0b00000100,
-	CONTROL = 0b10000000,
-	MESSAGE = 0b00001000
+	PlAYERDATA = 1,
+	SOUND = 2,
+	OBJECTPOSTIONS = 4,
+	CONTROL = 8,
+	MESSAGE = 16
 };
 
 struct Packet {
@@ -30,7 +35,7 @@ struct Packet {
 	uint32_t size;
 
 	// Define payload types
-	struct PlayerPosition {
+	struct PlayerData {
 		float x;
 		float y;
 		float z;
@@ -44,7 +49,7 @@ struct Packet {
 	};
 
 	union Payload {
-		PlayerPosition position;
+		PlayerData player;
 		MessagePayload message;
 		Payload() {}
 	} payload;
@@ -73,7 +78,10 @@ namespace NetworkManager
 	int SendPackets();
 
 	//packet sending
-	Packet SendPacketMessage(const char* message);
+	void SendPlayerData(glm::vec3 postion, glm::vec3 rotation);
+	void SendPacketMessage(std::string message);
+
+	void EvaulatePackets();
 
 };
 

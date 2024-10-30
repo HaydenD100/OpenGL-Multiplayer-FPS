@@ -55,15 +55,52 @@ namespace NetworkManager
 			memset(recvbuf, 0, sizeof(recvbuf));
 			iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 			if (iResult > 0) {
-				printf("Bytes received: %d\n", iResult);
-				std::cout << "Client: " << recvbuf << "\n";
+				Packet packet;
 
-				if (std::strcmp(recvbuf, "closeserver") == 0) {
-					printf("Closeing Server");
-					closesocket(ClientSocket);
-					WSACleanup();
-					return 1;
+				switch (recvbuf[0])
+				{
+				case MESSAGE:
+					packet.type = MESSAGE;
+					std::memcpy(&packet.size, recvbuf + sizeof(packet.type), 2);
+					std::memcpy(&packet.payload.message.message, recvbuf + sizeof(packet.type) + sizeof(packet.size), packet.size);
+
+					in.push(packet);
+					/*
+					std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
+					std::cout << (int)packet.type << "\n";
+					std::cout << (int)packet.size << "\n";
+					std::cout << packet.payload.message.message << "\n";
+					*/
+
+					break;
+				case PlAYERDATA:
+					packet.type = PlAYERDATA;
+					std::memcpy(&packet.size, recvbuf + sizeof(packet.type), sizeof(packet.size));
+
+					//get floats
+					std::memcpy(&packet.payload.player.x, recvbuf + sizeof(packet.type) + sizeof(packet.size), sizeof(float));
+					std::memcpy(&packet.payload.player.y, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 1, sizeof(float));
+					std::memcpy(&packet.payload.player.z, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 2, sizeof(float));
+
+					std::memcpy(&packet.payload.player.rotation_x, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 3, sizeof(float));
+					std::memcpy(&packet.payload.player.rotation_y, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 4, sizeof(float));
+					std::memcpy(&packet.payload.player.rotation_z, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 5, sizeof(float));
+
+					in.push(packet);
+
+					/*
+					std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
+					std::cout << (int)packet.type << "\n";
+					std::cout << (int)packet.size << "\n";
+					std::cout << "x: " << packet.payload.player.x << " y: " << packet.payload.player.y << " z:" << packet.payload.player.z << "\n";
+					*/
+
+					break;
+				default:
+					break;
 				}
+				
+
 			}
 		} while (isRunning);
 
@@ -166,13 +203,51 @@ namespace NetworkManager
 		while (isRunning) {
 			iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
 			if (iResult > 0) {
-				printf("Bytes received: %d\n", iResult);
+				Packet packet;
+
+				switch (recvbuf[0])
+				{
+				case MESSAGE:
+					packet.type = MESSAGE;
+					std::memcpy(&packet.size, recvbuf + sizeof(packet.type), 2);
+					std::memcpy(&packet.payload.message.message, recvbuf + sizeof(packet.type) + sizeof(packet.size), packet.size);
+
+					in.push(packet);
+					/*
+					std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
+					std::cout << (int)packet.type << "\n";
+					std::cout << (int)packet.size << "\n";
+					std::cout << packet.payload.message.message << "\n";
+					*/
+
+					break;
+				case PlAYERDATA:
+					packet.type = PlAYERDATA;
+					std::memcpy(&packet.size, recvbuf + sizeof(packet.type), sizeof(packet.size));
+
+					//get floats
+					std::memcpy(&packet.payload.player.x, recvbuf + sizeof(packet.type) + sizeof(packet.size), sizeof(float));
+					std::memcpy(&packet.payload.player.y, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 1, sizeof(float));
+					std::memcpy(&packet.payload.player.z, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 2, sizeof(float));
+
+					std::memcpy(&packet.payload.player.rotation_x, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 3, sizeof(float));
+					std::memcpy(&packet.payload.player.rotation_y, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 4, sizeof(float));
+					std::memcpy(&packet.payload.player.rotation_z, recvbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 5, sizeof(float));
+
+					in.push(packet);
+
+					/*
+					std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
+					std::cout << (int)packet.type << "\n";
+					std::cout << (int)packet.size << "\n";
+					std::cout << "x: " << packet.payload.player.x << " y: " << packet.payload.player.y << " z:" << packet.payload.player.z << "\n";
+					*/
+
+					break;
+				default:
+					break;
+				}
 			}
-
-			/*
-			
-			*/
-
 
 		}
 
@@ -195,6 +270,7 @@ namespace NetworkManager
 		}
 
 		// Resolve the server address and port
+		//change hostname to the servers ip
 		iResult = getaddrinfo(hostname, DEFAULT_PORT, &hints, &result);
 		if (iResult != 0) {
 			printf("getaddrinfo failed: %d\n", iResult);
@@ -314,24 +390,34 @@ namespace NetworkManager
 
 	int SendPackets() {
 		while(out.size() > 0){
-			std::cout << out.size();
-
 			Packet packet = out.front();
 			out.pop();
-
-			char sendbuf[DEFAULT_BUFLEN] = { 0 };
+			char sendbuf[DEFAULT_BUFLEN] = {0};
 			std::memcpy(sendbuf, &packet.type, sizeof(packet.type));
 			std::memcpy(sendbuf + sizeof(packet.type), &packet.size, sizeof(packet.size));
 			switch (packet.type)
 			{
 			case MESSAGE:
-				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size),
-					packet.payload.message.message, packet.size);
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size),packet.payload.message.message, packet.size);
 
 				break;
+			case PlAYERDATA:
+				// Calculate base offset for the payload
+				// Copy player position coordinates to send buffer
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size), &packet.payload.player.x, sizeof(float));         // Offset for x
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float), &packet.payload.player.y, sizeof(float));     // Offset for y
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 2, &packet.payload.player.z, sizeof(float));     // Offset for z
+				// Copy player rotation values to send buffer
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 3, &packet.payload.player.rotation_x, sizeof(float)); // Offset for rotation_x
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 4, &packet.payload.player.rotation_y, sizeof(float)); // Offset for rotation_y
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 5, &packet.payload.player.rotation_z, sizeof(float)); // Offset for rotation_z
+				break;
+
 			default:
 				break;
 			}
+
+
 			if (isServer)
 				SendDataToClient(sendbuf);
 
@@ -342,13 +428,49 @@ namespace NetworkManager
 		return 0;
 	}
 
-	Packet SendPacketMessage(const char* message) {
+	void SendPlayerData(glm::vec3 postion, glm::vec3 rotation) {
 		Packet temp;
-		temp.type = MESSAGE;
-		temp.size = 256;
-		strcpy(temp.payload.message.message, message);
+		temp.type = PlAYERDATA;
+		temp.size = sizeof(float) * 6;
+		temp.payload.player.x = postion.x;
+		temp.payload.player.y = postion.y;
+		temp.payload.player.z = postion.z;
+
+		temp.payload.player.rotation_x = rotation.x;
+		temp.payload.player.rotation_y = rotation.y;
+		temp.payload.player.rotation_z = rotation.z;
 
 		out.push(temp);
+	}
+
+	void SendPacketMessage(std::string message) {
+		Packet temp;
+		temp.type = MESSAGE;
+		temp.size = static_cast<uint32_t>(message.size());
+		strcpy(temp.payload.message.message, message.c_str());
+		out.push(temp);
+	}
+
+	void EvaulatePackets() {
+		//this is so it wont evaulate any more packets coming in
+		int current_in_size = in.size();
+		while (current_in_size > 0) {
+			current_in_size--;
+			Packet packet = in.front();
+			in.pop();
+			switch (packet.type)
+			{
+			case MESSAGE:
+
+				break;
+			case PlAYERDATA:
+				AssetManager::GetGameObject("PlayerTwo")->setPosition(glm::vec3(packet.payload.player.x, packet.payload.player.y, packet.payload.player.z));
+				break;
+
+			default:
+				break;
+			}
+		}
 	}
 
 
