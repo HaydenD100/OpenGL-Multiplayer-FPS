@@ -15,7 +15,7 @@ class SkinnedAnimation
 public:
     SkinnedAnimation() = default;
 
-    SkinnedAnimation(const std::string& animationPath, Model* model, int index = 0)
+    SkinnedAnimation(const std::string& animationPath, Model* model, int index = 0, std::string AnimationName = "none")
     {
         Assimp::Importer importer;
         const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
@@ -41,7 +41,7 @@ public:
                 //std::cout << "Bone length: " << length << std::endl;
             //}
         }
-        
+        animationName = AnimationName;
     }
 
     ~SkinnedAnimation()
@@ -72,6 +72,10 @@ public:
     inline const std::map<std::string, BoneInfo>& GetBoneIDMap()
     {
         return m_BoneInfoMap;
+    }
+
+    std::string GetName() {
+        return animationName;
     }
 
 private:
@@ -145,6 +149,8 @@ private:
         }
     }
 
+
+    std::string animationName;
     float m_Duration;
     int m_TicksPerSecond;
     std::vector<Bone> m_Bones;

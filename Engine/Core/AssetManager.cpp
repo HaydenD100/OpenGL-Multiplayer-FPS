@@ -11,6 +11,7 @@ namespace AssetManager
 	std::vector<Texture> Textures;
 	std::vector<Decal> Decals;
 	std::vector<DecalInstance> DecalInstances;
+	std::vector<SkinnedAnimation> SkinnedAnimations;
 
 	std::map<std::string, Model> models;
 
@@ -258,6 +259,18 @@ namespace AssetManager
 		for (int i = 0; i < Textures.size(); i++) {
 			if (Textures[i].GetName() == name)
 				return &Textures[i];
+		}
+		return nullptr;
+	}
+
+	size_t AddSkinnedAnimation(SkinnedAnimation skinnedanimation) {
+		SkinnedAnimations.push_back(skinnedanimation);
+		return SkinnedAnimations.size();
+	}
+	SkinnedAnimation* GetSkinnedAnimation(std::string name) {
+		for (int i = 0; i < SkinnedAnimations.size(); i++) {
+			if (SkinnedAnimations[i].GetName() == name)
+				return &SkinnedAnimations[i];
 		}
 		return nullptr;
 	}

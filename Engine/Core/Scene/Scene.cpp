@@ -249,7 +249,7 @@ void Scene::Update(float deltaTime) {
 
 	for (int gun = 0; gun < gunPickUps.size(); gun++) {
 		gunPickUps[gun].Update();
-		if (gunPickUps[gun].Interact() && Player::getCurrentGun() == "nothing")
+		if (gunPickUps[gun].Interact())
 			gunPickUps.erase(gunPickUps.begin() + gun);
 	}
 

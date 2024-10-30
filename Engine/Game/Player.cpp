@@ -387,32 +387,55 @@ namespace Player
 namespace PlayerTwo
 {
 	std::string objectName = "PlayerTwo";
-	std::string gunName = "nothing";
+	std::string currentGun = "nothing";
 	std::string interactingWithName = "nothing";
 
 	void PlayerTwo::Init() {
 		AssetManager::AddGameObject("PlayerTwo", AssetManager::GetModel("playertwo"), glm::vec3(0, 2, 0), false, 0, Convex);
 
-		AssetManager::AddGameObject(GameObject("glock_PlayerTwo", AssetManager::GetModel("glockhand"), glm::vec3(5, 0, -5), false, 0, Convex));
+		AssetManager::AddGameObject(GameObject("glock_PlayerTwo", AssetManager::GetModel("glockhand"), glm::vec3(-0.3, -0.2f, 0.9), false, 0, Convex));
 		AssetManager::GetGameObject("glock_PlayerTwo")->SetRender(false);
 		AssetManager::GetGameObject("glock_PlayerTwo")->SetParentName("PlayerTwo");
 
-		AssetManager::AddGameObject(GameObject("ak47_PlayerTwo", AssetManager::GetModel("ak47hand"), glm::vec3(0.2, -0.25, -0.2), false, 0, Convex));
+		AssetManager::AddGameObject(GameObject("ak47_PlayerTwo", AssetManager::GetModel("ak47hand"), glm::vec3(-0.3, -0.25, 0.9), false, 0, Convex));
 		AssetManager::GetGameObject("ak47_PlayerTwo")->SetRender(false);
 		AssetManager::GetGameObject("ak47_PlayerTwo")->SetParentName("PlayerTwo");
 
-		AssetManager::AddGameObject("shotgun_PlayerTwo", AssetManager::GetModel("shotgun"), glm::vec3(-3, 2, 3), false, 0, Convex);
+		AssetManager::AddGameObject("shotgun_PlayerTwo", AssetManager::GetModel("shotgun"), glm::vec3(-0.3, -0.25, 0.9), false, 0, Convex);
 		AssetManager::GetGameObject("shotgun_PlayerTwo")->SetRender(false);
 		AssetManager::GetGameObject("shotgun_PlayerTwo")->SetParentName("PlayerTwo");
 
-		AssetManager::AddGameObject("double_barrel_PlayerTwo", AssetManager::GetModel("double_barrel_hand"), glm::vec3(-3, 2, 3), false, 0, Convex);
+		AssetManager::AddGameObject("double_barrel_PlayerTwo", AssetManager::GetModel("double_barrel_hand"), glm::vec3(-0.27, -0.2f, 1.5), false, 0, Convex);
 		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetRender(false);
 		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetParentName("PlayerTwo");
+
+		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/glock17_shoot1.dae", AssetManager::GetModel("glockhand"), 0, "glock17_shoot"));
+		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/glock17_reload.dae", AssetManager::GetModel("glockhand"), 0, "glock17_reload"));
+		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/glock17_equip.dae", AssetManager::GetModel("glockhand"), 0, "glock17_equip"));
+
+		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/ak47_shoot.dae", AssetManager::GetModel("ak47hand"), 0, "ak47_shoot"));
+		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/ak47_reload.dae", AssetManager::GetModel("ak47hand"), 0, "ak47_reload"));
+		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/ak47_equip.dae", AssetManager::GetModel("ak47hand"), 0, "ak47_equip"));
+
+		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/db_shoot.dae", AssetManager::GetModel("double_barrel_hand"), 1, "db_shoot"));
+		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/db_reload.dae", AssetManager::GetModel("double_barrel_hand"), 0, "db_reload"));
+		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/db_equip.dae", AssetManager::GetModel("double_barrel_hand"), 1, "db_equip"));
+
 
 	}
 	void PlayerTwo::SetData(std::string interact, std::string gunname, glm::vec3 position, glm::vec3 rotation) {
 		interactingWithName = interact;
-		gunName = gunname;
+		if (gunname != currentGun) {
+			if(currentGun != "nothing")
+				AssetManager::GetGameObject(currentGun + "_PlayerTwo")->SetRender(false);
+			currentGun = gunname;
+			if (currentGun != "nothing")
+				AssetManager::GetGameObject(currentGun + "_PlayerTwo")->SetRender(true);
+
+			std::cout << "Player_two changed weapon to: " << currentGun << "\n";
+
+		}
+			
 
 		AssetManager::GetGameObject("PlayerTwo")->setPosition(position);
 		AssetManager::GetGameObject("PlayerTwo")->setRotation(rotation);
@@ -427,5 +450,8 @@ namespace PlayerTwo
 	}
 	void PlayerTwo::SetIneractingWith(std::string interact) {
 		interactingWithName = interact;
+	}
+	std::string PlayerTwo::GetCurrentWeapon() {
+		return currentGun;
 	}
 }

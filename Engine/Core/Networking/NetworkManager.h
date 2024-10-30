@@ -21,12 +21,19 @@
 #define DEFAULT_PORT "27015"
 #define DEFAULT_BUFLEN 512
 
+#undef PlaySound
+#undef near
+#undef far
+
+
 enum PacketType : uint8_t {
 	PlAYERDATA = 1,
 	SOUND = 2,
 	OBJECTPOSTIONS = 4,
 	CONTROL = 8,
-	MESSAGE = 16
+	MESSAGE = 16,
+	DYNAMICOBJECT = 32,
+	ANIMATION = 64
 };
 
 struct Packet {
@@ -56,9 +63,18 @@ struct Packet {
 		char message[256];  // Fixed-size buffer for the message
 	};
 
+	struct Animation {
+		uint8_t AnimationNameSize;
+		uint8_t ObjectNameSize;
+
+		char AnimationName[64];
+		char ObjectName[128];
+	};
+
 	union Payload {
 		PlayerData player;
 		MessagePayload message;
+		Animation animation;
 		Payload() {}
 	} payload;
 };
@@ -89,6 +105,7 @@ namespace NetworkManager
 	void ReceivePackets(char recvbuf[DEFAULT_BUFLEN]);
 
 	//packet sending
+	void SendAnimation(std::string AnimationName, std::string ObjectName);
 	void SendPlayerData(glm::vec3 postion, glm::vec3 rotation, std::string currentGun, std::string interactingWith);
 	void SendPacketMessage(std::string message);
 

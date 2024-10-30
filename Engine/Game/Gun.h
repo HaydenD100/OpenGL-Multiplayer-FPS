@@ -8,6 +8,8 @@
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Core/SkinnedAnimatior.h"
 
+#include "Engine/Core/Networking/NetworkManager.h"
+
 enum GunType
 {
 	Semi,

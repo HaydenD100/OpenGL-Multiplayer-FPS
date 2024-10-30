@@ -40,4 +40,5 @@ namespace PlayerTwo
 	void SetIneractingWith(std::string interact);
 	void Update();
 	std::string GetInteractingWithName();
+	std::string GetCurrentWeapon();
 }

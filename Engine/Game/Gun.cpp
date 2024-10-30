@@ -62,15 +62,22 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 }
 
 void Gun::Equip() {
-	if (hasAnimations)
+	if (hasAnimations) {
 		Animator::PlayAnimation(&equipAnim, name, false);
+		NetworkManager::SendAnimation(equipAnim.GetName(), name + "_PlayerTwo");
+	}
+		
 }
 
 void Gun::Reload() {
-	if(hasAnimations)
+	if (hasAnimations) {
 		Animator::PlayAnimation(&reloadAnim, name, false);
-	else
+		NetworkManager::SendAnimation(reloadAnim.GetName(), name + "_PlayerTwo");
+	}
+	else 
 		AnimationManager::Play("ak47_reload", Player::getCurrentGun());
+		
+	
 
 }
 
@@ -80,6 +87,9 @@ void Gun::Shoot(){
 
 	if (hasAnimations) {
 		Animator::PlayAnimation(&shootAnim, name, false);
+		//tell the other instance to play animation
+		NetworkManager::SendAnimation(shootAnim.GetName(), name + "_PlayerTwo");
+		
 	}
 	else 
 		kickbackOffset += kickback;
@@ -130,9 +140,9 @@ namespace WeaponManager
 		glock.ammo = 18;
 		glock.reloadtime = 1.5;
 		glock.firerate = 250; 
-		glock.shootAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_shoot1.dae", AssetManager::GetModel("glockhand"));
-		glock.reloadAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_reload.dae", AssetManager::GetModel("glockhand"));
-		glock.equipAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_equip.dae", AssetManager::GetModel("glockhand"));
+		glock.shootAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_shoot1.dae", AssetManager::GetModel("glockhand"),0, "glock17_shoot");
+		glock.reloadAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_reload.dae", AssetManager::GetModel("glockhand"), 0, "glock17_reload");
+		glock.equipAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_equip.dae", AssetManager::GetModel("glockhand"), 0, "glock17_equip");
 
 		glock.hasAnimations = true;
 		glock.currentammo = 18;
@@ -159,9 +169,9 @@ namespace WeaponManager
 		ak47.recoilY = 175;
 		ak47.kickback = 2;
 
-		ak47.shootAnim = SkinnedAnimation("Assets/Objects/FBX/ak47_shoot.dae", AssetManager::GetModel("ak47hand"), 0);
-		ak47.reloadAnim = SkinnedAnimation("Assets/Objects/FBX/ak47_reload.dae", AssetManager::GetModel("ak47hand"), 0);
-		ak47.equipAnim = SkinnedAnimation("Assets/Objects/FBX/ak47_equip.dae", AssetManager::GetModel("ak47hand"), 0);
+		ak47.shootAnim = SkinnedAnimation("Assets/Objects/FBX/ak47_shoot.dae", AssetManager::GetModel("ak47hand"), 0, "ak47_shoot");
+		ak47.reloadAnim = SkinnedAnimation("Assets/Objects/FBX/ak47_reload.dae", AssetManager::GetModel("ak47hand"), 0, "ak47_reload");
+		ak47.equipAnim = SkinnedAnimation("Assets/Objects/FBX/ak47_equip.dae", AssetManager::GetModel("ak47hand"), 0, "ak47_equip");
 		ak47.hasAnimations = true;
 
 		ak47.gunModel = "ak47";
@@ -204,9 +214,9 @@ namespace WeaponManager
 		doublebarrel.recoilY = 250;
 		doublebarrel.kickback = 2;
 
-		doublebarrel.shootAnim = SkinnedAnimation("Assets/Objects/FBX/db_shoot.dae", AssetManager::GetModel("double_barrel_hand"), 1);
-		doublebarrel.reloadAnim = SkinnedAnimation("Assets/Objects/FBX/db_reload.dae", AssetManager::GetModel("double_barrel_hand"),0);
-		doublebarrel.equipAnim = SkinnedAnimation("Assets/Objects/FBX/db_equip.dae", AssetManager::GetModel("double_barrel_hand"), 1);
+		doublebarrel.shootAnim = SkinnedAnimation("Assets/Objects/FBX/db_shoot.dae", AssetManager::GetModel("double_barrel_hand"), 1, "db_shoot");
+		doublebarrel.reloadAnim = SkinnedAnimation("Assets/Objects/FBX/db_reload.dae", AssetManager::GetModel("double_barrel_hand"),0, "db_reload");
+		doublebarrel.equipAnim = SkinnedAnimation("Assets/Objects/FBX/db_equip.dae", AssetManager::GetModel("double_barrel_hand"), 1, "db_equip");
 		doublebarrel.hasAnimations = true;
 
 		doublebarrel.firesounds = 1;
@@ -257,6 +267,14 @@ void GunPickUp::Update() {
 }
 
 bool GunPickUp::Interact() {
+	if (PlayerTwo::GetInteractingWithName() == objectName && PlayerTwo::GetCurrentWeapon() != gunName) {
+		GameObject* object = AssetManager::GetGameObject(objectName);
+		PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(object->GetRigidBody());
+		object->SetRender(false);
+
+		AudioManager::PlaySound("item_pickup", Player::getPosition());
+		return true;
+	}
 	if (Player::GetInteractingWithName() != objectName || !Player::SelectWeapon(gunName))
 		return false;
 	

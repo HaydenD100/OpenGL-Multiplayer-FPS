@@ -53,7 +53,8 @@ namespace AssetManager
 	Model* AddModel(std::string name, const char* path, Texture* texture);
 	Model* AddModel(std::string name, Model model);
 
-
+	size_t AddSkinnedAnimation(SkinnedAnimation skinnedanimation);
+	SkinnedAnimation* GetSkinnedAnimation(std::string name);
 
 
 	void RemoveGameObject(std::string name);

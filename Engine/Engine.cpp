@@ -111,8 +111,9 @@ namespace Engine
 			
 			Renderer::SwapBuffers(Backend::GetWindowPointer());
 
-
-			NetworkManager::SendPlayerData(Player::getPosition(), glm::vec3(AssetManager::GetGameObject("player")->getRotation().x, AssetManager::GetGameObject("player")->getRotation().y, AssetManager::GetGameObject("player")->getRotation().z), Player::getCurrentGun(), Player::GetInteractingWithName());
+			glm::vec3 inversed_rot = AssetManager::GetGameObject("player_head")->getRotation();
+			inversed_rot *= -1.0f;
+			NetworkManager::SendPlayerData(Player::getPosition(), inversed_rot, Player::getCurrentGun(), Player::GetInteractingWithName());
 			NetworkManager::SendPackets();
 			
 		}

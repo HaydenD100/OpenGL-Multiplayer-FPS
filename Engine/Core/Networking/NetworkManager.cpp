@@ -1,4 +1,5 @@
 #include "NetworkManager.h"
+#include "Engine/Core/SkinnedAnimatior.h"
 
 
 namespace NetworkManager
@@ -321,6 +322,12 @@ namespace NetworkManager
 				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + sizeof(float) * 6 + sizeof(uint8_t) * 2 + packet.payload.player.interactingWithSize, packet.payload.player.currentGun, packet.payload.player.currentGunSize);
 
 				break;
+			case ANIMATION:
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size), &packet.payload.animation.AnimationNameSize, sizeof(float));
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + 1, &packet.payload.animation.ObjectNameSize, sizeof(float));
+
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + 2, &packet.payload.animation.AnimationName, packet.payload.animation.AnimationNameSize);
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + 2 + packet.payload.animation.AnimationNameSize, &packet.payload.animation.ObjectName, packet.payload.animation.ObjectNameSize);
 
 			default:
 				break;
@@ -338,6 +345,7 @@ namespace NetworkManager
 	}
 	void ReceivePackets(char recvbuf[DEFAULT_BUFLEN]) {
 		Packet packet;
+		size_t offset = 0;
 
 		switch (recvbuf[0])
 		{
@@ -380,21 +388,57 @@ namespace NetworkManager
 			packet.payload.player.currentGun[packet.payload.player.currentGunSize] = '\0';
 			in.push(packet);
 
+			/*
+			std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
+			std::cout << (int)packet.type << "\n";
+			std::cout << (int)packet.size << "\n";
+			std::cout << "x: " << packet.payload.player.x << " y: " << packet.payload.player.y << " z:" << packet.payload.player.z << "\n";
+			std::cout << packet.payload.player.interactingWith << "\n";
+			*/
+			break;
 			
-			if (!isServer && packet.payload.player.interactingWith != "nothing") {
-				std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
-				std::cout << (int)packet.type << "\n";
-				std::cout << (int)packet.size << "\n";
-				std::cout << "x: " << packet.payload.player.x << " y: " << packet.payload.player.y << " z:" << packet.payload.player.z << "\n";
-				std::cout << packet.payload.player.interactingWith << "\n";
-			}
-			
-			
+		case ANIMATION:
+			packet.type = ANIMATION;
+			offset = sizeof(packet.type);
+
+			// Extract packet size
+			std::memcpy(&packet.size, recvbuf + offset, sizeof(packet.size));
+			offset += sizeof(packet.size);
+
+			// Extract `AnimationNameSize` and `ObjectNameSize`
+			std::memcpy(&packet.payload.animation.AnimationNameSize, recvbuf + offset, sizeof(uint8_t));
+			offset += sizeof(uint8_t);
+			std::memcpy(&packet.payload.animation.ObjectNameSize, recvbuf + offset, sizeof(uint8_t));
+			offset += sizeof(uint8_t);
+
+			// Extract `AnimationName` and `ObjectName` strings based on their sizes
+			std::memcpy(packet.payload.animation.AnimationName, recvbuf + offset, packet.payload.animation.AnimationNameSize);
+			packet.payload.animation.AnimationName[packet.payload.animation.AnimationNameSize] = '\0'; // Null-terminate
+			offset += packet.payload.animation.AnimationNameSize;
+
+			std::memcpy(packet.payload.animation.ObjectName, recvbuf + offset, packet.payload.animation.ObjectNameSize);
+			packet.payload.animation.ObjectName[packet.payload.animation.ObjectNameSize] = '\0'; // Null-terminate
+
+			in.push(packet);
 
 			break;
 		default:
 			break;
 		}
+	}
+
+	void SendAnimation(std::string AnimationName, std::string ObjectName) {
+		Packet temp;
+		temp.type = ANIMATION;
+		temp.size = sizeof(AnimationName) + sizeof(ObjectName) + 2;
+
+		temp.payload.animation.AnimationNameSize = sizeof(AnimationName);
+		temp.payload.animation.ObjectNameSize = sizeof(ObjectName);
+
+		strcpy(temp.payload.animation.AnimationName, AnimationName.c_str());
+		strcpy(temp.payload.animation.ObjectName, ObjectName.c_str());
+
+		out.push(temp);
 	}
 
 	void SendPlayerData(glm::vec3 postion, glm::vec3 rotation, std::string currentGun, std::string interactingWith) {
@@ -452,7 +496,16 @@ namespace NetworkManager
 
 				PlayerTwo::SetData(interact, currentgun, glm::vec3(packet.payload.player.x, packet.payload.player.y, packet.payload.player.z), glm::vec3(packet.payload.player.rotation_x, packet.payload.player.rotation_y, packet.payload.player.rotation_z));
 				break;
+			case ANIMATION:
 
+				std::cout << "ANIMATION: " << packet.payload.animation.AnimationName << "\n";
+				std::cout << "ANIMATION: " << packet.payload.animation.ObjectName << "\n";
+
+
+				Animator::PlayAnimation(AssetManager::GetSkinnedAnimation(packet.payload.animation.AnimationName), packet.payload.animation.ObjectName, false);
+
+
+				break;
 			default:
 				break;
 			}
