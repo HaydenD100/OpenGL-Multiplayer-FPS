@@ -228,12 +228,12 @@ namespace NetworkManager
 			return 1;
 		}
 
-		std::cout << "Connected to server \n";
+		std::cout << "\n Connected to server \n";
 		netowrking_thread = std::thread(RunClient);
 	}
 
 
-
+	//Redundant
 	int CheckForDataFromClient() {
 		char recvbuf[DEFAULT_BUFLEN];
 		int iResult, iSendResult;
@@ -297,6 +297,8 @@ namespace NetworkManager
 			char sendbuf[DEFAULT_BUFLEN] = {0};
 			std::memcpy(sendbuf, &packet.type, sizeof(packet.type));
 			std::memcpy(sendbuf + sizeof(packet.type), &packet.size, sizeof(packet.size));
+
+			size_t offset;
 			switch (packet.type)
 			{
 			case MESSAGE:
@@ -328,7 +330,64 @@ namespace NetworkManager
 
 				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + 2, &packet.payload.animation.AnimationName, packet.payload.animation.AnimationNameSize);
 				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size) + 2 + packet.payload.animation.AnimationNameSize, &packet.payload.animation.ObjectName, packet.payload.animation.ObjectNameSize);
+				break;
 
+			case GUNSHOT:
+				offset = sizeof(packet.type) + sizeof(packet.size);
+
+				// Copy ObjectNameSize
+				std::memcpy(sendbuf + offset, &packet.payload.gunshotdata.ObjectNameSize, sizeof(uint8_t));
+				offset += sizeof(uint8_t);
+
+				// Copy ObjectName
+				std::memcpy(sendbuf + offset, packet.payload.gunshotdata.ObjectName, packet.payload.gunshotdata.ObjectNameSize);
+				offset += packet.payload.gunshotdata.ObjectNameSize;
+
+				// Copy DecalNameSize
+				std::memcpy(sendbuf + offset, &packet.payload.gunshotdata.DecalNameSize, sizeof(uint8_t));
+				offset += sizeof(uint8_t);
+
+				// Copy DecalName
+				std::memcpy(sendbuf + offset, packet.payload.gunshotdata.DecalName, packet.payload.gunshotdata.DecalNameSize);
+				offset += packet.payload.gunshotdata.DecalNameSize;
+
+				// Copy world hit point coordinates
+				std::memcpy(sendbuf + offset, &packet.payload.gunshotdata.worldhitpoint_x, sizeof(float));
+				offset += sizeof(float);
+				std::memcpy(sendbuf + offset, &packet.payload.gunshotdata.worldhitpoint_y, sizeof(float));
+				offset += sizeof(float);
+				std::memcpy(sendbuf + offset, &packet.payload.gunshotdata.worldhitpoint_z, sizeof(float));
+				offset += sizeof(float);
+
+				// Copy hit point normal coordinates
+				std::memcpy(sendbuf + offset, &packet.payload.gunshotdata.hitpointNormal_x, sizeof(float));
+				offset += sizeof(float);
+				std::memcpy(sendbuf + offset, &packet.payload.gunshotdata.hitpointNormal_y, sizeof(float));
+				offset += sizeof(float);
+				std::memcpy(sendbuf + offset, &packet.payload.gunshotdata.hitpointNormal_z, sizeof(float));
+				offset += sizeof(float);
+
+				// Copy damage
+				std::memcpy(sendbuf + offset, &packet.payload.gunshotdata.Damage, sizeof(int32_t));
+				offset += sizeof(int32_t);
+
+				// Copy force
+				std::memcpy(sendbuf + offset, &packet.payload.gunshotdata.force_x, sizeof(float));
+				offset += sizeof(float);
+				std::memcpy(sendbuf + offset, &packet.payload.gunshotdata.force_y, sizeof(float));
+				offset += sizeof(float);
+				std::memcpy(sendbuf + offset, &packet.payload.gunshotdata.force_z, sizeof(float));
+				offset += sizeof(float);
+
+				// Copy hit point local coordinates
+				std::memcpy(sendbuf + offset, &packet.payload.gunshotdata.hitpointLocal_x, sizeof(float));
+				offset += sizeof(float);
+				std::memcpy(sendbuf + offset, &packet.payload.gunshotdata.hitpointLocal_y, sizeof(float));
+				offset += sizeof(float);
+				std::memcpy(sendbuf + offset, &packet.payload.gunshotdata.hitpointLocal_z, sizeof(float));
+				offset += sizeof(float);
+
+				break;
 			default:
 				break;
 			}
@@ -422,9 +481,140 @@ namespace NetworkManager
 			in.push(packet);
 
 			break;
+		case GUNSHOT:
+			packet.type = GUNSHOT;
+			offset = sizeof(packet.type);
+
+			// Deserialize packet size
+			std::memcpy(&packet.size, recvbuf + offset, sizeof(packet.size));
+			offset += sizeof(packet.size);
+
+			// Deserialize ObjectNameSize
+			std::memcpy(&packet.payload.gunshotdata.ObjectNameSize, recvbuf + offset, sizeof(uint8_t));
+			offset += sizeof(uint8_t);
+
+			// Deserialize ObjectName
+			std::memcpy(packet.payload.gunshotdata.ObjectName, recvbuf + offset, packet.payload.gunshotdata.ObjectNameSize);
+			packet.payload.gunshotdata.ObjectName[packet.payload.gunshotdata.ObjectNameSize] = '\0'; // Null-terminate
+			offset += packet.payload.gunshotdata.ObjectNameSize;
+
+			// Deserialize DecalNameSize
+			std::memcpy(&packet.payload.gunshotdata.DecalNameSize, recvbuf + offset, sizeof(uint8_t));
+			offset += sizeof(uint8_t);
+
+			// Deserialize DecalName
+			std::memcpy(packet.payload.gunshotdata.DecalName, recvbuf + offset, packet.payload.gunshotdata.DecalNameSize);
+			packet.payload.gunshotdata.DecalName[packet.payload.gunshotdata.DecalNameSize] = '\0'; // Null-terminate
+			offset += packet.payload.gunshotdata.DecalNameSize;
+
+			// Deserialize world hit point coordinates
+			std::memcpy(&packet.payload.gunshotdata.worldhitpoint_x, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+			std::memcpy(&packet.payload.gunshotdata.worldhitpoint_y, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+			std::memcpy(&packet.payload.gunshotdata.worldhitpoint_z, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+
+			// Deserialize hit point normal coordinates
+			std::memcpy(&packet.payload.gunshotdata.hitpointNormal_x, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+			std::memcpy(&packet.payload.gunshotdata.hitpointNormal_y, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+			std::memcpy(&packet.payload.gunshotdata.hitpointNormal_z, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+
+			// Deserialize damage
+			std::memcpy(&packet.payload.gunshotdata.Damage, recvbuf + offset, sizeof(int32_t));
+			offset += sizeof(int32_t);
+
+			// Deserialize force vector
+			std::memcpy(&packet.payload.gunshotdata.force_x, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+			std::memcpy(&packet.payload.gunshotdata.force_y, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+			std::memcpy(&packet.payload.gunshotdata.force_z, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+
+			// Deserialize hit point local coordinates
+			std::memcpy(&packet.payload.gunshotdata.hitpointLocal_x, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+			std::memcpy(&packet.payload.gunshotdata.hitpointLocal_y, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+			std::memcpy(&packet.payload.gunshotdata.hitpointLocal_z, recvbuf + offset, sizeof(float));
+
+
+			offset += sizeof(float);
+
+			// Push packet to the input queue
+			in.push(packet);
+			/*
+			std::cout << "------------- GUNSHOT DATA ---------------\n";
+			std::cout << "Object Name: " << packet.payload.gunshotdata.ObjectName << " (Size: " << (int)packet.payload.gunshotdata.ObjectNameSize << ")\n";
+			std::cout << "Decal Name: " << packet.payload.gunshotdata.DecalName << " (Size: " << (int)packet.payload.gunshotdata.DecalNameSize << ")\n";
+			std::cout << "World Hit Point: ("
+				<< packet.payload.gunshotdata.worldhitpoint_x << ", "
+				<< packet.payload.gunshotdata.worldhitpoint_y << ", "
+				<< packet.payload.gunshotdata.worldhitpoint_z << ")\n";
+			std::cout << "Hit Point Normal: ("
+				<< packet.payload.gunshotdata.hitpointNormal_x << ", "
+				<< packet.payload.gunshotdata.hitpointNormal_y << ", "
+				<< packet.payload.gunshotdata.hitpointNormal_z << ")\n";
+			std::cout << "Damage: " << packet.payload.gunshotdata.Damage << "\n";
+			std::cout << "Force: ("
+				<< packet.payload.gunshotdata.force_x << ", "
+				<< packet.payload.gunshotdata.force_y << ", "
+				<< packet.payload.gunshotdata.force_z << ")\n";
+			std::cout << "Local Hit Point: ("
+				<< packet.payload.gunshotdata.hitpointLocal_x << ", "
+				<< packet.payload.gunshotdata.hitpointLocal_y << ", "
+				<< packet.payload.gunshotdata.hitpointLocal_z << ")\n";
+			std::cout << "------------------------------------------\n";
+			*/
+
+			break;
 		default:
 			break;
 		}
+	}
+	void SendGunShotData(std::string objectname, std::string decalName, glm::vec3 worldhitpoint, glm::vec3 hitpointnormal, glm::vec3 hitpointlocal, int32_t damage, glm::vec3 force) {
+		Packet packet;
+		packet.type = GUNSHOT;
+		//this is wrong
+		packet.size = 128;
+		// Set ObjectName and DecalName with their respective sizes in packet.payload.gunshotdata
+		packet.payload.gunshotdata.ObjectNameSize = static_cast<uint8_t>(objectname.size());
+		std::memset(packet.payload.gunshotdata.ObjectName, 0, sizeof(packet.payload.gunshotdata.ObjectName));
+		std::memcpy(packet.payload.gunshotdata.ObjectName, objectname.c_str(), packet.payload.gunshotdata.ObjectNameSize);
+
+		packet.payload.gunshotdata.DecalNameSize = static_cast<uint8_t>(decalName.size());
+		std::memset(packet.payload.gunshotdata.DecalName, 0, sizeof(packet.payload.gunshotdata.DecalName));
+		std::memcpy(packet.payload.gunshotdata.DecalName, decalName.c_str(), packet.payload.gunshotdata.DecalNameSize);
+
+		// Set world hit point coordinates
+		packet.payload.gunshotdata.worldhitpoint_x = worldhitpoint.x;
+		packet.payload.gunshotdata.worldhitpoint_y = worldhitpoint.y;
+		packet.payload.gunshotdata.worldhitpoint_z = worldhitpoint.z;
+
+		// Set hit point normal coordinates
+		packet.payload.gunshotdata.hitpointNormal_x = hitpointnormal.x;
+		packet.payload.gunshotdata.hitpointNormal_y = hitpointnormal.y;
+		packet.payload.gunshotdata.hitpointNormal_z = hitpointnormal.z;
+
+		// Set hit point local coordinates
+		packet.payload.gunshotdata.hitpointLocal_x = hitpointlocal.x;
+		packet.payload.gunshotdata.hitpointLocal_y = hitpointlocal.y;
+		packet.payload.gunshotdata.hitpointLocal_z = hitpointlocal.z;
+
+		// Set damage
+		packet.payload.gunshotdata.Damage = damage;
+
+		// Calculate force based on normal and damage (example: force = normal * damage)
+		packet.payload.gunshotdata.force_x = force.x;
+		packet.payload.gunshotdata.force_y = force.y;
+		packet.payload.gunshotdata.force_z = force.z;
+
+		out.push(packet);
+
 	}
 
 	void SendAnimation(std::string AnimationName, std::string ObjectName) {
@@ -497,12 +687,28 @@ namespace NetworkManager
 				PlayerTwo::SetData(interact, currentgun, glm::vec3(packet.payload.player.x, packet.payload.player.y, packet.payload.player.z), glm::vec3(packet.payload.player.rotation_x, packet.payload.player.rotation_y, packet.payload.player.rotation_z));
 				break;
 			case ANIMATION:
-
-				std::cout << "ANIMATION: " << packet.payload.animation.AnimationName << "\n";
-				std::cout << "ANIMATION: " << packet.payload.animation.ObjectName << "\n";
-
-
+				//std::cout << "ANIMATION: " << packet.payload.animation.AnimationName << "\n";
+				//std::cout << "ANIMATION: " << packet.payload.animation.ObjectName << "\n";
 				Animator::PlayAnimation(AssetManager::GetSkinnedAnimation(packet.payload.animation.AnimationName), packet.payload.animation.ObjectName, false);
+				break;
+
+			case GUNSHOT:
+
+				if (std::strcmp(packet.payload.gunshotdata.ObjectName, "PlayerTwo") == 0) {
+					Player::TakeDamage(packet.payload.gunshotdata.Damage);
+				}
+				else {
+
+					std::string objectName = std::string(packet.payload.gunshotdata.ObjectName, packet.payload.gunshotdata.ObjectNameSize);
+					GameObject* gameobject = AssetManager::GetGameObject(objectName);
+					if (gameobject == nullptr)
+						break;
+					btRigidBody* body = gameobject->GetRigidBody();
+					if(body != nullptr)
+						body->applyImpulse(btVector3(packet.payload.gunshotdata.force_x, packet.payload.gunshotdata.force_y, packet.payload.gunshotdata.force_z), btVector3(packet.payload.gunshotdata.hitpointLocal_x, packet.payload.gunshotdata.hitpointLocal_y, packet.payload.gunshotdata.hitpointLocal_z));
+					AssetManager::AddDecalInstance(glm::vec3(packet.payload.gunshotdata.worldhitpoint_x, packet.payload.gunshotdata.worldhitpoint_y, packet.payload.gunshotdata.worldhitpoint_z), glm::vec3(packet.payload.gunshotdata.hitpointNormal_x, packet.payload.gunshotdata.hitpointNormal_y, packet.payload.gunshotdata.hitpointNormal_z), AssetManager::GetDecal("bullet_hole"), gameobject);
+				}
+
 
 
 				break;

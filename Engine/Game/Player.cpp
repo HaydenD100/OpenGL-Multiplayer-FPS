@@ -2,6 +2,8 @@
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Core/Scene/SceneManager.h"
 #include "Engine/Physics/BulletPhysics.h"
+#include <random>
+
 
 namespace Player
 {
@@ -35,6 +37,12 @@ namespace Player
 	const int decal_count = 5;
 	std::string decal_inv[decal_count] = { "flower_decal","panda_decal","pizza_decal","tank_decal", "freaky_decal"};
 	int decal_index = 0;
+
+
+
+
+	//Game Logic
+	int Health = 100;
 
 
 	void Player::Init() {
@@ -106,7 +114,8 @@ namespace Player
 					if (gameobject != nullptr)
 					{
 						btRigidBody* body = gameobject->GetRigidBody();
-						body->applyImpulse(2 * glmToBtVector3(Camera::ComputeRay()), body->getWorldTransform().inverse() * hit.m_hitPointWorld);
+						btVector3 localForcePos = body->getWorldTransform().inverse() * hit.m_hitPointWorld;
+						body->applyImpulse(2 * glmToBtVector3(Camera::ComputeRay()), localForcePos);
 						glm::vec4 worldPositionHomogeneous(glm::vec3(hit.m_hitPointWorld.getX(), hit.m_hitPointWorld.getY(), hit.m_hitPointWorld.getZ()), 1.0f);
 						glm::vec4 localPositionHomogeneous = glm::inverse(gameobject->GetModelMatrix()) * worldPositionHomogeneous;
 						glm::vec3 vec3local = glm::vec3(localPositionHomogeneous.x, localPositionHomogeneous.y, localPositionHomogeneous.z);
@@ -114,6 +123,8 @@ namespace Player
 						glm::mat4 rotation_matrix = glm::mat4_cast(glm::quat(gameobject->getRotation()));
 						normal = glm::vec3(glm::inverse(rotation_matrix) * glm::vec4(normal, 0));
 						AssetManager::AddDecalInstance(vec3local, normal, AssetManager::GetDecal("bullet_hole"), gameobject);
+
+						NetworkManager::SendGunShotData(gameobject->GetName(), "bullet_hole", vec3local, normal, btToGlmVector3(localForcePos), WeaponManager::GetGunByName(gunName)->damage, btToGlmVector3(2 * glmToBtVector3(Camera::ComputeRay())));
 					}
 				}
 			}
@@ -381,6 +392,35 @@ namespace Player
 		AssetManager::GetGameObject(inv[index])->SetRender(false);
 		gunName = inv[index];
 	}
+
+	void Player::TakeDamage(int amount) {
+		Health -= amount;
+		if (Health <= 0) {
+			//death
+			std::cout << "Player Died" << std::endl;
+			Respawn();
+		}
+	}
+
+	void Player::SetHealth(int NewHealth) {
+		Health = NewHealth;
+	}
+	int Player::GetHealth() {
+		return Health;
+	}
+	void Player::Respawn() {
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<> distrib(0, spawnpointsize);
+		int spawnpointindex = distrib(gen);
+
+		Health = 100;
+		if(gunName != "nothing")
+			AssetManager::GetGameObject(gunName)->SetRender(false);
+		gunName = "nothing";
+
+		setPosition(spawnpoints[spawnpointindex]);
+	}
 }
 
 
@@ -396,18 +436,26 @@ namespace PlayerTwo
 		AssetManager::AddGameObject(GameObject("glock_PlayerTwo", AssetManager::GetModel("glockhand"), glm::vec3(-0.3, -0.2f, 0.9), false, 0, Convex));
 		AssetManager::GetGameObject("glock_PlayerTwo")->SetRender(false);
 		AssetManager::GetGameObject("glock_PlayerTwo")->SetParentName("PlayerTwo");
+		AssetManager::GetGameObject("glock_PlayerTwo")->SetScale(0.5);
+
 
 		AssetManager::AddGameObject(GameObject("ak47_PlayerTwo", AssetManager::GetModel("ak47hand"), glm::vec3(-0.3, -0.25, 0.9), false, 0, Convex));
 		AssetManager::GetGameObject("ak47_PlayerTwo")->SetRender(false);
 		AssetManager::GetGameObject("ak47_PlayerTwo")->SetParentName("PlayerTwo");
+		AssetManager::GetGameObject("ak47_PlayerTwo")->SetScale(0.5);
+
 
 		AssetManager::AddGameObject("shotgun_PlayerTwo", AssetManager::GetModel("shotgun"), glm::vec3(-0.3, -0.25, 0.9), false, 0, Convex);
 		AssetManager::GetGameObject("shotgun_PlayerTwo")->SetRender(false);
 		AssetManager::GetGameObject("shotgun_PlayerTwo")->SetParentName("PlayerTwo");
+		AssetManager::GetGameObject("shotgun_PlayerTwo")->SetScale(0.5);
+
 
 		AssetManager::AddGameObject("double_barrel_PlayerTwo", AssetManager::GetModel("double_barrel_hand"), glm::vec3(-0.27, -0.2f, 1.5), false, 0, Convex);
 		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetRender(false);
 		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetParentName("PlayerTwo");
+		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetScale(0.5);
+
 
 		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/glock17_shoot1.dae", AssetManager::GetModel("glockhand"), 0, "glock17_shoot"));
 		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/glock17_reload.dae", AssetManager::GetModel("glockhand"), 0, "glock17_reload"));
@@ -454,4 +502,6 @@ namespace PlayerTwo
 	std::string PlayerTwo::GetCurrentWeapon() {
 		return currentGun;
 	}
+
+	
 }

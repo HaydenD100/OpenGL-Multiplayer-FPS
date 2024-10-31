@@ -106,13 +106,19 @@ namespace Engine
 				oss << WeaponManager::GetGunByName(Player::getCurrentGun())->currentammo << "/" << WeaponManager::GetGunByName(Player::getCurrentGun())->ammo << "\n";
 				Renderer::RenderText(oss.str().c_str(), 700, 60, 15);
 			}
+
+			oss.str(""); oss.clear();
+			oss.precision(4);
+			oss << Player::GetHealth() << "\n";
+			Renderer::RenderText(oss.str().c_str(), 5, 20, 30);
 			//AssetManager::CleanUp();
 
 			
 			Renderer::SwapBuffers(Backend::GetWindowPointer());
 
 			glm::vec3 inversed_rot = AssetManager::GetGameObject("player_head")->getRotation();
-			inversed_rot *= -1.0f;
+			//glm::vec3 camera_rot = glm::inverse(Camera::GetRotation());
+			inversed_rot = glm::vec3(-Camera::GetVerticalAngle(), Camera::GetHorizontalAngle(), 0);
 			NetworkManager::SendPlayerData(Player::getPosition(), inversed_rot, Player::getCurrentGun(), Player::GetInteractingWithName());
 			NetworkManager::SendPackets();
 			

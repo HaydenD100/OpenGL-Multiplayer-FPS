@@ -34,7 +34,12 @@ namespace Camera
 	Frustum Camera::GetFrustum() {
 		return frustrum;
 	}
-
+	float GetHorizontalAngle() {
+		return horizontalAngle;
+	}
+	float GetVerticalAngle() {
+		return verticalAngle;
+	}
 
 	
 	glm::mat4 Camera::getViewMatrix() {

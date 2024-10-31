@@ -22,6 +22,10 @@ namespace Camera
 	glm::vec3 GetRight();
 	glm::vec3 GetUp();
 	Frustum GetFrustum();
+
+	float GetHorizontalAngle();
+	float GetVerticalAngle();
+
 	
 
 	void Update(float dt);

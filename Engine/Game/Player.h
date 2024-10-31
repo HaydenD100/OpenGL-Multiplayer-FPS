@@ -31,6 +31,11 @@ namespace Player
 	void SwitchWeapons(int index);
 	void Shoot();
 	void Graffite();
+
+	void TakeDamage(int amount);
+	void SetHealth(int NewHealth);
+	int GetHealth();
+	void Respawn();
 }
 
 namespace PlayerTwo
@@ -39,6 +44,7 @@ namespace PlayerTwo
 	void SetData(std::string interact, std::string gunname, glm::vec3 position, glm::vec3 rotation);
 	void SetIneractingWith(std::string interact);
 	void Update();
+
 	std::string GetInteractingWithName();
 	std::string GetCurrentWeapon();
 }
