@@ -106,12 +106,15 @@ public:
 		return btToGlmVector3(body->getWorldTransform().getOrigin());
 	}
 
+	bool IsDynamic();
+
 private:
 	Transform transform = Transform();
 	Model* model = nullptr;
 
 	std::string parentName;
 	std::string name;
+	bool isDynamic = false;
 	//Water or Glass
 	std::string shaderType = "Default";
 	

@@ -6,6 +6,7 @@
 #include "Engine/Core/Networking/NetworkManager.h"
 
 
+
 //rewrite of my first 3D Engine
 //Not sure what im going to call it yet 
 //this Engine is fueled by coffee and sleep deprivation
@@ -21,23 +22,20 @@ namespace Engine
 	int Engine::Run() {
 
 		NetworkManager::Init();
-		std::cout << "1 for server 0 for client \n";
-		int temp;
-		std::cin >> temp;
-		if (temp)
+		std::cout << "==================================CONNECT/HOST==================================================\n";
+		std::cout << "ENTER 0 to create a Game OR Type the IP of the server to join ";
+		char temp[255];
+		std::cin.getline(temp, sizeof(temp));
+		std::cout << "================================================================================================\n";
+
+		
+		if (temp[0] == '0')
 			NetworkManager::InitServer();
 		else
-			NetworkManager::InitClient();
+			NetworkManager::InitClient(temp);
 
-		//Im g
-		/*
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		ImGui::StyleColorsDark();
-		ImGui_ImplGlfw_InitForOpenGL(Backend::GetWindowPointer(), true);
-		ImGui_ImplOpenGL3_Init("#version 330");
-		*/
+
+		
 
 		//init Engine comps
 		AssetManager::Init();
@@ -115,12 +113,25 @@ namespace Engine
 
 			
 			Renderer::SwapBuffers(Backend::GetWindowPointer());
-
-			glm::vec3 inversed_rot = AssetManager::GetGameObject("player_head")->getRotation();
-			//glm::vec3 camera_rot = glm::inverse(Camera::GetRotation());
-			inversed_rot = glm::vec3(-Camera::GetVerticalAngle(), Camera::GetHorizontalAngle(), 0);
-			NetworkManager::SendPlayerData(Player::getPosition(), inversed_rot, Player::getCurrentGun(), Player::GetInteractingWithName());
+			
+			//send Network Info
+			NetworkManager::SendPlayerData(Player::getPosition(), glm::vec3(-Camera::GetVerticalAngle(), Camera::GetHorizontalAngle(), 0), Player::getCurrentGun(), Player::GetInteractingWithName());
 			NetworkManager::SendPackets();
+
+			//Host keeps track of all the physics objects 
+			if (NetworkManager::IsServer) {
+				for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
+					GameObject* gameobject = AssetManager::GetGameObject(i);
+					if (!gameobject->IsDynamic() || gameobject->GetName() == "PlayerTwo" || gameobject->GetName() == "player")
+						continue;
+
+					NetworkManager::SendDyanmicObjectData(gameobject->GetName(), gameobject->GetPosition(), gameobject->getRotation());
+
+				}
+			}
+			
+
+			
 			
 		}
 

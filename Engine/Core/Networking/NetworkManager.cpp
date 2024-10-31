@@ -1,5 +1,7 @@
 #include "NetworkManager.h"
 #include "Engine/Core/SkinnedAnimatior.h"
+#include "Engine/Core/AssetManager.h"
+#include "Engine/Game/Player.h"
 
 
 namespace NetworkManager
@@ -17,6 +19,8 @@ namespace NetworkManager
 
 	void LoadedIn() {
 		loadedIn = 1;
+		if(!isServer)
+			SendControl(CONNECTED);
 	}
 
 	std::thread netowrking_thread;
@@ -34,12 +38,13 @@ namespace NetworkManager
 
 	}
 	void CleanUp() {
-		isRunning = 0;
 		if (!isServer) {
 			// shutdown the connection for sending since no more data will be sent
 			// the client can still use the ConnectSocket for receiving data
+			SendControl(DISCONNECTED);
 			iResult = shutdown(ConnectSocket, SD_SEND);
 		}
+		isRunning = 0;
 		netowrking_thread.join();
 		// cleanup
 		closesocket(ClientSocket);
@@ -139,8 +144,6 @@ namespace NetworkManager
 	}
 
 	int RunClient() {
-		std::cout << "Starting Client \n";
-
 		int recvbuflen = DEFAULT_BUFLEN;
 		char message[DEFAULT_BUFLEN] = "Client Connected to server";
 		char recvbuf[DEFAULT_BUFLEN];
@@ -171,21 +174,23 @@ namespace NetworkManager
 
 	}
 
-	int InitClient() {
+	int InitClient(char hostname[256]) {
 		isServer = 0;
 		ZeroMemory(&hints, sizeof(hints));
 		hints.ai_family = AF_INET;
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
-		char hostname[256];
 
 
-		// Get the local host name
-		if (gethostname(hostname, sizeof(hostname)) != 0) {
-			fprintf(stderr, "gethostname failed.\n");
-			WSACleanup();
-			return 1;
+		// Get the local host name if no ip was givving
+		if (hostname[0] == NULL) {
+			if (gethostname(hostname, sizeof(hostname)) != 0) {
+				fprintf(stderr, "gethostname failed.\n");
+				WSACleanup();
+				return 1;
+			}
 		}
+		
 
 		// Resolve the server address and port
 		//change hostname to the servers ip
@@ -227,8 +232,7 @@ namespace NetworkManager
 			WSACleanup();
 			return 1;
 		}
-
-		std::cout << "\n Connected to server \n";
+		std::cout << "\n =============== Connected to server ===============\n";
 		netowrking_thread = std::thread(RunClient);
 	}
 
@@ -387,6 +391,38 @@ namespace NetworkManager
 				std::memcpy(sendbuf + offset, &packet.payload.gunshotdata.hitpointLocal_z, sizeof(float));
 				offset += sizeof(float);
 
+				break;
+
+			case DYNAMICOBJECT:
+				// Copy packet type
+				offset = sizeof(packet.type) + sizeof(packet.size);
+
+				// Copy ObjectNameSize and ObjectName
+				std::memcpy(sendbuf + offset, &packet.payload.dynamicObjectData.ObjectNameSize, sizeof(packet.payload.dynamicObjectData.ObjectNameSize));
+				offset += sizeof(packet.payload.dynamicObjectData.ObjectNameSize);
+
+				std::memcpy(sendbuf + offset, packet.payload.dynamicObjectData.ObjectName, packet.payload.dynamicObjectData.ObjectNameSize);
+				offset += packet.payload.dynamicObjectData.ObjectNameSize;
+
+				// Copy position data
+				std::memcpy(sendbuf + offset, &packet.payload.dynamicObjectData.x, sizeof(float));
+				offset += sizeof(float);
+				std::memcpy(sendbuf + offset, &packet.payload.dynamicObjectData.y, sizeof(float));
+				offset += sizeof(float);
+				std::memcpy(sendbuf + offset, &packet.payload.dynamicObjectData.z, sizeof(float));
+				offset += sizeof(float);
+
+				// Copy rotation data
+				std::memcpy(sendbuf + offset, &packet.payload.dynamicObjectData.rotation_x, sizeof(float));
+				offset += sizeof(float);
+				std::memcpy(sendbuf + offset, &packet.payload.dynamicObjectData.rotation_y, sizeof(float));
+				offset += sizeof(float);
+				std::memcpy(sendbuf + offset, &packet.payload.dynamicObjectData.rotation_z, sizeof(float));
+
+				break;
+
+			case CONTROL:
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size), &packet.payload.control.flag, 1);
 				break;
 			default:
 				break;
@@ -572,10 +608,102 @@ namespace NetworkManager
 			*/
 
 			break;
+		case DYNAMICOBJECT:
+			std::memcpy(&packet.type, recvbuf + offset, sizeof(packet.type));
+			offset = sizeof(packet.type);
+
+			// Extract packet size
+			std::memcpy(&packet.size, recvbuf + offset, sizeof(packet.size));
+			offset += sizeof(packet.size);
+
+			// Extract ObjectNameSize
+			std::memcpy(&packet.payload.dynamicObjectData.ObjectNameSize, recvbuf + offset, sizeof(packet.payload.dynamicObjectData.ObjectNameSize));
+			offset += sizeof(packet.payload.dynamicObjectData.ObjectNameSize);
+
+			// Extract ObjectName based on its size
+			std::memcpy(packet.payload.dynamicObjectData.ObjectName, recvbuf + offset, packet.payload.dynamicObjectData.ObjectNameSize);
+			offset += packet.payload.dynamicObjectData.ObjectNameSize;
+
+			// Extract position data
+			std::memcpy(&packet.payload.dynamicObjectData.x, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+			std::memcpy(&packet.payload.dynamicObjectData.y, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+			std::memcpy(&packet.payload.dynamicObjectData.z, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+
+			// Extract rotation data
+			std::memcpy(&packet.payload.dynamicObjectData.rotation_x, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+			std::memcpy(&packet.payload.dynamicObjectData.rotation_y, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+			std::memcpy(&packet.payload.dynamicObjectData.rotation_z, recvbuf + offset, sizeof(float));
+
+			in.push(packet);
+
+			
+			/*
+			std::cout << "-------------Received Packet Info---------------\n";
+			std::cout << "Object Name Size: " << static_cast<int>(packet.payload.dynamicObjectData.ObjectNameSize) << "\n";
+			std::cout << "Object Name: " << packet.payload.dynamicObjectData.ObjectName << "\n";
+			std::cout << "Packet Type: " << static_cast<int>(packet.type) << "\n";
+			std::cout << "Packet Size: " << packet.size << "\n";
+			std::cout << "Position: "
+				<< "x: " << packet.payload.dynamicObjectData.x << ", "
+				<< "y: " << packet.payload.dynamicObjectData.y << ", "
+				<< "z: " << packet.payload.dynamicObjectData.z << "\n";
+
+			std::cout << "Rotation: "
+				<< "rotation_x: " << packet.payload.dynamicObjectData.rotation_x << ", "
+				<< "rotation_y: " << packet.payload.dynamicObjectData.rotation_y << ", "
+				<< "rotation_z: " << packet.payload.dynamicObjectData.rotation_z << "\n";
+			std::cout << "------------------------------------------------\n";
+			*/
+
+			break;
+
+
+		case CONTROL:
+			packet.type = CONTROL;
+			packet.size = 1;
+			std::memcpy(&packet.payload.control.flag, recvbuf + 5, 1);
+			in.push(packet);
+
 		default:
 			break;
 		}
 	}
+
+	void SendControl(ControlFlag flag) {
+		Packet packet;
+		packet.type = CONTROL;
+		packet.size = 1;
+		packet.payload.control.flag = flag;
+
+		out.push(packet);
+	}
+
+
+	void SendDyanmicObjectData(std::string objectname, glm::vec3 postion, glm::vec3 rotaion) {
+		Packet packet;
+		packet.type = DYNAMICOBJECT;
+		packet.size = objectname.size() + 6;
+
+		packet.payload.dynamicObjectData.ObjectNameSize = static_cast<uint8_t>(objectname.size());
+		std::memset(packet.payload.dynamicObjectData.ObjectName, 0, sizeof(packet.payload.dynamicObjectData.ObjectName));
+		std::memcpy(packet.payload.dynamicObjectData.ObjectName, objectname.c_str(), packet.payload.dynamicObjectData.ObjectNameSize);
+
+		packet.payload.dynamicObjectData.x = postion.x;
+		packet.payload.dynamicObjectData.y = postion.y;
+		packet.payload.dynamicObjectData.z = postion.z;
+
+		packet.payload.dynamicObjectData.rotation_x = rotaion.x;
+		packet.payload.dynamicObjectData.rotation_y = rotaion.y;
+		packet.payload.dynamicObjectData.rotation_z = rotaion.z;
+
+		out.push(packet);
+	}
+
 	void SendGunShotData(std::string objectname, std::string decalName, glm::vec3 worldhitpoint, glm::vec3 hitpointnormal, glm::vec3 hitpointlocal, int32_t damage, glm::vec3 force) {
 		Packet packet;
 		packet.type = GUNSHOT;
@@ -614,7 +742,6 @@ namespace NetworkManager
 		packet.payload.gunshotdata.force_z = force.z;
 
 		out.push(packet);
-
 	}
 
 	void SendAnimation(std::string AnimationName, std::string ObjectName) {
@@ -668,6 +795,7 @@ namespace NetworkManager
 		std::string playerInteractWith = "nothing";
 		std::string interact;
 		std::string currentgun;
+		std::string objectName;
 
 		while (current_in_size > 0) {
 			current_in_size--;
@@ -699,7 +827,7 @@ namespace NetworkManager
 				}
 				else {
 
-					std::string objectName = std::string(packet.payload.gunshotdata.ObjectName, packet.payload.gunshotdata.ObjectNameSize);
+					objectName = std::string(packet.payload.gunshotdata.ObjectName, packet.payload.gunshotdata.ObjectNameSize);
 					GameObject* gameobject = AssetManager::GetGameObject(objectName);
 					if (gameobject == nullptr)
 						break;
@@ -708,10 +836,29 @@ namespace NetworkManager
 						body->applyImpulse(btVector3(packet.payload.gunshotdata.force_x, packet.payload.gunshotdata.force_y, packet.payload.gunshotdata.force_z), btVector3(packet.payload.gunshotdata.hitpointLocal_x, packet.payload.gunshotdata.hitpointLocal_y, packet.payload.gunshotdata.hitpointLocal_z));
 					AssetManager::AddDecalInstance(glm::vec3(packet.payload.gunshotdata.worldhitpoint_x, packet.payload.gunshotdata.worldhitpoint_y, packet.payload.gunshotdata.worldhitpoint_z), glm::vec3(packet.payload.gunshotdata.hitpointNormal_x, packet.payload.gunshotdata.hitpointNormal_y, packet.payload.gunshotdata.hitpointNormal_z), AssetManager::GetDecal("bullet_hole"), gameobject);
 				}
+				break;
+			case DYNAMICOBJECT: {
+				objectName = std::string(packet.payload.dynamicObjectData.ObjectName, packet.payload.dynamicObjectData.ObjectNameSize);
+				GameObject* dynamicObject = AssetManager::GetGameObject(objectName);
+				if (dynamicObject == nullptr)
+					continue;
 
+				dynamicObject->setPosition(glm::vec3(packet.payload.dynamicObjectData.x, packet.payload.dynamicObjectData.y, packet.payload.dynamicObjectData.z));
+				dynamicObject->setRotation(glm::vec3(packet.payload.dynamicObjectData.rotation_x, packet.payload.dynamicObjectData.rotation_y, packet.payload.dynamicObjectData.rotation_z));
 
 
 				break;
+			}
+			case CONTROL:
+
+				if (packet.payload.control.flag == CONNECTED)
+					AssetManager::GetGameObject("PlayerTwo")->SetRender(true);
+				else if (packet.payload.control.flag == DISCONNECTED)
+					AssetManager::GetGameObject("PlayerTwo")->SetRender(false);
+
+				break;
+
+
 			default:
 				break;
 			}

@@ -132,6 +132,9 @@
     <ClCompile Include="Engine\Core\RagDoll.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Core\Networking\NetworkManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Scene\Scene.h">
@@ -255,6 +258,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\RagDoll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Networking\NetworkManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -8,6 +8,7 @@
 
 
 
+
 SkyBox::SkyBox() = default;
 
 SkyBox::SkyBox(std::vector<std::string> faces) {
@@ -655,6 +656,8 @@ namespace Renderer
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glDisableVertexAttribArray(0);
 		glDisable(GL_DEPTH_TEST);
+
+
 	}
 
 

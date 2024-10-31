@@ -23,7 +23,7 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	Btransform.setOrigin(glmToBtVector3(position));
 	convexHullShape = shape;
 
-	bool isDynamic = (mass != 0.f);
+	isDynamic = (mass != 0.f);
 
 	btVector3 localInertia(0, 0, 0);
 	if (isDynamic)
@@ -60,10 +60,11 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	this->model = model;
 	parentName = "";
 	canSave = save;
+
 	Btransform.setOrigin(glmToBtVector3(position));
 	collider = shape;
 
-	bool isDynamic = (mass != 0.f);
+	isDynamic = (mass != 0.f);
 
 	btVector3 localInertia(0, 0, 0);
 	if (isDynamic)
@@ -103,6 +104,7 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	this->name = name;
 	this->model = model;
 	parentName = "";
+
 	canSave = save;
 
 	float width = 1;
@@ -227,7 +229,7 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	}
 
 	PhysicsManagerBullet::AddColliderShape(collider);
-	bool isDynamic = (mass != 0.f);
+	isDynamic = (mass != 0.f);
 
 	btVector3 localInertia(0, 0, 0);
 	if (isDynamic && collider != nullptr)
@@ -286,7 +288,7 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 		collider = new btEmptyShape();
 
 	PhysicsManagerBullet::AddColliderShape(collider);
-	bool isDynamic = (mass != 0.f);
+	isDynamic = (mass != 0.f);
 
 	btVector3 localInertia(0, 0, 0);
 	if (isDynamic)
@@ -538,6 +540,9 @@ std::vector<glm::mat4>  GameObject::GetFinalBoneMatricies() {
 }
 void GameObject::SetFinalBoneMatricies(int index, glm::mat4 mat) {
 	m_FinalBoneMatrices[index] = mat;
+}
+bool GameObject::IsDynamic() {
+	return isDynamic;
 }
 
 

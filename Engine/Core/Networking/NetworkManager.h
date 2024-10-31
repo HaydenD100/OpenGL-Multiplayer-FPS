@@ -7,9 +7,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Engine/Core/AssetManager.h"
-#include "Engine/Game/Player.h"
-
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdio.h>
@@ -26,14 +23,19 @@
 #undef far
 
 
+enum ControlFlag : uint8_t {
+	CONNECTED= 1,
+	DISCONNECTED = 2
+};
+
+
 enum PacketType : uint8_t {
 	MESSAGE = 0,
 	PlAYERDATA = 1,
 	SOUND = 2,
-	OBJECTPOSTIONS = 4,
+	DYNAMICOBJECT = 4,
 	CONTROL = 8,
 	GUNSHOT = 16,
-	DYNAMICOBJECT = 32,
 	ANIMATION = 64,
 
 };
@@ -59,6 +61,10 @@ struct Packet {
 		char interactingWith[128];
 		char currentGun[64];
 
+	};
+
+	struct Control {
+		ControlFlag flag;
 	};
 
 	struct MessagePayload {
@@ -99,12 +105,26 @@ struct Packet {
 
 	};
 
+	struct DynamicObjectData {
+		uint8_t ObjectNameSize;
+		char ObjectName[128];
+
+		float x;
+		float y;
+		float z;
+		float rotation_x;
+		float rotation_y;
+		float rotation_z;
+	};
+
 	union Payload {
+		Control control;
 		PlayerData player;
 		MessagePayload message;
 		AnimationData animation;
 		GunShotData gunshotdata;
-		
+		DynamicObjectData dynamicObjectData;
+
 		Payload() {}
 	} payload;
 };
@@ -127,7 +147,7 @@ namespace NetworkManager
 	int SendDataToServer(const char* buffer);
 
 	int RunClient();
-	int InitClient();
+	int InitClient(char hostname[256]);
 
 	int IsServer();
 
@@ -135,7 +155,8 @@ namespace NetworkManager
 	void ReceivePackets(char recvbuf[DEFAULT_BUFLEN]);
 
 	//packet sending
-
+	void SendControl(ControlFlag flag);
+	void SendDyanmicObjectData(std::string objectname, glm::vec3 postion, glm::vec3 rotaion);
 	void SendGunShotData(std::string objectname, std::string decalName, glm::vec3 worldhitpoint, glm::vec3 hitpointnormal, glm::vec3 hitpointlocal, int32_t damage, glm::vec3 force);
 	void SendAnimation(std::string AnimationName, std::string ObjectName);
 	void SendPlayerData(glm::vec3 postion, glm::vec3 rotation, std::string currentGun, std::string interactingWith);

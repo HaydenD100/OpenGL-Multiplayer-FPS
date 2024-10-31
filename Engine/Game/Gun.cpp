@@ -146,7 +146,7 @@ namespace WeaponManager
 
 		glock.hasAnimations = true;
 		glock.currentammo = 18;
-		glock.damage = 10;
+		glock.damage = 14;
 		glock.type = Semi;
 		glock.recoil = 0.01f;
 		glock.recoilY = 100;
@@ -163,7 +163,7 @@ namespace WeaponManager
 		ak47.reloadtime = 2.5;
 		ak47.firerate = 600;
 		ak47.currentammo = 30;
-		ak47.damage = 25;
+		ak47.damage = 18;
 		ak47.type = Auto;
 		ak47.recoil = 0.03f;
 		ak47.recoilY = 175;
@@ -208,7 +208,7 @@ namespace WeaponManager
 		doublebarrel.reloadtime = 2;
 		doublebarrel.firerate = 100;
 		doublebarrel.currentammo = 2;
-		doublebarrel.damage = 25;
+		doublebarrel.damage = 10;
 		doublebarrel.type = Semi;
 		doublebarrel.recoil = 0.07f;
 		doublebarrel.recoilY = 250;

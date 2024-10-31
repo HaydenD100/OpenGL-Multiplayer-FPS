@@ -38,7 +38,7 @@ namespace Player
 	std::string decal_inv[decal_count] = { "flower_decal","panda_decal","pizza_decal","tank_decal", "freaky_decal"};
 	int decal_index = 0;
 
-
+	float timeSinceRespawn = 0;
 
 
 	//Game Logic
@@ -46,6 +46,7 @@ namespace Player
 
 
 	void Player::Init() {
+		timeSinceRespawn = glfwGetTime();
 		srand((unsigned int)time(nullptr));
 		AssetManager::AddGameObject(GameObject("player", AssetManager::GetModel("player") , glm::vec3(0, 10, 5), false, 1, Capsule, 0.5, 2.2, 0.5));
 		AssetManager::AddGameObject(GameObject("player_head", AssetManager::GetModel("player"), glm::vec3(0, 10, 5), false, 0, Sphere, 0, 0, 0));
@@ -353,6 +354,10 @@ namespace Player
 			std::cout << GetInteractingWithName() << "\n";
 
 		//AudioManager::UpdateListener(player->getPosition(), Camera::GetDirection(), btToGlmVector3(player->GetRigidBody()->getLinearVelocity()));
+
+		//sometimes you fall through floor
+		if (getPosition().y < -200)
+			Respawn();
 	}
 	
 	glm::vec3 Player::getPosition() {
@@ -394,6 +399,8 @@ namespace Player
 	}
 
 	void Player::TakeDamage(int amount) {
+		if (timeSinceRespawn < 2.0f)
+			return;
 		Health -= amount;
 		if (Health <= 0) {
 			//death
@@ -420,6 +427,8 @@ namespace Player
 		gunName = "nothing";
 
 		setPosition(spawnpoints[spawnpointindex]);
+
+		timeSinceRespawn = glfwGetTime();
 	}
 }
 
@@ -432,6 +441,8 @@ namespace PlayerTwo
 
 	void PlayerTwo::Init() {
 		AssetManager::AddGameObject("PlayerTwo", AssetManager::GetModel("playertwo"), glm::vec3(0, 2, 0), false, 0, Convex);
+		if(NetworkManager::IsServer())
+			AssetManager::GetGameObject("PlayerTwo")->SetRender(false);
 
 		AssetManager::AddGameObject(GameObject("glock_PlayerTwo", AssetManager::GetModel("glockhand"), glm::vec3(-0.3, -0.2f, 0.9), false, 0, Convex));
 		AssetManager::GetGameObject("glock_PlayerTwo")->SetRender(false);

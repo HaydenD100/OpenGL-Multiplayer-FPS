@@ -61,4 +61,5 @@ namespace Renderer
     void GenerateShadowMap();
 
     void RenderScene();
+
 }
