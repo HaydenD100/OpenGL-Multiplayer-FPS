@@ -23,7 +23,7 @@ namespace Engine
 
 		NetworkManager::Init();
 		std::cout << "==================================CONNECT/HOST==================================================\n";
-		std::cout << "ENTER 0 to create a Game OR Type the IP of the server to join ";
+		std::cout << "ENTER 0 to create a Game OR Type the IP of the server to join:";
 		char temp[255];
 		std::cin.getline(temp, sizeof(temp));
 		std::cout << "================================================================================================\n";
@@ -116,7 +116,6 @@ namespace Engine
 			
 			//send Network Info
 			NetworkManager::SendPlayerData(Player::getPosition(), glm::vec3(-Camera::GetVerticalAngle(), Camera::GetHorizontalAngle(), 0), Player::getCurrentGun(), Player::GetInteractingWithName());
-			NetworkManager::SendPackets();
 
 			//Host keeps track of all the physics objects 
 			if (NetworkManager::IsServer) {
@@ -130,6 +129,8 @@ namespace Engine
 				}
 			}
 			
+			NetworkManager::SendPackets();
+
 
 			
 			

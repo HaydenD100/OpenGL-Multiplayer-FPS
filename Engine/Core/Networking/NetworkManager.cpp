@@ -16,6 +16,7 @@ namespace NetworkManager
 	int isServer = 0;
 	int isRunning = 1;
 	int loadedIn = 0;
+	int clientConnected = 0;
 
 	void LoadedIn() {
 		loadedIn = 1;
@@ -53,10 +54,9 @@ namespace NetworkManager
 
 
 	int RunServer() {
-		std::cout << "Server initialized \n";
+		std::cout << "\n =================== Server initialized =================== \n";
 
 		WaitForClient();
-
 		char recvbuf[DEFAULT_BUFLEN];
 		int iResult, iSendResult;
 		int recvbuflen = DEFAULT_BUFLEN;
@@ -134,7 +134,13 @@ namespace NetworkManager
 		ClientSocket = INVALID_SOCKET;
 
 		// Accept a client socket
-		ClientSocket = accept(ListenSocket, NULL, NULL);
+		std::cout << "\n===================== Waiting for Client to Connect =====================\n";
+
+		while (ClientSocket == INVALID_SOCKET) {
+			ClientSocket = accept(ListenSocket, NULL, NULL);
+		}
+		std::cout << "\n===================== Client Connected =====================\n";
+		clientConnected = 1;
 		if (ClientSocket == INVALID_SOCKET) {
 			printf("accept failed: %d\n", WSAGetLastError());
 			closesocket(ListenSocket);
@@ -266,7 +272,7 @@ namespace NetworkManager
 		iResult = send(ClientSocket, buffer, recvbuflen, 0);
 
 		if (iResult == SOCKET_ERROR) {
-			printf("send failed: %d\n", WSAGetLastError());
+			//printf("send failed: %d\n", WSAGetLastError());
 			closesocket(ClientSocket);
 			WSACleanup();
 			return 1;
@@ -295,6 +301,10 @@ namespace NetworkManager
 	}
 
 	int SendPackets() {
+
+		if (isServer && !clientConnected)
+			return 1;
+
 		while(out.size() > 0){
 			Packet packet = out.front();
 			out.pop();
@@ -685,6 +695,9 @@ namespace NetworkManager
 
 
 	void SendDyanmicObjectData(std::string objectname, glm::vec3 postion, glm::vec3 rotaion) {
+		if (isServer && !clientConnected)
+			return;
+
 		Packet packet;
 		packet.type = DYNAMICOBJECT;
 		packet.size = objectname.size() + 6;
@@ -705,6 +718,9 @@ namespace NetworkManager
 	}
 
 	void SendGunShotData(std::string objectname, std::string decalName, glm::vec3 worldhitpoint, glm::vec3 hitpointnormal, glm::vec3 hitpointlocal, int32_t damage, glm::vec3 force) {
+		if (isServer && !clientConnected)
+			return;
+
 		Packet packet;
 		packet.type = GUNSHOT;
 		//this is wrong
@@ -745,6 +761,9 @@ namespace NetworkManager
 	}
 
 	void SendAnimation(std::string AnimationName, std::string ObjectName) {
+		if (isServer && !clientConnected)
+			return;
+
 		Packet temp;
 		temp.type = ANIMATION;
 		temp.size = sizeof(AnimationName) + sizeof(ObjectName) + 2;
@@ -759,6 +778,9 @@ namespace NetworkManager
 	}
 
 	void SendPlayerData(glm::vec3 postion, glm::vec3 rotation, std::string currentGun, std::string interactingWith) {
+		if (isServer && !clientConnected)
+			return;
+
 		Packet temp;
 		temp.type = PlAYERDATA;
 		temp.size = sizeof(float) * 6;
@@ -780,6 +802,9 @@ namespace NetworkManager
 	}
 
 	void SendPacketMessage(std::string message) {
+		if (isServer && !clientConnected)
+			return;
+
 		Packet temp;
 		temp.type = MESSAGE;
 		temp.size = static_cast<uint32_t>(message.size());
