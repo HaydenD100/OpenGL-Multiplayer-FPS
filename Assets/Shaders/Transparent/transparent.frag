@@ -156,7 +156,12 @@ void main() {
     vec3 color = Lo * 2;
     color += ambient;
 
-    // HDR
+     float intensity = dot(color, vec3(0.2126, 0.7152, 0.0722)); 
+     alpha =  alpha * intensity ; 
+
+    // HDR to ldexp 
     color = color / (color + vec3(1.0));
+
+    
     gAlbedoSpec = vec4(color, alpha);
 }

@@ -347,6 +347,7 @@ namespace Player
 
 		if ((Input::KeyDown('w') || Input::KeyDown('a') || Input::KeyDown('s') || Input::KeyDown('d')) && footstepTime + footstep_interval < glfwGetTime() ) {
 			AudioManager::PlaySound("foot_step" + std::to_string((rand() % 4) + 1), player->getPosition());
+			NetworkManager::SendSound("foot_step" + std::to_string((rand() % 4) + 1), player->getPosition());
 			footstepTime = glfwGetTime();
 		}
 
@@ -399,8 +400,12 @@ namespace Player
 	}
 
 	void Player::TakeDamage(int amount) {
-		if (timeSinceRespawn < 2.0f)
+		//packets get evaluated after respawn leading to take damage after respawning
+		if (timeSinceRespawn < 2.0f) {
 			return;
+			Health = 100;
+		}
+			
 		Health -= amount;
 		if (Health <= 0) {
 			//death

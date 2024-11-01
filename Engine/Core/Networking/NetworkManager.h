@@ -117,6 +117,15 @@ struct Packet {
 		float rotation_z;
 	};
 
+	struct SoundData {
+		uint8_t SoundNameSize;
+		char SoundName[128];
+
+		float x;
+		float y;
+		float z;
+	};
+
 	union Payload {
 		Control control;
 		PlayerData player;
@@ -124,6 +133,7 @@ struct Packet {
 		AnimationData animation;
 		GunShotData gunshotdata;
 		DynamicObjectData dynamicObjectData;
+		SoundData sound;
 
 		Payload() {}
 	} payload;
@@ -155,6 +165,7 @@ namespace NetworkManager
 	void ReceivePackets(char recvbuf[DEFAULT_BUFLEN]);
 
 	//packet sending
+	void SendSound(std::string soundname, glm::vec3 postion);
 	void SendControl(ControlFlag flag);
 	void SendDyanmicObjectData(std::string objectname, glm::vec3 postion, glm::vec3 rotaion);
 	void SendGunShotData(std::string objectname, std::string decalName, glm::vec3 worldhitpoint, glm::vec3 hitpointnormal, glm::vec3 hitpointlocal, int32_t damage, glm::vec3 force);

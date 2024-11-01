@@ -434,6 +434,25 @@ namespace NetworkManager
 			case CONTROL:
 				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size), &packet.payload.control.flag, 1);
 				break;
+			case SOUND:
+				offset = sizeof(packet.type) + sizeof(packet.size);
+
+				std::memcpy(sendbuf + offset, &packet.payload.sound.SoundNameSize, sizeof(packet.payload.sound.SoundNameSize));
+				offset += sizeof(packet.payload.sound.SoundNameSize);
+
+				// Write SoundName
+				std::memcpy(sendbuf + offset, packet.payload.sound.SoundName, packet.payload.sound.SoundNameSize);
+
+				offset += packet.payload.sound.SoundNameSize;
+
+				// Write position (x, y, z)
+				std::memcpy(sendbuf + offset, &packet.payload.sound.x, sizeof(float));
+				offset += sizeof(float);
+				std::memcpy(sendbuf + offset, &packet.payload.sound.y, sizeof(float));
+				offset += sizeof(float);
+				std::memcpy(sendbuf + offset, &packet.payload.sound.z, sizeof(float));
+
+				break;
 			default:
 				break;
 			}
@@ -679,12 +698,64 @@ namespace NetworkManager
 			std::memcpy(&packet.payload.control.flag, recvbuf + 5, 1);
 			in.push(packet);
 
+			break;
+
+		case SOUND:
+
+			// Read packet type
+			packet.type = SOUND;
+			offset = 1;
+			// Read packet size
+			std::memcpy(&packet.size, recvbuf + offset, sizeof(uint32_t));
+			offset += sizeof(packet.size);
+
+			// Read SoundNameSize
+			std::memcpy(&packet.payload.sound.SoundNameSize, recvbuf + offset, sizeof(packet.payload.sound.SoundNameSize));
+			offset += sizeof(packet.payload.sound.SoundNameSize);
+
+			// Read SoundName
+			std::memcpy(packet.payload.sound.SoundName, recvbuf + offset, packet.payload.sound.SoundNameSize);
+			packet.payload.sound.SoundName[packet.payload.sound.SoundNameSize] = '\0'; // Null-terminate
+			offset += packet.payload.sound.SoundNameSize;
+
+			// Read position (x, y, z)
+			std::memcpy(&packet.payload.sound.x, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+			std::memcpy(&packet.payload.sound.y, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+			std::memcpy(&packet.payload.sound.z, recvbuf + offset, sizeof(float));
+
+			in.push(packet);
+			break;
+
 		default:
 			break;
 		}
 	}
 
+	void SendSound(std::string soundname, glm::vec3 postion) {
+		if (isServer && !clientConnected)
+			return;
+
+		Packet packet;
+		packet.type = SOUND;
+		packet.size = 4 * 3 + soundname.size();
+
+		packet.payload.sound.SoundNameSize = soundname.size();
+		std::memset(packet.payload.sound.SoundName, 0, sizeof(packet.payload.sound.SoundName));
+		std::memcpy(packet.payload.sound.SoundName, soundname.c_str(), packet.payload.sound.SoundNameSize);
+
+		packet.payload.sound.x = postion.x;
+		packet.payload.sound.y = postion.y;
+		packet.payload.sound.z = postion.z;
+		out.push(packet);
+	}
+
+
 	void SendControl(ControlFlag flag) {
+		if (isServer && !clientConnected)
+			return;
+
 		Packet packet;
 		packet.type = CONTROL;
 		packet.size = 1;
@@ -882,7 +953,14 @@ namespace NetworkManager
 					AssetManager::GetGameObject("PlayerTwo")->SetRender(false);
 
 				break;
+			case SOUND:
+			{
+				std::string soundName = std::string(packet.payload.sound.SoundName, packet.payload.sound.SoundNameSize);
 
+				AudioManager::PlaySound(soundName, glm::vec3(packet.payload.sound.x, packet.payload.sound.y, packet.payload.sound.z));
+				break;
+			}
+				
 
 			default:
 				break;
