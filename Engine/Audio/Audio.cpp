@@ -182,7 +182,7 @@ namespace AudioManager {
 				result = system->playSound(GetSound(sound)->GetSound(), 0, true, &channels[i]);
 				if (!succeededOrWarn("Error1", result))
 					return Sound::DEFAULT;
-				//GetSound(sound)->SetPosition(Position);
+				GetSound(sound)->SetPosition(Position);
 
 
 				FMOD_VECTOR position;

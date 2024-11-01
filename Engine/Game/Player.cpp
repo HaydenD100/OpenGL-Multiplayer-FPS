@@ -132,7 +132,9 @@ namespace Player
 		}
 		else {
 			// Click click
-			AudioManager::PlaySound("dry_fire", AssetManager::GetGameObject("player")->getPosition());
+			AudioManager::PlaySound("dry_fire", Player::getPosition());
+			NetworkManager::SendSound("dry_fire", Player::getPosition());
+
 		}
 		
 		WeaponManager::GetGunByName(gunName)->lastTimeShot = glfwGetTime();
@@ -357,7 +359,7 @@ namespace Player
 		//AudioManager::UpdateListener(player->getPosition(), Camera::GetDirection(), btToGlmVector3(player->GetRigidBody()->getLinearVelocity()));
 
 		//sometimes you fall through floor
-		if (getPosition().y < -200)
+		if (getPosition().y < -100)
 			Respawn();
 	}
 	

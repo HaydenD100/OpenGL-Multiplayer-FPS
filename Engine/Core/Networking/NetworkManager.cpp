@@ -91,6 +91,9 @@ namespace NetworkManager
 		hints.ai_protocol = IPPROTO_TCP;
 		hints.ai_flags = AI_PASSIVE;
 
+
+
+
 		// Resolve the local address and port to be used by the server
 		iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
 		if (iResult != 0) {
@@ -125,6 +128,17 @@ namespace NetworkManager
 			WSACleanup();
 			return 1; 
 		}
+
+		for (struct addrinfo* ptr = result; ptr != NULL; ptr = ptr->ai_next) {
+			struct sockaddr_in* sockaddr_ipv4 = (struct sockaddr_in*)ptr->ai_addr;
+			char ipStr[INET_ADDRSTRLEN];
+			inet_ntop(AF_INET, &sockaddr_ipv4->sin_addr, ipStr, sizeof(ipStr));
+			std::cout << "\n===================== Server will run on IP: " << ipStr << " =====================\n";
+
+		}
+
+
+		
 
 		netowrking_thread = std::thread(RunServer);
 	}
@@ -188,7 +202,7 @@ namespace NetworkManager
 		hints.ai_protocol = IPPROTO_TCP;
 
 
-		// Get the local host name if no ip was givving
+		// Get the local host name if no ip was given
 		if (hostname[0] == NULL) {
 			if (gethostname(hostname, sizeof(hostname)) != 0) {
 				fprintf(stderr, "gethostname failed.\n");
@@ -197,6 +211,9 @@ namespace NetworkManager
 			}
 		}
 		
+		std::string hostname_str = std::string(hostname);
+
+		std::cout << "\n=================== TRYING TO CONNECT TO " << hostname_str << "========= \n";
 
 		// Resolve the server address and port
 		//change hostname to the servers ip
@@ -956,7 +973,7 @@ namespace NetworkManager
 			case SOUND:
 			{
 				std::string soundName = std::string(packet.payload.sound.SoundName, packet.payload.sound.SoundNameSize);
-
+				std::cout << "Play sound: " << soundName << "\n";
 				AudioManager::PlaySound(soundName, glm::vec3(packet.payload.sound.x, packet.payload.sound.y, packet.payload.sound.z));
 				break;
 			}

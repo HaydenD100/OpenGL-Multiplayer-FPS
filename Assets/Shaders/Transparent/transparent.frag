@@ -157,11 +157,13 @@ void main() {
     color += ambient;
 
      float intensity = dot(color, vec3(0.2126, 0.7152, 0.0722)); 
-     alpha =  alpha * intensity ; 
+     float Changedalpha =  alpha * intensity ; 
+
+     Changedalpha = clamp(Changedalpha,alpha,100);
 
     // HDR to ldexp 
     color = color / (color + vec3(1.0));
 
     
-    gAlbedoSpec = vec4(color, alpha);
+    gAlbedoSpec = vec4(color, Changedalpha);
 }

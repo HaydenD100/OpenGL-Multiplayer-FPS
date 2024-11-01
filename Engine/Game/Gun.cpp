@@ -84,6 +84,7 @@ void Gun::Reload() {
 void Gun::Shoot(){
 	int randomnum = (rand() % firesounds) + 1;
 	AudioManager::PlaySound(gunsShotName + std::to_string(randomnum));
+	NetworkManager::SendSound(gunsShotName + std::to_string(randomnum), Player::getPosition());
 
 	if (hasAnimations) {
 		Animator::PlayAnimation(&shootAnim, name, false);
