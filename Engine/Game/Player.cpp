@@ -40,13 +40,15 @@ namespace Player
 
 	float timeSinceRespawn = 0;
 
-
 	//Game Logic
 	int Health = 100;
+	int needRespawning = 0;
+	float timeSinceDeath = 0;
 
 
 	void Player::Init() {
 		timeSinceRespawn = glfwGetTime();
+		timeSinceDeath = glfwGetTime();
 		srand((unsigned int)time(nullptr));
 		AssetManager::AddGameObject(GameObject("player", AssetManager::GetModel("player") , glm::vec3(0, 10, 5), false, 1, Capsule, 0.5, 2.2, 0.5));
 		AssetManager::AddGameObject(GameObject("player_head", AssetManager::GetModel("player"), glm::vec3(0, 10, 5), false, 0, Sphere, 0, 0, 0));
@@ -361,6 +363,7 @@ namespace Player
 		//sometimes you fall through floor
 		if (getPosition().y < -100)
 			Respawn();
+
 	}
 	
 	glm::vec3 Player::getPosition() {
@@ -412,7 +415,11 @@ namespace Player
 		if (Health <= 0) {
 			//death
 			std::cout << "Player Died" << std::endl;
+			//timeSinceDeath = glfwGetTime();
+			//needRespawning = 1;
+
 			Respawn();
+
 		}
 	}
 
@@ -434,6 +441,7 @@ namespace Player
 		gunName = "nothing";
 
 		setPosition(spawnpoints[spawnpointindex]);
+		NetworkManager::SendAnimation("bean_death", "PlayerTwo");
 
 		timeSinceRespawn = glfwGetTime();
 	}
@@ -486,6 +494,9 @@ namespace PlayerTwo
 		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/db_shoot.dae", AssetManager::GetModel("double_barrel_hand"), 1, "db_shoot"));
 		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/db_reload.dae", AssetManager::GetModel("double_barrel_hand"), 0, "db_reload"));
 		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/db_equip.dae", AssetManager::GetModel("double_barrel_hand"), 1, "db_equip"));
+
+		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/bean_death.dae", AssetManager::GetModel("playertwo"), 0, "bean_death"));
+
 
 
 	}

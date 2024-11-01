@@ -51,7 +51,7 @@ void Scene::LoadAssets() {
 
 	AssetManager::AddModel("swat", Model("Assets/Objects/FBX/swat_death.dae", AssetManager::GetTexture("uvmap")));
 	
-	AssetManager::AddModel("playertwo", Model(Mesh("Assets/Objects/playerTwo.obj"), AssetManager::GetTexture("uvmap")));
+	AssetManager::AddModel("playertwo", Model("Assets/Objects/FBX/bean_death.dae", AssetManager::GetTexture("uvmap")));
 
 
 	AssetManager::AddModel("fence1", Model("Assets/Objects/fence1.fbx", AssetManager::GetTexture("concrete")));
