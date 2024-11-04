@@ -25,9 +25,13 @@ namespace NetworkManager
 	}
 
 	std::thread netowrking_thread;
+	ThreadQueueStatus queueStatus = NONE;
 
 	std::queue<Packet> out;
 	std::queue<Packet> in;
+	//used for when the main thread is using in 
+	std::queue<Packet> in_queue;
+
 
 	int Init() {
 		// Initialize Winsock
@@ -56,13 +60,25 @@ namespace NetworkManager
 	int RunServer() {
 		std::cout << "\n =================== Server initialized =================== \n";
 
-		WaitForClient();
 		char recvbuf[DEFAULT_BUFLEN];
 		int iResult, iSendResult;
 		int recvbuflen = DEFAULT_BUFLEN;
 
 		// Receive until the peer shuts down the connection
 		do {
+			if(!clientConnected)
+				WaitForClient();
+
+			if (queueStatus == NONE && in_queue.size() > 0) {
+				queueStatus = COMPILING;
+				while (in_queue.size() > 0) {
+					Packet packet = in_queue.front();
+					in_queue.pop();
+					in.push(packet);
+				}
+				queueStatus = NONE;
+			}
+
 			memset(recvbuf, 0, sizeof(recvbuf));
 			iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 			if (iResult > 0) {
@@ -150,7 +166,7 @@ namespace NetworkManager
 		// Accept a client socket
 		std::cout << "\n===================== Waiting for Client to Connect =====================\n";
 
-		while (ClientSocket == INVALID_SOCKET) {
+		while (ClientSocket == INVALID_SOCKET && Backend::IsWindowOpen()) {
 			ClientSocket = accept(ListenSocket, NULL, NULL);
 		}
 		std::cout << "\n===================== Client Connected =====================\n";
@@ -204,6 +220,7 @@ namespace NetworkManager
 
 		// Get the local host name if no ip was given
 		if (hostname[0] == NULL) {
+			std::cout << "getting hostname \n";
 			if (gethostname(hostname, sizeof(hostname)) != 0) {
 				fprintf(stderr, "gethostname failed.\n");
 				WSACleanup();
@@ -225,6 +242,8 @@ namespace NetworkManager
 		}
 		ConnectSocket = INVALID_SOCKET;
 
+
+		/*
 		// Attempt to connect to the first address returned by
 		// the call to getaddrinfo
 		ptr = result;
@@ -245,11 +264,30 @@ namespace NetworkManager
 			closesocket(ConnectSocket);
 			ConnectSocket = INVALID_SOCKET;
 		}
-		// Should really try the next address returned by getaddrinfo
-		// if the connect call failed
-		// But for this simple example we just free the resources
-		// returned by getaddrinfo and print an error message
+		*/
+		// Loop through all returned addresses and try to connect
+		struct addrinfo* ptr = result;
+		for (; ptr != NULL; ptr = ptr->ai_next) {
+			// Create a SOCKET for connecting to server
+			ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+			if (ConnectSocket == INVALID_SOCKET) {
+				printf("Error at socket(): %ld\n", WSAGetLastError());
+				WSACleanup();
+				freeaddrinfo(result);
+				return 1;
+			}
+
+			// Attempt to connect to an address until one succeeds
+			if (connect(ConnectSocket, ptr->ai_addr, (int)ptr->ai_addrlen) == SOCKET_ERROR) {
+				closesocket(ConnectSocket);
+				ConnectSocket = INVALID_SOCKET;
+				continue;  // Try the next address
+			}
+			break;  // Successful connection
+		}
+
 		freeaddrinfo(result);
+
 		if (ConnectSocket == INVALID_SOCKET) {
 			printf("Unable to connect to server!\n");
 			WSACleanup();
@@ -290,9 +328,11 @@ namespace NetworkManager
 
 		if (iResult == SOCKET_ERROR) {
 			//printf("send failed: %d\n", WSAGetLastError());
-			closesocket(ClientSocket);
-			WSACleanup();
-			return 1;
+			//closesocket(ClientSocket);
+			//WSACleanup();
+			//return 1;
+
+			clientConnected = 0;
 		}
 
 		return iResult;
@@ -305,10 +345,7 @@ namespace NetworkManager
 		iResult = send(ConnectSocket, buffer, recvbuflen, 0);
 
 		if (iResult == SOCKET_ERROR) {
-			printf("send failed: %d\n", WSAGetLastError());
-			closesocket(ConnectSocket);
-			WSACleanup();
-			return 1;
+			
 		}
 		return iResult;
 	}
@@ -488,14 +525,20 @@ namespace NetworkManager
 		Packet packet;
 		size_t offset = 0;
 
+		if(queueStatus != EVALUTING)
+			queueStatus = RECEVING;
+
 		switch (recvbuf[0])
 		{
 		case MESSAGE:
 			packet.type = MESSAGE;
 			std::memcpy(&packet.size, recvbuf + sizeof(packet.type), 2);
-			std::memcpy(&packet.payload.message.message, recvbuf + sizeof(packet.type) + sizeof(packet.size), packet.size);
+			std::memcpy(&packet.payload.message.message, recvbuf + sizeof(packet.type) + sizeof(packet.size), packet.size);\
 
-			in.push(packet);
+			if(queueStatus == EVALUTING)
+				in_queue.push(packet);
+			else
+				in.push(packet);
 			/*
 			std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
 			std::cout << (int)packet.type << "\n";
@@ -527,8 +570,10 @@ namespace NetworkManager
 			// Ensure strings are null-terminated
 			packet.payload.player.interactingWith[packet.payload.player.interactingWithSize] = '\0';
 			packet.payload.player.currentGun[packet.payload.player.currentGunSize] = '\0';
-			in.push(packet);
-
+			if (queueStatus == EVALUTING)
+				in_queue.push(packet);
+			else
+				in.push(packet);
 			/*
 			std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
 			std::cout << (int)packet.type << "\n";
@@ -560,7 +605,10 @@ namespace NetworkManager
 			std::memcpy(packet.payload.animation.ObjectName, recvbuf + offset, packet.payload.animation.ObjectNameSize);
 			packet.payload.animation.ObjectName[packet.payload.animation.ObjectNameSize] = '\0'; // Null-terminate
 
-			in.push(packet);
+			if (queueStatus == EVALUTING)
+				in_queue.push(packet);
+			else
+				in.push(packet);
 
 			break;
 		case GUNSHOT:
@@ -628,7 +676,10 @@ namespace NetworkManager
 			offset += sizeof(float);
 
 			// Push packet to the input queue
-			in.push(packet);
+			if (queueStatus == EVALUTING)
+				in_queue.push(packet);
+			else
+				in.push(packet);
 			/*
 			std::cout << "------------- GUNSHOT DATA ---------------\n";
 			std::cout << "Object Name: " << packet.payload.gunshotdata.ObjectName << " (Size: " << (int)packet.payload.gunshotdata.ObjectNameSize << ")\n";
@@ -685,7 +736,10 @@ namespace NetworkManager
 			offset += sizeof(float);
 			std::memcpy(&packet.payload.dynamicObjectData.rotation_z, recvbuf + offset, sizeof(float));
 
-			in.push(packet);
+			if (queueStatus == EVALUTING)
+				in_queue.push(packet);
+			else
+				in.push(packet);
 
 			
 			/*
@@ -742,12 +796,19 @@ namespace NetworkManager
 			offset += sizeof(float);
 			std::memcpy(&packet.payload.sound.z, recvbuf + offset, sizeof(float));
 
-			in.push(packet);
+			if (queueStatus == EVALUTING)
+				in_queue.push(packet);
+			else
+				in.push(packet);
+
 			break;
 
 		default:
 			break;
 		}
+
+		if(queueStatus == RECEVING)
+			queueStatus = NONE;
 	}
 
 	void SendSound(std::string soundname, glm::vec3 postion) {
@@ -904,13 +965,18 @@ namespace NetworkManager
 		//this is so it wont evaulate any more packets coming in
 		int current_in_size = in.size();
 
+		while (queueStatus == RECEVING) {
+			
+		}
+		queueStatus = EVALUTING;
+
 		//needed
 		std::string playerInteractWith = "nothing";
 		std::string interact;
 		std::string currentgun;
 		std::string objectName;
 
-		while (current_in_size > 0) {
+		while (current_in_size > 0 && !in.empty()) {
 			current_in_size--;
 			Packet packet = in.front();
 			in.pop();
@@ -927,11 +993,14 @@ namespace NetworkManager
 
 				PlayerTwo::SetData(interact, currentgun, glm::vec3(packet.payload.player.x, packet.payload.player.y, packet.payload.player.z), glm::vec3(packet.payload.player.rotation_x, packet.payload.player.rotation_y, packet.payload.player.rotation_z));
 				break;
-			case ANIMATION:
-				//std::cout << "ANIMATION: " << packet.payload.animation.AnimationName << "\n";
-				//std::cout << "ANIMATION: " << packet.payload.animation.ObjectName << "\n";
-				Animator::PlayAnimation(AssetManager::GetSkinnedAnimation(packet.payload.animation.AnimationName), packet.payload.animation.ObjectName, false);
+			case ANIMATION: {
+				SkinnedAnimation* animation = AssetManager::GetSkinnedAnimation(packet.payload.animation.AnimationName);
+				if (animation == nullptr)
+					return;
+				Animator::PlayAnimation(animation, packet.payload.animation.ObjectName, false);
 				break;
+			}
+				
 
 			case GUNSHOT:
 
@@ -954,7 +1023,7 @@ namespace NetworkManager
 				objectName = std::string(packet.payload.dynamicObjectData.ObjectName, packet.payload.dynamicObjectData.ObjectNameSize);
 				GameObject* dynamicObject = AssetManager::GetGameObject(objectName);
 				if (dynamicObject == nullptr)
-					continue;
+					break;
 
 				dynamicObject->setPosition(glm::vec3(packet.payload.dynamicObjectData.x, packet.payload.dynamicObjectData.y, packet.payload.dynamicObjectData.z));
 				dynamicObject->setRotation(glm::vec3(packet.payload.dynamicObjectData.rotation_x, packet.payload.dynamicObjectData.rotation_y, packet.payload.dynamicObjectData.rotation_z));
@@ -964,16 +1033,32 @@ namespace NetworkManager
 			}
 			case CONTROL:
 
-				if (packet.payload.control.flag == CONNECTED)
-					AssetManager::GetGameObject("PlayerTwo")->SetRender(true);
-				else if (packet.payload.control.flag == DISCONNECTED)
-					AssetManager::GetGameObject("PlayerTwo")->SetRender(false);
+				if (packet.payload.control.flag == CONNECTED) {
+					GameObject* otherPlayer = AssetManager::GetGameObject("PlayerTwo");
+					if (otherPlayer == nullptr)
+						break;
+					otherPlayer->SetRender(true);
+					otherPlayer->GetRigidBody()->setActivationState(ACTIVE_TAG);
+					otherPlayer->GetRigidBody()->activate(true);
+				}
+					
+				else if (packet.payload.control.flag == DISCONNECTED) {
+					GameObject* otherPlayer = AssetManager::GetGameObject("PlayerTwo");
+					if (otherPlayer == nullptr)
+						break;
+					otherPlayer->SetRender(false);
+					otherPlayer->GetRigidBody()->setActivationState(DISABLE_SIMULATION);
+					clientConnected = 0;
+					if(isServer)
+						std::cout << "\n===================== Client Disconnected =====================\n";
+
+				}
+					
 
 				break;
 			case SOUND:
 			{
 				std::string soundName = std::string(packet.payload.sound.SoundName, packet.payload.sound.SoundNameSize);
-				std::cout << "Play sound: " << soundName << "\n";
 				AudioManager::PlaySound(soundName, glm::vec3(packet.payload.sound.x, packet.payload.sound.y, packet.payload.sound.z));
 				break;
 			}
@@ -984,7 +1069,7 @@ namespace NetworkManager
 			}
 		}
 		PlayerTwo::SetIneractingWith(playerInteractWith);
-
+		queueStatus = NONE;
 	}
 
 

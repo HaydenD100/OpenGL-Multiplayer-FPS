@@ -31,23 +31,21 @@ namespace Player
 
 	double reloadingTime = 0;
 	double footstepTime = 0;
-	double footstep_interval = 0.5;
+	double footstep_interval = 0.8;
 
 	std::string inv[4] = {"ak47","glock","double_barrel"};
 	const int decal_count = 5;
 	std::string decal_inv[decal_count] = { "flower_decal","panda_decal","pizza_decal","tank_decal", "freaky_decal"};
 	int decal_index = 0;
 
-	float timeSinceRespawn = 0;
-
 	//Game Logic
 	int Health = 100;
-	int needRespawning = 0;
+	int isDead = 0;
 	float timeSinceDeath = 0;
+	float animationDeathTime = 0.5f;
 
 
 	void Player::Init() {
-		timeSinceRespawn = glfwGetTime();
 		timeSinceDeath = glfwGetTime();
 		srand((unsigned int)time(nullptr));
 		AssetManager::AddGameObject(GameObject("player", AssetManager::GetModel("player") , glm::vec3(0, 10, 5), false, 1, Capsule, 0.5, 2.2, 0.5));
@@ -185,6 +183,16 @@ namespace Player
 
 	//TODO :: This is a mess I should clean this up at somepoint
 	void Player::Update(float deltaTime) {
+		if (isDead && timeSinceDeath < glfwGetTime() - animationDeathTime) {
+			Respawn();
+		}
+
+		if (isDead) {
+			return;
+		}
+			
+
+
 		GameObject* player =  AssetManager::GetGameObject("player");
 
 		GameObject* head = AssetManager::GetGameObject("player_head");
@@ -406,19 +414,22 @@ namespace Player
 
 	void Player::TakeDamage(int amount) {
 		//packets get evaluated after respawn leading to take damage after respawning
-		if (timeSinceRespawn < 2.0f) {
-			return;
+		if (timeSinceDeath + animationDeathTime < 2.0f) {
 			Health = 100;
+			return;
 		}
 			
 		Health -= amount;
-		if (Health <= 0) {
+		if (Health <= 0 && !isDead) {
 			//death
-			std::cout << "Player Died" << std::endl;
-			//timeSinceDeath = glfwGetTime();
-			//needRespawning = 1;
-
-			Respawn();
+			Health = 0;
+			isDead = 1;
+			timeSinceDeath = glfwGetTime();
+			NetworkManager::SendAnimation("bean_death", "PlayerTwo");
+			if(gunName != "nothing")
+				AssetManager::GetGameObject(gunName)->SetRender(false);
+			gunName = "nothing";
+			
 
 		}
 	}
@@ -439,11 +450,9 @@ namespace Player
 		if(gunName != "nothing")
 			AssetManager::GetGameObject(gunName)->SetRender(false);
 		gunName = "nothing";
-
 		setPosition(spawnpoints[spawnpointindex]);
-		NetworkManager::SendAnimation("bean_death", "PlayerTwo");
+		isDead = 0;
 
-		timeSinceRespawn = glfwGetTime();
 	}
 }
 
@@ -456,32 +465,38 @@ namespace PlayerTwo
 
 	void PlayerTwo::Init() {
 		AssetManager::AddGameObject("PlayerTwo", AssetManager::GetModel("playertwo"), glm::vec3(0, 2, 0), false, 0, Convex);
-		if(NetworkManager::IsServer())
-			AssetManager::GetGameObject("PlayerTwo")->SetRender(false);
+		if (NetworkManager::IsServer()) {
+			GameObject* otherPlayer = AssetManager::GetGameObject("PlayerTwo");
+			if (otherPlayer != nullptr) {
+				otherPlayer->SetRender(false);
+				otherPlayer->GetRigidBody()->setActivationState(DISABLE_SIMULATION);
+			}
+		}
+		
 
-		AssetManager::AddGameObject(GameObject("glock_PlayerTwo", AssetManager::GetModel("glockhand"), glm::vec3(-0.3, -0.2f, 0.9), false, 0, Convex));
+		AssetManager::AddGameObject(GameObject("glock_PlayerTwo", AssetManager::GetModel("glockhand"), glm::vec3(-0.3, 0.25f, 0.9), false, 0, Convex));
 		AssetManager::GetGameObject("glock_PlayerTwo")->SetRender(false);
 		AssetManager::GetGameObject("glock_PlayerTwo")->SetParentName("PlayerTwo");
-		AssetManager::GetGameObject("glock_PlayerTwo")->SetScale(0.5);
+		AssetManager::GetGameObject("glock_PlayerTwo")->SetScale(0.3);
+		AssetManager::GetGameObject("glock_PlayerTwo")->SetDontCull(true);
 
-
-		AssetManager::AddGameObject(GameObject("ak47_PlayerTwo", AssetManager::GetModel("ak47hand"), glm::vec3(-0.3, -0.25, 0.9), false, 0, Convex));
+		AssetManager::AddGameObject(GameObject("ak47_PlayerTwo", AssetManager::GetModel("ak47hand"), glm::vec3(-0.3, 0.25, 0.9), false, 0, Convex));
 		AssetManager::GetGameObject("ak47_PlayerTwo")->SetRender(false);
 		AssetManager::GetGameObject("ak47_PlayerTwo")->SetParentName("PlayerTwo");
-		AssetManager::GetGameObject("ak47_PlayerTwo")->SetScale(0.5);
+		AssetManager::GetGameObject("ak47_PlayerTwo")->SetScale(0.3);
+		AssetManager::GetGameObject("ak47_PlayerTwo")->SetDontCull(true);
 
-
-		AssetManager::AddGameObject("shotgun_PlayerTwo", AssetManager::GetModel("shotgun"), glm::vec3(-0.3, -0.25, 0.9), false, 0, Convex);
+		AssetManager::AddGameObject("shotgun_PlayerTwo", AssetManager::GetModel("shotgun"), glm::vec3(-0.3, 0.25, 0.9), false, 0, Convex);
 		AssetManager::GetGameObject("shotgun_PlayerTwo")->SetRender(false);
 		AssetManager::GetGameObject("shotgun_PlayerTwo")->SetParentName("PlayerTwo");
-		AssetManager::GetGameObject("shotgun_PlayerTwo")->SetScale(0.5);
+		AssetManager::GetGameObject("shotgun_PlayerTwo")->SetScale(0.3);
+		AssetManager::GetGameObject("shotgun_PlayerTwo")->SetDontCull(true);
 
-
-		AssetManager::AddGameObject("double_barrel_PlayerTwo", AssetManager::GetModel("double_barrel_hand"), glm::vec3(-0.27, -0.2f, 1.5), false, 0, Convex);
+		AssetManager::AddGameObject("double_barrel_PlayerTwo", AssetManager::GetModel("double_barrel_hand"), glm::vec3(-0.3, 0.25f, 0.9), false, 0, Convex);
 		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetRender(false);
 		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetParentName("PlayerTwo");
-		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetScale(0.5);
-
+		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetScale(0.3);
+		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetDontCull(true);
 
 		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/glock17_shoot1.dae", AssetManager::GetModel("glockhand"), 0, "glock17_shoot"));
 		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/glock17_reload.dae", AssetManager::GetModel("glockhand"), 0, "glock17_reload"));

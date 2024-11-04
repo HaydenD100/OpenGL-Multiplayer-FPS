@@ -274,7 +274,7 @@ void Scene::RenderObjects(GLuint programid) {
 			NeedRendering.push_back(gameobjectRender);
 			continue;
 		}
-		if (!gameobjectRender->GetModel()->GetAABB()->isOnFrustum(Camera::GetFrustum(), gameobjectRender->getTransform()))
+		if (!gameobjectRender->GetModel()->GetAABB()->isOnFrustum(Camera::GetFrustum(), gameobjectRender->getTransform()) && !gameobjectRender->DontCull())
 			continue;
 
 		auto transforms = gameobjectRender->GetFinalBoneMatricies();

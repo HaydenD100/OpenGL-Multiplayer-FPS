@@ -176,6 +176,9 @@ namespace AudioManager {
 	
 	int PlaySound(std::string sound, glm::vec3 Position) {
 		bool isPlaying = false;
+		if (GetSound(sound) == nullptr)
+			return  Sound::DEFAULT;
+
 		for (int i = 0; i < channelSize; i++) {
 			channels[i]->isPlaying(&isPlaying);
 			if (!isPlaying) {

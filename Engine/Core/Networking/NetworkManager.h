@@ -13,6 +13,8 @@
 #include <iostream>
 #include <thread>
 #include <queue>
+#include <mutex>
+
 #pragma comment(lib, "Ws2_32.lib")
 
 #define DEFAULT_PORT "27015"
@@ -22,12 +24,18 @@
 #undef near
 #undef far
 
+enum ThreadQueueStatus : uint8_t {
+	NONE = 0,
+	EVALUTING = 1,
+	RECEVING = 2,
+	TRYINGTOEVAL = 3,
+	COMPILING = 4
+};
 
 enum ControlFlag : uint8_t {
 	CONNECTED= 1,
 	DISCONNECTED = 2
 };
-
 
 enum PacketType : uint8_t {
 	MESSAGE = 0,

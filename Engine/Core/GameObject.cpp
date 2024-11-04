@@ -544,7 +544,12 @@ void GameObject::SetFinalBoneMatricies(int index, glm::mat4 mat) {
 bool GameObject::IsDynamic() {
 	return isDynamic;
 }
-
+bool GameObject::DontCull() {
+	return dontCull;
+}
+void GameObject::SetDontCull(bool cull) {
+	dontCull = cull;
+}
 
 
 

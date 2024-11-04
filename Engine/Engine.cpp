@@ -7,6 +7,7 @@
 
 
 
+
 //rewrite of my first 3D Engine
 //Not sure what im going to call it yet 
 //this Engine is fueled by coffee and sleep deprivation
@@ -20,6 +21,14 @@ namespace Engine
 	bool Editing = false;
 
 	int Engine::Run() {
+
+
+		std::filesystem::path cwd = std::filesystem::current_path();
+		std::ofstream file(cwd.string());
+		file.close();
+
+
+		std::cout << "Currently in: " << cwd << "\n";
 
 		NetworkManager::Init();
 		std::cout << "==================================CONNECT/HOST==================================================\n";
@@ -135,7 +144,7 @@ namespace Engine
 			
 			
 		}
-
+		NetworkManager::SendControl(DISCONNECTED);
 		NetworkManager::CleanUp();
 		return 0;
 	}

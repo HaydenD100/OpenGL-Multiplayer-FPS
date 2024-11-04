@@ -107,6 +107,8 @@ public:
 	}
 
 	bool IsDynamic();
+	bool DontCull();
+	void SetDontCull(bool cull);
 
 private:
 	Transform transform = Transform();
@@ -128,6 +130,7 @@ private:
 	//canSave is used for json
 	bool canSave = false;
 	bool render = true;
+	bool dontCull = false;
 	bool shouldDelete = false;
 
 	//change to this
