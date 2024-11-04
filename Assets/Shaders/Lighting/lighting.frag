@@ -160,5 +160,6 @@ void main() {
 
     // HDR and gamma correction
     color = color / (color + vec3(1.0));
+   // color = albedo.xyz;
     FragColor = vec4(color, alpha);
 }

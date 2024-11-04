@@ -6,6 +6,7 @@ namespace Input
     bool keyPressed[372];
     bool keyDown[372];
     bool keyDownLastFrame[372];
+    bool leftShift = false;
 
     double mouseX = 0;
     double mouseY = 0;
@@ -56,6 +57,9 @@ namespace Input
     void Input::DisableCursor() {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     }
+    bool LeftShiftDown() {
+        return leftShift;
+    }
 
     void Input::HideCursor() {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -92,6 +96,8 @@ namespace Input
     float GetMouseOffsetY() {
         return (float)mouseOffsetY;
     }
+
+   
 
     void Input::Init() {
         double x, y;
@@ -137,6 +143,12 @@ namespace Input
             mouseX = x;
             mouseY = y;
         }
+
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            leftShift = true;
+        else
+            leftShift = false;
+
 
         // Left mouse down/pressed
         leftMouseDown = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);

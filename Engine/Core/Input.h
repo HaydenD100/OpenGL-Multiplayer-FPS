@@ -14,6 +14,7 @@ namespace Input
 
 	int GetMouseX();
 	int GetMouseY();
+	bool LeftShiftDown();
 	bool KeyPressed(char c);
 	bool KeyDown(char c);
 	bool KeyDownLastFrame(char c);

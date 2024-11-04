@@ -21,6 +21,10 @@ namespace Player
 	float smoothFactor = 0.1f;
 	float mouseSpeed = 0.005f;
 	float speed = 5000;
+
+	const float runningSpeed = 6000;
+	const float walkingSpeed = 4000;
+
 	float airSpeed = 1000;
 	float MaxSpeed = 6;
 	float jumpforce = 9;
@@ -32,6 +36,10 @@ namespace Player
 	double reloadingTime = 0;
 	double footstepTime = 0;
 	double footstep_interval = 0.8;
+
+	const double walkingfootstep_interval = 0.6;
+	const double runningfootstep_interval = 0.3;
+
 
 	std::string inv[4] = {"ak47","glock","double_barrel"};
 	const int decal_count = 5;
@@ -263,7 +271,16 @@ namespace Player
 		if (Input::KeyDown(' ') && IsGrounded) {
 			movement.y = 1 * jumpforce;
 		}
-		
+		if (Input::LeftShiftDown()) {
+			speed = runningSpeed;
+			footstep_interval = runningfootstep_interval;
+		}
+			
+		else {
+			speed = walkingSpeed;
+			footstep_interval = walkingfootstep_interval;
+		}
+			
 		
 		//movement = glm::normalize(movement);
 		float lenght = glm::vec3(movement.x, 0, movement.z).length();

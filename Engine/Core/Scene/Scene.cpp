@@ -86,7 +86,27 @@ void Scene::LoadAssets() {
 	AssetManager::GetModel("double_barrel_hand")->GetMeshByName("Arms_L_R_Mesh_002-mesh")->SetTexture(AssetManager::GetTexture("arm"));
 
 
+	//AssetManager::AddModel("map_floor", Model("Assets/Objects/Map1/floors.fbx", AssetManager::GetTexture("wooden_floor")));
+	//AssetManager::AddModel("map_walls", Model("Assets/Objects/Map1/walls.fbx", AssetManager::GetTexture("beige_wall")));
+	//AssetManager::AddModel("map_ceiling", Model("Assets/Objects/Map1/ceiling.fbx", AssetManager::GetTexture("beige_wall")));
 
+	AssetManager::AddModel("map_test1", Model("Assets/Maps/map_test1.fbx", AssetManager::GetTexture("wooden_floor")));
+	AssetManager::GetModel("map_test1")->GetMeshByName("Map_floor")->SetTexture(AssetManager::GetTexture("wooden_floor"));
+
+	auto model = AssetManager::GetModel("map_test1");
+	auto beigeWallTexture = AssetManager::GetTexture("beige_wall");
+
+	for (int i = 1; i <= 40; ++i) {
+		std::stringstream ss;
+		ss << "map_walls." << std::setw(3) << std::setfill('0') << i;
+		std::string meshName = ss.str();
+
+		model->GetMeshByName(meshName)->SetTexture(beigeWallTexture);
+	}
+
+	AssetManager::GetModel("map_test1")->GetMeshByName("map_roof.008")->SetTexture(AssetManager::GetTexture("beige_wall"));
+
+	
 
 	//AssetManager::GetModel("doublebarrel")->GetMeshByName("Arms_L_R_Mesh_002-mesh")->SetTexture(AssetManager::GetTexture("uvmap"));
 
@@ -94,9 +114,7 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("door", Model(Mesh("Assets/Objects/door.obj"), AssetManager::GetTexture("door")));
 	AssetManager::AddModel("door_frame", Model(Mesh("Assets/Objects/door_frame.obj"), AssetManager::GetTexture("door")));
 	AssetManager::AddModel("player", Model("Assets/Objects/FBX/player.fbx", AssetManager::GetTexture("uvmap")));
-	AssetManager::AddModel("map_floor", Model("Assets/Objects/Map1/floors.fbx", AssetManager::GetTexture("wooden_floor")));
-	AssetManager::AddModel("map_walls", Model("Assets/Objects/Map1/walls.fbx", AssetManager::GetTexture("beige_wall")));
-	AssetManager::AddModel("map_ceiling", Model("Assets/Objects/Map1/ceiling.fbx", AssetManager::GetTexture("beige_wall")));
+
 	AssetManager::AddModel("shotgun", Model("Assets/Objects/fbx/remington.fbx", "Assets/Objects/shotgun_convex.obj", AssetManager::GetTexture("shotgun")));
 
 	AssetManager::AddDecal("bullet_hole", AssetManager::GetTexture("bullet_hole"), glm::vec3(0.02, 0.005, 0.02));
@@ -121,16 +139,18 @@ void Scene::Load() {
 	WeaponManager::Init();
 
 
-	AssetManager::AddGameObject("map1_floor", AssetManager::GetModel("map_floor"), glm::vec3(0, 1.6, 0), true, 0, Concave);
-	AssetManager::AddGameObject("map1_walls", AssetManager::GetModel("map_walls"), glm::vec3(0, 1.6, 0), true, 0, Concave);
-	AssetManager::AddGameObject("map1_ceiling", AssetManager::GetModel("map_ceiling"), glm::vec3(0, 1.6, 0), true, 0, Convex);
+	//AssetManager::AddGameObject("map1_floor", AssetManager::GetModel("map_floor"), glm::vec3(0, 1.6, 0), true, 0, Concave);
+	//AssetManager::AddGameObject("map1_walls", AssetManager::GetModel("map_walls"), glm::vec3(0, 1.6, 0), true, 0, Concave);
+	AssetManager::AddGameObject("map_test1", AssetManager::GetModel("map_test1"), glm::vec3(0, 0, 0), true, 0, Concave);
+	AssetManager::GetGameObject("map_test1")->SetRotationX(-1.5708f);
 
+	/*
 	AssetManager::AddGameObject("window1", AssetManager::GetModel("window"), glm::vec3(-11, 2, 14),true, 0,Concave);
 	AssetManager::AddGameObject("window_glass1", AssetManager::GetModel("window_glass"), glm::vec3(-11, 2, 14), true, 0, Concave);
 	AssetManager::GetGameObject("window_glass1")->SetShaderType("Transparent");
 	AssetManager::GetGameObject("window_glass1")->SetRotationX(1.5708f);
-
-
+	*/
+	/*
 	AssetManager::AddGameObject("red_glass", AssetManager::GetModel("cube"), glm::vec3(-7, 2, 6), true, 0, Convex);
 	AssetManager::GetGameObject("red_glass")->SetShaderType("Transparent");
 
@@ -138,9 +158,7 @@ void Scene::Load() {
 	AssetManager::GetGameObject("red_glass1")->SetShaderType("Transparent");
 
 	AssetManager::AddGameObject("floor", AssetManager::GetModel("floor"), glm::vec3(0, 0, 0), true, 0, Box);
-	//AssetManager::AddGameObject("db", AssetManager::GetModel("doublebarrel"), glm::vec3(0, 2, 0), true, 0, Box);
-
-
+	*/
 	
 	crates.push_back(Crate(glm::vec3(1, 2, 1), "crate1", AssetManager::GetModel("crate")));
 	crates.push_back(Crate(glm::vec3(-3, 2, -3), "crate2", AssetManager::GetModel("crate")));
@@ -150,13 +168,13 @@ void Scene::Load() {
 	gunPickUps.push_back(GunPickUp("glock", "glock_pickup", AssetManager::GetModel("glock"), glm::vec3(1, 25, 0)));
 
 	
-	doors.push_back(Door("door1", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-10.6, 0, 0.05), glm::vec3(0, 0, 0)));
-	doors.push_back(Door("door2", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-10.6, 0, 9.95), glm::vec3(0, 0, 0)));
-	doors.push_back(Door("door3", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-12.3, 0, 4.6), glm::vec3(0, 1.5708f, 0), false));
-	doors.push_back(Door("door4", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-10, 0, 4.6), glm::vec3(0,1.5708f,0)));
+	doors.push_back(Door("door1", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(0.4, 0, -5), glm::vec3(0, 0, 0)));
+	doors.push_back(Door("door2", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-9.4, 0, -5), glm::vec3(0, 0, 0)));
+	doors.push_back(Door("door3", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-9.4, 0, -15), glm::vec3(0, 0, 0)));
+	doors.push_back(Door("door4", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-9.4, 0, -24.8), glm::vec3(0,0,0)));
 	
 	
-	AssetManager::AddGameObject(GameObject("swat", AssetManager::GetModel("swat"), glm::vec3(0, 0, 0), false, 0,Capsule,0.5,2,0));
+	//AssetManager::AddGameObject(GameObject("swat", AssetManager::GetModel("swat"), glm::vec3(0, 0, 0), false, 0,Capsule,0.5,2,0));
 	
 
 	// Sets renderer
@@ -173,27 +191,41 @@ void Scene::Load() {
 
 	// MAX LIGHTS BY DEFAULT IS 128 if you want more lights go to lighting.frag and change MAXLIGHTS
 	{
-		Light light(glm::vec3(-11, 2, 15), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.032);
+		Light light(glm::vec3(-3.6,2, 2), glm::vec3(1, 0.779, 0.529) * 7.0f, 0.027, 0.0028);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-11, 2, 6), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.032);
+		Light light(glm::vec3(-5, 2, -10), glm::vec3(1, 0.779, 0.529) * 6.0f, 0.027, 0.0028);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-15, 2, 5), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.032);
+		Light light(glm::vec3(-10, 2, -19), glm::vec3(1, 0.779, 0.529) * 9.0f, 0.027, 0.0028);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-7.5, 2, 5), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.032);
+		Light light(glm::vec3(0, 2, -20), glm::vec3(1, 0.25, 0) * 8.0f, 0.027, 0.0028);
 		lights.push_back(light);
 	}
 
 	{
-		Light light(glm::vec3(-2.5, 2, -5), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.0320);
+		Light light(glm::vec3(-5, 2, -31), glm::vec3(1, 0.779, 0.529) * 10.0f, 0.027, 0.0028);
 		lights.push_back(light);
 	}
-	
+
+	{
+		Light light(glm::vec3(4, 2, -20), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(-14, 2, -9), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+
+	{
+		Light light(glm::vec3(3, 2, -9), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+	/*
 	{
 		Light light(glm::vec3(-6, 2, -2), glm::vec3(1, 0, 1) * 4.0f, 0.09, 0.0320);
 		lights.push_back(light);
@@ -202,7 +234,7 @@ void Scene::Load() {
 		Light light(glm::vec3(-1, 2, -1), glm::vec3(0, 1, 1) * 4.0f, 0.09, 0.0320);
 		lights.push_back(light);
 	}
-	/*
+	
 	{
 		Light light(glm::vec3(-1, 10, -1), glm::vec3(1, 1, 1) * 50.0f, 0.09, 0.0320);
 		lights.push_back(light);
@@ -212,7 +244,7 @@ void Scene::Load() {
 
 	
 	Player::Init();
-	Player::setPosition(glm::vec3(0, 10, 0));
+	Player::setPosition(glm::vec3(0, 1, 0));
 
 	// TODO: not currently working
 	//AssetManager::SaveAssets("Assets/Saves/mainScene.json");
