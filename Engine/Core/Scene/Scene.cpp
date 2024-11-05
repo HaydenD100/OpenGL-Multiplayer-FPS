@@ -90,9 +90,11 @@ void Scene::LoadAssets() {
 	//AssetManager::AddModel("map_walls", Model("Assets/Objects/Map1/walls.fbx", AssetManager::GetTexture("beige_wall")));
 	//AssetManager::AddModel("map_ceiling", Model("Assets/Objects/Map1/ceiling.fbx", AssetManager::GetTexture("beige_wall")));
 
-	AssetManager::AddModel("map_test1", Model("Assets/Maps/map_test1.fbx", AssetManager::GetTexture("wooden_floor")));
-	AssetManager::GetModel("map_test1")->GetMeshByName("Map_floor")->SetTexture(AssetManager::GetTexture("wooden_floor"));
+	//AssetManager::AddModel("map_test1", Model("Assets/Maps/map_test1.fbx", AssetManager::GetTexture("wooden_floor")));
+	//AssetManager::GetModel("map_test1")->GetMeshByName("Map_floor")->SetTexture(AssetManager::GetTexture("wooden_floor"));
+	AssetManager::AddModel("map_test1", Model("Assets/Maps/tower_1.fbx", AssetManager::GetTexture("uvmap")));
 
+	/*
 	auto model = AssetManager::GetModel("map_test1");
 	auto beigeWallTexture = AssetManager::GetTexture("beige_wall");
 
@@ -105,7 +107,7 @@ void Scene::LoadAssets() {
 	}
 
 	AssetManager::GetModel("map_test1")->GetMeshByName("map_roof.008")->SetTexture(AssetManager::GetTexture("beige_wall"));
-
+	*/
 	
 
 	//AssetManager::GetModel("doublebarrel")->GetMeshByName("Arms_L_R_Mesh_002-mesh")->SetTexture(AssetManager::GetTexture("uvmap"));
@@ -164,15 +166,26 @@ void Scene::Load() {
 	crates.push_back(Crate(glm::vec3(-3, 2, -3), "crate2", AssetManager::GetModel("crate")));
 	crates.push_back(Crate(glm::vec3(-10, 2, 14), "crate3", AssetManager::GetModel("crate")));
 
+	crates.push_back(Crate(glm::vec3(10, 2, -3), "crate1", AssetManager::GetModel("crate")));
+	crates.push_back(Crate(glm::vec3(-13, 2, -5), "crate2", AssetManager::GetModel("crate")));
+	crates.push_back(Crate(glm::vec3(10, 2, 14), "crate3", AssetManager::GetModel("crate")));
+	crates.push_back(Crate(glm::vec3(3, 2, -9), "crate1", AssetManager::GetModel("crate")));
+	crates.push_back(Crate(glm::vec3(7, 2, 7), "crate2", AssetManager::GetModel("crate")));
+	crates.push_back(Crate(glm::vec3(-10, 2, 14), "crate3", AssetManager::GetModel("crate")));
+
+	crates.push_back(Crate(glm::vec3(1, 14.5, -1), "crate1", AssetManager::GetModel("crate")));
+	crates.push_back(Crate(glm::vec3(2, 14.5, -1), "crate2", AssetManager::GetModel("crate")));
+	crates.push_back(Crate(glm::vec3(1, 14.5, -2), "crate3", AssetManager::GetModel("crate")));
+
 	gunPickUps.push_back(GunPickUp("ak47", "ak47_pickup", AssetManager::GetModel("ak47"), glm::vec3(1, 30, 1)));
 	gunPickUps.push_back(GunPickUp("glock", "glock_pickup", AssetManager::GetModel("glock"), glm::vec3(1, 25, 0)));
 
-	
+	/*
 	doors.push_back(Door("door1", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(0.4, 0, -5), glm::vec3(0, 0, 0)));
 	doors.push_back(Door("door2", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-9.4, 0, -5), glm::vec3(0, 0, 0)));
 	doors.push_back(Door("door3", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-9.4, 0, -15), glm::vec3(0, 0, 0)));
 	doors.push_back(Door("door4", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-9.4, 0, -24.8), glm::vec3(0,0,0)));
-	
+	*/
 	
 	//AssetManager::AddGameObject(GameObject("swat", AssetManager::GetModel("swat"), glm::vec3(0, 0, 0), false, 0,Capsule,0.5,2,0));
 	
@@ -191,38 +204,70 @@ void Scene::Load() {
 
 	// MAX LIGHTS BY DEFAULT IS 128 if you want more lights go to lighting.frag and change MAXLIGHTS
 	{
-		Light light(glm::vec3(-3.6,2, 2), glm::vec3(1, 0.779, 0.529) * 7.0f, 0.027, 0.0028);
+		Light light(glm::vec3(-3.6,5, 2), glm::vec3(1, 0.779, 0.529) * 7.0f, 0.027, 0.0028);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-5, 2, -10), glm::vec3(1, 0.779, 0.529) * 6.0f, 0.027, 0.0028);
+		Light light(glm::vec3(-5, 5, -10), glm::vec3(1, 0.779, 0.529) * 6.0f, 0.027, 0.0028);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-10, 2, -19), glm::vec3(1, 0.779, 0.529) * 9.0f, 0.027, 0.0028);
+		Light light(glm::vec3(-10, 5, -19), glm::vec3(1, 0.779, 0.529) * 9.0f, 0.027, 0.0028);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(0, 2, -20), glm::vec3(1, 0.25, 0) * 8.0f, 0.027, 0.0028);
-		lights.push_back(light);
-	}
-
-	{
-		Light light(glm::vec3(-5, 2, -31), glm::vec3(1, 0.779, 0.529) * 10.0f, 0.027, 0.0028);
+		Light light(glm::vec3(0, 5, -20), glm::vec3(1, 0.25, 0) * 8.0f, 0.027, 0.0028);
 		lights.push_back(light);
 	}
 
 	{
-		Light light(glm::vec3(4, 2, -20), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(-14, 2, -9), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
+		Light light(glm::vec3(-5, 5, -31), glm::vec3(1, 0.779, 0.529) * 10.0f, 0.027, 0.0028);
 		lights.push_back(light);
 	}
 
 	{
-		Light light(glm::vec3(3, 2, -9), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
+		Light light(glm::vec3(-18, 2, -20), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(-14, 5, -1), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+
+	{
+		Light light(glm::vec3(3, 5, -9), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(-21, 5, 12), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(-6, 5, 21), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(13, 2, 18), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(18, 2, 0), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(1, 6.5, -1), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(1, 10, -1), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(1, 14.5, -1), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(1, 18, -1), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
 		lights.push_back(light);
 	}
 	/*
@@ -241,10 +286,11 @@ void Scene::Load() {
 	}
 	*/
 
+	//gunSpawners.push_back(GunSpawner("ak47", "spawner1",glm::vec3(1, 18, -1)));
 
 	
 	Player::Init();
-	Player::setPosition(glm::vec3(0, 1, 0));
+	Player::setPosition(glm::vec3(0, 30, 0));
 
 	// TODO: not currently working
 	//AssetManager::SaveAssets("Assets/Saves/mainScene.json");
@@ -283,6 +329,9 @@ void Scene::Update(float deltaTime) {
 		gunPickUps[gun].Update();
 		if (gunPickUps[gun].Interact())
 			gunPickUps.erase(gunPickUps.begin() + gun);
+	}
+	for (int spawner = 0; spawner < gunSpawners.size(); spawner++) {
+		gunSpawners[spawner].CheckForSpawn();
 	}
 
 	for (int crate = 0; crate < crates.size(); crate++) {
@@ -393,4 +442,12 @@ SkyBox Scene::GetSkyBox() {
 std::vector<GameObject*> Scene::NeedRenderingObjects() {
 	return NeedRendering;
 }
+int Scene::DoesGunPickUpExsit(std::string name) {
+	for (int i = 0; i < gunPickUps.size(); i++) {
+		if (gunPickUps[i].GetName() == name)
+			return 1;
+	}
+	return 0;
+}
+
 

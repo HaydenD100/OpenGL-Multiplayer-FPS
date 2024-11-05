@@ -68,6 +68,21 @@ namespace WeaponManager
 	Gun* GetGunByName(std::string name);
 }
 
+class GunSpawner {
+public:
+	GunSpawner(std::string GunType, std::string spawnerName, glm::vec3 postion);
+	void CheckForSpawn();
+
+private:
+	std::string gunType;
+	std::string spawnerName;
+	glm::vec3 postion;
+
+	float timeSincePickUp = 0;
+	float spawnTime = 5;
+	bool needsSpawning = 1;
+};
+
 class GunPickUp
 {
 public:
@@ -76,7 +91,9 @@ public:
 	GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force);
 	void Update();
 	bool Interact();
+	std::string GetName();
 private:
 	std::string gunName = "";
 	std::string objectName = "Unkown";
+
 };

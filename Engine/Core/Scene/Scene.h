@@ -39,6 +39,7 @@ public:
 	void LoadAssets();
  
 	int GetGunPickUpSize();
+	int DoesGunPickUpExsit(std::string name);
 	Crate* GetCrate(std::string name);
 	std::vector<Light> getLights();
 	SkyBox GetSkyBox();
@@ -53,6 +54,8 @@ private:
 	std::vector<Crate> crates;
 	std::vector<GunPickUp> gunPickUps;
 	std::vector<Light> lights;
+	std::vector<GunSpawner> gunSpawners;
+
 
 	//holds the model shader ID for Gemoetry
 	GLuint ModelMatrixId;

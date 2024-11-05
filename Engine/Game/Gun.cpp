@@ -266,12 +266,17 @@ glm::vec3 Gun::swayPosition = glm::vec3(0);
 void GunPickUp::Update() {
 	
 }
+std::string GunPickUp::GetName() {
+	return objectName;
+}
+
 
 bool GunPickUp::Interact() {
 	if (PlayerTwo::GetInteractingWithName() == objectName && PlayerTwo::GetCurrentWeapon() != gunName) {
 		GameObject* object = AssetManager::GetGameObject(objectName);
 		PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(object->GetRigidBody());
 		object->SetRender(false);
+		AssetManager::RemoveGameObject(objectName);
 
 		AudioManager::PlaySound("item_pickup", Player::getPosition());
 		return true;
@@ -286,6 +291,27 @@ bool GunPickUp::Interact() {
 	WeaponManager::GetGunByName(gunName)->currentammo = WeaponManager::GetGunByName(gunName)->ammo;
 	AudioManager::PlaySound("item_pickup", Player::getPosition());
 	return true;
+
+
+}
+GunSpawner::GunSpawner(std::string GunType, std::string spawnerName, glm::vec3 postion) {
+	gunType = GunType;
+	this->spawnerName = spawnerName;
+	this->postion = postion;
+}
+
+void GunSpawner::CheckForSpawn() {
+	if (needsSpawning && timeSincePickUp < glfwGetTime() - spawnTime) {
+		std::cout << "Spawning Gun \n";
+		SceneManager::GetCurrentScene()->AddGunPickUp(GunPickUp(gunType, spawnerName, AssetManager::GetModel(gunType), postion));
+		needsSpawning = 0;
+	}
+	else if(needsSpawning == 0) {
+		needsSpawning = !SceneManager::GetCurrentScene()->DoesGunPickUpExsit(spawnerName);
+		if (needsSpawning)
+			timeSincePickUp = glfwGetTime();
+		std::cout << "needs spawning: " << needsSpawning << "\n";
+	}
 }
 
 int GunPickUp::GunPickUpCount = 0;

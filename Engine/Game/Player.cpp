@@ -22,8 +22,8 @@ namespace Player
 	float mouseSpeed = 0.005f;
 	float speed = 5000;
 
-	const float runningSpeed = 6000;
-	const float walkingSpeed = 4000;
+	const float runningSpeed = 8500;
+	const float walkingSpeed = 6000;
 
 	float airSpeed = 1000;
 	float MaxSpeed = 6;
@@ -37,7 +37,7 @@ namespace Player
 	double footstepTime = 0;
 	double footstep_interval = 0.8;
 
-	const double walkingfootstep_interval = 0.6;
+	const double walkingfootstep_interval = 0.5;
 	const double runningfootstep_interval = 0.3;
 
 
