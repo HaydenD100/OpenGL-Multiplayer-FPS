@@ -7,6 +7,12 @@
 #include <iostream>
 #include <cctype>
 
+
+enum Controls {
+	RESPAWN = 'p',
+	PLAYERINFO = 'o'
+};
+
 namespace Input
 {
 	void Init();

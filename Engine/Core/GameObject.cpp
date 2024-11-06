@@ -1,6 +1,9 @@
 #include "GameObject.h"
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Physics/BulletPhysics.h"
+#include "Engine/Core/Networking/NetworkManager.h"
+
+#undef max
 
 GameObject::GameObject() = default;
 
@@ -40,6 +43,9 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	body->setActivationState(DISABLE_DEACTIVATION);
 	body->setFriction(0.7f);
 	body->setUserIndex(-1);
+	if(!NetworkManager::IsServer() && name != "player")
+		body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+
 
 	// Add the body to the dynamics world
 	if (mass != 0)
@@ -82,6 +88,8 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	body->setActivationState(DISABLE_DEACTIVATION);
 	body->setFriction(0.7f);
 	body->setUserIndex(-1);
+	if (!NetworkManager::IsServer() && name != "player")
+		body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
 
 	// Add the body to the dynamics world
 	if (mass != 0)
@@ -258,6 +266,8 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	body->setActivationState(DISABLE_DEACTIVATION);
 	body->setFriction(0.7f);
 	body->setUserIndex(-1);
+	if (!NetworkManager::IsServer() && name != "player")
+		body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
 
 	// Add the body to the dynamics world
 	if (mass != 0)
@@ -304,6 +314,8 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	body->setActivationState(DISABLE_DEACTIVATION);
 	body->setFriction(0.7f);
 	body->setUserIndex(-1);
+	if (!NetworkManager::IsServer() && name != "player")
+		body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
 
 	// Add the body to the dynamics world
 	if (mass != 0)

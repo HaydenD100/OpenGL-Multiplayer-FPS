@@ -488,7 +488,8 @@ namespace Renderer
 			DecalInstance& decal = (*decals)[i];
 
 			// Skip decals with null parents or those outside the camera frustum
-			if (decal.CheckParentIsNull() || !decal.GetAABB()->isOnFrustum(Camera::GetFrustum(), decal.getTransform()))
+			//getting rid of  || !decal.GetAABB()->isOnFrustum(Camera::GetFrustum(), decal.getTransform()) for now
+			if (decal.CheckParentIsNull())
 				continue;
 			decal.GetDecal()->AddInstace(&decal);
 		}
@@ -640,6 +641,9 @@ namespace Renderer
 		glUniform3fv(glGetUniformLocation(programid, "viewPos"),1, &Camera::GetPosition()[0]);
 		glUniformMatrix4fv(glGetUniformLocation(programid, "inverseV"), 1, GL_FALSE, &glm::inverse(Camera::getViewMatrix())[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(programid, "V"), 1, GL_FALSE, &Camera::getViewMatrix()[0][0]);
+
+		glUniform1i(glGetUniformLocation(programid, "isDead"), Player::IsDead());
+
 
 
 		glEnableVertexAttribArray(0);

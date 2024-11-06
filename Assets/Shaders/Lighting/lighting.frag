@@ -25,6 +25,8 @@ uniform vec3 viewPos;
 uniform mat4 inverseV; // Inverse of the view matrix
 uniform mat4 V; // View matrix
 
+uniform bool isDead;
+
 const float PI = 3.14159265359;
 const float far_plane = 25.0; // Constant, moved outside main
 vec3 gridSamplingDisk[20] = vec3[]
@@ -41,7 +43,8 @@ float ShadowCalculation(vec3 fragPos, int index)
     vec3 fragToLight = fragPos - LightPositions_worldspace[index];
     float currentDepth = length(fragToLight);
     float shadow = 0.0;
-    float bias = 0.15;
+    float bias = 0.4;
+
     int samples = 20;
     float viewDistance = length(viewPos - fragPos);
     float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
@@ -110,6 +113,8 @@ void main() {
     float skybox = texture(gPBR, UV).z;
 
     if(skybox == 1){
+        if(isDead)
+            albedo = albedo  + vec3(1,-0.2,-0.2);
         FragColor = vec4(albedo, 1);
         return; // Stop further execution and write this color to the framebuffer
     }
@@ -160,6 +165,9 @@ void main() {
 
     // HDR and gamma correction
     color = color / (color + vec3(1.0));
-   // color = albedo.xyz;
-    FragColor = vec4(color, alpha);
+    // color = albedo.xyz;
+    if(isDead)
+        color = color + vec3(1,-0.2,-0.2);
+   
+    FragColor = vec4(color, alpha) + vec4(albedo * 0.2,1);
 }

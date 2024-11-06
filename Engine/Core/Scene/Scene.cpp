@@ -30,6 +30,10 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("beige_wall", "Assets/Textures/beige_wall.jpg", "Assets/Normals/beige_wall_normal.jpg", 0.7, 0);
 	AssetManager::AddTexture("wooden_floor", "Assets/Textures/wooden_floor.jpg", "Assets/Normals/wooden_floor_normal.jpg", 0.2, 0.2);
 	AssetManager::AddTexture("arm", "Assets/Textures/Arm_COL.png", "Assets/Normals/Arm_NOR.png", 0.7, 0);
+	AssetManager::AddTexture("brick", "Assets/Textures/brick.png", "Assets/Normals/bricks_normal.png", "Assets/Roughness/brick_roughness.png", 0);
+	AssetManager::AddTexture("sand_ground", "Assets/Textures/sand_ground.jpg", "Assets/Normals/sand_ground_normal.jpg", "Assets/Roughness/sand_ground_roughness.jpg", 0);
+
+
 
 	AssetManager::AddTexture("shotgun", "Assets/Textures/remington.png", "Assets/Normals/remington_normal.png", "Assets/Roughness/remington_roughness.png","Assets/Metalic/remington_metallic.png");
 
@@ -92,7 +96,8 @@ void Scene::LoadAssets() {
 
 	//AssetManager::AddModel("map_test1", Model("Assets/Maps/map_test1.fbx", AssetManager::GetTexture("wooden_floor")));
 	//AssetManager::GetModel("map_test1")->GetMeshByName("Map_floor")->SetTexture(AssetManager::GetTexture("wooden_floor"));
-	AssetManager::AddModel("map_test1", Model("Assets/Maps/tower_1.fbx", AssetManager::GetTexture("uvmap")));
+	AssetManager::AddModel("map_test1", Model("Assets/Maps/dusty_1.fbx", AssetManager::GetTexture("brick")));
+	AssetManager::GetModel("map_test1")->GetMeshByName("floor.001")->SetTexture(AssetManager::GetTexture("sand_ground"));
 
 	/*
 	auto model = AssetManager::GetModel("map_test1");
@@ -162,6 +167,7 @@ void Scene::Load() {
 	AssetManager::AddGameObject("floor", AssetManager::GetModel("floor"), glm::vec3(0, 0, 0), true, 0, Box);
 	*/
 	
+	/*
 	crates.push_back(Crate(glm::vec3(1, 2, 1), "crate1", AssetManager::GetModel("crate")));
 	crates.push_back(Crate(glm::vec3(-3, 2, -3), "crate2", AssetManager::GetModel("crate")));
 	crates.push_back(Crate(glm::vec3(-10, 2, 14), "crate3", AssetManager::GetModel("crate")));
@@ -176,9 +182,9 @@ void Scene::Load() {
 	crates.push_back(Crate(glm::vec3(1, 14.5, -1), "crate1", AssetManager::GetModel("crate")));
 	crates.push_back(Crate(glm::vec3(2, 14.5, -1), "crate2", AssetManager::GetModel("crate")));
 	crates.push_back(Crate(glm::vec3(1, 14.5, -2), "crate3", AssetManager::GetModel("crate")));
-
-	gunPickUps.push_back(GunPickUp("ak47", "ak47_pickup", AssetManager::GetModel("ak47"), glm::vec3(1, 30, 1)));
-	gunPickUps.push_back(GunPickUp("glock", "glock_pickup", AssetManager::GetModel("glock"), glm::vec3(1, 25, 0)));
+	*/
+	//gunPickUps.push_back(GunPickUp("ak47", "ak47_pickup", AssetManager::GetModel("ak47"), glm::vec3(1, 30, 1)));
+	//gunPickUps.push_back(GunPickUp("glock", "glock_pickup", AssetManager::GetModel("glock"), glm::vec3(1, 25, 0)));
 
 	/*
 	doors.push_back(Door("door1", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(0.4, 0, -5), glm::vec3(0, 0, 0)));
@@ -193,15 +199,16 @@ void Scene::Load() {
 	// Sets renderer
 	Renderer::UseProgram(Renderer::GetProgramID("Texture"));
 	std::vector<std::string> faces{
-		"Assets/Skybox/Space/right.png",
-			"Assets/Skybox/Space/left.png",
-			"Assets/Skybox/Space/top.png",
-			"Assets/Skybox/Space/bottom.png",
-			"Assets/Skybox/Space/front.png",
-			"Assets/Skybox/Space/back.png"
+		"Assets/Skybox/daylight/right.png",
+			"Assets/Skybox/daylight/left.png",
+			"Assets/Skybox/daylight/top.png",
+			"Assets/Skybox/daylight/bottom.png",
+			"Assets/Skybox/daylight/front.png",
+			"Assets/Skybox/daylight/back.png"
 	};
 	sky = SkyBox(faces);
 
+	/*
 	// MAX LIGHTS BY DEFAULT IS 128 if you want more lights go to lighting.frag and change MAXLIGHTS
 	{
 		Light light(glm::vec3(-3.6,5, 2), glm::vec3(1, 0.779, 0.529) * 7.0f, 0.027, 0.0028);
@@ -270,6 +277,36 @@ void Scene::Load() {
 		Light light(glm::vec3(1, 18, -1), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
 		lights.push_back(light);
 	}
+	{
+		Light light(glm::vec3(19, 3.5, 10), glm::vec3(1, 0.5, 0.529) * 5.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(21, 3.5, -21), glm::vec3(0.8, 0, 0.8) * 5.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+	*/
+	{
+		Light light(glm::vec3(4.86, 4, -1.5), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35, 0.44);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(13, 4, 7.46), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35, 0.44);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(-1.77, 3, 7.47), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35,	0.44);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(3.44, 4, -9), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35,	0.44);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(7, 15, -3), glm::vec3(1, 0.922, 0.753) * 10.0f, 0.09, 0.0320);
+		lights.push_back(light);
+	}
+
 	/*
 	{
 		Light light(glm::vec3(-6, 2, -2), glm::vec3(1, 0, 1) * 4.0f, 0.09, 0.0320);

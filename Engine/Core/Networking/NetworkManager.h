@@ -24,13 +24,7 @@
 #undef near
 #undef far
 
-enum ThreadQueueStatus : uint8_t {
-	NONE = 0,
-	EVALUTING = 1,
-	RECEVING = 2,
-	TRYINGTOEVAL = 3,
-	COMPILING = 4
-};
+
 
 enum ControlFlag : uint8_t {
 	CONNECTED= 1,
@@ -41,6 +35,7 @@ enum PacketType : uint8_t {
 	MESSAGE = 0,
 	PlAYERDATA = 1,
 	SOUND = 2,
+	PLAYERDIED = 3,
 	DYNAMICOBJECT = 4,
 	CONTROL = 8,
 	GUNSHOT = 16,
@@ -173,6 +168,7 @@ namespace NetworkManager
 	void ReceivePackets(char recvbuf[DEFAULT_BUFLEN]);
 
 	//packet sending
+	void SendPlayerDied();
 	void SendSound(std::string soundname, glm::vec3 postion);
 	void SendControl(ControlFlag flag);
 	void SendDyanmicObjectData(std::string objectname, glm::vec3 postion, glm::vec3 rotaion);

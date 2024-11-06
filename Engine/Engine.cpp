@@ -71,6 +71,9 @@ namespace Engine
 
 		PlayerTwo::Init();
 		NetworkManager::LoadedIn();
+		NetworkManager::SendControl(CONNECTED);
+		NetworkManager::SendPackets();
+
 		while (Backend::IsWindowOpen()) {
 			// Delta time stuff
 			double currentTime = glfwGetTime();
@@ -100,12 +103,15 @@ namespace Engine
 			Renderer::RenderScene();
 			AudioManager::Update();
 			PhysicsManagerBullet::Update(dt);
+
+
+			//TODO :: put this in the scnene or somthing idk why its still here in ENGINE.cpp
 			std::ostringstream oss;
 			oss << "FPS: " << FPS;
 			Renderer::RenderText(oss.str().c_str(), 660, 585, 15);
 			oss.str(""); oss.clear();
-			oss.precision(4);
-			oss << "Position: " << Player::getPosition().x << " y:" << Player::getPosition().y << " z:" << Player::getPosition().z << "\n";
+			oss.precision(3);
+			oss << Player::getPosition().x << " y:" << Player::getPosition().y << " z:" << Player::getPosition().z << "\n";
 			Renderer::RenderText(oss.str().c_str(), 0, 560, 15);
 			if (Player::getCurrentGun() != "nothing") {
 				oss.str(""); oss.clear();
@@ -118,6 +124,12 @@ namespace Engine
 			oss.precision(4);
 			oss << Player::GetHealth() << "\n";
 			Renderer::RenderText(oss.str().c_str(), 5, 20, 30);
+
+			oss.str(""); oss.clear();
+			oss.precision(4);
+			oss << "P1:" << Player::GetKills() << " P2:" << Player::GetDeaths();
+			Renderer::RenderText(oss.str().c_str(), 350, 560, 20);
+
 			//AssetManager::CleanUp();
 
 			

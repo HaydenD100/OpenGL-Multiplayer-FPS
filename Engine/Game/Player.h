@@ -36,6 +36,11 @@ namespace Player
 	void SetHealth(int NewHealth);
 	int GetHealth();
 	void Respawn();
+	void AddToKill();
+	int GetKills();
+	int GetDeaths();
+	int IsDead();
+
 }
 
 namespace PlayerTwo
@@ -44,6 +49,8 @@ namespace PlayerTwo
 	void SetData(std::string interact, std::string gunname, glm::vec3 position, glm::vec3 rotation);
 	void SetIneractingWith(std::string interact);
 	void Update();
+
+	int GetKills();
 
 	std::string GetInteractingWithName();
 	std::string GetCurrentWeapon();

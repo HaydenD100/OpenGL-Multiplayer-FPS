@@ -4,6 +4,13 @@
 #include "Engine/Game/Player.h"
 
 
+//BUGS
+//physics objects were glitchy
+//weird gun glitch where u cant switch weapons
+//weird taking no damage glitch
+//add score board
+//add another gun maybe like a sniper
+
 namespace NetworkManager
 {
 	struct addrinfo* result = NULL, * ptr = NULL, hints;
@@ -18,6 +25,10 @@ namespace NetworkManager
 	int loadedIn = 0;
 	int clientConnected = 0;
 
+	std::condition_variable cv;
+	std::mutex m;//you can use std::lock_guard if you want to be exception safe
+
+
 	void LoadedIn() {
 		loadedIn = 1;
 		if(!isServer)
@@ -25,12 +36,10 @@ namespace NetworkManager
 	}
 
 	std::thread netowrking_thread;
-	ThreadQueueStatus queueStatus = NONE;
-
 	std::queue<Packet> out;
 	std::queue<Packet> in;
 	//used for when the main thread is using in 
-	std::queue<Packet> in_queue;
+	//std::queue<Packet> in_queue;
 
 
 	int Init() {
@@ -68,16 +77,6 @@ namespace NetworkManager
 		do {
 			if(!clientConnected)
 				WaitForClient();
-
-			if (queueStatus == NONE && in_queue.size() > 0) {
-				queueStatus = COMPILING;
-				while (in_queue.size() > 0) {
-					Packet packet = in_queue.front();
-					in_queue.pop();
-					in.push(packet);
-				}
-				queueStatus = NONE;
-			}
 
 			memset(recvbuf, 0, sizeof(recvbuf));
 			iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
@@ -162,6 +161,7 @@ namespace NetworkManager
 
 	int WaitForClient() {
 		ClientSocket = INVALID_SOCKET;
+		clientConnected = 0;
 
 		// Accept a client socket
 		std::cout << "\n===================== Waiting for Client to Connect =====================\n";
@@ -507,6 +507,9 @@ namespace NetworkManager
 				std::memcpy(sendbuf + offset, &packet.payload.sound.z, sizeof(float));
 
 				break;
+
+			case PLAYERDIED:
+				break;
 			default:
 				break;
 			}
@@ -523,10 +526,9 @@ namespace NetworkManager
 	}
 	void ReceivePackets(char recvbuf[DEFAULT_BUFLEN]) {
 		Packet packet;
+		packet.type = 255;
 		size_t offset = 0;
-
-		if(queueStatus != EVALUTING)
-			queueStatus = RECEVING;
+		
 
 		switch (recvbuf[0])
 		{
@@ -535,10 +537,8 @@ namespace NetworkManager
 			std::memcpy(&packet.size, recvbuf + sizeof(packet.type), 2);
 			std::memcpy(&packet.payload.message.message, recvbuf + sizeof(packet.type) + sizeof(packet.size), packet.size);\
 
-			if(queueStatus == EVALUTING)
-				in_queue.push(packet);
-			else
-				in.push(packet);
+
+			in.push(packet);
 			/*
 			std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
 			std::cout << (int)packet.type << "\n";
@@ -570,10 +570,7 @@ namespace NetworkManager
 			// Ensure strings are null-terminated
 			packet.payload.player.interactingWith[packet.payload.player.interactingWithSize] = '\0';
 			packet.payload.player.currentGun[packet.payload.player.currentGunSize] = '\0';
-			if (queueStatus == EVALUTING)
-				in_queue.push(packet);
-			else
-				in.push(packet);
+
 			/*
 			std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
 			std::cout << (int)packet.type << "\n";
@@ -605,10 +602,6 @@ namespace NetworkManager
 			std::memcpy(packet.payload.animation.ObjectName, recvbuf + offset, packet.payload.animation.ObjectNameSize);
 			packet.payload.animation.ObjectName[packet.payload.animation.ObjectNameSize] = '\0'; // Null-terminate
 
-			if (queueStatus == EVALUTING)
-				in_queue.push(packet);
-			else
-				in.push(packet);
 
 			break;
 		case GUNSHOT:
@@ -675,11 +668,7 @@ namespace NetworkManager
 
 			offset += sizeof(float);
 
-			// Push packet to the input queue
-			if (queueStatus == EVALUTING)
-				in_queue.push(packet);
-			else
-				in.push(packet);
+
 			/*
 			std::cout << "------------- GUNSHOT DATA ---------------\n";
 			std::cout << "Object Name: " << packet.payload.gunshotdata.ObjectName << " (Size: " << (int)packet.payload.gunshotdata.ObjectNameSize << ")\n";
@@ -736,10 +725,6 @@ namespace NetworkManager
 			offset += sizeof(float);
 			std::memcpy(&packet.payload.dynamicObjectData.rotation_z, recvbuf + offset, sizeof(float));
 
-			if (queueStatus == EVALUTING)
-				in_queue.push(packet);
-			else
-				in.push(packet);
 
 			
 			/*
@@ -767,7 +752,6 @@ namespace NetworkManager
 			packet.type = CONTROL;
 			packet.size = 1;
 			std::memcpy(&packet.payload.control.flag, recvbuf + 5, 1);
-			in.push(packet);
 
 			break;
 
@@ -796,19 +780,32 @@ namespace NetworkManager
 			offset += sizeof(float);
 			std::memcpy(&packet.payload.sound.z, recvbuf + offset, sizeof(float));
 
-			if (queueStatus == EVALUTING)
-				in_queue.push(packet);
-			else
-				in.push(packet);
+	
 
+			break;
+
+		case PLAYERDIED:
+			packet.type = PLAYERDIED;
+			packet.size = 1;
 			break;
 
 		default:
 			break;
 		}
 
-		if(queueStatus == RECEVING)
-			queueStatus = NONE;
+		if (packet.type != 255) {
+			std::unique_lock<std::mutex> lk(m);
+			in.push(packet);
+			lk.unlock();
+			cv.notify_one();
+		}
+
+	}        
+
+	void SendPlayerDied() {
+		Packet packet;
+		packet.type = PLAYERDIED;
+		out.push(packet);
 	}
 
 	void SendSound(std::string soundname, glm::vec3 postion) {
@@ -963,12 +960,12 @@ namespace NetworkManager
 
 	void EvaulatePackets() {
 		//this is so it wont evaulate any more packets coming in
-		int current_in_size = in.size();
+		if (isServer && !clientConnected)
+			return;
 
-		while (queueStatus == RECEVING) {
-			
-		}
-		queueStatus = EVALUTING;
+		int current_in_size = in.size();
+		std::unique_lock<std::mutex> lk(m);
+		cv.wait(lk, [] {return !in.empty(); });
 
 		//needed
 		std::string playerInteractWith = "nothing";
@@ -1060,8 +1057,13 @@ namespace NetworkManager
 			{
 				std::string soundName = std::string(packet.payload.sound.SoundName, packet.payload.sound.SoundNameSize);
 				AudioManager::PlaySound(soundName, glm::vec3(packet.payload.sound.x, packet.payload.sound.y, packet.payload.sound.z));
-				break;
+				
 			}
+				break;
+			case PLAYERDIED:
+				Player::AddToKill();
+
+				break;
 				
 
 			default:
@@ -1069,7 +1071,7 @@ namespace NetworkManager
 			}
 		}
 		PlayerTwo::SetIneractingWith(playerInteractWith);
-		queueStatus = NONE;
+
 	}
 
 

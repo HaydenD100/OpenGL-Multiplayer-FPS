@@ -17,8 +17,6 @@
 #include "Engine/Core/Texture.h"
 
 
-
-
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -32,8 +30,8 @@
 #define MAXDECALS 3000
 
 //gamestuff
-static const int spawnpointsize = 5;
-static glm::vec3 spawnpoints[spawnpointsize] = { glm::vec3(19, 2.5, -21), glm::vec3(17.46, 2.5, 23), glm::vec3(-15, 2.5, 16), glm::vec3(-3.9, 2.5, -5), glm::vec3(18, 2.5, 12) };
+static const int spawnpointsize = 3;
+static glm::vec3 spawnpoints[spawnpointsize] = { glm::vec3(11, 4.5, 11), glm::vec3(14.5, 4, -9.28), glm::vec3(8.9, 3, 11)};
 
 
 

@@ -94,6 +94,16 @@ namespace AudioManager {
 		AudioManager::AddSound("Assets/Audio/item_pick_up.wav", "item_pickup", glm::vec3(0, 0, 0), 10, 0.8);
 		AudioManager::AddSound("Assets/Audio/glass_impact1.wav", "glass_impact1", glm::vec3(0, 0, 0), 10, 0.8);
 		AudioManager::AddSound("Assets/Audio/glass_impact2.wav", "glass_impact2", glm::vec3(0, 0, 0), 10, 0.8);
+
+		AudioManager::AddSound("Assets/Audio/spray_paint.wav", "spray_paint", glm::vec3(0, 0, 0), 10, 1);
+
+		AudioManager::AddSound("Assets/Audio/bullet_impact_00.wav", "bullet_impact_0", glm::vec3(0, 0, 0), 6, 0.2);
+		AudioManager::AddSound("Assets/Audio/bullet_impact_01.wav", "bullet_impact_1", glm::vec3(0, 0, 0),	6, 0.2);
+		AudioManager::AddSound("Assets/Audio/bullet_impact_02.wav", "bullet_impact_2", glm::vec3(0, 0, 0), 6, 0.2);
+		AudioManager::AddSound("Assets/Audio/bullet_impact_03.wav", "bullet_impact_3", glm::vec3(0, 0, 0), 6, 0.2);
+		AudioManager::AddSound("Assets/Audio/bullet_impact_04.wav", "bullet_impact_4", glm::vec3(0, 0, 0), 6, 0.2);
+
+
 	}
 
 	void AudioManager::CleanUp() {

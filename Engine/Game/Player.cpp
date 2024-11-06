@@ -51,6 +51,13 @@ namespace Player
 	int isDead = 0;
 	float timeSinceDeath = 0;
 	float animationDeathTime = 0.5f;
+	int kills = 0;
+	int deaths = 0;
+
+	void AddToKill() {
+		kills++;
+		std::cout << kills << "\n";
+	}
 
 
 	void Player::Init() {
@@ -134,6 +141,14 @@ namespace Player
 						AssetManager::AddDecalInstance(vec3local, normal, AssetManager::GetDecal("bullet_hole"), gameobject);
 
 						NetworkManager::SendGunShotData(gameobject->GetName(), "bullet_hole", vec3local, normal, btToGlmVector3(localForcePos), WeaponManager::GetGunByName(gunName)->damage, btToGlmVector3(2 * glmToBtVector3(Camera::ComputeRay())));
+
+						if (gameobject->GetName() == "PlayerTwo") {
+							int randomnum = (rand() % 5) + 1;
+							AudioManager::PlaySound("bullet_impact_" + std::to_string(randomnum), gameobject->GetPosition());
+							NetworkManager::SendSound("bullet_impact_" + std::to_string(randomnum), gameobject->GetPosition());
+						}
+
+
 					}
 				}
 			}
@@ -162,6 +177,7 @@ namespace Player
 				normal = glm::vec3(glm::inverse(rotation_matrix) * glm::vec4(normal, 0));
 
 				AssetManager::AddDecalInstance(vec3local, normal, AssetManager::GetDecal(decal_inv[decal_index]), gameobject);
+				AudioManager::PlaySound("spray_paint");
 
 			}
 		}
@@ -374,7 +390,7 @@ namespace Player
 		
 		horizontalAngle += mouseSpeed * float(SCREENWIDTH / 2 - Input::GetMouseX());
 
-		if ((Input::KeyDown('w') || Input::KeyDown('a') || Input::KeyDown('s') || Input::KeyDown('d')) && footstepTime + footstep_interval < glfwGetTime() ) {
+		if ((Input::KeyDown('w') || Input::KeyDown('a') || Input::KeyDown('s') || Input::KeyDown('d')) && footstepTime + footstep_interval < glfwGetTime()  && IsGrounded) {
 			AudioManager::PlaySound("foot_step" + std::to_string((rand() % 4) + 1), player->getPosition());
 			NetworkManager::SendSound("foot_step" + std::to_string((rand() % 4) + 1), player->getPosition());
 			footstepTime = glfwGetTime();
@@ -388,6 +404,19 @@ namespace Player
 		//sometimes you fall through floor
 		if (getPosition().y < -100)
 			Respawn();
+
+		if(Input::KeyPressed(RESPAWN))
+			Respawn();
+		if (Input::KeyPressed(PLAYERINFO)) {
+			std::cout << "========================== PLAYER INFO ======================= \n";
+			std::cout << "Current Weapon: " << getCurrentGun() << "\n";
+			std::cout << "death state: " << isDead << "\n";
+			std::cout << "time since death: " << timeSinceDeath << "\n";
+			std::cout << "============================================================== \n";
+
+
+
+		}
 
 	}
 	
@@ -430,13 +459,17 @@ namespace Player
 	}
 
 	void Player::TakeDamage(int amount) {
+			
 		//packets get evaluated after respawn leading to take damage after respawning
 		if (timeSinceDeath + animationDeathTime < 2.0f) {
 			Health = 100;
 			return;
 		}
-			
+
 		Health -= amount;
+		if (Health < 0)
+			Health = 0;
+
 		if (Health <= 0 && !isDead) {
 			//death
 			Health = 0;
@@ -446,7 +479,9 @@ namespace Player
 			if(gunName != "nothing")
 				AssetManager::GetGameObject(gunName)->SetRender(false);
 			gunName = "nothing";
-			
+
+			NetworkManager::SendPlayerDied();
+			deaths++;
 
 		}
 	}
@@ -471,6 +506,17 @@ namespace Player
 		isDead = 0;
 
 	}
+
+	int GetKills() {
+		return kills;
+	}
+	int GetDeaths() {
+		return deaths;
+	}
+	int IsDead() {
+		return isDead;
+	}
+
 }
 
 
@@ -480,8 +526,14 @@ namespace PlayerTwo
 	std::string currentGun = "nothing";
 	std::string interactingWithName = "nothing";
 
+	int kills = 0;
+
+	int GetKills() {
+		return kills;
+	}
+
 	void PlayerTwo::Init() {
-		AssetManager::AddGameObject("PlayerTwo", AssetManager::GetModel("playertwo"), glm::vec3(0, 2, 0), false, 0, Convex);
+		AssetManager::AddGameObject("PlayerTwo", AssetManager::GetModel("playertwo"), glm::vec3(0, -10, 0), false, 0, Convex);
 		if (NetworkManager::IsServer()) {
 			GameObject* otherPlayer = AssetManager::GetGameObject("PlayerTwo");
 			if (otherPlayer != nullptr) {
@@ -530,7 +582,7 @@ namespace PlayerTwo
 		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/bean_death.dae", AssetManager::GetModel("playertwo"), 0, "bean_death"));
 
 
-
+		Animator::PlayAnimation(AssetManager::GetSkinnedAnimation("bean_death"), "PlayerTwo",0);
 	}
 	void PlayerTwo::SetData(std::string interact, std::string gunname, glm::vec3 position, glm::vec3 rotation) {
 		interactingWithName = interact;
