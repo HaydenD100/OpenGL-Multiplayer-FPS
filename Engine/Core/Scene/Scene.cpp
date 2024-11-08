@@ -16,6 +16,7 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("flower", "Assets/Textures/flower_decal.png", 0, 0);
 	AssetManager::AddTexture("freaky", "Assets/Textures/freaky_decal.png", 0, 0);
 	AssetManager::AddTexture("pizza", "Assets/Textures/pizza_decal.png", 0, 0);
+
 	AssetManager::AddTexture("tank", "Assets/Textures/tank_decal.png", 0, 0);
 	AssetManager::AddTexture("crate", "Assets/Textures/crate.png", 0.7, 0);
 	AssetManager::AddTexture("window", "Assets/Textures/window.png", 0.7, 0);
@@ -33,6 +34,12 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("brick", "Assets/Textures/brick.png", "Assets/Normals/bricks_normal.png", "Assets/Roughness/brick_roughness.png", 0);
 	AssetManager::AddTexture("sand_ground", "Assets/Textures/sand_ground.jpg", "Assets/Normals/sand_ground_normal.jpg", "Assets/Roughness/sand_ground_roughness.jpg", 0);
 
+	AssetManager::AddTexture("pallet", "Assets/Textures/pallet.png", "Assets/Normals/pallet_normal.png", "Assets/Roughness/pallet_roughness.png", "Assets/Metalic/pallet_metallic.png");
+	AssetManager::AddTexture("barrel", "Assets/Textures/barrel.jpg", "Assets/Normals/barrel_normal.jpg", "Assets/Roughness/barrel_roughness.jpg", "Assets/Metalic/barrel_metallic.jpg");
+	AssetManager::AddTexture("cargo_crate", "Assets/Textures/cargo_crate.jpg", "Assets/Normals/cargo_crate_normal.jpg", "Assets/Roughness/cargo_crate_roughness.jpg", "Assets/Metalic/cargo_crate_metallic.jpg");
+
+
+
 
 
 	AssetManager::AddTexture("shotgun", "Assets/Textures/remington.png", "Assets/Normals/remington_normal.png", "Assets/Roughness/remington_roughness.png","Assets/Metalic/remington_metallic.png");
@@ -44,6 +51,7 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("double_barrel_shotgun_metal_receiver", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_normal.png", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_metallic.jpg");
 
 	AssetManager::AddTexture("glass", "Assets/Textures/glass.png", 0.1, 1);
+	AssetManager::AddTexture("transparent", "Assets/Textures/glass.png", 0, 0);
 
 
 	// TODO: not currently working
@@ -97,8 +105,22 @@ void Scene::LoadAssets() {
 	//AssetManager::AddModel("map_test1", Model("Assets/Maps/map_test1.fbx", AssetManager::GetTexture("wooden_floor")));
 	//AssetManager::GetModel("map_test1")->GetMeshByName("Map_floor")->SetTexture(AssetManager::GetTexture("wooden_floor"));
 	AssetManager::AddModel("map_test1", Model("Assets/Maps/dusty_1.fbx", AssetManager::GetTexture("brick")));
-	AssetManager::GetModel("map_test1")->GetMeshByName("floor.001")->SetTexture(AssetManager::GetTexture("sand_ground"));
+	Model* model = AssetManager::GetModel("map_test1");
+	model->GetMeshByName("floor.001")->SetTexture(AssetManager::GetTexture("sand_ground"));
+	model->GetMeshByName("barrel1")->SetTexture(AssetManager::GetTexture("barrel"));
+	model->GetMeshByName("barrel2")->SetTexture(AssetManager::GetTexture("barrel"));
+	model->GetMeshByName("barrel3")->SetTexture(AssetManager::GetTexture("barrel"));
+	model->GetMeshByName("cargo_crate")->SetTexture(AssetManager::GetTexture("cargo_crate"));
+	model->GetMeshByName("pallet1")->SetTexture(AssetManager::GetTexture("pallet"));
+	model->GetMeshByName("pallet2")->SetTexture(AssetManager::GetTexture("pallet"));
+	model->GetMeshByName("pallet3")->SetTexture(AssetManager::GetTexture("pallet"));
+	model->GetMeshByName("pallet4")->SetTexture(AssetManager::GetTexture("pallet"));
 
+
+
+
+
+	//Stuff for another map
 	/*
 	auto model = AssetManager::GetModel("map_test1");
 	auto beigeWallTexture = AssetManager::GetTexture("beige_wall");
@@ -287,6 +309,14 @@ void Scene::Load() {
 	}
 	*/
 	{
+		Light light(glm::vec3(13.4, 4, -9), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35, 0.44);
+		lights.push_back(light);
+	}
+	{
+		Light light(glm::vec3(7.7, 4, 10), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35, 0.44);
+		lights.push_back(light);
+	}
+	{
 		Light light(glm::vec3(4.86, 4, -1.5), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35, 0.44);
 		lights.push_back(light);
 	}
@@ -299,11 +329,11 @@ void Scene::Load() {
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(3.44, 4, -9), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35,	0.44);
+		Light light(glm::vec3(3.88, 4, -7), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35,	0.44);
 		lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(7, 15, -3), glm::vec3(1, 0.922, 0.753) * 10.0f, 0.09, 0.0320);
+		Light light(glm::vec3(7, 15, -2), glm::vec3(1, 0.922, 0.753) * 10.0f, 0.09, 0.0320);
 		lights.push_back(light);
 	}
 
