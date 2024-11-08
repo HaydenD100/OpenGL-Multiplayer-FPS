@@ -111,10 +111,13 @@ void Scene::LoadAssets() {
 	model->GetMeshByName("barrel2")->SetTexture(AssetManager::GetTexture("barrel"));
 	model->GetMeshByName("barrel3")->SetTexture(AssetManager::GetTexture("barrel"));
 	model->GetMeshByName("cargo_crate")->SetTexture(AssetManager::GetTexture("cargo_crate"));
+	model->GetMeshByName("cargo_crate1")->SetTexture(AssetManager::GetTexture("cargo_crate"));
+
 	model->GetMeshByName("pallet1")->SetTexture(AssetManager::GetTexture("pallet"));
 	model->GetMeshByName("pallet2")->SetTexture(AssetManager::GetTexture("pallet"));
-	model->GetMeshByName("pallet3")->SetTexture(AssetManager::GetTexture("pallet"));
+	model->GetMeshByName("pallet5")->SetTexture(AssetManager::GetTexture("pallet"));
 	model->GetMeshByName("pallet4")->SetTexture(AssetManager::GetTexture("pallet"));
+	model->GetMeshByName("pallet3.001")->SetTexture(AssetManager::GetTexture("pallet"));
 
 
 

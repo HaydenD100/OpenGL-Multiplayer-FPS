@@ -38,7 +38,7 @@ struct Light
 	GLuint depthCubemap = 0;
 	GLuint depthMapFBO = 0 ;
 
-	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	const int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 	std::vector<glm::mat4> shadowTransforms;
 	glm::mat4 shadowProj;
 

@@ -30,8 +30,8 @@
 #define MAXDECALS 3000
 
 //gamestuff
-static const int spawnpointsize = 3;
-static glm::vec3 spawnpoints[spawnpointsize] = { glm::vec3(11, 4.5, 11), glm::vec3(14.5, 4, -9.28), glm::vec3(8.9, 3, 11)};
+static const int spawnpointsize = 4;
+static glm::vec3 spawnpoints[spawnpointsize] = { glm::vec3(11, 4.5, 11), glm::vec3(10, 4, -7.43), glm::vec3(8.52, 3, 10.7),glm::vec3(11.2, 4, -1.42) };
 
 
 

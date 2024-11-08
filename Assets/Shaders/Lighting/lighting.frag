@@ -43,7 +43,7 @@ float ShadowCalculation(vec3 fragPos, int index)
     vec3 fragToLight = fragPos - LightPositions_worldspace[index];
     float currentDepth = length(fragToLight);
     float shadow = 0.0;
-    float bias = 0.4;
+    float bias = 0.2;
 
     int samples = 20;
     float viewDistance = length(viewPos - fragPos);

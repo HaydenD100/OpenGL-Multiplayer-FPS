@@ -210,8 +210,22 @@ void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         Mesh model_mesh = processMesh(mesh, scene);
         model_mesh.SetTexture(texture);
-        model_mesh.SetName(mesh->mName.C_Str());
-        std::cout << mesh->mName.C_Str() << "\n";
+        int name_count = 0;
+        for (int i = 0; i < meshes.size(); i++) {
+            if (std::strcmp(meshes[i].GetName().c_str(), mesh->mName.C_Str()) == 0) {
+                name_count++;
+            }
+        }
+        if (name_count > 0) {
+            std::string mesh_name = mesh->mName.C_Str() + std::to_string(name_count);
+            model_mesh.SetName(mesh_name);
+        }
+        else 
+            model_mesh.SetName(mesh->mName.C_Str());
+
+        
+
+        std::cout << model_mesh.GetName() << "\n";
         meshes.push_back(model_mesh);
     }
     // then do the same for each of its children

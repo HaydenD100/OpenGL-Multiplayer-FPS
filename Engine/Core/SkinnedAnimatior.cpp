@@ -47,7 +47,6 @@ namespace Animator {
                 return;
             }
         }
-        std::cout << "Created new Animation \n";
         AnimationInstance temp;
         temp.Animation = pAnimation;
         temp.m_CurrentTime = 0.0;
