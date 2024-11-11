@@ -6,7 +6,7 @@ https://github.com/HaydenD100/3dEngine2.0
 ### 3D Engine 2.0 2024/November/10
 A Lot has happened since the last update, firstly I implemented Skinned animation and a few more optimizations to shadows. I also started writing the netcode using Microsoft's winsock2 api, most of the netcode has been written and now I have to polish the netcode as well as add proper running jumping and shoot animations as right now the players are beans with arms as when I added animated all the weapons I only animated the gun with arms not thinking I was going to make the game multiplayer. Here's a link to my youtube for a full play test with me and my friend: https://www.youtube.com/watch?v=TNkH7IxkP3c
 
-![screenshot](https://github.com/HaydenD100/3dEngine2.0/blob/Bullet3-physics/github/screenshots/multiplayer_test.png)
+![screenshot](https://github.com/HaydenD100/3dEngine2.0/blob/1v1/github/screenshots/multiplayer_test.png)
 
 
 ### 3D Engine 2.0 2024/October/10
