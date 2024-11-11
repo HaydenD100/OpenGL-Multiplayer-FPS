@@ -38,6 +38,7 @@ namespace NetworkManager
 	std::thread netowrking_thread;
 	std::queue<Packet> out;
 	std::queue<Packet> in;
+	const int MAX_EVALUTED_PACKETS = 15;
 	//used for when the main thread is using in 
 	//std::queue<Packet> in_queue;
 
@@ -973,7 +974,10 @@ namespace NetworkManager
 		std::string currentgun;
 		std::string objectName;
 
-		while (current_in_size > 0 && !in.empty()) {
+		int evaluated_packets = 0;
+
+		while (current_in_size > 0 && !in.empty() && evaluated_packets < MAX_EVALUTED_PACKETS) {
+			evaluated_packets++;
 			current_in_size--;
 			Packet packet = in.front();
 			in.pop();

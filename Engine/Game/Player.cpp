@@ -16,10 +16,10 @@ namespace Player
 	std::string interactingWithName = "nothing";
 	float interactDistance = 3;
 
-	float swayIntensity = 0.02f;
+	float swayIntensity = 0.02f; 
 	float swaySpeed = 2.0f;
 	float smoothFactor = 0.1f;
-	float mouseSpeed = 0.005f;
+	float mouseSpeed = 0.002f;
 	float speed = 5000;
 
 	const float runningSpeed = 8500;
@@ -40,8 +40,9 @@ namespace Player
 	const double walkingfootstep_interval = 0.5;
 	const double runningfootstep_interval = 0.3;
 
-
-	std::string inv[4] = {"ak47","glock","double_barrel"};
+	
+	const int weapon_size = 3;
+	std::string inv[weapon_size] = {"ak47","glock","double_barrel"};
 	const int decal_count = 5;
 	std::string decal_inv[decal_count] = { "flower_decal","panda_decal","pizza_decal","tank_decal", "freaky_decal"};
 	int decal_index = 0;
@@ -504,6 +505,14 @@ namespace Player
 		gunName = "nothing";
 		setPosition(spawnpoints[spawnpointindex]);
 		isDead = 0;
+
+		for (int i = 0; i < weapon_size; i++) {
+			Gun* gun = WeaponManager::GetGunByName(inv[i]);
+			gun->currentammo = gun->ammo;
+		}
+
+
+
 
 	}
 

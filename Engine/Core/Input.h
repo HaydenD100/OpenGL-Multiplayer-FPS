@@ -8,6 +8,8 @@
 #include <cctype>
 
 
+#define MOUSE_SENSITIVITY = 0.002f;
+
 enum Controls {
 	RESPAWN = 'p',
 	PLAYERINFO = 'o'

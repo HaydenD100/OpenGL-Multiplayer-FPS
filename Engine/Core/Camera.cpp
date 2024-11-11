@@ -16,7 +16,7 @@ namespace Camera
 	float verticalAngle = 0.0f;
 	float initialFoV = 50.0f;
 	float maxAngle = 1.5;
-	float mouseSpeed = 0.005f;
+	float mouseSpeed = 0.002f;
 	
 	glm::mat4 ViewMatrix;
 	glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(initialFoV), RATIO, 0.1f, 100.0f);
