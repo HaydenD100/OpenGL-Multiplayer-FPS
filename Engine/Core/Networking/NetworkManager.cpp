@@ -483,7 +483,13 @@ namespace NetworkManager
 				std::memcpy(sendbuf + offset, &packet.payload.dynamicObjectData.rotation_y, sizeof(float));
 				offset += sizeof(float);
 				std::memcpy(sendbuf + offset, &packet.payload.dynamicObjectData.rotation_z, sizeof(float));
+				offset += sizeof(float);
 
+				std::memcpy(sendbuf + offset, &packet.payload.dynamicObjectData.velocity_x, sizeof(float));
+				offset += sizeof(float);
+				std::memcpy(sendbuf + offset, &packet.payload.dynamicObjectData.velocity_y, sizeof(float));
+				offset += sizeof(float);
+				std::memcpy(sendbuf + offset, &packet.payload.dynamicObjectData.velocity_z, sizeof(float));
 				break;
 
 			case CONTROL:
@@ -725,6 +731,13 @@ namespace NetworkManager
 			std::memcpy(&packet.payload.dynamicObjectData.rotation_y, recvbuf + offset, sizeof(float));
 			offset += sizeof(float);
 			std::memcpy(&packet.payload.dynamicObjectData.rotation_z, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+
+			std::memcpy(&packet.payload.dynamicObjectData.velocity_x, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+			std::memcpy(&packet.payload.dynamicObjectData.velocity_y, recvbuf + offset, sizeof(float));
+			offset += sizeof(float);
+			std::memcpy(&packet.payload.dynamicObjectData.velocity_z, recvbuf + offset, sizeof(float));
 
 
 			
@@ -841,7 +854,7 @@ namespace NetworkManager
 	}
 
 
-	void SendDyanmicObjectData(std::string objectname, glm::vec3 postion, glm::vec3 rotaion) {
+	void SendDyanmicObjectData(std::string objectname, glm::vec3 postion, glm::vec3 rotaion, glm::vec3 velocity) {
 		if (isServer && !clientConnected)
 			return;
 
@@ -860,6 +873,11 @@ namespace NetworkManager
 		packet.payload.dynamicObjectData.rotation_x = rotaion.x;
 		packet.payload.dynamicObjectData.rotation_y = rotaion.y;
 		packet.payload.dynamicObjectData.rotation_z = rotaion.z;
+
+		packet.payload.dynamicObjectData.velocity_x = velocity.x;
+		packet.payload.dynamicObjectData.velocity_y = velocity.y;
+		packet.payload.dynamicObjectData.velocity_z = velocity.z;
+
 
 		out.push(packet);
 	}
@@ -974,6 +992,8 @@ namespace NetworkManager
 		std::string currentgun;
 		std::string objectName;
 
+
+		//This is so the packets are spread out so it dosent slow down the frames when theres an influx of packets
 		int evaluated_packets = 0;
 
 		while (current_in_size > 0 && !in.empty() && evaluated_packets < MAX_EVALUTED_PACKETS) {
@@ -1028,7 +1048,7 @@ namespace NetworkManager
 
 				dynamicObject->setPosition(glm::vec3(packet.payload.dynamicObjectData.x, packet.payload.dynamicObjectData.y, packet.payload.dynamicObjectData.z));
 				dynamicObject->setRotation(glm::vec3(packet.payload.dynamicObjectData.rotation_x, packet.payload.dynamicObjectData.rotation_y, packet.payload.dynamicObjectData.rotation_z));
-
+				dynamicObject->GetRigidBody()->setLinearVelocity(btVector3(packet.payload.dynamicObjectData.velocity_x, packet.payload.dynamicObjectData.velocity_y, packet.payload.dynamicObjectData.velocity_z));
 
 				break;
 			}

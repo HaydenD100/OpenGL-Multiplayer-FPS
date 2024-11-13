@@ -14,7 +14,8 @@ enum GunType
 {
 	Semi,
 	Auto,
-	ShotGun
+	ShotGun,
+	Melee
 };
 
 struct Gun
@@ -23,14 +24,14 @@ struct Gun
 	static glm::vec3 swayPosition;
 
 	std::string name;
-	int ammo;
-	double firerate;
-	int currentammo;
-	double reloadtime;
-	int damage;
-	float recoil;
-	float recoilY;
-	float kickback;
+	int ammo = 1;
+	double firerate = 100;
+	int currentammo = 1;
+	double reloadtime = 0;
+	int damage = 0;
+	float recoil = 0;
+	float recoilY = 0;
+	float kickback = 0;
 	double lastTimeShot = glfwGetTime();
 	std::string gunModel;
 	std::string gunsShotName;

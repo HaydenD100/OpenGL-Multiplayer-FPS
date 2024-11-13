@@ -32,7 +32,7 @@ namespace PathFinding {
 		Path path;
 		//change this for some stuff
 		path.start = glm::vec3(round_up(pos.x, 1), pos.y, round_up(pos.z, 1));
-		
+		return path;
 	}
 
 

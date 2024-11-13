@@ -1,5 +1,8 @@
 #include "Scene.h"
 
+
+//TODO :: I want to pull all of the updating and rendering out the scene manager.
+
 Scene::Scene() {
 
 }
@@ -7,7 +10,7 @@ Scene::Scene() {
 void Scene::LoadAssets() {
 	AssetManager::ClearAssets();
 	AnimationManager::ClearAnimations();
-	//Thank you to tokyo splif for some of the models and sounds
+	//Thank you to tokyosplif for some of the models and sounds
 
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
 	AssetManager::AddTexture("red_glass", "Assets/Textures/red_glass.png", 0.1, 0.9);
@@ -37,6 +40,7 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("pallet", "Assets/Textures/pallet.png", "Assets/Normals/pallet_normal.png", "Assets/Roughness/pallet_roughness.png", "Assets/Metalic/pallet_metallic.png");
 	AssetManager::AddTexture("barrel", "Assets/Textures/barrel.jpg", "Assets/Normals/barrel_normal.jpg", "Assets/Roughness/barrel_roughness.jpg", "Assets/Metalic/barrel_metallic.jpg");
 	AssetManager::AddTexture("cargo_crate", "Assets/Textures/cargo_crate.jpg", "Assets/Normals/cargo_crate_normal.jpg", "Assets/Roughness/cargo_crate_roughness.jpg", "Assets/Metalic/cargo_crate_metallic.jpg");
+	AssetManager::AddTexture("knife", "Assets/Textures/knife.png", "Assets/Normals/knife_normal.png", "Assets/Roughness/knife_roughness.png", "Assets/Metalic/knife_metallic.png");
 
 
 
@@ -63,7 +67,7 @@ void Scene::LoadAssets() {
 
 	AssetManager::AddModel("swat", Model("Assets/Objects/FBX/swat_death.dae", AssetManager::GetTexture("uvmap")));
 	
-	AssetManager::AddModel("playertwo", Model("Assets/Objects/FBX/bean_death.dae", AssetManager::GetTexture("uvmap")));
+	AssetManager::AddModel("playertwo", Model("Assets/Objects/FBX/bean_death.dae","Assets/Objects/player_mesh.obj", AssetManager::GetTexture("uvmap")));
 
 
 	AssetManager::AddModel("fence1", Model("Assets/Objects/fence1.fbx", AssetManager::GetTexture("concrete")));
@@ -88,6 +92,9 @@ void Scene::LoadAssets() {
 	
 	AssetManager::AddModel("ak47hand", Model("Assets/Objects/FBX/ak47_shoot.dae", "Assets/Objects/ak47_convex.obj", AssetManager::GetTexture("ak47")));
 	AssetManager::GetModel("ak47hand")->GetMeshByName("Arms_L_R_Mesh_002-mesh")->SetTexture(AssetManager::GetTexture("arm"));
+
+	AssetManager::AddModel("knifehand", Model("Assets/Objects/FBX/knife_equip.dae", "Assets/Objects/glock17_convex.obj", AssetManager::GetTexture("knife")));
+	AssetManager::GetModel("knifehand")->GetMeshByName("Arms_L_R_Mesh_002-mesh")->SetTexture(AssetManager::GetTexture("arm"));
 
 
 	AssetManager::AddModel("double_barrel_hand", Model("Assets/Objects/FBX/db_shoot.dae", "Assets/Objects/db_convex.obj", AssetManager::GetTexture("double_barrel_shotgun_main_barrel")));
@@ -119,29 +126,6 @@ void Scene::LoadAssets() {
 	model->GetMeshByName("pallet4")->SetTexture(AssetManager::GetTexture("pallet"));
 	model->GetMeshByName("pallet3.001")->SetTexture(AssetManager::GetTexture("pallet"));
 
-
-
-
-
-	//Stuff for another map
-	/*
-	auto model = AssetManager::GetModel("map_test1");
-	auto beigeWallTexture = AssetManager::GetTexture("beige_wall");
-
-	for (int i = 1; i <= 40; ++i) {
-		std::stringstream ss;
-		ss << "map_walls." << std::setw(3) << std::setfill('0') << i;
-		std::string meshName = ss.str();
-
-		model->GetMeshByName(meshName)->SetTexture(beigeWallTexture);
-	}
-
-	AssetManager::GetModel("map_test1")->GetMeshByName("map_roof.008")->SetTexture(AssetManager::GetTexture("beige_wall"));
-	*/
-	
-
-	//AssetManager::GetModel("doublebarrel")->GetMeshByName("Arms_L_R_Mesh_002-mesh")->SetTexture(AssetManager::GetTexture("uvmap"));
-
 	AssetManager::AddModel("ak47", Model("Assets/Objects/FBX/ak47.fbx", "Assets/Objects/ak47_convex.obj", AssetManager::GetTexture("ak47")));
 	AssetManager::AddModel("door", Model(Mesh("Assets/Objects/door.obj"), AssetManager::GetTexture("door")));
 	AssetManager::AddModel("door_frame", Model(Mesh("Assets/Objects/door_frame.obj"), AssetManager::GetTexture("door")));
@@ -171,45 +155,9 @@ void Scene::Load() {
 	WeaponManager::Init();
 
 
-	//AssetManager::AddGameObject("map1_floor", AssetManager::GetModel("map_floor"), glm::vec3(0, 1.6, 0), true, 0, Concave);
-	//AssetManager::AddGameObject("map1_walls", AssetManager::GetModel("map_walls"), glm::vec3(0, 1.6, 0), true, 0, Concave);
+
 	AssetManager::AddGameObject("map_test1", AssetManager::GetModel("map_test1"), glm::vec3(0, 0, 0), true, 0, Concave);
 	AssetManager::GetGameObject("map_test1")->SetRotationX(-1.5708f);
-
-	/*
-	AssetManager::AddGameObject("window1", AssetManager::GetModel("window"), glm::vec3(-11, 2, 14),true, 0,Concave);
-	AssetManager::AddGameObject("window_glass1", AssetManager::GetModel("window_glass"), glm::vec3(-11, 2, 14), true, 0, Concave);
-	AssetManager::GetGameObject("window_glass1")->SetShaderType("Transparent");
-	AssetManager::GetGameObject("window_glass1")->SetRotationX(1.5708f);
-	*/
-	/*
-	AssetManager::AddGameObject("red_glass", AssetManager::GetModel("cube"), glm::vec3(-7, 2, 6), true, 0, Convex);
-	AssetManager::GetGameObject("red_glass")->SetShaderType("Transparent");
-
-	AssetManager::AddGameObject("red_glass1", AssetManager::GetModel("cube1"), glm::vec3(-6, 2, 8), true, 0, Convex);
-	AssetManager::GetGameObject("red_glass1")->SetShaderType("Transparent");
-
-	AssetManager::AddGameObject("floor", AssetManager::GetModel("floor"), glm::vec3(0, 0, 0), true, 0, Box);
-	*/
-	
-	/*
-	crates.push_back(Crate(glm::vec3(1, 2, 1), "crate1", AssetManager::GetModel("crate")));
-	crates.push_back(Crate(glm::vec3(-3, 2, -3), "crate2", AssetManager::GetModel("crate")));
-	crates.push_back(Crate(glm::vec3(-10, 2, 14), "crate3", AssetManager::GetModel("crate")));
-
-	crates.push_back(Crate(glm::vec3(10, 2, -3), "crate1", AssetManager::GetModel("crate")));
-	crates.push_back(Crate(glm::vec3(-13, 2, -5), "crate2", AssetManager::GetModel("crate")));
-	crates.push_back(Crate(glm::vec3(10, 2, 14), "crate3", AssetManager::GetModel("crate")));
-	crates.push_back(Crate(glm::vec3(3, 2, -9), "crate1", AssetManager::GetModel("crate")));
-	crates.push_back(Crate(glm::vec3(7, 2, 7), "crate2", AssetManager::GetModel("crate")));
-	crates.push_back(Crate(glm::vec3(-10, 2, 14), "crate3", AssetManager::GetModel("crate")));
-
-	crates.push_back(Crate(glm::vec3(1, 14.5, -1), "crate1", AssetManager::GetModel("crate")));
-	crates.push_back(Crate(glm::vec3(2, 14.5, -1), "crate2", AssetManager::GetModel("crate")));
-	crates.push_back(Crate(glm::vec3(1, 14.5, -2), "crate3", AssetManager::GetModel("crate")));
-	*/
-	//gunPickUps.push_back(GunPickUp("ak47", "ak47_pickup", AssetManager::GetModel("ak47"), glm::vec3(1, 30, 1)));
-	//gunPickUps.push_back(GunPickUp("glock", "glock_pickup", AssetManager::GetModel("glock"), glm::vec3(1, 25, 0)));
 
 	/*
 	doors.push_back(Door("door1", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(0.4, 0, -5), glm::vec3(0, 0, 0)));
@@ -217,8 +165,6 @@ void Scene::Load() {
 	doors.push_back(Door("door3", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-9.4, 0, -15), glm::vec3(0, 0, 0)));
 	doors.push_back(Door("door4", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-9.4, 0, -24.8), glm::vec3(0,0,0)));
 	*/
-	
-	//AssetManager::AddGameObject(GameObject("swat", AssetManager::GetModel("swat"), glm::vec3(0, 0, 0), false, 0,Capsule,0.5,2,0));
 	
 
 	// Sets renderer
@@ -233,84 +179,6 @@ void Scene::Load() {
 	};
 	sky = SkyBox(faces);
 
-	/*
-	// MAX LIGHTS BY DEFAULT IS 128 if you want more lights go to lighting.frag and change MAXLIGHTS
-	{
-		Light light(glm::vec3(-3.6,5, 2), glm::vec3(1, 0.779, 0.529) * 7.0f, 0.027, 0.0028);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(-5, 5, -10), glm::vec3(1, 0.779, 0.529) * 6.0f, 0.027, 0.0028);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(-10, 5, -19), glm::vec3(1, 0.779, 0.529) * 9.0f, 0.027, 0.0028);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(0, 5, -20), glm::vec3(1, 0.25, 0) * 8.0f, 0.027, 0.0028);
-		lights.push_back(light);
-	}
-
-	{
-		Light light(glm::vec3(-5, 5, -31), glm::vec3(1, 0.779, 0.529) * 10.0f, 0.027, 0.0028);
-		lights.push_back(light);
-	}
-
-	{
-		Light light(glm::vec3(-18, 2, -20), glm::vec3(1, 0.25, 0) * 5.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(-14, 5, -1), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-
-	{
-		Light light(glm::vec3(3, 5, -9), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(-21, 5, 12), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(-6, 5, 21), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(13, 2, 18), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(18, 2, 0), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(1, 6.5, -1), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(1, 10, -1), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(1, 14.5, -1), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(1, 18, -1), glm::vec3(1, 0.779, 0.529) * 5.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(19, 3.5, 10), glm::vec3(1, 0.5, 0.529) * 5.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(21, 3.5, -21), glm::vec3(0.8, 0, 0.8) * 5.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-	*/
 	{
 		Light light(glm::vec3(13.4, 4, -9), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35, 0.44);
 		lights.push_back(light);
@@ -340,22 +208,6 @@ void Scene::Load() {
 		lights.push_back(light);
 	}
 
-	/*
-	{
-		Light light(glm::vec3(-6, 2, -2), glm::vec3(1, 0, 1) * 4.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(-1, 2, -1), glm::vec3(0, 1, 1) * 4.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-	
-	{
-		Light light(glm::vec3(-1, 10, -1), glm::vec3(1, 1, 1) * 50.0f, 0.09, 0.0320);
-		lights.push_back(light);
-	}
-	*/
-
 	//gunSpawners.push_back(GunSpawner("ak47", "spawner1",glm::vec3(1, 18, -1)));
 
 	
@@ -369,14 +221,14 @@ void Scene::Load() {
 	ModelMatrixId = glGetUniformLocation(Renderer::GetCurrentProgramID(), "model");
 	Animator::Init();
 
-	//swat_death = SkinnedAnimation("Assets/Objects/FBX/swat_death.dae", AssetManager::GetModel("swat"), 0);
-	//Animator::PlayAnimation(&swat_death, "swat", false);
 	//TODO :: dosent work yet
-	PathFinding::Init();
+	//PathFinding::Init();
+
 	glBindVertexArray(sky.GetSkyBoxVAO());
 }
 
 void Scene::Update(float deltaTime) {
+	//problem should pull this out
 	Player::Update(deltaTime);
 	Animator::UpdateAnimation(deltaTime);
 

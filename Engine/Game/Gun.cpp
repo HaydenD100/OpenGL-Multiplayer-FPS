@@ -5,7 +5,7 @@
 
 
 void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
-	GameObject* gun = AssetManager::GetGameObject(gunModel);
+	GameObject* gun = AssetManager::GetGameObject(name);
 	gun->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
 	gun->GetRigidBody()->setLinearVelocity(btVector3(0, 0, 0));
 	if (! hasAnimations) {
@@ -26,7 +26,7 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 	
 
 	if (aiming) {
-		AssetManager::GetGameObject(gunModel)->setPosition(aimingPosition);
+		gun->setPosition(aimingPosition);
 	}
 	else {
 		gun->setPosition(weaponOffSet + (direction * -kickbackOffset * 1.0f/60.0f));
@@ -70,6 +70,8 @@ void Gun::Equip() {
 }
 
 void Gun::Reload() {
+	if (type == Melee)
+		return;
 	if (hasAnimations) {
 		Animator::PlayAnimation(&reloadAnim, name, false);
 		NetworkManager::SendAnimation(reloadAnim.GetName(), name + "_PlayerTwo");
@@ -101,6 +103,11 @@ namespace WeaponManager
 	std::vector<Gun> guns;
 
 	void WeaponManager::Init() {
+		AssetManager::AddGameObject(GameObject("knife", AssetManager::GetModel("knifehand"), glm::vec3(5, 0, -5), false, 0, Convex));
+		AssetManager::GetGameObject("knife")->SetRender(false);
+		AssetManager::GetGameObject("knife")->SetParentName("player_head");
+		AssetManager::GetGameObject("knife")->SetShaderType("Overlay");
+
 		AssetManager::AddGameObject(GameObject("glock", AssetManager::GetModel("glockhand"), glm::vec3(5, 0, -5), false, 0, Convex));
 		AssetManager::GetGameObject("glock")->SetRender(false);
 		AssetManager::GetGameObject("glock")->SetParentName("player_head");
@@ -135,6 +142,13 @@ namespace WeaponManager
 		AudioManager::AddSound("Assets/Audio/glock_fire3.wav", "glock_fire3", AssetManager::GetGameObject("glock")->getPosition(), 10, 0.5f);
 		AudioManager::AddSound("Assets/Audio/glock_fire4.wav", "glock_fire4", AssetManager::GetGameObject("glock")->getPosition(), 10, 0.5f);
 		AudioManager::AddSound("Assets/Audio/dry_fire.wav", "dry_fire", AssetManager::GetGameObject("glock")->getPosition(), 5, 0.2f);
+		AudioManager::AddSound("Assets/Audio/knife.wav", "knife_swing1", AssetManager::GetGameObject("knife")->getPosition(), 5, 1.0f);
+		AudioManager::AddSound("Assets/Audio/knife.wav", "knife_swing2", AssetManager::GetGameObject("knife")->getPosition(), 5, 1.0f);
+		AudioManager::AddSound("Assets/Audio/knife.wav", "knife_swing3", AssetManager::GetGameObject("knife")->getPosition(), 5, 1.0f);
+		AudioManager::AddSound("Assets/Audio/knife.wav", "knife_swing4", AssetManager::GetGameObject("knife")->getPosition(), 5, 1.0f);
+
+
+
 	
 		Gun glock;
 		glock.name = "glock";
@@ -180,7 +194,6 @@ namespace WeaponManager
 		ak47.weaponOffSet = glm::vec3(-0.3, -0.25, 0.9);
 		ak47.aimingPosition = glm::vec3(0, -0.32, 0.7);
 		guns.emplace_back(ak47);
-
 
 		//removing this for now
 		Gun shotgun;
@@ -228,12 +241,32 @@ namespace WeaponManager
 		doublebarrel.weaponOffSet = glm::vec3(-0.27, -0.2f, 1.5);
 		doublebarrel.aimingPosition = glm::vec3(0, -0.2, 0.7);
 		guns.emplace_back(doublebarrel);
+
+		Gun kinfe;
+		kinfe.name = "knife";
+		kinfe.firerate = 100;
+		kinfe.shootAnim = SkinnedAnimation("Assets/Objects/FBX/knife_attack.dae", AssetManager::GetModel("knifehand"), 0, "knife_shoot");
+		kinfe.equipAnim = SkinnedAnimation("Assets/Objects/FBX/knife_equip.dae", AssetManager::GetModel("knifehand"), 0, "knife_equip");
+
+		kinfe.hasAnimations = true;
+		kinfe.damage = 14;
+		kinfe.type = Melee;
+		kinfe.recoil = 0;
+		kinfe.recoilY = 0;
+		kinfe.kickback = 0;
+		kinfe.weaponOffSet = glm::vec3(-0.3, -0.2f, 0.9);
+		kinfe.aimingPosition = glm::vec3(0.15, -0.2, 0.7);
+		kinfe.gunModel = "knifehand";
+		kinfe.gunsShotName = "knife_swing";
+		guns.emplace_back(kinfe);
 	}
 	
 	Gun* WeaponManager::GetGunByName(std::string name) {
 		for (int i = 0; i < guns.size(); i++)
 			if (guns[i].name == name)
 				return &guns[i];
+
+		std::cout << "Cant find Weapon " << name << "\n";
 		return nullptr;
 	}
 }

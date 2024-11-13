@@ -4,3 +4,30 @@ Todo
 - Better UI, add support for Dear MyGui
 - reflection textures
 - animations
+- settings menu
+
+
+Animation stuff
+death
+walk 
+run jump
+idle
+
+
+per gun
+shoot idle
+shoot walk
+shoot run
+shoot jump
+
+reload idle
+reload walk
+reload run
+reload jump
+
+pull out idle
+pull out walk
+pull out run 
+pull out jump
+
+

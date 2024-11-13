@@ -31,11 +31,12 @@ namespace Engine
 		std::cout << "Currently in: " << cwd << "\n";
 
 		NetworkManager::Init();
-		std::cout << "==================================CONNECT/HOST==================================================\n";
-		std::cout << "ENTER 0 to create a Game OR Type the IP of the server to join:";
+		std::cout << "==================================CONNECT/HOST==============================================================================\n";
+		std::cout << "ENTER 0 to create/host a Game OR Type the IP of the server to join:";
 		char temp[255];
 		std::cin.getline(temp, sizeof(temp));
-		std::cout << "================================================================================================\n";
+		std::cout << "If you are hosting/creating a game for others outside of your network to join you remember to port forward PORT: " << DEFAULT_PORT << "\n";
+		std::cout << "============================================================================================================================\n";
 
 		
 		if (temp[0] == '0')
@@ -145,7 +146,7 @@ namespace Engine
 					if (!gameobject->IsDynamic() || gameobject->GetName() == "PlayerTwo" || gameobject->GetName() == "player")
 						continue;
 
-					NetworkManager::SendDyanmicObjectData(gameobject->GetName(), gameobject->GetPosition(), gameobject->getRotation());
+					NetworkManager::SendDyanmicObjectData(gameobject->GetName(), gameobject->GetPosition(), gameobject->getRotation(),btToGlmVector3(gameobject->GetRigidBody()->getLinearVelocity()));
 
 				}
 			}

@@ -118,6 +118,10 @@ struct Packet {
 		float rotation_x;
 		float rotation_y;
 		float rotation_z;
+
+		float velocity_x;
+		float velocity_y;
+		float velocity_z;
 	};
 
 	struct SoundData {
@@ -171,7 +175,7 @@ namespace NetworkManager
 	void SendPlayerDied();
 	void SendSound(std::string soundname, glm::vec3 postion);
 	void SendControl(ControlFlag flag);
-	void SendDyanmicObjectData(std::string objectname, glm::vec3 postion, glm::vec3 rotaion);
+	void SendDyanmicObjectData(std::string objectname, glm::vec3 postion, glm::vec3 rotaion, glm::vec3 velocity);
 	void SendGunShotData(std::string objectname, std::string decalName, glm::vec3 worldhitpoint, glm::vec3 hitpointnormal, glm::vec3 hitpointlocal, int32_t damage, glm::vec3 force);
 	void SendAnimation(std::string AnimationName, std::string ObjectName);
 	void SendPlayerData(glm::vec3 postion, glm::vec3 rotation, std::string currentGun, std::string interactingWith);

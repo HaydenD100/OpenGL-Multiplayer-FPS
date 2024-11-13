@@ -41,8 +41,8 @@ namespace Player
 	const double runningfootstep_interval = 0.3;
 
 	
-	const int weapon_size = 3;
-	std::string inv[weapon_size] = {"ak47","glock","double_barrel"};
+	const int weapon_size = 4;
+	std::string inv[weapon_size] = {"ak47","glock","double_barrel","knife"};
 	const int decal_count = 5;
 	std::string decal_inv[decal_count] = { "flower_decal","panda_decal","pizza_decal","tank_decal", "freaky_decal"};
 	int decal_index = 0;
@@ -117,6 +117,50 @@ namespace Player
 		if (gunName == "nothing")
 			return;
 
+		WeaponManager::GetGunByName(gunName)->lastTimeShot = glfwGetTime();
+
+
+		if (WeaponManager::GetGunByName(gunName)->type == Melee) {
+			WeaponManager::GetGunByName(gunName)->Shoot();
+			btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit(0);
+			if (hit.m_collisionObject != nullptr) {
+				GameObject* gameobject = AssetManager::GetGameObject(hit.m_collisionObject->getUserIndex());
+				if (gameobject != nullptr)
+				{
+					btVector3 start = hit.m_rayFromWorld; // Ray origin
+					btVector3 end = hit.m_hitPointWorld; // Hit point
+					float distance = (end - start).length();
+					if (distance > 2)
+						return;
+					btRigidBody* body = gameobject->GetRigidBody();
+					btVector3 localForcePos = body->getWorldTransform().inverse() * hit.m_hitPointWorld;
+					body->applyImpulse(2 * glmToBtVector3(Camera::ComputeRay()), localForcePos);
+					glm::vec4 worldPositionHomogeneous(glm::vec3(hit.m_hitPointWorld.getX(), hit.m_hitPointWorld.getY(), hit.m_hitPointWorld.getZ()), 1.0f);
+					glm::vec4 localPositionHomogeneous = glm::inverse(gameobject->GetModelMatrix()) * worldPositionHomogeneous;
+					glm::vec3 vec3local = glm::vec3(localPositionHomogeneous.x, localPositionHomogeneous.y, localPositionHomogeneous.z);
+					glm::vec3 normal = glm::vec3(hit.m_hitNormalWorld.getX(), hit.m_hitNormalWorld.getY(), hit.m_hitNormalWorld.getZ());
+					glm::mat4 rotation_matrix = glm::mat4_cast(glm::quat(gameobject->getRotation()));
+					normal = glm::vec3(glm::inverse(rotation_matrix) * glm::vec4(normal, 0));
+					AssetManager::AddDecalInstance(vec3local, normal, AssetManager::GetDecal("bullet_hole"), gameobject);
+
+					NetworkManager::SendGunShotData(gameobject->GetName(), "bullet_hole", vec3local, normal, btToGlmVector3(localForcePos), WeaponManager::GetGunByName(gunName)->damage, btToGlmVector3(2 * glmToBtVector3(Camera::ComputeRay())));
+
+					if (gameobject->GetName() == "PlayerTwo") {
+						int randomnum = (rand() % 5) + 1;
+						AudioManager::PlaySound("bullet_impact_" + std::to_string(randomnum), gameobject->GetPosition());
+						NetworkManager::SendSound("bullet_impact_" + std::to_string(randomnum), gameobject->GetPosition());
+					}
+
+
+				}
+			}
+
+
+
+			return;
+
+		}
+
 		if (WeaponManager::GetGunByName(gunName)->currentammo > 0) {
 			WeaponManager::GetGunByName(gunName)->currentammo--;
 			WeaponManager::GetGunByName(gunName)->Shoot();
@@ -161,7 +205,6 @@ namespace Player
 
 		}
 		
-		WeaponManager::GetGunByName(gunName)->lastTimeShot = glfwGetTime();
 	}
 	void Player::Graffite() {
 		btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit();
@@ -337,14 +380,14 @@ namespace Player
 				decal_index++;
 		}
 		
-		if (Input::KeyPressed('r') && !reloading && !aiming && gunName != "nothing") {
+		if (Input::KeyPressed('r') && !reloading && !aiming && gunName != "nothing" && WeaponManager::GetGunByName(getCurrentGun())->type != Melee) {
 			reloading = true;
 			reloadingTime = glfwGetTime();
 			WeaponManager::GetGunByName(gunName)->Reload();
 
 		}
 
-		if (Input::RightMouseDown() && !reloading) {
+		if (Input::RightMouseDown() && !reloading && WeaponManager::GetGunByName(gunName)->type != Melee) {
 			aiming = true;
 		}
 		else {
@@ -360,7 +403,7 @@ namespace Player
 			}
 			
 			// Get ray details
-			if (Input::LeftMousePressed() && WeaponManager::GetGunByName(gunName)->type == Semi && glfwGetTime() - WeaponManager::GetGunByName(gunName)->lastTimeShot > 60.0f / WeaponManager::GetGunByName(gunName)->firerate && !reloading) {
+			if (Input::LeftMousePressed() && (WeaponManager::GetGunByName(gunName)->type == Semi || WeaponManager::GetGunByName(gunName)->type == Melee) && glfwGetTime() - WeaponManager::GetGunByName(gunName)->lastTimeShot > 60.0f / WeaponManager::GetGunByName(gunName)->firerate && !reloading) {
 				Shoot();
 			}
 			else if (Input::LeftMouseDown() && WeaponManager::GetGunByName(gunName)->type == Auto && glfwGetTime() - WeaponManager::GetGunByName(gunName)->lastTimeShot > 60.0f / WeaponManager::GetGunByName(gunName)->firerate && !reloading) {
@@ -381,12 +424,14 @@ namespace Player
 		if (Input::KeyPressed('1')) {
 			SelectWeapon(inv[0]);
 		}
-
 		if (Input::KeyPressed('2')) {
 			SelectWeapon(inv[1]);
 		}
 		if (Input::KeyPressed('3')) {
 			SelectWeapon(inv[2]);
+		}
+		if (Input::KeyPressed('4')) {
+			SelectWeapon(inv[3]);
 		}
 		
 		horizontalAngle += mouseSpeed * float(SCREENWIDTH / 2 - Input::GetMouseX());
@@ -576,6 +621,13 @@ namespace PlayerTwo
 		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetScale(0.3);
 		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetDontCull(true);
 
+		AssetManager::AddGameObject("knife_PlayerTwo", AssetManager::GetModel("knifehand"), glm::vec3(-0.3, 0.25f, 0.9), false, 0, Convex);
+		AssetManager::GetGameObject("knife_PlayerTwo")->SetRender(false);
+		AssetManager::GetGameObject("knife_PlayerTwo")->SetParentName("PlayerTwo");
+		AssetManager::GetGameObject("knife_PlayerTwo")->SetScale(0.3);
+		AssetManager::GetGameObject("knife_PlayerTwo")->SetDontCull(true);
+
+
 		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/glock17_shoot1.dae", AssetManager::GetModel("glockhand"), 0, "glock17_shoot"));
 		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/glock17_reload.dae", AssetManager::GetModel("glockhand"), 0, "glock17_reload"));
 		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/glock17_equip.dae", AssetManager::GetModel("glockhand"), 0, "glock17_equip"));
@@ -587,6 +639,9 @@ namespace PlayerTwo
 		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/db_shoot.dae", AssetManager::GetModel("double_barrel_hand"), 1, "db_shoot"));
 		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/db_reload.dae", AssetManager::GetModel("double_barrel_hand"), 0, "db_reload"));
 		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/db_equip.dae", AssetManager::GetModel("double_barrel_hand"), 1, "db_equip"));
+
+		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/knife_attack.dae", AssetManager::GetModel("knifehand"), 0, "knife_shoot"));
+		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/knife_equip.dae", AssetManager::GetModel("knifehand"), 0, "knife_equip"));
 
 		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/bean_death.dae", AssetManager::GetModel("playertwo"), 0, "bean_death"));
 
