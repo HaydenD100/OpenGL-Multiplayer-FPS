@@ -21,9 +21,6 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#define SCREENWIDTH 1280
-#define SCREENHEIGHT 720
-#define RATIO 16.0f/9.0f
 #define WINDOWTITILE "Engine 2.0"
 
 //Rendering stuff

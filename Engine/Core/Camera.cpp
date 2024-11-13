@@ -16,10 +16,9 @@ namespace Camera
 	float verticalAngle = 0.0f;
 	float initialFoV = 50.0f;
 	float maxAngle = 1.5;
-	float mouseSpeed = 0.002f;
 	
 	glm::mat4 ViewMatrix;
-	glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(initialFoV), RATIO, 0.1f, 100.0f);
+	glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(initialFoV), (float)Backend::GetWidth()/ (float)Backend::GetHeight(), 0.1f, 100.0f);
 
 
 	glm::vec3 Camera::GetPosition() {
@@ -64,15 +63,15 @@ namespace Camera
 	
 	glm::vec3 Camera::ComputeRay() {
 		glm::vec4 lRayStart_NDC(
-			((float)Input::GetMouseX() / (float)SCREENWIDTH - 0.5f) * 2.0f, // [0,1024] -> [-1,1]
-			((float)Input::GetMouseY() / (float)SCREENHEIGHT - 0.5f) * 2.0f, // [0, 768] -> [-1,1]
+			((float)Input::GetMouseX() / (float)Backend::GetWidth() - 0.5f) * 2.0f, // [0,1024] -> [-1,1]
+			((float)Input::GetMouseY() / (float)Backend::GetHeight() - 0.5f) * 2.0f, // [0, 768] -> [-1,1]
 			-1.0, // The near plane maps to Z=-1 in Normalized Device Coordinates
 			1.0f
 		);
 		
 		glm::vec4 lRayEnd_NDC(
-			((float)Input::GetMouseX() / (float)SCREENWIDTH - 0.5f) * 2.0f,
-			((float)Input::GetMouseY() / (float)SCREENHEIGHT - 0.5f) * 2.0f,
+			((float)Input::GetMouseX() / (float)Backend::GetWidth() - 0.5f) * 2.0f,
+			((float)Input::GetMouseY() / (float)Backend::GetHeight() - 0.5f) * 2.0f,
 			0.0,
 			1.0f
 		);
@@ -109,7 +108,7 @@ namespace Camera
 
 	void Camera::Update(float dt) {
 		if (verticalAngle <= maxAngle && verticalAngle >= -maxAngle)
-			verticalAngle += mouseSpeed * float(SCREENHEIGHT / 2 - Input::GetMouseY());
+			verticalAngle += Input::GetSensitivity() * float(Backend::GetHeight() / 2 - Input::GetMouseY());
 		else if (verticalAngle > maxAngle)
 			verticalAngle = maxAngle;
 		else if (verticalAngle < -maxAngle)
@@ -137,7 +136,7 @@ namespace Camera
 			up                  // Head is up (set to 0,-1,0 to look upside-down)
 		);
 
-		frustrum = createFrustumFromCamera(SCREENWIDTH/SCREENHEIGHT, glm::radians(initialFoV*2.0f), 0.1f, 100.0f);
+		frustrum = createFrustumFromCamera(Backend::GetWidth() / Backend::GetHeight(), glm::radians(initialFoV*2.0f), 0.1f, 100.0f);
 	}
 	
 	glm::vec3 Camera::GetDirection() {

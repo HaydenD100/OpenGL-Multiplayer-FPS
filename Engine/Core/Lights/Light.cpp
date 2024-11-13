@@ -92,7 +92,7 @@ void Light::GenerateShadows() {
 	Renderer::setVec3(glGetUniformLocation(Renderer::GetCurrentProgramID(), "lightPos"), position);
 
 	SceneManager::GetCurrentScene()->RenderAllObjects(Renderer::GetCurrentProgramID());
-	glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
+	glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//std::cout << "Generated shadows \n";

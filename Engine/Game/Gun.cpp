@@ -163,8 +163,8 @@ namespace WeaponManager
 		glock.currentammo = 18;
 		glock.damage = 14;
 		glock.type = Semi;
-		glock.recoil = 0.01f;
-		glock.recoilY = 100;
+		glock.recoil = 0.03f;
+		glock.recoilY = 50;
 		glock.kickback = 3;
 		glock.weaponOffSet = glm::vec3(-0.3, -0.2f, 0.9);
 		glock.aimingPosition = glm::vec3(0.15,-0.2, 0.7);
@@ -244,7 +244,7 @@ namespace WeaponManager
 
 		Gun kinfe;
 		kinfe.name = "knife";
-		kinfe.firerate = 100;
+		kinfe.firerate = 400;
 		kinfe.shootAnim = SkinnedAnimation("Assets/Objects/FBX/knife_attack.dae", AssetManager::GetModel("knifehand"), 0, "knife_shoot");
 		kinfe.equipAnim = SkinnedAnimation("Assets/Objects/FBX/knife_equip.dae", AssetManager::GetModel("knifehand"), 0, "knife_equip");
 

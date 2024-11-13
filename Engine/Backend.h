@@ -1,10 +1,13 @@
 #pragma once
 
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "Engine/Core/Common.h"
 #include "Engine/Core/Renderer.h"
 #include <iostream>
+
+
 
 
 namespace Backend
@@ -13,5 +16,9 @@ namespace Backend
 	GLFWwindow* GetWindowPointer();
 	bool IsWindowOpen();
 	void CloseWindow();
+
+	int GetHeight();
+	int GetWidth();
+	void SetWindowResolution(int width, int height);
 
 }

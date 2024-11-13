@@ -19,7 +19,6 @@ namespace Player
 	float swayIntensity = 0.02f; 
 	float swaySpeed = 2.0f;
 	float smoothFactor = 0.1f;
-	float mouseSpeed = 0.002f;
 	float speed = 5000;
 
 	const float runningSpeed = 8500;
@@ -212,6 +211,11 @@ namespace Player
 			GameObject* gameobject = AssetManager::GetGameObject(hit.m_collisionObject->getUserIndex());
 			if (gameobject != nullptr)
 			{
+				btVector3 start = hit.m_rayFromWorld; // Ray origin
+				btVector3 end = hit.m_hitPointWorld; // Hit point
+				float distance = (end - start).length();
+				if (distance > 3)
+					return;
 				btRigidBody* body = gameobject->GetRigidBody();
 				glm::vec4 worldPositionHomogeneous(glm::vec3(hit.m_hitPointWorld.getX(), hit.m_hitPointWorld.getY(), hit.m_hitPointWorld.getZ()), 1.0f);
 				glm::vec4 localPositionHomogeneous = glm::inverse(gameobject->GetModelMatrix()) * worldPositionHomogeneous;
@@ -290,7 +294,7 @@ namespace Player
 		interactingWithName = "nothing";
 
 		if (verticalAngle <= maxAngle && verticalAngle >= -maxAngle)
-			verticalAngle += mouseSpeed * float(SCREENHEIGHT / 2 - Input::GetMouseY());
+			verticalAngle += Input::GetSensitivity() * float(Backend::GetHeight() / 2 - Input::GetMouseY());
 		
 		else if (verticalAngle > maxAngle)
 			verticalAngle = maxAngle;
@@ -434,7 +438,7 @@ namespace Player
 			SelectWeapon(inv[3]);
 		}
 		
-		horizontalAngle += mouseSpeed * float(SCREENWIDTH / 2 - Input::GetMouseX());
+		horizontalAngle += Input::GetSensitivity() * float(Backend::GetWidth() / 2 - Input::GetMouseX());
 
 		if ((Input::KeyDown('w') || Input::KeyDown('a') || Input::KeyDown('s') || Input::KeyDown('d')) && footstepTime + footstep_interval < glfwGetTime()  && IsGrounded) {
 			AudioManager::PlaySound("foot_step" + std::to_string((rand() % 4) + 1), player->getPosition());

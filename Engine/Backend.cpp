@@ -1,11 +1,17 @@
 #include "Backend.h"
 
+#include "Engine/Core/UI/UI.h"
+
 
 
 namespace Backend
 {
 	GLFWwindow* window;
 	bool windowOpen = true;
+	int width = 1280;
+	int height = 720;
+
+
 
 	int Backend::init() {
 		glewExperimental = true; // Needed for core profile
@@ -19,9 +25,12 @@ namespace Backend
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL 
+#ifdef __APPLE__
+		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
 
 		// Open a window and create its OpenGL context
-		window = glfwCreateWindow(SCREENWIDTH, SCREENHEIGHT , WINDOWTITILE, nullptr, nullptr);
+		window = glfwCreateWindow(width, height , WINDOWTITILE, nullptr, nullptr);
 
 		if (window == nullptr) {
 			glfwTerminate();
@@ -37,12 +46,10 @@ namespace Backend
 		glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 		glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		
 
 		Renderer::init();
 		return 0;
 	}
-
 
 	GLFWwindow* Backend::GetWindowPointer() {
 		return window;
@@ -54,5 +61,15 @@ namespace Backend
 
 	void Backend::CloseWindow() {
 		windowOpen = false;
+	}
+	int GetHeight() {
+		return height;
+	}
+	int GetWidth() {
+		return width;
+	}
+	void SetWindowResolution(int Width, int Height) {
+		width = Width;
+		height = Height;
 	}
 }

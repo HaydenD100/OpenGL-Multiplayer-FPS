@@ -150,7 +150,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Core\Debug\BulletDebug.cpp" />
-    <ClCompile Include="Editor\EditorManager.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Backend.cpp" />
     <ClCompile Include="Engine\Core\Animation.cpp" />
@@ -223,7 +222,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Debug\BulletDebug.h" />
-    <ClInclude Include="Editor\EditorManager.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\Backend.h" />
     <ClInclude Include="Engine\Core\Animation.h" />
@@ -241,6 +239,7 @@
     <ClInclude Include="Engine\Core\shader_s.h" />
     <ClInclude Include="Engine\Core\Texture.h" />
     <ClInclude Include="Engine\Core\UI\Text2D.h" />
+    <ClInclude Include="Engine\Core\UI\UI.h" />
     <ClInclude Include="Engine\Debug\DebugDrawer.h" />
     <ClInclude Include="Engine\Engine.h" />
     <ClInclude Include="Engine\Game\Crate.h" />

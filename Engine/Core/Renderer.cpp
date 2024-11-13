@@ -205,8 +205,8 @@ namespace Renderer
 
 		UseProgram(GetProgramID("ssao"));
 		glUniform3fv(glGetUniformLocation(GetCurrentProgramID(), "samples"), (GLsizei)ssaoKernel.size(), glm::value_ptr(ssaoKernel[0]));
-		glUniform1f(glGetUniformLocation(GetCurrentProgramID(), "ScreenWidth"), SCREENWIDTH);
-		glUniform1f(glGetUniformLocation(GetCurrentProgramID(), "ScreenHeight"), SCREENHEIGHT);
+		glUniform1f(glGetUniformLocation(GetCurrentProgramID(), "ScreenWidth"), Backend::GetWidth());
+		glUniform1f(glGetUniformLocation(GetCurrentProgramID(), "ScreenHeight"), Backend::GetHeight());
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gPostion"), 0);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gNormal"), 1);
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "texNoise"), 2);
@@ -217,7 +217,7 @@ namespace Renderer
 		glUniform1i(glGetUniformLocation(GetCurrentProgramID(), "gDepth"), 3);
 
 
-		glUniform2f(glGetUniformLocation(GetCurrentProgramID(), "resolution"), SCREENWIDTH, SCREENHEIGHT);
+		glUniform2f(glGetUniformLocation(GetCurrentProgramID(), "resolution"), Backend::GetWidth(), Backend::GetHeight());
 
 
 		std::cout << "Done loading shaders \n";
@@ -267,31 +267,31 @@ namespace Renderer
 
 		glGenTextures(1, &gPosition);
 		glBindTexture(GL_TEXTURE_2D, gPosition);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, Backend::GetWidth(), Backend::GetHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 		glGenTextures(1, &gNormal);
 		glBindTexture(GL_TEXTURE_2D, gNormal);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Backend::GetWidth(), Backend::GetHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 		glGenTextures(1, &gAlbeido);
 		glBindTexture(GL_TEXTURE_2D, gAlbeido);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, Backend::GetWidth(), Backend::GetHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 		glGenTextures(1, &gPBR);
 		glBindTexture(GL_TEXTURE_2D, gPBR);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, Backend::GetWidth(), Backend::GetHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 		glGenTextures(1, &depthTexture);
 		glBindTexture(GL_TEXTURE_2D, depthTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, SCREENWIDTH, SCREENHEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, Backend::GetWidth(), Backend::GetHeight(), 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -339,7 +339,7 @@ namespace Renderer
 
 		glGenTextures(1, &ssaoColorBuffer);
 		glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, SCREENWIDTH, SCREENHEIGHT, 0, GL_RED, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, Backend::GetWidth(), Backend::GetHeight(), 0, GL_RED, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -350,7 +350,7 @@ namespace Renderer
 
 		glGenTextures(1, &bloomTexture);
 		glBindTexture(GL_TEXTURE_2D, bloomTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, SCREENWIDTH, SCREENHEIGHT, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, Backend::GetWidth(), Backend::GetHeight(), 0, GL_RGB, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -460,7 +460,7 @@ namespace Renderer
 	void Renderer::RenderScene() {
 		glEnable(GL_DEPTH_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
+		glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
@@ -588,7 +588,7 @@ namespace Renderer
 		}
 
 		glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
-		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
+		glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//---------------------------------------------------SSAO-------------------------------------
@@ -619,7 +619,7 @@ namespace Renderer
 		glDisableVertexAttribArray(0);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, SCREENWIDTH, SCREENHEIGHT);
+		glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		//---------------------------------------------------Lighting-------------------------------------

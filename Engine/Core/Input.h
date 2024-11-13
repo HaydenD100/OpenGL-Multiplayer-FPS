@@ -38,5 +38,9 @@ namespace Input
 	void HideCursor();
 	void ShowCursor();
 
+	float GetSensitivity();
+	void SetSensitivity(float sensitivity);
+
+
 	void windowFocusCallback(GLFWwindow* window, int focused);
 }

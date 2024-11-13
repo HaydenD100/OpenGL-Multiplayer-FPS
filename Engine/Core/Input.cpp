@@ -13,6 +13,8 @@ namespace Input
     double mouseOffsetX = 0;
     double mouseOffsetY = 0;
 
+    float sensitivity = 0.002;
+
     bool leftMouseDown = false;
     bool rightMouseDown = false;
     bool leftMousePressed = false;
@@ -70,7 +72,7 @@ namespace Input
     }
 
     void Input::CenterMouse() {
-        glfwSetCursorPos(window, SCREENWIDTH / 2, SCREENHEIGHT / 2);
+        glfwSetCursorPos(window, Backend::GetWidth() / 2, Backend::GetHeight() / 2);
     }
 
     bool Input::LeftMouseDown() {
@@ -95,6 +97,12 @@ namespace Input
 
     float GetMouseOffsetY() {
         return (float)mouseOffsetY;
+    }
+    float GetSensitivity() {
+        return sensitivity;
+    }
+    void SetSensitivity(float Sensitivity) {
+        sensitivity = Sensitivity;
     }
 
    

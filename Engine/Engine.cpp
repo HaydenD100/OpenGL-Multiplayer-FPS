@@ -1,6 +1,5 @@
 #include "Engine.h"
 #include "Engine/Physics/BulletPhysics.h"
-#include "Editor/EditorManager.h"
 #include <ctime>
 #include <iostream>
 #include "Engine/Core/Networking/NetworkManager.h"
@@ -76,6 +75,7 @@ namespace Engine
 		NetworkManager::SendPackets();
 
 		while (Backend::IsWindowOpen()) {
+
 			// Delta time stuff
 			double currentTime = glfwGetTime();
 			double dt = currentTime - lastTimeDT;
