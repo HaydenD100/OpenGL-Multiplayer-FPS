@@ -160,7 +160,7 @@ void main() {
 
     }
 
-    vec3 ambient = (vec3(1) * ao);
+    vec3 ambient = ao * vec3(1) ;
     vec3 color = ambient * Lo;
 
     // HDR and gamma correction

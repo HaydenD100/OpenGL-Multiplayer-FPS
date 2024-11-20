@@ -152,7 +152,7 @@
     <ClCompile Include="Engine\Core\Debug\BulletDebug.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Backend.cpp" />
-    <ClCompile Include="Engine\Core\Animation.cpp" />
+    <ClCompile Include="Engine\Animation\Animation.cpp" />
     <ClCompile Include="Engine\Core\AssetManager.cpp" />
     <ClCompile Include="Engine\Core\Camera.cpp" />
     <ClCompile Include="Engine\Core\Common.cpp" />
@@ -160,10 +160,11 @@
     <ClCompile Include="Engine\Core\DecalInstance.cpp" />
     <ClCompile Include="Engine\Core\GameObject.cpp" />
     <ClCompile Include="Engine\Core\Input.cpp" />
-    <ClCompile Include="Engine\Core\Renderer.cpp" />
+    <ClCompile Include="Engine\Renderer\Renderer.cpp" />
     <ClCompile Include="Engine\Core\Scene\Scene.cpp" />
     <ClCompile Include="Engine\Core\Scene\SceneManager.cpp" />
-    <ClCompile Include="Engine\Core\Texture.cpp" />
+    <ClCompile Include="Engine\Renderer\Shader.cpp" />
+    <ClCompile Include="Engine\Renderer\Texture.cpp" />
     <ClCompile Include="Engine\Core\UI\Text2D.cpp" />
     <ClCompile Include="Engine\Debug\DebugDrawer.cpp" />
     <ClCompile Include="Engine\Engine.cpp" />
@@ -175,19 +176,19 @@
     <ClCompile Include="Engine\Loaders\ShaderLoader.cpp" />
     <ClCompile Include="Engine\Loaders\stb_image.cpp" />
     <ClCompile Include="Engine\Loaders\vboindexer.cpp" />
-    <ClCompile Include="Engine\Core\Model.cpp" />
+    <ClCompile Include="Engine\Renderer\Model.cpp" />
     <ClCompile Include="Engine\Pathfinding\Pathfinding.cpp" />
     <ClCompile Include="Engine\Physics\BulletPhysics.cpp" />
     <ClCompile Include="Engine\Physics\Physics.cpp" />
     <ClCompile Include="Engine\Core\Lights\light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Physics\NividaPhysics.cpp" />
-    <ClCompile Include="Engine\Core\Mesh.cpp" />
-    <ClCompile Include="Engine\Core\Bone.cpp" />
-    <ClCompile Include="Engine\Core\SkinnedAnimatior.cpp" />
-    <ClCompile Include="Engine\Core\SkinnedAnimation.cpp" />
+    <ClCompile Include="Engine\Renderer\Mesh.cpp" />
+    <ClCompile Include="Engine\Animation\Bone.cpp" />
+    <ClCompile Include="Engine\Animation\SkinnedAnimatior.cpp" />
+    <ClCompile Include="Engine\Animation\SkinnedAnimation.cpp" />
     <ClCompile Include="Engine\Core\RagDoll.cpp" />
-    <ClCompile Include="Engine\Core\Networking\NetworkManager.cpp" />
+    <ClCompile Include="Engine\Networking\NetworkManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Saves\mainScene.json" />
@@ -224,7 +225,7 @@
     <ClInclude Include="Engine\Core\Debug\BulletDebug.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\Backend.h" />
-    <ClInclude Include="Engine\Core\Animation.h" />
+    <ClInclude Include="Engine\Animation\Animation.h" />
     <ClInclude Include="Engine\Core\AssetManager.h" />
     <ClInclude Include="Engine\Core\Camera.h" />
     <ClInclude Include="Engine\Core\Common.h" />
@@ -232,12 +233,13 @@
     <ClInclude Include="Engine\Core\DecalInstance.h" />
     <ClInclude Include="Engine\Core\GameObject.h" />
     <ClInclude Include="Engine\Core\Input.h" />
-    <ClInclude Include="Engine\Core\Model.h" />
-    <ClInclude Include="Engine\Core\Renderer.h" />
+    <ClInclude Include="Engine\Renderer\Model.h" />
+    <ClInclude Include="Engine\Renderer\Renderer.h" />
     <ClInclude Include="Engine\Core\Scene\Scene.h" />
     <ClInclude Include="Engine\Core\Scene\SceneManager.h" />
     <ClInclude Include="Engine\Core\shader_s.h" />
-    <ClInclude Include="Engine\Core\Texture.h" />
+    <ClInclude Include="Engine\Renderer\Shader.h" />
+    <ClInclude Include="Engine\Renderer\Texture.h" />
     <ClInclude Include="Engine\Core\UI\Text2D.h" />
     <ClInclude Include="Engine\Core\UI\UI.h" />
     <ClInclude Include="Engine\Debug\DebugDrawer.h" />
@@ -257,12 +259,12 @@
     <ClInclude Include="Engine\Physics\Physics.h" />
     <ClInclude Include="Engine\Core\Lights\light.h" />
     <ClInclude Include="Engine\Physics\NividaPhysics.h" />
-    <ClInclude Include="Engine\Core\Mesh.h" />
-    <ClInclude Include="Engine\Core\Bone.h" />
-    <ClInclude Include="Engine\Core\SkinnedAnimatior.h" />
-    <ClInclude Include="Engine\Core\SkinnedAnimation.h" />
+    <ClInclude Include="Engine\Renderer\Mesh.h" />
+    <ClInclude Include="Engine\Animation\Bone.h" />
+    <ClInclude Include="Engine\Animation\SkinnedAnimatior.h" />
+    <ClInclude Include="Engine\Animation\SkinnedAnimation.h" />
     <ClInclude Include="Engine\Core\RagDoll.h" />
-    <ClInclude Include="Engine\Core\Networking\NetworkManager.h" />
+    <ClInclude Include="Engine\Networking\NetworkManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="github\screenshots\3DEngine.png" />

@@ -11,8 +11,8 @@
 
 #include "Engine/Core/GameObject.h"
 #include "Engine/Core/Common.h"
-#include "Engine/Core/Renderer.h"
-#include "Engine/Core/Texture.h"
+#include "Engine/Renderer/Renderer.h"
+#include "Engine/Renderer/Texture.h"
 #include "Engine/Core/Decal.h"
 
 // Json stuff

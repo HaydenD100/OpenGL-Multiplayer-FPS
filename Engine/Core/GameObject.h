@@ -9,12 +9,12 @@
 #include <string>
 
 #include "Common.h"
-#include "Renderer.h"
+#include "Engine/Renderer/Renderer.h"
 
 #include "../Loaders/vboindexer.h"
 #include "../Loaders/Loader.hpp"
 #include "Engine/Physics/BulletPhysics.h"
-#include "Engine/Core/Model.h"
+#include "Engine/Renderer/Model.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -41,7 +41,7 @@ public:
 	glm::mat4 GetModelMatrix();
 	glm::mat4 GetLocalModelMatrix();
 	
-	void RenderObject(GLuint& programID);
+	void RenderObject(GLuint programID);
 
 	void setPosition(glm::vec3 position);
 	void setRotation(glm::vec3 rotation);

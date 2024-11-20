@@ -270,7 +270,7 @@ bool Model::RenderAll() {
     return renderAllMeshes;
 }
 
-void Model::RenderModel(GLuint& programID) {
+void Model::RenderModel(GLuint programID) {
 
     if (renderAllMeshes)
     {

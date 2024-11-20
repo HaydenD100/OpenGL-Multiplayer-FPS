@@ -33,7 +33,7 @@
     <ClCompile Include="Engine\Core\Common.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Renderer.cpp">
+    <ClCompile Include="Engine\Renderer\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Loaders\loader.cpp">
@@ -78,7 +78,7 @@
     <ClCompile Include="Engine\Game\Door.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Animation.cpp">
+    <ClCompile Include="Engine\Animation\Animation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Audio\Audio.cpp">
@@ -96,28 +96,28 @@
     <ClCompile Include="Engine\Core\Lights\light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Texture.cpp">
+    <ClCompile Include="Engine\Renderer\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Physics\NividaPhysics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Mesh.cpp">
+    <ClCompile Include="Engine\Renderer\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Model.cpp">
+    <ClCompile Include="Engine\Renderer\Model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Core\DecalInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Bone.cpp">
+    <ClCompile Include="Engine\Animation\Bone.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\SkinnedAnimatior.cpp">
+    <ClCompile Include="Engine\Animation\SkinnedAnimatior.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\SkinnedAnimation.cpp">
+    <ClCompile Include="Engine\Animation\SkinnedAnimation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Pathfinding\Pathfinding.cpp">
@@ -129,7 +129,10 @@
     <ClCompile Include="Engine\Core\RagDoll.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Networking\NetworkManager.cpp">
+    <ClCompile Include="Engine\Networking\NetworkManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Renderer\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -170,7 +173,7 @@
     <ClInclude Include="Engine\Game\Door.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Animation.h">
+    <ClInclude Include="Engine\Animation\Animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Audio\Audio.h">
@@ -200,7 +203,7 @@
     <ClInclude Include="Engine\Core\GameObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Renderer.h">
+    <ClInclude Include="Engine\Renderer\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\shader_s.h">
@@ -221,28 +224,28 @@
     <ClInclude Include="Engine\Core\Lights\light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Texture.h">
+    <ClInclude Include="Engine\Renderer\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Physics\NividaPhysics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Mesh.h">
+    <ClInclude Include="Engine\Renderer\Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Model.h">
+    <ClInclude Include="Engine\Renderer\Model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\DecalInstance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Bone.h">
+    <ClInclude Include="Engine\Animation\Bone.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\SkinnedAnimatior.h">
+    <ClInclude Include="Engine\Animation\SkinnedAnimatior.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\SkinnedAnimation.h">
+    <ClInclude Include="Engine\Animation\SkinnedAnimation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Pathfinding\Pathfinding.h">
@@ -254,10 +257,13 @@
     <ClInclude Include="Engine\Core\RagDoll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Networking\NetworkManager.h">
+    <ClInclude Include="Engine\Networking\NetworkManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\UI\UI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

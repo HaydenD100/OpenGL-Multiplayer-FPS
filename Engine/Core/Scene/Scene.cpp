@@ -168,7 +168,6 @@ void Scene::Load() {
 	
 
 	// Sets renderer
-	Renderer::UseProgram(Renderer::GetProgramID("Texture"));
 	std::vector<std::string> faces{
 		"Assets/Skybox/daylight/right.png",
 			"Assets/Skybox/daylight/left.png",
@@ -264,81 +263,10 @@ void Scene::Update(float deltaTime) {
 	AudioManager::Update();
 }
 
-void Scene::RenderObjects(GLuint programid) {
-	NeedRendering.clear();
-	glm::mat4 ViewMatrix = Camera::getViewMatrix();
-	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
-		GameObject* gameobjectRender = AssetManager::GetGameObject(i);
-		
-		if (!gameobjectRender->ShouldRender()) 
-			continue;
-		if (gameobjectRender->GetShaderType() != "Default") {
-			//make guns render on top;
-			NeedRendering.push_back(gameobjectRender);
-			continue;
-		}
-		if (!gameobjectRender->GetModel()->GetAABB()->isOnFrustum(Camera::GetFrustum(), gameobjectRender->getTransform()) && !gameobjectRender->DontCull())
-			continue;
 
-		auto transforms = gameobjectRender->GetFinalBoneMatricies();
-		if (transforms[0] != glm::mat4(1)) {
-			glUniform1i(glGetUniformLocation(programid, "animated"), true);
-
-			for (int i = 0; i < transforms.size(); ++i) {
-				std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
-				Renderer::setMat4(glGetUniformLocation(programid, pos.c_str()), transforms[i]);
-			}
-		}
-		else
-			glUniform1i(glGetUniformLocation(programid, "animated"), false);
-
-		
-
-		glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
-		glm::mat4 modelViewMatrix = ViewMatrix * ModelMatrix;
-		glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
-
-		glUniformMatrix3fv(glGetUniformLocation(programid, "normalMatrix3"), 1, GL_FALSE, &normalMatrix[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);
-		gameobjectRender->RenderObject(programid);
-	}
-
-}
 
 void Scene::AddGunPickUp(GunPickUp gunpickup) {
 	gunPickUps.push_back(gunpickup);
-}
-void Scene::RenderAllObjects(GLuint programid) {
-	NeedRendering.clear();
-	glm::mat4 ViewMatrix = Camera::getViewMatrix();
-	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
-		GameObject* gameobjectRender = AssetManager::GetGameObject(i);
-
-		if (!gameobjectRender->ShouldRender())
-			continue;
-		if (gameobjectRender->GetShaderType() != "Default") {
-			//make guns render on top;
-			NeedRendering.push_back(gameobjectRender);
-			continue;
-		}
-
-		//auto transforms = animatior.GetFinalBoneMatrices(gameobjectRender->GetName());
-		auto transforms = gameobjectRender->GetFinalBoneMatricies();
-		if (transforms[0] != glm::mat4(1)) {
-			glUniform1i(glGetUniformLocation(programid, "animated"), true);
-
-			for (int i = 0; i < transforms.size(); ++i) {
-				std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
-				Renderer::setMat4(glGetUniformLocation(programid, pos.c_str()), transforms[i]);
-			}
-		}
-		else
-			glUniform1i(glGetUniformLocation(programid, "animated"), false);
-
-		glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
-		glUniformMatrix4fv(glGetUniformLocation(programid, "M"), 1, GL_FALSE, &ModelMatrix[0][0]);
-		gameobjectRender->RenderObject(programid);
-	}
 }
 
 //had to change back to int instead of size_t as it was giving me errors with string sizes

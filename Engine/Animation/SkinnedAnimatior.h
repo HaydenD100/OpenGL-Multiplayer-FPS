@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Core/SkinnedAnimation.h"
+#include "Engine/Animation/SkinnedAnimation.h"
 #include <vector>
 #include <string>
 #include <glm/mat4x4.hpp>

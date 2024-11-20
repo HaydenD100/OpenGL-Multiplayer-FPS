@@ -1,6 +1,6 @@
 #pragma once
-#include "Engine/Core/Bone.h"
-#include "Engine/Core/Model.h"
+#include "Engine/Animation/Bone.h"
+#include "Engine/Renderer/Model.h"
 
 struct AssimpNodeData
 {

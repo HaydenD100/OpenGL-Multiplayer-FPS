@@ -3,7 +3,7 @@
 #include <string>
 
 #include "Engine/Core/Common.h"
-#include "Engine/Core/Renderer.h"
+#include "Engine/Renderer/Renderer.h"
 
 #include "Engine/Core/GameObject.h"
 

@@ -1,5 +1,5 @@
 #include "NetworkManager.h"
-#include "Engine/Core/SkinnedAnimatior.h"
+#include "Engine/Animation/SkinnedAnimatior.h"
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Game/Player.h"
 

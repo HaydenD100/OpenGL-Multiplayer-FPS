@@ -14,7 +14,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
-#include "Engine/Core/Texture.h"
+#include "Engine/Renderer/Texture.h"
 
 
 #include <assimp/Importer.hpp>

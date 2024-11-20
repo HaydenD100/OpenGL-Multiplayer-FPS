@@ -214,7 +214,7 @@ namespace Player
 				btVector3 start = hit.m_rayFromWorld; // Ray origin
 				btVector3 end = hit.m_hitPointWorld; // Hit point
 				float distance = (end - start).length();
-				if (distance > 3)
+				if (distance > 4)
 					return;
 				btRigidBody* body = gameobject->GetRigidBody();
 				glm::vec4 worldPositionHomogeneous(glm::vec3(hit.m_hitPointWorld.getX(), hit.m_hitPointWorld.getY(), hit.m_hitPointWorld.getZ()), 1.0f);

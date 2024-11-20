@@ -3,7 +3,7 @@
 #include <string>
 
 #include "Engine/Core/Common.h"
-#include "Engine/Core/Renderer.h"
+#include "Engine/Renderer/Renderer.h"
 #include "Engine/Physics/BulletPhysics.h"
 #include "Engine/Core/GameObject.h"
 
@@ -16,7 +16,7 @@ public:
     Decal() = default;
     Decal(std::string name, Texture* texture, glm::vec3 size);
 
-    void RenderDecal(GLuint& programID);
+    void RenderDecal(GLuint programID);
     size_t getVerticesSize();
     std::vector<glm::vec3> getVerticies();
     glm::vec3 GetVertex(int i);

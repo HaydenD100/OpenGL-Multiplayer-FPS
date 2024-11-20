@@ -1,5 +1,5 @@
 #include "Light.h"
-#include "Engine/Core/Renderer.h"
+#include "Engine/Renderer/Renderer.h"
 #include "Engine/Core/Scene/SceneManager.h"
 Light::Light(glm::vec3 position, glm::vec3 direction, glm::vec3 colour, float cutoff, float outercutoff, float linear, float quadratic) {
 	this->lighttype = Spotlight;
@@ -58,7 +58,7 @@ void Light::SetUpShadows() {
 
 	aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
 	near = 1.0f;
-	far = 25.0f;
+	far = 100.0f;
 	shadowProj = glm::perspective(glm::radians(90.0f), aspect, near, far);
 
 	shadowTransforms.push_back(shadowProj *
@@ -79,7 +79,7 @@ void Light::SetUpShadows() {
 
 void Light::GenerateShadows() {
 	glEnable(GL_DEPTH_TEST);
-	Renderer::UseProgram(Renderer::GetProgramID("shadow"));
+	Renderer::s_shadow.Use();
 	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -89,9 +89,9 @@ void Light::GenerateShadows() {
 		glUniformMatrix4fv(glGetUniformLocation(Renderer::GetCurrentProgramID(), pos.c_str()), 1, GL_FALSE, &shadowTransforms[i][0][0]);
 	}
 	glUniform1f(glGetUniformLocation(Renderer::GetCurrentProgramID(), "far_plane"), 25);
-	Renderer::setVec3(glGetUniformLocation(Renderer::GetCurrentProgramID(), "lightPos"), position);
+	Renderer::s_shadow.SetVec3("lightPos", position);
 
-	SceneManager::GetCurrentScene()->RenderAllObjects(Renderer::GetCurrentProgramID());
+	Renderer::RenderAllObjects(Renderer::s_shadow);
 	glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

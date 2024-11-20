@@ -23,7 +23,8 @@ namespace Text2D
 
 		// Initialize Shader
 		Text2DShaderID = LoadShaders::LoadShaders("Assets/Shaders/textShader.vert", "Assets/Shaders/textShader.frag");
-		Renderer::UseProgram(Text2DShaderID);
+		glUseProgram(Text2DShaderID);
+
 		
 		// Initialize uniforms' IDs
 		Text2DUniformID = glGetUniformLocation(Text2DShaderID, "textShader");

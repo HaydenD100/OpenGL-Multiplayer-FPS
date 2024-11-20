@@ -25,9 +25,7 @@ namespace SceneManager
 		scenes[currentScene].Update(dt);
 	}
 	
-	void SceneManager::Render(GLuint programid) {
-		scenes[currentScene].RenderObjects(programid);
-	}
+
 
 	Scene* SceneManager::GetCurrentScene() {
 		return &scenes[currentScene];

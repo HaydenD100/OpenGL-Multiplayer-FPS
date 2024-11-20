@@ -12,8 +12,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
-#include "Engine/Core/Texture.h"
-#include "Engine/Core/Mesh.h"
+#include "Engine/Renderer/Texture.h"
+#include "Engine/Renderer/Mesh.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -40,7 +40,7 @@ public:
     std::vector<Mesh>* GetAllMeshes();
     Mesh* GetMesh(int i);
     size_t GetMeshSize();
-    void RenderModel(GLuint& programID);
+    void RenderModel(GLuint programID);
     void RenderAllMeshes(bool state);
     bool RenderAll();
     std::string GetName();

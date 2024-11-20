@@ -6,21 +6,21 @@
 #include "Engine/Audio/Audio.h"
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Core/GameObject.h"
-#include "Engine/Core/Renderer.h"
+#include "Engine/Renderer/Renderer.h"
 #include "Engine/Core/Camera.h"
 #include "Engine/Core/Camera.h"
 #include "Engine/Backend.h"
 #include "Engine/Game/Player.h"
 #include "Engine/Game/Door.h"
 #include "Engine/Game/Gun.h"
-#include "Engine/Core/Animation.h"
+#include "Engine/Animation/Animation.h"
 #include "Engine/Game/Door.h"
 #include "Engine/Game/Gun.h"
 #include "Engine/Game/Crate.h"
 #include "Engine/Core/Lights/Light.h"
 #include "Engine/Physics/BulletPhysics.h"
-#include "Engine/Core/Animation.h"
-#include "Engine/Core/SkinnedAnimatior.h"
+#include "Engine/Animation/Animation.h"
+#include "Engine/Animation/SkinnedAnimatior.h"
 #include "Engine/Pathfinding/Pathfinding.h"
 
  
@@ -31,8 +31,6 @@ public:
 
 	void Load();
 	void Update(float dt);
-	void RenderObjects(GLuint programid);
-	void RenderAllObjects(GLuint programid);
 
 	void AddGunPickUp(GunPickUp gunpickup);
 

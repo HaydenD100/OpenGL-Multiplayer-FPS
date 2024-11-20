@@ -6,9 +6,9 @@
 #include "Engine/Core/GameObject.h"
 #include "Engine/Game/Player.h"
 #include "Engine/Core/AssetManager.h"
-#include "Engine/Core/SkinnedAnimatior.h"
+#include "Engine/Animation/SkinnedAnimatior.h"
 
-#include "Engine/Core/Networking/NetworkManager.h"
+#include "Engine/Networking/NetworkManager.h"
 
 enum GunType
 {

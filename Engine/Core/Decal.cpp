@@ -46,7 +46,7 @@ glm::vec3 Decal::GetSize() {
 
 
 
-void Decal::RenderDecal(GLuint& programID) {
+void Decal::RenderDecal(GLuint programID) {
 	if (instancesModel.size() <= 0)
 		return;
 	glUseProgram(programID);

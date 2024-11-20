@@ -4,11 +4,11 @@
 #include "Backend.h"
 #include "Core/Scene/SceneManager.h"
 #include "Core/Scene/Scene.h"
-#include "Core/Renderer.h"
+#include "Renderer/Renderer.h"
 #include "Core/Input.h"
 #include "Core/Camera.h"
 #include "Core/UI/Text2D.h"
-#include "Core/Animation.h"
+#include "Animation/Animation.h"
 #include "Engine/Audio/Audio.h"
 
 

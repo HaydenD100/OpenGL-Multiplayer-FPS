@@ -1,7 +1,7 @@
 #include "GameObject.h"
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Physics/BulletPhysics.h"
-#include "Engine/Core/Networking/NetworkManager.h"
+#include "Engine/Networking/NetworkManager.h"
 
 #undef max
 
@@ -376,7 +376,7 @@ void GameObject::Update() {
 	transform.rotation = glm::eulerAngles(glm::quat(body->getWorldTransform().getRotation().w(), body->getWorldTransform().getRotation().x(), body->getWorldTransform().getRotation().y(), body->getWorldTransform().getRotation().z()));
 }
 
-void GameObject::RenderObject(GLuint& programID) {
+void GameObject::RenderObject(GLuint programID) {
 	if (!render)
 		return;
 	model->RenderModel(programID);

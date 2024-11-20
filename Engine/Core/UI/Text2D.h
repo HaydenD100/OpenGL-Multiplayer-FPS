@@ -5,7 +5,7 @@
 
 #include "Loaders/Loader.hpp"
 #include "Loaders/ShaderLoader.hpp"
-#include "Engine/Core/Renderer.h"
+#include "Engine/Renderer/Renderer.h"
 
 namespace Text2D
 {
