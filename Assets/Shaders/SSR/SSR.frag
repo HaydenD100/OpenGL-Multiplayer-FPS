@@ -18,13 +18,11 @@ const float step = 0.1;
 const float minRayStep = 0.1;
 const float maxSteps = 30;
 const int numBinarySearchSteps = 10;
-const float reflectionSpecularFalloffExponent = 3.0;
+const float reflectionSpecularFalloffExponent = 1.0;
 
 //Credits to imanolfotia for the code, you can find there video and the code at https://imanolfotia.com/blog/1
 
 
-#define Scale vec3(.8, .8, .8)
-#define K 19.19
 
 vec3 BinarySearch(inout vec3 dir, inout vec3 hitCoord, inout float dDepth)
 {
@@ -107,23 +105,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 }
 
 
-vec3 hash(vec3 a)
-{
-    a = fract(a * Scale);
-    a += dot(a, a.yxz + K);
-    return fract((a.xxy + a.yxx)*a.zyx);
-}
 
-vec3 stable_hash31(vec2 texCoords, float roughness)
-{
-   // Use stable inputs (TexCoords) to create a consistent seed
-   vec3 p3 = fract(vec3(vec3(texCoords,0) * Scale));  // Scale the texture coordinates for variation
-   p3 += dot(p3, p3.yzx + K);                 // Add complexity to the seed
-   vec3 jitter = fract((p3.xxy + p3.yzz) * p3.zyx);  // Generate the pseudo-random vector
-
-   // Scale jitter by roughness to vary effect based on surface roughness
-   return jitter * roughness;
-}
 
 void main()
 {
@@ -168,8 +150,6 @@ void main()
  
     // Get color
     vec3 SSR = textureLod(gFinal, coords.xy, 0).rgb * clamp(ReflectionMultiplier, 0.0, 0.9) * Fresnel;
-
-
 
 	gSSR = vec4(SSR,Metallic);
 }

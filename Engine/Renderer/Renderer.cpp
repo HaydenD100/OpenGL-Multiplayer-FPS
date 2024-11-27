@@ -112,8 +112,7 @@ namespace Renderer
 
 	GLuint FinalFrameFBO = 0;
 	GLuint FinalFrameTexture = 0;
-	GLuint SSR = 0;
-	GLuint SSR_Texture = 0;
+
 
 
 
@@ -618,8 +617,6 @@ namespace Renderer
 		//-------------------------------------------------SSR-------------------------
 		ssrBuffer.Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		
 		s_SSR.Use();
 		s_SSR.SetMat4("P", Camera::getProjectionMatrix());
 		s_SSR.SetMat4("V", Camera::getViewMatrix());

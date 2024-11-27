@@ -22,12 +22,12 @@ namespace Engine
 	int Engine::Run() {
 
 		NetworkManager::Init();
-		std::cout << "==================================CONNECT/HOST==============================================================================\n";
+		std::cout << "==================================CONNECT/HOST=========================================================================\n";
 		std::cout << "ENTER 0 to create/host a Game OR Type the IP of the server to join:";
 		char temp[255];
 		std::cin.getline(temp, sizeof(temp));
 		std::cout << "If you are hosting/creating a game for others outside of your network to join you remember to port forward PORT: " << DEFAULT_PORT << "\n";
-		std::cout << "============================================================================================================================\n";
+		std::cout << "=======================================================================================================================\n";
 
 		
 		if (temp[0] == '0')
