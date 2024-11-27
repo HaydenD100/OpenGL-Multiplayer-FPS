@@ -135,6 +135,18 @@
     <ClCompile Include="Engine\Renderer\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Renderer\Gbuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Renderer\BufferSSR.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Renderer\BufferLighting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Renderer\BufferSSAO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Scene\Scene.h">
@@ -266,6 +278,18 @@
     <ClInclude Include="Engine\Renderer\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Renderer\Gbuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\BufferSSR.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\BufferLighting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\BufferSSAO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\SkyBoxShader.vert" />
@@ -294,6 +318,12 @@
     <None Include="Assets\Shaders\Bloom\bloom.frag" />
     <None Include="Assets\Shaders\Debug\debug.frag" />
     <None Include="Assets\Shaders\Debug\debug.vert" />
+    <None Include="Assets\Shaders\Final\final.vert" />
+    <None Include="Assets\Shaders\Final\final.frag" />
+    <None Include="Assets\Shaders\SSR\SSR.frag" />
+    <None Include="Assets\Shaders\SSR\SSR.vert" />
+    <None Include="Assets\Shaders\PostProccess\post.frag" />
+    <None Include="Assets\Shaders\PostProccess\post.vert" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

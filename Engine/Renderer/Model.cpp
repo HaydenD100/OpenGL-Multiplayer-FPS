@@ -225,7 +225,7 @@ void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
 
         
 
-        std::cout << model_mesh.GetName() << "\n";
+       //std::cout << model_mesh.GetName() << "\n";
         meshes.push_back(model_mesh);
     }
     // then do the same for each of its children

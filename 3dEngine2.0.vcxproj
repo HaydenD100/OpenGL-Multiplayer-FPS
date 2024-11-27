@@ -160,6 +160,10 @@
     <ClCompile Include="Engine\Core\DecalInstance.cpp" />
     <ClCompile Include="Engine\Core\GameObject.cpp" />
     <ClCompile Include="Engine\Core\Input.cpp" />
+    <ClCompile Include="Engine\Renderer\BufferLighting.cpp" />
+    <ClCompile Include="Engine\Renderer\BufferSSAO.cpp" />
+    <ClCompile Include="Engine\Renderer\BufferSSR.cpp" />
+    <ClCompile Include="Engine\Renderer\Gbuffer.cpp" />
     <ClCompile Include="Engine\Renderer\Renderer.cpp" />
     <ClCompile Include="Engine\Core\Scene\Scene.cpp" />
     <ClCompile Include="Engine\Core\Scene\SceneManager.cpp" />
@@ -202,8 +206,12 @@
     <None Include="Assets\Shaders\Deffered\geomerty.vert" />
     <None Include="Assets\Shaders\Editor\Editor.frag" />
     <None Include="Assets\Shaders\Editor\Editor.vert" />
+    <None Include="Assets\Shaders\Final\final.frag" />
+    <None Include="Assets\Shaders\Final\final.vert" />
     <None Include="Assets\Shaders\Lighting\lighting.frag" />
     <None Include="Assets\Shaders\Lighting\lighting.vert" />
+    <None Include="Assets\Shaders\PostProccess\post.frag" />
+    <None Include="Assets\Shaders\PostProccess\post.vert" />
     <None Include="Assets\Shaders\Shadow\depth.frag" />
     <None Include="Assets\Shaders\Shadow\depth.geom" />
     <None Include="Assets\Shaders\Shadow\depth.vert" />
@@ -213,6 +221,8 @@
     <None Include="Assets\Shaders\SSAO\blur.vert" />
     <None Include="Assets\Shaders\SSAO\ssao.frag" />
     <None Include="Assets\Shaders\SSAO\ssao.vert" />
+    <None Include="Assets\Shaders\SSR\SSR.frag" />
+    <None Include="Assets\Shaders\SSR\SSR.vert" />
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.frag" />
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.vert" />
     <None Include="Assets\Shaders\Transparent\transparent.frag" />
@@ -233,6 +243,10 @@
     <ClInclude Include="Engine\Core\DecalInstance.h" />
     <ClInclude Include="Engine\Core\GameObject.h" />
     <ClInclude Include="Engine\Core\Input.h" />
+    <ClInclude Include="Engine\Renderer\BufferLighting.h" />
+    <ClInclude Include="Engine\Renderer\BufferSSAO.h" />
+    <ClInclude Include="Engine\Renderer\BufferSSR.h" />
+    <ClInclude Include="Engine\Renderer\Gbuffer.h" />
     <ClInclude Include="Engine\Renderer\Model.h" />
     <ClInclude Include="Engine\Renderer\Renderer.h" />
     <ClInclude Include="Engine\Core\Scene\Scene.h" />

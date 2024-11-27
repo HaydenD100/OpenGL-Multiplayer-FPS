@@ -100,21 +100,7 @@ float SkyBox::skyboxVertices[108] = {
 
 namespace Renderer
 {
-	GLuint gPosition;
-
-
-
-	GLuint ubo;
 	//deffered rendering stuff
-	GLuint FramebufferName = 0;
-	GLuint gPostion;
-	GLuint gNormal;
-	GLuint gAlbeido;
-	GLuint gPBR;
-
-
-	GLuint depthrenderbuffer = 0;
-	GLenum DrawBuffers[4] = { GL_COLOR_ATTACHMENT0,GL_COLOR_ATTACHMENT1,GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
 	GLuint quad_vertexbuffer;
 	GLuint depthTexture;
 
@@ -124,7 +110,12 @@ namespace Renderer
 	unsigned int noiseTexture;
 	unsigned int ssaoColorBuffer;
 
-	GLuint ssaoFBO = 0;
+	GLuint FinalFrameFBO = 0;
+	GLuint FinalFrameTexture = 0;
+	GLuint SSR = 0;
+	GLuint SSR_Texture = 0;
+
+
 
 	GLuint bloomFBO = 0;
 	GLuint bloomTexture;
@@ -138,6 +129,16 @@ namespace Renderer
 	Shader s_transparent;
 	Shader s_shadow;
 	Shader s_decal;
+	Shader s_final;
+	Shader s_SSR;
+	Shader s_Post;
+
+
+	GBuffer gbuffer;
+	BufferLighting lightingBuffer;
+	BufferSSAO ssaoBuffer;
+	BufferSSR ssrBuffer;
+	
 
 	//some objects will be withheld from rendering in the gemoetry render
 	std::vector<GameObject*> NeedRendering;
@@ -154,6 +155,9 @@ namespace Renderer
 		s_transparent.Load("Assets/Shaders/Transparent/transparent.vert", "Assets/Shaders/Transparent/transparent.frag");
 		s_shadow.Load("Assets/Shaders/Shadow/depth.vert", "Assets/Shaders/Shadow/depth.frag", "Assets/Shaders/Shadow/depth.geom");
 		s_decal.Load("Assets/Shaders/Decal/decal.vert", "Assets/Shaders/Decal/decal.frag");
+		s_final.Load("Assets/Shaders/Final/final.vert", "Assets/Shaders/Final/final.frag");
+		s_SSR.Load("Assets/Shaders/SSR/SSR.vert", "Assets/Shaders/SSR/SSR.frag");
+		s_Post.Load("Assets/Shaders/PostProccess/post.vert", "Assets/Shaders/PostProccess/post.frag");
 		//s_bloom.Load("Assets/Shaders/Bloom/bloom.vert", "Assets/Shaders/Bloom/bloom.frag");
 		//s_debug.Load("Assets/Shaders/Debug/debug.vert", "Assets/Shaders/Debug/debug.frag");
 
@@ -166,8 +170,9 @@ namespace Renderer
 		s_lighting.SetInt("gAlbeido", 2);
 		s_lighting.SetInt("gPBR", 3);
 		s_lighting.SetInt("ssaoTexture", 4);
+		s_lighting.SetInt("gFinal", 5);
 		for (int i = 0; i < 26; i++) {
-			s_lighting.SetInt("depthMap[" + std::to_string(i) + "]", 5 + i);
+			s_lighting.SetInt("depthMap[" + std::to_string(i) + "]", 6 + i);
 		}
 
 		s_skybox.Use();
@@ -203,6 +208,23 @@ namespace Renderer
 		s_decal.SetInt("decalNormal", 2);
 		s_decal.SetInt("gDepth", 3);
 		s_decal.SetVec2("resolution", glm::vec2(Backend::GetWidth(), Backend::GetHeight()));
+
+		s_Post.Use();
+		s_Post.SetInt("gLighting", 0);
+		s_Post.SetInt("gSSR", 1);
+
+		s_final.Use();
+		s_final.SetInt("gFinal", 0);
+
+		s_SSR.Use();
+		s_SSR.SetInt("gPostion", 0);
+		s_SSR.SetInt("gNormal", 1);
+		s_SSR.SetInt("gAlbedo", 2); 
+		s_SSR.SetInt("gFinal", 3);   
+		s_SSR.SetInt("gRMA", 4);    
+
+
+
 
 
 		std::cout << "Done loading shaders \n";
@@ -245,56 +267,10 @@ namespace Renderer
 		}
 
 		LoadAllShaders();
-
-		// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
-		glGenFramebuffers(1, &FramebufferName);
-		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-
-		glGenTextures(1, &gPosition);
-		glBindTexture(GL_TEXTURE_2D, gPosition);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, Backend::GetWidth(), Backend::GetHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-		glGenTextures(1, &gNormal);
-		glBindTexture(GL_TEXTURE_2D, gNormal);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Backend::GetWidth(), Backend::GetHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-		glGenTextures(1, &gAlbeido);
-		glBindTexture(GL_TEXTURE_2D, gAlbeido);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, Backend::GetWidth(), Backend::GetHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-		glGenTextures(1, &gPBR);
-		glBindTexture(GL_TEXTURE_2D, gPBR);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, Backend::GetWidth(), Backend::GetHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-		glGenTextures(1, &depthTexture);
-		glBindTexture(GL_TEXTURE_2D, depthTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, Backend::GetWidth(), Backend::GetHeight(), 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTexture, 0);
-		// Set "renderedTexture" as our colour attachement #0
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, gPosition, 0);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, gNormal, 0);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, gAlbeido, 0);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, gPBR, 0);
-
-		// Set the list of draw buffers.
-		glDrawBuffers(4, DrawBuffers); // "1" is the size of DrawBuffer
-
-
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-			std::cout << "problem \n";
+		gbuffer.Configure();
+		ssaoBuffer.Configure();
+		ssrBuffer.Configure();
+		lightingBuffer.Configure();
 
 		static const GLfloat g_quad_vertex_buffer_data[] = {
 		-1.0f, -1.0f, 0.0f,
@@ -310,7 +286,6 @@ namespace Renderer
 		glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
 
 
-
 		glGenTextures(1, &noiseTexture);
 		glBindTexture(GL_TEXTURE_2D, noiseTexture);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, 4, 4, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
@@ -319,27 +294,22 @@ namespace Renderer
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		glGenFramebuffers(1, &ssaoFBO);
-		glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 
-		glGenTextures(1, &ssaoColorBuffer);
-		glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, Backend::GetWidth(), Backend::GetHeight(), 0, GL_RED, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+		//TODO :: I hate this i wish i could just get it work in the gbuffer but ive spent to long trying to fix it 
+		glGenFramebuffers(1, &FinalFrameFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, FinalFrameFBO);
+		glGenTextures(1, &FinalFrameTexture);
+		glBindTexture(GL_TEXTURE_2D, FinalFrameTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, Backend::GetWidth(), Backend::GetHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
-
-		glGenFramebuffers(1, &bloomFBO);
-		glBindFramebuffer(GL_FRAMEBUFFER, bloomFBO);
-
-		glGenTextures(1, &bloomTexture);
-		glBindTexture(GL_TEXTURE_2D, bloomTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, Backend::GetWidth(), Backend::GetHeight(), 0, GL_RGB, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, FinalFrameTexture, 0);
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, bloomTexture, 0);
+		GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0};
+		glDrawBuffers(1, DrawBuffers);
+
+
 
 		return 0;
 	}
@@ -383,7 +353,7 @@ namespace Renderer
 
 		// Upload depth maps (cubemap for shadow mapping)
 		for (int i = 0; i < lights.size(); i++) {
-			glActiveTexture(GL_TEXTURE5 + i); // Activate texture unit i
+			glActiveTexture(GL_TEXTURE6 + i); // Activate texture unit i
 			glBindTexture(GL_TEXTURE_CUBE_MAP, lights[i].depthCubemap); // Bind the depth cubemap to the texture unit
 		}
 
@@ -435,9 +405,11 @@ namespace Renderer
 	}
 
 	void Renderer::RenderScene() {
+
+
 		glEnable(GL_DEPTH_TEST);
-		glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
-		glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
+
+		gbuffer.Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
@@ -486,7 +458,7 @@ namespace Renderer
 		glEnable(GL_BLEND);
 		s_decal.Use();
 		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, depthTexture);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.Depth);
 		s_decal.SetMat4("P", Camera::getProjectionMatrix());
 		s_decal.SetMat4("V", Camera::getViewMatrix());
 		s_decal.SetMat4("inverseV", glm::inverse(Camera::getViewMatrix()));
@@ -511,10 +483,11 @@ namespace Renderer
 			decal.RenderDecal(s_decal.GetShaderID());
 		}
 
+
+
 		//-----------------------------------------Transaprent stuff---------------------------------------
 		s_transparent.Use();
 		SetLights(SceneManager::GetCurrentScene()->getLights());
-
 
 		s_transparent.SetMat4("P", Camera::getProjectionMatrix());
 		s_transparent.SetMat4("V", Camera::getViewMatrix());
@@ -555,10 +528,14 @@ namespace Renderer
 			s_transparent.SetMat4("M", ModelMatrix);
 			NeedRendering[i]->RenderObject(s_transparent.GetShaderID());
 		}
+
+
 		glDisable(GL_BLEND);
 
 		//---------------------------------------------------Overlay-------------------------------------
 		s_geomerty.Use();
+
+
 
 		glClear(GL_DEPTH_BUFFER_BIT);
 		for (int i = 0; i < overlay.size(); i++) {
@@ -586,73 +563,111 @@ namespace Renderer
 			overlay[i]->RenderObject(s_geomerty.GetShaderID());
 		}
 
-		glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
-		glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
+		//glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//---------------------------------------------------SSAO-------------------------------------
+		ssaoBuffer.Bind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		s_ssao.Use();
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gPosition);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, gNormal);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gNormal);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, noiseTexture);
 		s_ssao.SetMat4("projection", Camera::getProjectionMatrix());		
 
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
-		glVertexAttribPointer(
-			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-		);
 
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glDisableVertexAttribArray(0);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+
+		RenderPlane();
 		//---------------------------------------------------Lighting-------------------------------------
+
+		lightingBuffer.Bind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		s_lighting.Use();
 		SetLights(SceneManager::GetCurrentScene()->getLights());
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gPosition);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, gNormal);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gNormal);
 		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, gAlbeido);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gAlbedo);
 		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, gPBR);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gRMA);
 		glActiveTexture(GL_TEXTURE4);
-		glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
+		glBindTexture(GL_TEXTURE_2D, ssaoBuffer.gSSAO);
+
+
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, FinalFrameTexture);
+
 		
 		s_lighting.SetVec3("viewPos", Camera::GetPosition());
 		s_lighting.SetMat4("inverseV", glm::inverse(Camera::getViewMatrix()));
 		s_lighting.SetMat4("V", Camera::getViewMatrix());
 		s_lighting.SetBool("isDead", Player::IsDead());
 
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
-		glVertexAttribPointer(
-			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-		);
+		RenderPlane();
 
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		glDisableVertexAttribArray(0);
+		//-------------------------------------------------SSR-------------------------
+		ssrBuffer.Bind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		
+		s_SSR.Use();
+		s_SSR.SetMat4("P", Camera::getProjectionMatrix());
+		s_SSR.SetMat4("V", Camera::getViewMatrix());
+		s_SSR.SetMat4("inverseV", glm::inverse(Camera::getViewMatrix()));
+		s_SSR.SetMat4("inverseP", glm::inverse(Camera::getProjectionMatrix()));
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gNormal);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gAlbedo);
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, lightingBuffer.gLighting);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gRMA);
+		RenderPlane();
+
+
+
+
+		//---------------------------------------------------Post-------------------------------------
+		
+
+		glBindFramebuffer(GL_FRAMEBUFFER, FinalFrameFBO);
+		glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+		s_Post.Use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, lightingBuffer.gLighting);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, ssrBuffer.gSSR);
+
+		RenderPlane();
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//--------------------------------------------------Final-------------------------------------
+
+		s_final.Use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, FinalFrameTexture);
+
+		RenderPlane();
+
 		glDisable(GL_DEPTH_TEST);
-
 
 	}
 
@@ -681,5 +696,21 @@ namespace Renderer
 		GLint currentProgramID;
 		glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgramID);
 		return currentProgramID;
+	}
+
+	void RenderPlane() {
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
+		glVertexAttribPointer(
+			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+			3,                  // size
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			0,                  // stride
+			(void*)0            // array buffer offset
+		);
+
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDisableVertexAttribArray(0);
 	}
 }

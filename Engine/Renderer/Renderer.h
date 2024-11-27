@@ -15,6 +15,10 @@
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Animation/SkinnedAnimatior.h"
 #include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/Gbuffer.h"
+#include "Engine/Renderer/BufferLighting.h"
+#include "Engine/Renderer/BufferSSAO.h"
+#include "Engine/Renderer/BufferSSR.h"
 
 
 
@@ -62,5 +66,6 @@ namespace Renderer
     // Shader
     void SetLights(std::vector<Light> lights);
     void RenderScene();
+    void RenderPlane();
 
 }

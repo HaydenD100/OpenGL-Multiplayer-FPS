@@ -1,5 +1,6 @@
 #version 430 core
-out vec4 FragColor;
+layout (location = 0) out vec4 gLighting;
+
 
 in vec2 UV;
 //becuase we are binding cubemaps per light and the max texture bindings is 32 we have to limit the lights to 26
@@ -10,6 +11,9 @@ uniform sampler2D gNormal;     // View-space normal
 uniform sampler2D gAlbeido;
 uniform sampler2D gPBR;
 uniform sampler2D ssaoTexture;
+
+uniform sampler2D gFinal; 
+
 
 uniform vec3 LightColors[MAXLIGHTS];
 uniform vec3 LightPositions_worldspace[MAXLIGHTS];
@@ -96,7 +100,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 void main() {
     float threshold = 0.0009; // Distance threshold
     if (length(UV - vec2(0.5, 0.5)) <= threshold) {
-        FragColor = vec4(1);
+        gLighting = vec4(1);
         return;
     }
 
@@ -108,14 +112,13 @@ void main() {
 
 
     vec3 albedo = texture(gAlbeido, UV).rgb;
-    float alpha = texture(gAlbeido, UV).a;
 
     float skybox = texture(gPBR, UV).z;
 
     if(skybox == 1){
         if(isDead)
             albedo = albedo  + vec3(1,-0.2,-0.2);
-        FragColor = vec4(albedo, 1);
+        gLighting = vec4(albedo, 1);
         return; // Stop further execution and write this color to the framebuffer
     }
 
@@ -132,6 +135,7 @@ void main() {
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
 
     vec3 Lo = vec3(0.0);
+    vec3 spec = vec3(0.0);
     for (int i = 0; i < MAXLIGHTS; ++i) {
         if (LightRadius[i] == 0) continue;
 
@@ -157,6 +161,8 @@ void main() {
         float shadow = ShadowCalculation(FragPos , i);
         //the 1.3 makes it a little brighter
         Lo += ((kD * albedo) * (1.0f - shadow) / PI + specular) * radiance * NdotL * (1.0f - shadow);
+        spec += specular * radiance * NdotL * (1.0 - shadow);
+
 
     }
 
@@ -169,5 +175,5 @@ void main() {
     if(isDead)
         color = color + vec3(1,-0.2,-0.2);
    
-    FragColor = vec4(color, alpha) + vec4(albedo * 0.2,1);
+    gLighting = vec4(color, spec) + vec4(albedo * 0.2,1);
 }

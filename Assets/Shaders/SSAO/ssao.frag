@@ -1,5 +1,5 @@
 #version 430 core
-out vec3 color;
+layout (location = 0) out vec3 color;
 
 
 in vec2 UV;

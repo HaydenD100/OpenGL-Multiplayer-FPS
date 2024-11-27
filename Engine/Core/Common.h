@@ -82,6 +82,8 @@ struct Transform{
 	}
 };
 
+void checkOpenGLError(const char* functionName);
+
 //LearnOpenGl code
 struct Plane
 {

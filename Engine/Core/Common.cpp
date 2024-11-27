@@ -239,3 +239,9 @@ double round_up(double value, int decimal_places) {
     return std::ceil(value * multiplier) / multiplier;
 }
 
+void checkOpenGLError(const char* functionName) {
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        std::cerr << "OpenGL Error in " << functionName << ": " << gluErrorString(error) << std::endl;
+    }
+}

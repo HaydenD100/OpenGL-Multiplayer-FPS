@@ -35,7 +35,9 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("wooden_floor", "Assets/Textures/wooden_floor.jpg", "Assets/Normals/wooden_floor_normal.jpg", 0.2, 0.2);
 	AssetManager::AddTexture("arm", "Assets/Textures/Arm_COL.png", "Assets/Normals/Arm_NOR.png", 0.7, 0);
 	AssetManager::AddTexture("brick", "Assets/Textures/brick.png", "Assets/Normals/bricks_normal.png", "Assets/Roughness/brick_roughness.png", 0);
-	AssetManager::AddTexture("sand_ground", "Assets/Textures/sand_ground.jpg", "Assets/Normals/sand_ground_normal.jpg", "Assets/Roughness/sand_ground_roughness.jpg", 0);
+	//AssetManager::AddTexture("sand_ground", "Assets/Textures/sand_ground.jpg", "Assets/Normals/sand_ground_normal.jpg", "Assets/Roughness/sand_ground_roughness.jpg", 0);
+	AssetManager::AddTexture("sand_ground", "Assets/Textures/brick.png", "Assets/Normals/test.jpg", 0.1f, 0.9f);
+
 
 	AssetManager::AddTexture("pallet", "Assets/Textures/pallet.png", "Assets/Normals/pallet_normal.png", "Assets/Roughness/pallet_roughness.png", "Assets/Metalic/pallet_metallic.png");
 	AssetManager::AddTexture("barrel", "Assets/Textures/barrel.jpg", "Assets/Normals/barrel_normal.jpg", "Assets/Roughness/barrel_roughness.jpg", "Assets/Metalic/barrel_metallic.jpg");

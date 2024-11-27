@@ -21,14 +21,6 @@ namespace Engine
 
 	int Engine::Run() {
 
-
-		std::filesystem::path cwd = std::filesystem::current_path();
-		std::ofstream file(cwd.string());
-		file.close();
-
-
-		std::cout << "Currently in: " << cwd << "\n";
-
 		NetworkManager::Init();
 		std::cout << "==================================CONNECT/HOST==============================================================================\n";
 		std::cout << "ENTER 0 to create/host a Game OR Type the IP of the server to join:";
@@ -42,9 +34,6 @@ namespace Engine
 			NetworkManager::InitServer();
 		else
 			NetworkManager::InitClient(temp);
-
-
-		
 
 		//init Engine comps
 		AssetManager::Init();
