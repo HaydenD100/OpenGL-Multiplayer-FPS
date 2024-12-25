@@ -1,5 +1,7 @@
 #pragma once
 #include "Engine/Core/Common.h"
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include <string>
 #include <string>
 #include <fstream>

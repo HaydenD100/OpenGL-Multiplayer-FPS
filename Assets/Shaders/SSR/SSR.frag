@@ -18,7 +18,7 @@ const float step = 0.1;
 const float minRayStep = 0.1;
 const float maxSteps = 30;
 const int numBinarySearchSteps = 10;
-const float reflectionSpecularFalloffExponent = 1.0;
+const float reflectionSpecularFalloffExponent = 0.0;
 
 //Credits to imanolfotia for the code, you can find there video and the code at https://imanolfotia.com/blog/1
 
@@ -36,7 +36,7 @@ vec3 BinarySearch(inout vec3 dir, inout vec3 hitCoord, inout float dDepth)
         projectedCoord = P * vec4(hitCoord, 1.0);
         projectedCoord.xy /= projectedCoord.w;
         projectedCoord.xy = projectedCoord.xy * 0.5 + 0.5;
- 
+        
         depth = textureLod(gPostion, projectedCoord.xy, 2).z;
 
  
@@ -149,6 +149,8 @@ void main()
                 -reflected.z;
  
     // Get color
+    vec2 texcoord = clamp(coords.xy,0,1);
+    vec3 SSR1 = texture(gFinal, texcoord).xyz * clamp(ReflectionMultiplier, 0.0, 0.9) * Fresnel;
     vec3 SSR = textureLod(gFinal, coords.xy, 0).rgb * clamp(ReflectionMultiplier, 0.0, 0.9) * Fresnel;
 
 	gSSR = vec4(SSR,Metallic);

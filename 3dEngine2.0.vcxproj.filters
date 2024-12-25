@@ -147,6 +147,18 @@
     <ClCompile Include="Engine\Renderer\BufferSSAO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Renderer\Texture3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Renderer\Probe.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Renderer\StorageBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Renderer\Bloom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Scene\Scene.h">
@@ -218,9 +230,6 @@
     <ClInclude Include="Engine\Renderer\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\shader_s.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Loaders\loader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -290,6 +299,18 @@
     <ClInclude Include="Engine\Renderer\BufferSSAO.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Renderer\Texture3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\Probe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\StorageBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Renderer\Bloom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\SkyBoxShader.vert" />
@@ -315,7 +336,7 @@
     <None Include="Assets\Shaders\Decal\decal.vert" />
     <None Include="Assets\Shaders\Decal\decal.frag" />
     <None Include="Assets\Shaders\Bloom\bloom.vert" />
-    <None Include="Assets\Shaders\Bloom\bloom.frag" />
+    <None Include="Assets\Shaders\Bloom\downscale.frag" />
     <None Include="Assets\Shaders\Debug\debug.frag" />
     <None Include="Assets\Shaders\Debug\debug.vert" />
     <None Include="Assets\Shaders\Final\final.vert" />
@@ -324,6 +345,18 @@
     <None Include="Assets\Shaders\SSR\SSR.vert" />
     <None Include="Assets\Shaders\PostProccess\post.frag" />
     <None Include="Assets\Shaders\PostProccess\post.vert" />
+    <None Include="Assets\Shaders\Voxel\voxel.vert" />
+    <None Include="Assets\Shaders\Voxel\voxel.frag" />
+    <None Include="Assets\Shaders\Voxel\voxel_display.vert" />
+    <None Include="Assets\Shaders\Voxel\voxel_display.frag" />
+    <None Include="Assets\Shaders\Voxel\voxel.geom" />
+    <None Include="Assets\Shaders\GI\probe.vert" />
+    <None Include="Assets\Shaders\GI\probe.frag" />
+    <None Include="Assets\Shaders\GI\irradiance.vert" />
+    <None Include="Assets\Shaders\GI\irradiance.frag" />
+    <None Include="Assets\Shaders\GI\renderProbes.vert" />
+    <None Include="Assets\Shaders\GI\renderProbes.frag" />
+    <None Include="Assets\Shaders\Bloom\upscale.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

@@ -19,6 +19,11 @@
 #include "Engine/Renderer/BufferLighting.h"
 #include "Engine/Renderer/BufferSSAO.h"
 #include "Engine/Renderer/BufferSSR.h"
+#include "Engine/Renderer/Texture3D.h"
+#include "Engine/Renderer/Probe.h"
+#include "Engine/Renderer/StorageBuffer.h"
+
+
 
 
 
@@ -30,9 +35,53 @@ public:
     unsigned int GetTextureID();
     unsigned int GetSkyBoxVAO();
 private:
+	float skyboxVertices[108] =  {
+		// positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+	};
+
     unsigned int textureID;
     unsigned int skyboxVAO, skyboxVBO;
-    static float skyboxVertices[108];
 };
 
 namespace Renderer
@@ -45,6 +94,15 @@ namespace Renderer
     extern Shader s_transparent;
     extern Shader s_shadow;
     extern Shader s_decal;
+	extern ProbeGrid probeGrid;
+	extern Shader s_probe;
+	extern Shader s_probeRender;
+	extern Shader s_probeirradiance;
+	extern StorageBuffer SHBuffer;
+	extern Texture3D probeTexture;
+
+
+
     int init();
     void LoadAllShaders();
 
@@ -69,3 +127,4 @@ namespace Renderer
     void RenderPlane();
 
 }
+

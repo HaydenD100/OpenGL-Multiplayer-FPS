@@ -21,6 +21,8 @@ namespace Engine
 
 	int Engine::Run() {
 
+
+		
 		NetworkManager::Init();
 		std::cout << "==================================CONNECT/HOST=========================================================================\n";
 		std::cout << "ENTER 0 to create/host a Game OR Type the IP of the server to join:";
@@ -48,8 +50,7 @@ namespace Engine
 		SceneManager::CreateScene(basicScene);
 		float startLoadTime = glfwGetTime();
 		SceneManager::LoadScene(0);
-		float endLoadTime = glfwGetTime() - startLoadTime;
-		std::cout << "Load took " << endLoadTime << "s \n";
+
 		//EditorManager::Init();
 
 		// For speed computation
@@ -62,6 +63,14 @@ namespace Engine
 		NetworkManager::LoadedIn();
 		NetworkManager::SendControl(CONNECTED);
 		NetworkManager::SendPackets();
+
+
+		//--------------------------------------------PROBE-------------------------------------------	
+		Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->getLights());
+
+
+		float endLoadTime = glfwGetTime() - startLoadTime;
+		std::cout << "Load took " << endLoadTime << "s \n";
 
 		while (Backend::IsWindowOpen()) {
 
@@ -82,6 +91,8 @@ namespace Engine
 			//Reloads Shaders
 			if (Input::KeyDown('h'))
 				Renderer::LoadAllShaders();
+			if(Input::KeyDown('j'))
+				Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->getLights());
 				
 			NetworkManager::EvaulatePackets();
 				

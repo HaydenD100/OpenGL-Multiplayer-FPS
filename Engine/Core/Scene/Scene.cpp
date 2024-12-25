@@ -12,6 +12,7 @@ void Scene::LoadAssets() {
 	AnimationManager::ClearAnimations();
 	//Thank you to tokyosplif for some of the models and sounds
 
+	AssetManager::AddTexture("normal", "Assets/Textures/uvmap.png", "Assets/Normals/no_normal.png", 0.0,0.0);
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
 	AssetManager::AddTexture("red_glass", "Assets/Textures/red_glass.png", 0.1, 0.9);
 	AssetManager::AddTexture("green_glass", "Assets/Textures/green_glass.png", 0.1, 0.9);
@@ -40,6 +41,7 @@ void Scene::LoadAssets() {
 
 
 	AssetManager::AddTexture("pallet", "Assets/Textures/pallet.png", "Assets/Normals/pallet_normal.png", "Assets/Roughness/pallet_roughness.png", "Assets/Metalic/pallet_metallic.png");
+	AssetManager::GetTexture("pallet")->SetEmissive(true);
 	AssetManager::AddTexture("barrel", "Assets/Textures/barrel.jpg", "Assets/Normals/barrel_normal.jpg", "Assets/Roughness/barrel_roughness.jpg", "Assets/Metalic/barrel_metallic.jpg");
 	AssetManager::AddTexture("cargo_crate", "Assets/Textures/cargo_crate.jpg", "Assets/Normals/cargo_crate_normal.jpg", "Assets/Roughness/cargo_crate_roughness.jpg", "Assets/Metalic/cargo_crate_metallic.jpg");
 	AssetManager::AddTexture("knife", "Assets/Textures/knife.png", "Assets/Normals/knife_normal.png", "Assets/Roughness/knife_roughness.png", "Assets/Metalic/knife_metallic.png");
@@ -70,6 +72,12 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("swat", Model("Assets/Objects/FBX/swat_death.dae", AssetManager::GetTexture("uvmap")));
 	
 	AssetManager::AddModel("playertwo", Model("Assets/Objects/FBX/bean_death.dae","Assets/Objects/player_mesh.obj", AssetManager::GetTexture("uvmap")));
+
+
+	
+	AssetManager::AddModel("probe", Model("Assets/Objects/FBX/probe.fbx", AssetManager::GetTexture("uvmap")));
+	AssetManager::AddModel("cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("uvmap")));
+
 
 
 	AssetManager::AddModel("fence1", Model("Assets/Objects/fence1.fbx", AssetManager::GetTexture("concrete")));
@@ -179,7 +187,7 @@ void Scene::Load() {
 			"Assets/Skybox/daylight/back.png"
 	};
 	sky = SkyBox(faces);
-
+	/*
 	{
 		Light light(glm::vec3(13.4, 4, -9), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35, 0.44);
 		lights.push_back(light);
@@ -204,6 +212,8 @@ void Scene::Load() {
 		Light light(glm::vec3(3.88, 4, -7), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35,	0.44);
 		lights.push_back(light);
 	}
+	*/
+
 	{
 		Light light(glm::vec3(7, 15, -2), glm::vec3(1, 0.922, 0.753) * 10.0f, 0.09, 0.0320);
 		lights.push_back(light);
@@ -226,6 +236,8 @@ void Scene::Load() {
 	//PathFinding::Init();
 
 	glBindVertexArray(sky.GetSkyBoxVAO());
+
+
 }
 
 void Scene::Update(float deltaTime) {

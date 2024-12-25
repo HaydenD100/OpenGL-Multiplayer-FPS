@@ -272,6 +272,7 @@ bool Model::RenderAll() {
 
 void Model::RenderModel(GLuint programID) {
 
+
     if (renderAllMeshes)
     {
         for (int i = 0; i < meshes.size(); i++)
@@ -279,6 +280,7 @@ void Model::RenderModel(GLuint programID) {
     }
     else
         meshes[currentMesh].Render(programID);
+
 }
 size_t Model::GetColliderShapeVerticiesSize() {
     return collison_shape_vertices.size();

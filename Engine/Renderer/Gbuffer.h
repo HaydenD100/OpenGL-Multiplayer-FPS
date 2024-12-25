@@ -15,10 +15,10 @@ public:
 	void Configure();
 	unsigned int GetID();
 	
-	unsigned int gAlbedo, gNormal, gPosition, gRMA, Depth;
+	unsigned int gAlbedo, gNormal, gTrueNormal, gPosition, gRMA, gEmission, Depth;
 
 private:
-	const static int attachments = 4;
-	GLenum DrawBuffers[attachments] = { GL_COLOR_ATTACHMENT0,GL_COLOR_ATTACHMENT1,GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
+	const static int attachments = 6;
+	GLenum DrawBuffers[attachments] = { GL_COLOR_ATTACHMENT0,GL_COLOR_ATTACHMENT1,GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5 };
 	unsigned int ID = 0;
 };

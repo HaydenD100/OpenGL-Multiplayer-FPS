@@ -160,6 +160,7 @@
     <ClCompile Include="Engine\Core\DecalInstance.cpp" />
     <ClCompile Include="Engine\Core\GameObject.cpp" />
     <ClCompile Include="Engine\Core\Input.cpp" />
+    <ClCompile Include="Engine\Renderer\Bloom.cpp" />
     <ClCompile Include="Engine\Renderer\BufferLighting.cpp" />
     <ClCompile Include="Engine\Renderer\BufferSSAO.cpp" />
     <ClCompile Include="Engine\Renderer\BufferSSR.cpp" />
@@ -168,6 +169,7 @@
     <ClCompile Include="Engine\Core\Scene\Scene.cpp" />
     <ClCompile Include="Engine\Core\Scene\SceneManager.cpp" />
     <ClCompile Include="Engine\Renderer\Shader.cpp" />
+    <ClCompile Include="Engine\Renderer\StorageBuffer.cpp" />
     <ClCompile Include="Engine\Renderer\Texture.cpp" />
     <ClCompile Include="Engine\Core\UI\Text2D.cpp" />
     <ClCompile Include="Engine\Debug\DebugDrawer.cpp" />
@@ -193,11 +195,14 @@
     <ClCompile Include="Engine\Animation\SkinnedAnimation.cpp" />
     <ClCompile Include="Engine\Core\RagDoll.cpp" />
     <ClCompile Include="Engine\Networking\NetworkManager.cpp" />
+    <ClCompile Include="Engine\Renderer\Texture3D.cpp" />
+    <ClCompile Include="Engine\Renderer\Probe.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Saves\mainScene.json" />
-    <None Include="Assets\Shaders\Bloom\bloom.frag" />
+    <None Include="Assets\Shaders\Bloom\downscale.frag" />
     <None Include="Assets\Shaders\Bloom\bloom.vert" />
+    <None Include="Assets\Shaders\Bloom\upscale.frag" />
     <None Include="Assets\Shaders\Debug\debug.frag" />
     <None Include="Assets\Shaders\Debug\debug.vert" />
     <None Include="Assets\Shaders\Decal\decal.frag" />
@@ -208,6 +213,12 @@
     <None Include="Assets\Shaders\Editor\Editor.vert" />
     <None Include="Assets\Shaders\Final\final.frag" />
     <None Include="Assets\Shaders\Final\final.vert" />
+    <None Include="Assets\Shaders\GI\irradiance.frag" />
+    <None Include="Assets\Shaders\GI\irradiance.vert" />
+    <None Include="Assets\Shaders\GI\probe.frag" />
+    <None Include="Assets\Shaders\GI\probe.vert" />
+    <None Include="Assets\Shaders\GI\renderProbes.frag" />
+    <None Include="Assets\Shaders\GI\renderProbes.vert" />
     <None Include="Assets\Shaders\Lighting\lighting.frag" />
     <None Include="Assets\Shaders\Lighting\lighting.vert" />
     <None Include="Assets\Shaders\PostProccess\post.frag" />
@@ -227,6 +238,11 @@
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.vert" />
     <None Include="Assets\Shaders\Transparent\transparent.frag" />
     <None Include="Assets\Shaders\Transparent\transparent.vert" />
+    <None Include="Assets\Shaders\Voxel\voxel.frag" />
+    <None Include="Assets\Shaders\Voxel\voxel.geom" />
+    <None Include="Assets\Shaders\Voxel\voxel.vert" />
+    <None Include="Assets\Shaders\Voxel\voxel_display.frag" />
+    <None Include="Assets\Shaders\Voxel\voxel_display.vert" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />
@@ -243,6 +259,7 @@
     <ClInclude Include="Engine\Core\DecalInstance.h" />
     <ClInclude Include="Engine\Core\GameObject.h" />
     <ClInclude Include="Engine\Core\Input.h" />
+    <ClInclude Include="Engine\Renderer\Bloom.h" />
     <ClInclude Include="Engine\Renderer\BufferLighting.h" />
     <ClInclude Include="Engine\Renderer\BufferSSAO.h" />
     <ClInclude Include="Engine\Renderer\BufferSSR.h" />
@@ -251,8 +268,8 @@
     <ClInclude Include="Engine\Renderer\Renderer.h" />
     <ClInclude Include="Engine\Core\Scene\Scene.h" />
     <ClInclude Include="Engine\Core\Scene\SceneManager.h" />
-    <ClInclude Include="Engine\Core\shader_s.h" />
     <ClInclude Include="Engine\Renderer\Shader.h" />
+    <ClInclude Include="Engine\Renderer\StorageBuffer.h" />
     <ClInclude Include="Engine\Renderer\Texture.h" />
     <ClInclude Include="Engine\Core\UI\Text2D.h" />
     <ClInclude Include="Engine\Core\UI\UI.h" />
@@ -279,6 +296,8 @@
     <ClInclude Include="Engine\Animation\SkinnedAnimation.h" />
     <ClInclude Include="Engine\Core\RagDoll.h" />
     <ClInclude Include="Engine\Networking\NetworkManager.h" />
+    <ClInclude Include="Engine\Renderer\Texture3D.h" />
+    <ClInclude Include="Engine\Renderer\Probe.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="github\screenshots\3DEngine.png" />

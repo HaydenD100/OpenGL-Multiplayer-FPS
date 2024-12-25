@@ -12,7 +12,7 @@ public:
 
 	void Bind();
 	void Destroy();
-	void Configure();
+	void Configure(int width, int height);
 	unsigned int GetID();
 
 	unsigned int gSSR, Depth;

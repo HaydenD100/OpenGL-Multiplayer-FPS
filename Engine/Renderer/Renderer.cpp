@@ -53,50 +53,6 @@ unsigned int SkyBox::GetSkyBoxVAO() {
 	return skyboxVAO;
 }
 
-float SkyBox::skyboxVertices[108] = {
-	// positions          
-	-1.0f,  1.0f, -1.0f,
-	-1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-	 1.0f,  1.0f, -1.0f,
-	-1.0f,  1.0f, -1.0f,
-
-	-1.0f, -1.0f,  1.0f,
-	-1.0f, -1.0f, -1.0f,
-	-1.0f,  1.0f, -1.0f,
-	-1.0f,  1.0f, -1.0f,
-	-1.0f,  1.0f,  1.0f,
-	-1.0f, -1.0f,  1.0f,
-
-	 1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-
-	-1.0f, -1.0f,  1.0f,
-	-1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f, -1.0f,  1.0f,
-	-1.0f, -1.0f,  1.0f,
-
-	-1.0f,  1.0f, -1.0f,
-	 1.0f,  1.0f, -1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	-1.0f,  1.0f,  1.0f,
-	-1.0f,  1.0f, -1.0f,
-
-	-1.0f, -1.0f, -1.0f,
-	-1.0f, -1.0f,  1.0f,
-	 1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-	-1.0f, -1.0f,  1.0f,
-	 1.0f, -1.0f,  1.0f
-};
 
 namespace Renderer
 {
@@ -114,6 +70,10 @@ namespace Renderer
 	GLuint FinalFrameTexture = 0;
 
 
+	GLuint testFBO = 0;
+	GLuint testTexture;
+	GLuint testDepth;
+	GLenum DrawBuffersTest[1] = { GL_COLOR_ATTACHMENT0 };
 
 
 	GLuint bloomFBO = 0;
@@ -131,12 +91,31 @@ namespace Renderer
 	Shader s_final;
 	Shader s_SSR;
 	Shader s_Post;
+	Shader s_voxel;
+	Shader s_voxel_display;
+	Shader s_probe;
+	Shader s_probeRender;
+	Shader s_probeirradiance;
+
+	Shader s_downScale;
+	Shader s_upScale;
+
+
+	StorageBuffer SHBuffer;
+	Texture3D probeTexture;
+
 
 
 	GBuffer gbuffer;
+
+
 	BufferLighting lightingBuffer;
 	BufferSSAO ssaoBuffer;
 	BufferSSR ssrBuffer;
+
+	ProbeGrid probeGrid;
+
+
 	
 
 	//some objects will be withheld from rendering in the gemoetry render
@@ -146,10 +125,11 @@ namespace Renderer
 
 	void Renderer::LoadAllShaders() {
 		
-		s_lighting.Load("Assets/Shaders/Lighting/lighting.vert", "Assets/Shaders/Lighting/lighting.frag");
+
 		s_skybox.Load("Assets/Shaders/SkyBoxShader.vert", "Assets/Shaders/SkyBoxShader.frag");
 		s_geomerty.Load("Assets/Shaders/Deffered/geomerty.vert", "Assets/Shaders/Deffered/geomerty.frag");
 		s_ssao.Load("Assets/Shaders/SSAO/ssao.vert", "Assets/Shaders/SSAO/ssao.frag");
+
 		s_screen.Load("Assets/Shaders/Texture_Render/Texture_Render.vert", "Assets/Shaders/Texture_Render/Texture_Render.frag");
 		s_transparent.Load("Assets/Shaders/Transparent/transparent.vert", "Assets/Shaders/Transparent/transparent.frag");
 		s_shadow.Load("Assets/Shaders/Shadow/depth.vert", "Assets/Shaders/Shadow/depth.frag", "Assets/Shaders/Shadow/depth.geom");
@@ -157,22 +137,26 @@ namespace Renderer
 		s_final.Load("Assets/Shaders/Final/final.vert", "Assets/Shaders/Final/final.frag");
 		s_SSR.Load("Assets/Shaders/SSR/SSR.vert", "Assets/Shaders/SSR/SSR.frag");
 		s_Post.Load("Assets/Shaders/PostProccess/post.vert", "Assets/Shaders/PostProccess/post.frag");
-		//s_bloom.Load("Assets/Shaders/Bloom/bloom.vert", "Assets/Shaders/Bloom/bloom.frag");
-		//s_debug.Load("Assets/Shaders/Debug/debug.vert", "Assets/Shaders/Debug/debug.frag");
+		s_probe.Load("Assets/Shaders/GI/probe.vert", "Assets/Shaders/GI/probe.frag");
+		s_probeRender.Load("Assets/Shaders/GI/renderProbes.vert", "Assets/Shaders/GI/renderProbes.frag");
+		s_probeirradiance.Load("Assets/Shaders/GI/irradiance.vert", "Assets/Shaders/GI/irradiance.frag");
+		s_lighting.Load("Assets/Shaders/Lighting/lighting.vert", "Assets/Shaders/Lighting/lighting.frag");
+		s_downScale.Load("Assets/Shaders/Bloom/bloom.vert", "Assets/Shaders/Bloom/downscale.frag");
+		s_upScale.Load("Assets/Shaders/Bloom/bloom.vert", "Assets/Shaders/Bloom/upscale.frag");
 
 
 
 
+
+		
 		s_lighting.Use();
-		s_lighting.SetInt("gPostion", 0);
-		s_lighting.SetInt("gNormal", 1);
-		s_lighting.SetInt("gAlbeido", 2);
-		s_lighting.SetInt("gPBR", 3);
-		s_lighting.SetInt("ssaoTexture", 4);
-		s_lighting.SetInt("gFinal", 5);
+
+
 		for (int i = 0; i < 26; i++) {
-			s_lighting.SetInt("depthMap[" + std::to_string(i) + "]", 6 + i);
+			s_lighting.SetInt("depthMap[" + std::to_string(i) + "]", 8 + i);
 		}
+
+
 
 		s_skybox.Use();
 		s_skybox.SetInt("skybox", 0);
@@ -191,6 +175,8 @@ namespace Renderer
 		s_geomerty.SetInt("NormalTextureSampler", 1);
 		s_geomerty.SetInt("RoughnessTextureSampler", 2);
 		s_geomerty.SetInt("MetalicTextureSampler", 3);
+		s_geomerty.SetInt("DefaultNormal", 4);
+
 
 		s_ssao.Use();
 		for (size_t i = 0; i < ssaoKernel.size(); i++) {
@@ -198,13 +184,12 @@ namespace Renderer
 		}
 		s_ssao.SetFloat("ScreenWidth", Backend::GetWidth());
 		s_ssao.SetFloat("ScreenHeight", Backend::GetHeight());
-		s_ssao.SetInt("gPostion", 0);
+		s_ssao.SetInt("gPosition", 0);
 		s_ssao.SetInt("gNormal", 1);
 		s_ssao.SetInt("texNoise", 2);
 
 		s_decal.Use();
 		s_decal.SetInt("decalTexture", 1);
-		s_decal.SetInt("decalNormal", 2);
 		s_decal.SetInt("gDepth", 3);
 		s_decal.SetVec2("resolution", glm::vec2(Backend::GetWidth(), Backend::GetHeight()));
 
@@ -222,8 +207,14 @@ namespace Renderer
 		s_SSR.SetInt("gFinal", 3);   
 		s_SSR.SetInt("gRMA", 4);    
 
-
-
+		s_probe.Use();
+		for (int i = 0; i < 26; i++) {
+			s_probe.SetInt("depthMap[" + std::to_string(i) + "]", 4 + i);
+		}
+		s_probe.SetInt("diffuse", 0);
+		s_probe.SetInt("normal", 1);
+		s_probe.SetInt("roughness", 2);
+		s_probe.SetInt("metalic", 3);
 
 
 		std::cout << "Done loading shaders \n";
@@ -265,10 +256,14 @@ namespace Renderer
 			ssaoNoise.push_back(noise);
 		}
 
+
+
 		LoadAllShaders();
+
+
 		gbuffer.Configure();
 		ssaoBuffer.Configure();
-		ssrBuffer.Configure();
+		ssrBuffer.Configure(Backend::GetWidth(), Backend::GetHeight());
 		lightingBuffer.Configure();
 
 		static const GLfloat g_quad_vertex_buffer_data[] = {
@@ -309,6 +304,12 @@ namespace Renderer
 		glDrawBuffers(1, DrawBuffers);
 
 
+		//this is the projection to voxlize the scene from orgin (0,0,0) while the other one is the view of the camera
+		//voxel_orth = glm::ortho(-((float)voxelize_scene_albedo.GetWidth() / 2.0f), (float)voxelize_scene_albedo.GetWidth() / 2.0f, (float)voxelize_scene_albedo.GetWidth() / 2.0f, -((float)voxelize_scene_albedo.GetWidth() / 2.0f), -(float)voxelize_scene_albedo.GetWidth()/2.0f, (float)voxelize_scene_albedo.GetWidth()/2.0f);
+		float spacing = 1;
+		probeTexture.Create(glm::ceil(25 * 1/ spacing), glm::ceil(5 * 1 / spacing), glm::ceil(30 * 1 / spacing));
+		probeGrid.Configure(25,5,30, spacing, glm::vec3(-6,1,-14));
+		SHBuffer.Configure(probeGrid.probes.size() * sizeof(glm::mat3) * 3 + probeGrid.probes.size() * 256 * sizeof(float));
 
 		return 0;
 	}
@@ -338,7 +339,6 @@ namespace Renderer
 			LightOuterCutOff.push_back(light.outercutoff);
 		}
 
-		
 
 		s_lighting.SetVec3Array("LightPositions_worldspace", lightPositions);
 		s_lighting.SetVec3Array("Lightdirection", lightDirection);
@@ -349,12 +349,12 @@ namespace Renderer
 		s_lighting.SetFloatArray("LightCutOff", LightCutoff);
 		s_lighting.SetFloatArray("LightOuterCutOff", LightOuterCutOff);
 
-
 		// Upload depth maps (cubemap for shadow mapping)
 		for (int i = 0; i < lights.size(); i++) {
-			glActiveTexture(GL_TEXTURE6 + i); // Activate texture unit i
+			glActiveTexture(GL_TEXTURE8 + i); // Activate texture unit i
 			glBindTexture(GL_TEXTURE_CUBE_MAP, lights[i].depthCubemap); // Bind the depth cubemap to the texture unit
 		}
+
 
 	}
 	
@@ -406,16 +406,23 @@ namespace Renderer
 	void Renderer::RenderScene() {
 
 
-		glEnable(GL_DEPTH_TEST);
 
+		//--------------------------------------------PROBE-------------------------------------------	
+		//Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->getLights());
+
+		//-------------------------------------------GBUFFER-----------------------------------------
+
+		glEnable(GL_DEPTH_TEST);
 		gbuffer.Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
 
 		s_geomerty.Use();
 		s_geomerty.SetMat4("P", Camera::getProjectionMatrix());
 		s_geomerty.SetMat4("V", Camera::getViewMatrix());
+
+		glBindTextureUnit(4, AssetManager::GetTexture("normal")->GetTextureNormal());
+
 
 		NeedRendering.clear();
 		glm::mat4 ViewMatrix = Camera::getViewMatrix();
@@ -453,6 +460,11 @@ namespace Renderer
 			gameobjectRender->RenderObject(s_geomerty.GetShaderID());
 		}
 
+
+
+		if(Input::KeyDown('g'))
+			probeGrid.ShowProbes();
+
 		//-----------------------------------------Decal---------------------------------------
 		glEnable(GL_BLEND);
 		s_decal.Use();
@@ -481,12 +493,12 @@ namespace Renderer
 			s_decal.SetVec3("size", size);
 			decal.RenderDecal(s_decal.GetShaderID());
 		}
-
-
-
+		
 		//-----------------------------------------Transaprent stuff---------------------------------------
 		s_transparent.Use();
-		SetLights(SceneManager::GetCurrentScene()->getLights());
+
+		//SetLights(SceneManager::GetCurrentScene()->getLights());
+
 
 		s_transparent.SetMat4("P", Camera::getProjectionMatrix());
 		s_transparent.SetMat4("V", Camera::getViewMatrix());
@@ -531,10 +543,10 @@ namespace Renderer
 
 		glDisable(GL_BLEND);
 
+
+
 		//---------------------------------------------------Overlay-------------------------------------
 		s_geomerty.Use();
-
-
 
 		glClear(GL_DEPTH_BUFFER_BIT);
 		for (int i = 0; i < overlay.size(); i++) {
@@ -562,12 +574,10 @@ namespace Renderer
 			overlay[i]->RenderObject(s_geomerty.GetShaderID());
 		}
 
-		//glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
-		//glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//---------------------------------------------------SSAO-------------------------------------
 		ssaoBuffer.Bind();
+		glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		s_ssao.Use();
@@ -601,16 +611,21 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gRMA);
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, ssaoBuffer.gSSAO);
-
-
 		glActiveTexture(GL_TEXTURE5);
-		glBindTexture(GL_TEXTURE_2D, FinalFrameTexture);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gTrueNormal);
+
+		SHBuffer.Bind(7);
+		probeTexture.Bind(6);
 
 		
 		s_lighting.SetVec3("viewPos", Camera::GetPosition());
 		s_lighting.SetMat4("inverseV", glm::inverse(Camera::getViewMatrix()));
 		s_lighting.SetMat4("V", Camera::getViewMatrix());
 		s_lighting.SetBool("isDead", Player::IsDead());
+		s_lighting.SetVec3("gridWorldPos", probeGrid.postion);
+		s_lighting.SetVec3("volume", probeGrid.volume);
+		s_lighting.SetFloat("spacing", probeGrid.spacing);
+
 
 		RenderPlane();
 
@@ -649,6 +664,9 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, lightingBuffer.gLighting);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, ssrBuffer.gSSR);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gEmission);
+
 
 		RenderPlane();
 
@@ -660,7 +678,7 @@ namespace Renderer
 
 		s_final.Use();
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, FinalFrameTexture);
+		glBindTexture(GL_TEXTURE_2D, FinalFrameTexture); //FinalFrameTexture);
 
 		RenderPlane();
 

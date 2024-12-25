@@ -228,6 +228,11 @@ float Texture::GetRoughness() {
 float Texture::GetMetalic() {
     return metalic;
 }
+bool Texture::IsEmissive() {
+    return IsEmisive;
+}
+void Texture::SetEmissive(bool state) {
+    IsEmisive = state;
+}
 
-//int Texture::CurrentTextureNumber = GL_TEXTURE1;
 

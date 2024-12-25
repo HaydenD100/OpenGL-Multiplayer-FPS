@@ -24,6 +24,9 @@ public:
     GLuint GetTextureMetalic();
     float GetRoughness();
     float GetMetalic();
+    bool IsEmissive();
+    void SetEmissive(bool state);
+
 
 
 
@@ -37,6 +40,7 @@ private:
 
     float roughness = -1;
     float metalic = -1;
+    bool IsEmisive = false;
 
 
 };

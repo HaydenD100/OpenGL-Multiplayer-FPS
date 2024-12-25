@@ -191,17 +191,18 @@ void Mesh::Render(GLuint programID) {
         currentTexture = AssetManager::GetMissingTexture();
     }
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, currentTexture->GetTexture());
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, currentTexture->GetTextureNormal());
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, currentTexture->GetTextureRoughness());
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, currentTexture->GetTextureMetalic());
+    glBindTextureUnit(0, currentTexture->GetTexture());
+    glBindTextureUnit(1, currentTexture->GetTextureNormal());
+    glBindTextureUnit(2, currentTexture->GetTextureRoughness());
+    glBindTextureUnit(3, currentTexture->GetTextureMetalic());
 
     glUniform1f(glGetUniformLocation(programID, "Roughness"), currentTexture->GetRoughness());
     glUniform1f(glGetUniformLocation(programID, "Metalic"), currentTexture->GetMetalic());
+
+    glUniform1i(glGetUniformLocation(programID, "IsEmissive"), currentTexture->IsEmissive());
+
+
+
 
     // 1st attribute buffer : vertices
     glEnableVertexAttribArray(0);

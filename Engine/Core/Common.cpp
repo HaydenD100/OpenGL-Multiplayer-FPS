@@ -245,3 +245,10 @@ void checkOpenGLError(const char* functionName) {
         std::cerr << "OpenGL Error in " << functionName << ": " << gluErrorString(error) << std::endl;
     }
 }
+
+void checkOpenGLError() {
+    GLenum error = glGetError();
+    if (error != GL_NO_ERROR) {
+        std::cerr << "OpenGL Error " << gluErrorString(error) << std::endl;
+    }
+}
