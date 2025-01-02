@@ -98,6 +98,8 @@ namespace Renderer
 	Shader s_probe;
 	Shader s_probeRender;
 	Shader s_probeirradiance;
+	Shader s_SolidColor;
+
 
 	Shader s_downScale;
 	Shader s_upScale;
@@ -152,7 +154,7 @@ namespace Renderer
 		s_lighting.Load("Assets/Shaders/Lighting/lighting.vert", "Assets/Shaders/Lighting/lighting.frag");
 		s_downScale.Load("Assets/Shaders/Bloom/bloom.vert", "Assets/Shaders/Bloom/downscale.frag");
 		s_upScale.Load("Assets/Shaders/Bloom/bloom.vert", "Assets/Shaders/Bloom/upscale.frag");
-
+		s_SolidColor.Load("Assets/Shaders/SolidColour/solidColour.vert", "Assets/Shaders/SolidColour/solidColour.frag");
 
 
 
@@ -185,6 +187,13 @@ namespace Renderer
 		s_geomerty.SetInt("RoughnessTextureSampler", 2);
 		s_geomerty.SetInt("MetalicTextureSampler", 3);
 		s_geomerty.SetInt("DefaultNormal", 4);
+
+		s_SolidColor.Use();
+		s_SolidColor.SetInt("DiffuseTextureSampler", 0);
+		s_SolidColor.SetInt("NormalTextureSampler", 1);
+		s_SolidColor.SetInt("RoughnessTextureSampler", 2);
+		s_SolidColor.SetInt("MetalicTextureSampler", 3);
+		s_SolidColor.SetInt("DefaultNormal", 4);
 
 
 		s_ssao.Use();
@@ -327,6 +336,7 @@ namespace Renderer
 
 		return 0;
 	}
+
 
 	
 	void Renderer::SetLights(std::vector<Light> lights) {
@@ -474,6 +484,24 @@ namespace Renderer
 			gameobjectRender->RenderObject(s_geomerty.GetShaderID());
 		}
 
+		s_SolidColor.Use();
+		s_SolidColor.SetMat4("P", Camera::getProjectionMatrix());
+		s_SolidColor.SetMat4("V", Camera::getViewMatrix());
+		s_SolidColor.SetBool("animated", false);
+		s_SolidColor.SetBool("IsEmissive", true);
+		s_SolidColor.SetFloat("Rougness", 0.5);
+		s_SolidColor.SetFloat("Metalic", 0);
+
+
+		std::vector<Light> lights = SceneManager::GetCurrentScene()->getLights();
+		for (int i = 0; i < lights.size(); i++) {
+			s_SolidColor.SetVec3("color", lights[i].colour / 8.0f);
+			glm::mat4 positionMatrix = glm::mat4(); // create an identity matrix;
+			positionMatrix = glm::translate(positionMatrix, lights[i].position); //position is a vec3
+			s_SolidColor.SetMat4("M", positionMatrix);
+			AssetManager::GetModel("light_cube")->RenderModel(s_SolidColor.GetShaderID());
+		}
+
 
 
 		if(Input::KeyDown('g'))
@@ -613,7 +641,7 @@ namespace Renderer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		s_lighting.Use();
-		SetLights(SceneManager::GetCurrentScene()->getLights());
+		SetLights(lights);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);

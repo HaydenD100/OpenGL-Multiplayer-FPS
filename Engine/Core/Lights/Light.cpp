@@ -43,11 +43,12 @@ void Light::SetUpShadows() {
 	for (unsigned int i = 0; i < 6; ++i)
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
 
 	glGenFramebuffers(1, &depthMapFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -58,7 +59,7 @@ void Light::SetUpShadows() {
 
 	aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
 	near = 1.0f;
-	far = 100.0f;
+	far = 25.0f;
 	shadowProj = glm::perspective(glm::radians(90.0f), aspect, near, far);
 
 	shadowTransforms.push_back(shadowProj *
@@ -88,7 +89,7 @@ void Light::GenerateShadows() {
 		std::string pos = "shadowMatrices[" + std::to_string(i) + "]";
 		glUniformMatrix4fv(glGetUniformLocation(Renderer::GetCurrentProgramID(), pos.c_str()), 1, GL_FALSE, &shadowTransforms[i][0][0]);
 	}
-	glUniform1f(glGetUniformLocation(Renderer::GetCurrentProgramID(), "far_plane"), 25);
+	glUniform1f(glGetUniformLocation(Renderer::GetCurrentProgramID(), "far_plane"), this->far);
 	Renderer::s_shadow.SetVec3("lightPos", position);
 
 	Renderer::RenderAllObjects(Renderer::s_shadow);

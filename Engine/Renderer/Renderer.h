@@ -102,6 +102,8 @@ namespace Renderer
 	extern Texture3D probeTexture;
 	extern Shader s_downScale;
 	extern Shader s_upScale;
+	extern Shader s_SolidColor;
+
 
 
     int init();

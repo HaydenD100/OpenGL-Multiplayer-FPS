@@ -85,16 +85,17 @@ const vec3 directions[16] = vec3[](
 );
 
 
-float ShadowCalculation(vec3 fragPos, int index)
-{
-    vec3 fragToLight = fragPos - LightPositions_worldspace[index];
+float ShadowCalculation(vec3 fragPos, int index, vec3 N){
+     vec3 fragToLight = fragPos - LightPositions_worldspace[index];
     float currentDepth = length(fragToLight);
     float shadow = 0.0;
-    float bias = 0.2;
+    //float bias = 0.2;
+    float bias =0.1  ;
+
 
     int samples = 20;
     float viewDistance = length(viewPos - fragPos);
-    float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
+    float diskRadius = (1.0 + (viewDistance / far_plane)) / 200;
     for(int i = 0; i < samples; ++i)
     {
         float closestDepth = texture(depthMap[index], fragToLight + gridSamplingDisk[i] * diskRadius).r;
@@ -104,7 +105,8 @@ float ShadowCalculation(vec3 fragPos, int index)
     }
     shadow /= float(samples);  
     
-    return shadow;
+    return 1.0f - shadow;
+
 }
 
 // ----------------------------------------------------------------------------
@@ -508,7 +510,8 @@ void main() {
 
     // Transform view-space position to world-space position
     vec3 FragPos = (inverseV * vec4(FragPos_view, 1.0)).xyz;
-    vec3 N = normalize((transpose(V) * vec4(Normal_view, 0.0)).xyz);
+    //vec3 N = normalize((transpose(V) * vec4(Normal_view, 0.0)).xyz);
+    vec3 N = trueNormal;
     vec3 Vpos = normalize(viewPos - FragPos);
 
     // Reflectance at normal incidence
@@ -540,10 +543,10 @@ void main() {
             vec3 kS = F;
             vec3 kD = (1.0 - kS) * (1.0 - metallic);
             float NdotL = max(dot(N, L), 0.0);
-            float shadow = ShadowCalculation(FragPos , i);
+            float shadow = ShadowCalculation(FragPos , i, N);
             //the 1.3 makes it a little brighter
-            Lo += ((kD * albedo) * (1.0f - shadow) / PI + specular) * radiance * NdotL * (1.0f - shadow);
-            spec += specular * radiance * NdotL * (1.0 - shadow);
+            Lo += ((kD * albedo) * (shadow) / PI + specular) * radiance * NdotL * (shadow);
+            spec += specular * radiance * NdotL * (shadow);
         }
     }
 
@@ -570,10 +573,10 @@ void main() {
             vec3 kS = F;
             vec3 kD = (1.0 - kS) * (1.0 - metallic);
             float NdotL = max(dot(NTrue, L), 0.0);
-            float shadow = ShadowCalculation(FragPos , i);
+            float shadow = ShadowCalculation(FragPos , i, NTrue);
             //the 1.3 makes it a little brighter
-            Lo += ((kD * vec3(1)) * (1.0f - shadow) / PI + specular) * radiance * NdotL * (1.0f - shadow);
-            spec += specular * radiance * NdotL * (1.0 - shadow);
+            Lo += ((kD * vec3(1)) * (shadow) / PI + specular) * radiance * NdotL * (shadow);
+            spec += specular * radiance * NdotL * (shadow);
         }
     }
 
@@ -583,10 +586,10 @@ void main() {
     vec3 indirectLighting = GetIndirectLighting(FragPos,trueNormal);
 
     vec3 adjustedIndirectLighting = indirectLighting;
-    //float factor = min(1, roughness * 1.5);
-   // adjustedIndirectLighting *= (0.4) * vec3(factor);
-   // adjustedIndirectLighting = max(adjustedIndirectLighting, vec3(0));
-   // adjustedIndirectLighting *= albedo * 1.5;
+    float factor = min(1, roughness * 1.5);
+    //adjustedIndirectLighting *= (0.4) * vec3(factor);
+    //adjustedIndirectLighting = max(adjustedIndirectLighting, vec3(0));
+    adjustedIndirectLighting *= albedo * 1;
 
 
     
@@ -595,7 +598,7 @@ void main() {
     
     
     vec3 ambient = vec3(ao);// + adjustedIndirectLighting ;
-    vec3 color = ambient * (Lo + indirectLighting);
+    vec3 color = Lo + adjustedIndirectLighting;
 
 
     // HDR and gamma correction
@@ -604,19 +607,11 @@ void main() {
     if(isDead)
         color = color + vec3(1,-0.2,-0.2);
         
-    
-    
-    //not using this anymore
-    //vec3 voxel_pos = clamp(FragPos,-100,100);
-    //voxel_pos = (voxel_pos - (-100)) / (100 - (-100)) * 200;
-    //ivec3 postionVoxel = ivec3(voxel_pos);
-    //vec3 storedValue = vec3(imageLoad(voxelTextureColor, postionVoxel));
-    //gLighting = vec4(vec3(ids[0]/ 4000.0f),1);
     if(lightingState == 0)
         gLighting = vec4(color, spec);// + vec4(albedo * 0.2,1);
     if(lightingState == 1)
-        gLighting = vec4(Lo ,1);
+        gLighting = vec4(Lo ,spec);
     if(lightingState == 2)
-        gLighting = vec4(indirectLighting,1);
+        gLighting = vec4(adjustedIndirectLighting,1);
 
 }

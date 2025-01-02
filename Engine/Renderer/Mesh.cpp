@@ -191,15 +191,20 @@ void Mesh::Render(GLuint programID) {
         currentTexture = AssetManager::GetMissingTexture();
     }
 
-    glBindTextureUnit(0, currentTexture->GetTexture());
-    glBindTextureUnit(1, currentTexture->GetTextureNormal());
-    glBindTextureUnit(2, currentTexture->GetTextureRoughness());
-    glBindTextureUnit(3, currentTexture->GetTextureMetalic());
 
-    glUniform1f(glGetUniformLocation(programID, "Roughness"), currentTexture->GetRoughness());
-    glUniform1f(glGetUniformLocation(programID, "Metalic"), currentTexture->GetMetalic());
+    if (Renderer::GetCurrentProgramID() != Renderer::s_SolidColor.GetShaderID()) {
+        glBindTextureUnit(0, currentTexture->GetTexture());
+        glBindTextureUnit(1, currentTexture->GetTextureNormal());
 
-    glUniform1i(glGetUniformLocation(programID, "IsEmissive"), currentTexture->IsEmissive());
+        glBindTextureUnit(2, currentTexture->GetTextureRoughness());
+        glBindTextureUnit(3, currentTexture->GetTextureMetalic());
+
+        glUniform1f(glGetUniformLocation(programID, "Roughness"), currentTexture->GetRoughness());
+        glUniform1f(glGetUniformLocation(programID, "Metalic"), currentTexture->GetMetalic());
+
+        glUniform1i(glGetUniformLocation(programID, "IsEmissive"), currentTexture->IsEmissive());
+    }
+
 
 
 

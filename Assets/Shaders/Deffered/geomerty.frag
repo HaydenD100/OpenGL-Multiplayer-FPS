@@ -40,13 +40,12 @@ void main()
 
     float MaterialMetalic = Metalic;
     if(MaterialRoughness == -1)
-        MaterialMetalic =texture(MetalicTextureSampler, UV).r;
+        MaterialMetalic = texture(MetalicTextureSampler, UV).r;
     
     // Sample the normal map and transform it to world space using the TBN matrix
     vec3 normalMap = texture(NormalTextureSampler, UV).rgb;
     normalMap = normalMap * 2.0 - 1.0; // Convert from [0,1] range to [-1,1]
     vec3 transformedNormal = normalize(TBN * normalMap);
-
     
 
     // store the fragment position vector in the first gbuffer texture

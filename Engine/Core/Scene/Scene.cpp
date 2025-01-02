@@ -13,7 +13,7 @@ void Scene::LoadAssets() {
 	//Thank you to tokyosplif for some of the models and sounds
 
 	AssetManager::AddTexture("normal", "Assets/Textures/uvmap.png", "Assets/Normals/no_normal.png", 0.0,0.0);
-	AssetManager::AddTexture("white", "Assets/Textures/white.png", "Assets/Normals/no_normal.png", 0.0, 0.0);
+	AssetManager::AddTexture("white", "Assets/Textures/white.png", "Assets/Normals/bricks_normal.png", 0.5, 0.0);
 
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
 	AssetManager::AddTexture("red_glass", "Assets/Textures/red_glass.png", 0.1, 0.9);
@@ -80,6 +80,7 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("probe", Model("Assets/Objects/FBX/probe_cube.fbx", AssetManager::GetTexture("uvmap")));
 	AssetManager::AddModel("cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("uvmap")));
 
+	AssetManager::AddModel("light_cube", Model("Assets/Objects/FBX/light_cube.fbx", AssetManager::GetTexture("uvmap")));
 
 
 	AssetManager::AddModel("fence1", Model("Assets/Objects/fence1.fbx", AssetManager::GetTexture("concrete")));
@@ -223,6 +224,12 @@ void Scene::Load() {
 			lights.push_back(light);
 		}
 		*/
+
+		{
+			Light light(glm::vec3(-4.44, 6.6, 0), glm::vec3(1, 0, 0.847) * 8.0f, 0.22, 0.20);
+			lights.push_back(light);
+		}
+		
 
 		{
 			Light light(glm::vec3(0, 11, -2.4), glm::vec3(1, 0.922, 0.678) * 8.0f, 0.07, 0.017);

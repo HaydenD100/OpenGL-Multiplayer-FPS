@@ -357,6 +357,8 @@
     <None Include="Assets\Shaders\GI\renderProbes.vert" />
     <None Include="Assets\Shaders\GI\renderProbes.frag" />
     <None Include="Assets\Shaders\Bloom\upscale.frag" />
+    <None Include="Assets\Shaders\SolidColour\solidColour.frag" />
+    <None Include="Assets\Shaders\SolidColour\solidColour.vert" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

@@ -228,6 +228,8 @@
     <None Include="Assets\Shaders\Shadow\depth.vert" />
     <None Include="Assets\Shaders\SkyBoxShader.frag" />
     <None Include="Assets\Shaders\SkyBoxShader.vert" />
+    <None Include="Assets\Shaders\SolidColour\solidColour.frag" />
+    <None Include="Assets\Shaders\SolidColour\solidColour.vert" />
     <None Include="Assets\Shaders\SSAO\blur.frag" />
     <None Include="Assets\Shaders\SSAO\blur.vert" />
     <None Include="Assets\Shaders\SSAO\ssao.frag" />
