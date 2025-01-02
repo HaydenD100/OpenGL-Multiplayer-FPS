@@ -3,6 +3,12 @@ https://github.com/HaydenD100/3dEngine2.0
 
 ## Changelog
 
+### 3D Engine 2.0 2025/January/01
+The rendering engine now supports indirect global illumination, the indirect lighting is calculated from a spherical harmonics probe grid which is baked at runtime, this lights up areas that would not receive light from only direct lighting, I've included a link displaying the full effect at the end of this entry. Other notable features are Screen Space Reflections as well as emissive/glowing textures as seen by the light source in this screenshot. There was also some refactoring of the rendering code making the code cleaner. 
+Indirect Lighting Showcase: https://www.youtube.com/watch?v=_UIoXB9jr6w
+![screenshot](https://github.com/HaydenD100/3dEngine2.0/blob/1v1/github/screenshots/indirectLighting.png)
+
+
 ### 3D Engine 2.0 2024/November/10
 A Lot has happened since the last update, firstly I implemented Skinned animation and a few more optimizations to shadows. I also started writing the netcode using Microsoft's winsock2 api, most of the netcode has been written and now I have to polish the netcode as well as add proper running jumping and shoot animations as right now the players are beans with arms as when I added animated all the weapons I only animated the gun with arms not thinking I was going to make the game multiplayer. Here's a link to my youtube for a full play test with me and my friend: https://www.youtube.com/watch?v=TNkH7IxkP3c
 
@@ -29,7 +35,7 @@ The Engine is now a deferred renderer instead of a forward renderer. Deferred re
 
 ![screenshot](https://github.com/HaydenD100/3dEngine2.0/blob/Bullet3-physics/github/screenshots/deffered.png)
 
-### 3D Engine 2.0 2024/August/2
+### 3D Engine 2.0 2024/August/02
 My main focus for the next couple weeks is going to be overhauling the lighting and rendering systems. The Engine now supports multiple lights that can be dynamically changed in the scene. I'm looking at other graphical improvements like SSAO or Rendering to a texture allowing post processing as well as working on a material system to make the textures feel more unique.
 
 ![screenshot](https://github.com/HaydenD100/3dEngine2.0/blob/Bullet3-physics/github/screenshots/better_lighting.png)
