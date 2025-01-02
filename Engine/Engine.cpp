@@ -21,6 +21,7 @@ namespace Engine
 
 	int Engine::Run() {
 
+		
 
 		
 		NetworkManager::Init();
@@ -71,6 +72,7 @@ namespace Engine
 
 		float endLoadTime = glfwGetTime() - startLoadTime;
 		std::cout << "Load took " << endLoadTime << "s \n";
+
 
 		while (Backend::IsWindowOpen()) {
 

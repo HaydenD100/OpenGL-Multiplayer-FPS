@@ -12,10 +12,17 @@ in vec3 WorldPos;
 
 
 layout(std430, binding = 7) buffer ShCoeffient {
-   mat3 L1SH_0[3750];
-   mat3 L1SH_1[3750];
-   mat3 L1SH_2[3750];
-   float Depth[3750 * 4 * 4];
+   vec3 L1SH_0[3750];
+   vec3 L1SH_1[3750];
+   vec3 L1SH_2[3750];
+   vec3 L1SH_3[3750];
+
+   vec3 L1SH_4[3750];
+   vec3 L1SH_5[3750];
+   vec3 L1SH_6[3750];
+   vec3 L1SH_7[3750];
+
+  vec3 L1SH_8[3750 * 2];
 
 };
 
@@ -26,7 +33,7 @@ uniform int probeID;
 //Credits to https://www.shadertoy.com/view/wtt3W2
 
 #define myT vec3
-#define myL 2
+#define myL 1
 #define SphericalHarmonicsTL(T, L) T[(L + 1)*(L + 1)]
 #define SphericalHarmonics SphericalHarmonicsTL(myT, myL)
 #define shSize(L) ((L + 1)*(L + 1))
@@ -268,30 +275,79 @@ vec2 encodeToOctahedralMap(vec3 dir) {
     return p;
 }
 
+vec3 clampToNearestDirection(vec3 position) {
+    float maxDot = -1.0; // Initialize to the smallest possible value
+    int bestMatchIndex = 0;
+
+    // Iterate through all predefined directions
+    for (int i = 0; i < 16; ++i) {
+        float dotProduct = dot(position, directions[i]);
+
+        // Find the direction with the largest dot product (smallest angle)
+        if (dotProduct > maxDot) {
+            maxDot = dotProduct;
+            bestMatchIndex = i;
+        }
+    }
+
+    // Return the closest direction
+    return directions[bestMatchIndex];
+}
+
+int clampToNearestDirectionINT(vec3 position) {
+    float maxDot = -1.0; // Initialize to the smallest possible value
+    int bestMatchIndex = 0;
+
+    // Iterate through all predefined directions
+    for (int i = 0; i < 16; ++i) {
+        float dotProduct = dot(position, directions[i]);
+
+        // Find the direction with the largest dot product (smallest angle)
+        if (dotProduct > maxDot) {
+            maxDot = dotProduct;
+            bestMatchIndex = i;
+        }
+    }
+
+    // Return the closest direction
+    return bestMatchIndex;
+}
+
 void main()
 {    
   
     vec3 col;
 	SphericalHarmonics shRadiance;
 
-	shRadiance[0] = L1SH_0[probeID][0];
-	shRadiance[1] = L1SH_0[probeID][1];
-	shRadiance[2] = L1SH_0[probeID][2];
+	shRadiance[0] = L1SH_0[probeID];
+	shRadiance[1] = L1SH_1[probeID];
+	shRadiance[2] = L1SH_2[probeID];
+	shRadiance[3] = L1SH_3[probeID];
 
-	shRadiance[3] = L1SH_1[probeID][0];
-	shRadiance[4] = L1SH_1[probeID][1];
-	shRadiance[5] = L1SH_1[probeID][2];
+	#if (myL >= 2)
+		shRadiance[4] = L1SH_4[probeID];
+		shRadiance[5] = L1SH_5[probeID];
+		shRadiance[6] = L1SH_6[probeID];
+		shRadiance[7] = L1SH_7[probeID];
+		shRadiance[8] = L1SH_8[probeID];
+	#endif
+	
 
-	shRadiance[6] = L1SH_2[probeID][0];
-	shRadiance[7] = L1SH_2[probeID][1];
-	shRadiance[8] = L1SH_2[probeID][2];
+
+	//shRadiance[3] = L1SH_1[probeID][0];
+	//shRadiance[4] = L1SH_1[probeID][1];
+	//shRadiance[5] = L1SH_1[probeID][2];
+
+	//shRadiance[6] = L1SH_2[probeID][0];
+	//shRadiance[7] = L1SH_2[probeID][1];
+	//shRadiance[8] = L1SH_2[probeID][2];
 
 	col =  GetRadianceFromSH(shRadiance, WorldPos);
-	vec2 encodedDepthPos = encodeToOctahedralMap(WorldPos);
+	int probeDepthDirection = clampToNearestDirectionINT(WorldPos);
 
-	int flattenedIndex = int(floor(probeID * 16 + encodedDepthPos.x * 4 + encodedDepthPos.y));
+	int flattenedIndex = int(floor(probeID * 16 + probeDepthDirection));
 
-	float depth = Depth[flattenedIndex];
+	//float depth = depthSto[flattenedIndex];
 
 
     
@@ -300,6 +356,8 @@ void main()
     // also store the per-fragment normals into the gbuffer
     gRMA = vec4(0,0,1,0);
     gNormal = Normal;
-    gAlbedo = vec4(col, 1); // RGB for Albedo, R for Specular Intensity
+	//gAlbedo = vec4(depth,0,0, 1); // RGB for Albedo, R for Specular Intensity
+
+	gAlbedo = vec4(col, 1); // RGB for Albedo, R for Specular Intensity
 
 }

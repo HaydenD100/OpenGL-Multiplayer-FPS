@@ -168,6 +168,7 @@ void main()
     // HDR and gamma correction
     color = color / (color + vec3(1.0));
 
-    cubeMap = vec3(Lo);
+    cubeMap = vec3(color);
+    gl_FragDepth =  LinearizeDepth(gl_FragCoord.z);
 
 }

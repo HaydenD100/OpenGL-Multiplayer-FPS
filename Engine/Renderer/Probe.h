@@ -17,6 +17,7 @@ public:
 	void Irradiance();
 	Transform GetTransform();
 	GLuint GetCubeMap();
+	GLuint GetDepthCubeMap();
 	GLuint GetIrradianceCubeMap();
 
 	unsigned int ProbeID();
@@ -45,14 +46,16 @@ struct ProbeGrid {
 		volume = glm::vec3(width, height, depth);
 		postion = start;
 		this->spacing = spacing;
+		std::cout << "Starting configure \n";
 
-		for (float x = 0; x <= width; x += spacing) {
-			for (float y = 0; y <= height; y += spacing) {
-				for (float z = 0; z <= depth; z += spacing) {
+		for (float x = 0; x < width; x += spacing) {
+			for (float y = 0; y < height; y += spacing) {
+				for (float z = 0; z < depth; z += spacing) {
 					probes.push_back(Probe(glm::vec3(x, y, z) + start));
 				}
 			}
 		}
+		std::cout << "Done configure \n";
 	}
 
 	void AddProbe(glm::vec3 postion) {

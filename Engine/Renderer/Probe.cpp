@@ -68,7 +68,10 @@ void ProbeGrid::Bake(std::vector<Light> lights) {
 
 	glDisable(GL_CULL_FACE);
 	glViewport(0, 0, PROBESIZE, PROBESIZE);
-	glClearColor(135, 206, 235, 1);
+
+	//SkyBoxColor
+	glClearColor(0, 0, 0, 1);
+
 	for (int i = 0; i < probes.size(); i++) {
 		probes[i].Bake();
 	}
@@ -93,6 +96,8 @@ void ProbeGrid::Bake(std::vector<Light> lights) {
 
 
 	glClearColor(0, 0, 0, 1);
+
+	std::cout << "Done Baking \n";
 
 }
 
@@ -148,7 +153,7 @@ Probe::Probe(glm::vec3 postion) {
 	for (int face = 0; face < 6; ++face) {
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, probeCubemap, 0);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, probeIrradianceCubemap, 0);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,Depth, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, Depth, 0);
 
 	}
 
@@ -172,9 +177,8 @@ Probe::Probe(glm::vec3 postion) {
 
 void Probe::Irradiance() {
 	glBindFramebuffer(GL_FRAMEBUFFER, this->probeFBO);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glBindTextureUnit(0, GetCubeMap());
-	glBindTextureUnit(2, Depth);
+	glBindTextureUnit(1, GetDepthCubeMap());
 
 
 	captureViews[0] = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
@@ -196,7 +200,7 @@ void Probe::Irradiance() {
 	for (unsigned int i = 0; i < 6; ++i)
 	{
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, probeIrradianceCubemap, 0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		Renderer::s_probeirradiance.SetMat4("V", captureViews[i]);
 		AssetManager::GetModel("cube")->RenderModel(Renderer::s_probeirradiance.GetShaderID());
 	}
@@ -211,7 +215,7 @@ void Probe::Bake() {
 	captureViews[2] = glm::lookAt(transform.position, transform.position + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	captureViews[3] = glm::lookAt(transform.position, transform.position + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
 	captureViews[4] = glm::lookAt(transform.position, transform.position + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-	captureViews[5] = glm::lookAt(transform.position, transform.position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
+	captureViews[5] = glm::lookAt(transform.position, transform.position + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	glViewport(0, 0, PROBESIZE, PROBESIZE);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->probeFBO);
@@ -265,6 +269,10 @@ GLuint Probe::GetIrradianceCubeMap() {
 unsigned int Probe::ProbeID() {
 	return probeID;
 }
+GLuint Probe::GetDepthCubeMap() {
+	return Depth;
+}
+
 
 
 unsigned int Probe::probeCount = 0;

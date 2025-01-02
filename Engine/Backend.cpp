@@ -47,7 +47,6 @@ namespace Backend
 		glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-
 		Renderer::init();
 		return 0;
 	}

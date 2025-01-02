@@ -13,6 +13,8 @@ void Scene::LoadAssets() {
 	//Thank you to tokyosplif for some of the models and sounds
 
 	AssetManager::AddTexture("normal", "Assets/Textures/uvmap.png", "Assets/Normals/no_normal.png", 0.0,0.0);
+	AssetManager::AddTexture("white", "Assets/Textures/white.png", "Assets/Normals/no_normal.png", 0.0, 0.0);
+
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
 	AssetManager::AddTexture("red_glass", "Assets/Textures/red_glass.png", 0.1, 0.9);
 	AssetManager::AddTexture("green_glass", "Assets/Textures/green_glass.png", 0.1, 0.9);
@@ -41,7 +43,7 @@ void Scene::LoadAssets() {
 
 
 	AssetManager::AddTexture("pallet", "Assets/Textures/pallet.png", "Assets/Normals/pallet_normal.png", "Assets/Roughness/pallet_roughness.png", "Assets/Metalic/pallet_metallic.png");
-	AssetManager::GetTexture("pallet")->SetEmissive(true);
+	//AssetManager::GetTexture("pallet")->SetEmissive(true);
 	AssetManager::AddTexture("barrel", "Assets/Textures/barrel.jpg", "Assets/Normals/barrel_normal.jpg", "Assets/Roughness/barrel_roughness.jpg", "Assets/Metalic/barrel_metallic.jpg");
 	AssetManager::AddTexture("cargo_crate", "Assets/Textures/cargo_crate.jpg", "Assets/Normals/cargo_crate_normal.jpg", "Assets/Roughness/cargo_crate_roughness.jpg", "Assets/Metalic/cargo_crate_metallic.jpg");
 	AssetManager::AddTexture("knife", "Assets/Textures/knife.png", "Assets/Normals/knife_normal.png", "Assets/Roughness/knife_roughness.png", "Assets/Metalic/knife_metallic.png");
@@ -75,7 +77,7 @@ void Scene::LoadAssets() {
 
 
 	
-	AssetManager::AddModel("probe", Model("Assets/Objects/FBX/probe.fbx", AssetManager::GetTexture("uvmap")));
+	AssetManager::AddModel("probe", Model("Assets/Objects/FBX/probe_cube.fbx", AssetManager::GetTexture("uvmap")));
 	AssetManager::AddModel("cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("uvmap")));
 
 
@@ -122,6 +124,9 @@ void Scene::LoadAssets() {
 	//AssetManager::AddModel("map_test1", Model("Assets/Maps/map_test1.fbx", AssetManager::GetTexture("wooden_floor")));
 	//AssetManager::GetModel("map_test1")->GetMeshByName("Map_floor")->SetTexture(AssetManager::GetTexture("wooden_floor"));
 	AssetManager::AddModel("map_test1", Model("Assets/Maps/dusty_1.fbx", AssetManager::GetTexture("brick")));
+
+	AssetManager::AddModel("map_indirectLight", Model("Assets/Maps/lightingTest.obj", AssetManager::GetTexture("white")));
+
 	Model* model = AssetManager::GetModel("map_test1");
 	model->GetMeshByName("floor.001")->SetTexture(AssetManager::GetTexture("sand_ground"));
 	model->GetMeshByName("barrel1")->SetTexture(AssetManager::GetTexture("barrel"));
@@ -165,79 +170,79 @@ void Scene::Load() {
 	WeaponManager::Init();
 
 
+	{
+		//AssetManager::AddGameObject("map_test1", AssetManager::GetModel("map_test1"), glm::vec3(0, 0, 0), true, 0, Concave);
+		//AssetManager::GetGameObject("map_test1")->SetRotationX(-1.5708f);
 
-	AssetManager::AddGameObject("map_test1", AssetManager::GetModel("map_test1"), glm::vec3(0, 0, 0), true, 0, Concave);
-	AssetManager::GetGameObject("map_test1")->SetRotationX(-1.5708f);
 
-	/*
-	doors.push_back(Door("door1", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(0.4, 0, -5), glm::vec3(0, 0, 0)));
-	doors.push_back(Door("door2", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-9.4, 0, -5), glm::vec3(0, 0, 0)));
-	doors.push_back(Door("door3", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-9.4, 0, -15), glm::vec3(0, 0, 0)));
-	doors.push_back(Door("door4", AssetManager::GetModel("door"), AssetManager::GetModel("door_frame"), glm::vec3(-9.4, 0, -24.8), glm::vec3(0,0,0)));
-	*/
-	
+		AssetManager::AddGameObject("map_indirectLight", AssetManager::GetModel("map_indirectLight"), glm::vec3(0, 6, 0), true, 0, Concave);
+		//AssetManager::GetGameObject("map_indirectLight")->SetRotationX(-1.5708f);
 
-	// Sets renderer
-	std::vector<std::string> faces{
-		"Assets/Skybox/daylight/right.png",
-			"Assets/Skybox/daylight/left.png",
-			"Assets/Skybox/daylight/top.png",
-			"Assets/Skybox/daylight/bottom.png",
-			"Assets/Skybox/daylight/front.png",
-			"Assets/Skybox/daylight/back.png"
-	};
-	sky = SkyBox(faces);
-	/*
-	{
-		Light light(glm::vec3(13.4, 4, -9), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35, 0.44);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(7.7, 4, 10), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35, 0.44);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(4.86, 4, -1.5), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35, 0.44);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(13, 4, 7.46), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35, 0.44);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(-1.77, 3, 7.47), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35,	0.44);
-		lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(3.88, 4, -7), glm::vec3(1, 0.779, 0.529) * 2.0f, 0.35,	0.44);
-		lights.push_back(light);
-	}
-	*/
+		
+		// Sets renderer
+		/*
+		std::vector<std::string> faces{
+			"Assets/Skybox/daylight/right.png",
+				"Assets/Skybox/daylight/left.png",
+				"Assets/Skybox/daylight/top.png",
+				"Assets/Skybox/daylight/bottom.png",
+				"Assets/Skybox/daylight/front.png",
+				"Assets/Skybox/daylight/back.png"
+		};
+		*/
+		std::vector<std::string> faces{
+			"Assets/Skybox/Space/right.png",
+				"Assets/Skybox/Space/left.png",
+				"Assets/Skybox/Space/top.png",
+				"Assets/Skybox/Space/bottom.png",
+				"Assets/Skybox/Space/front.png",
+				"Assets/Skybox/Space/back.png"
+		};
+		sky = SkyBox(faces);
+		/*
+		{
+			Light light(glm::vec3(5.89, 3.1, -2.5), glm::vec3(1, 0., 0.753) * 2.0f, 0.35, 0.44);
+			lights.push_back(light);
+		}
 
-	{
-		Light light(glm::vec3(7, 15, -2), glm::vec3(1, 0.922, 0.753) * 10.0f, 0.09, 0.0320);
-		lights.push_back(light);
+		{
+			Light light(glm::vec3(2.2, 1.7, -7.37), glm::vec3(0.922, 0.612,0) * 2.0f, 0.35, 0.44);
+			lights.push_back(light);
+		}
+
+		{
+			Light light(glm::vec3(3.16, 3.1, -8), glm::vec3(1, 0.922, 0.753) * 2.0f, 0.35, 0.44);
+			lights.push_back(light);
+		}
+		{
+			Light light(glm::vec3(12.6, 3.1, -3.49), glm::vec3(1, 0.922, 0.753) * 2.0f, 0.35, 0.44);
+			lights.push_back(light);
+		}
+		{
+			Light light(glm::vec3(2.7, 3.1, 7.75), glm::vec3(1, 0., 0.753) * 2.0f, 0.35, 0.44);
+			lights.push_back(light);
+		}
+		*/
+
+		{
+			Light light(glm::vec3(0, 11, -2.4), glm::vec3(1, 0.922, 0.678) * 8.0f, 0.07, 0.017);
+			lights.push_back(light);
+		}
+		
+		
+		
 	}
 
 	//gunSpawners.push_back(GunSpawner("ak47", "spawner1",glm::vec3(1, 18, -1)));
 
 	
 	Player::Init();
-	Player::setPosition(glm::vec3(0, 30, 0));
+	Player::setPosition(glm::vec3(0, 10, 0));
 
 	// TODO: not currently working
 	//AssetManager::SaveAssets("Assets/Saves/mainScene.json");
-
-
-	ModelMatrixId = glGetUniformLocation(Renderer::GetCurrentProgramID(), "model");
 	Animator::Init();
-
-	//TODO :: dosent work yet
-	//PathFinding::Init();
-
 	glBindVertexArray(sky.GetSkyBoxVAO());
-
-
 }
 
 void Scene::Update(float deltaTime) {

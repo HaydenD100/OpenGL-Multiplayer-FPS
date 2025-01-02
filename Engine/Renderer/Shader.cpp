@@ -149,8 +149,8 @@ void Shader::SetBool(const std::string& name, bool value) {
 void Shader::SetInt(const std::string& name, int value) {
     if (m_uniformsLocations.find(name) == m_uniformsLocations.end())
         m_uniformsLocations[name] = glGetUniformLocation(m_ID, name.c_str());
-    if (glGetUniformLocation(m_ID, name.c_str()) == -1)
-        std::cout << "Id:" << m_ID << " Couldnt find uniform: " << name << "\n";
+    //if (glGetUniformLocation(m_ID, name.c_str()) == -1)
+        //std::cout << "Id:" << m_ID << " Couldnt find uniform: " << name << "\n";
     glUniform1i(m_uniformsLocations[name], value);
 }
 

@@ -2,11 +2,21 @@
 layout (location = 0) out vec4 gLighting;
 
 layout(std430, binding = 7) buffer ShCoeffient {
-   mat3 L1SH_0[3750];
-   mat3 L1SH_1[3750];
-   mat3 L1SH_2[3750];
-   float Depth[3750 * 4 * 4];
+   vec3 L1SH_0[3750 * 2];
+   vec3 L1SH_1[3750 * 2];
+   vec3 L1SH_2[3750 * 2];
+   vec3 L1SH_3[3750 * 2];
 
+   vec3 L1SH_4[3750 * 2];
+   vec3 L1SH_5[3750 * 2];
+   vec3 L1SH_6[3750 * 2];
+   vec3 L1SH_7[3750 * 2];
+
+  vec3 L1SH_8[3750 * 2];
+
+
+
+  
 
 };
 
@@ -49,6 +59,7 @@ uniform mat4 inverseV; // Inverse of the view matrix
 uniform mat4 V; // View matrix
 
 uniform bool isDead;
+uniform int lightingState;
 
 const float PI = 3.1415926535897932384626433832795;
 const float far_plane = 25.0; // Constant, moved outside main
@@ -60,6 +71,19 @@ vec3 gridSamplingDisk[20] = vec3[]
    vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
    vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
 );
+
+// Predefined 16 evenly spaced directions
+const vec3 directions[16] = vec3[](
+    normalize(vec3(1, 0, 0)), normalize(vec3(-1, 0, 0)),
+    normalize(vec3(0, 1, 0)), normalize(vec3(0, -1, 0)),
+    normalize(vec3(0, 0, 1)), normalize(vec3(0, 0, -1)),
+    normalize(vec3(1, 1, 0)), normalize(vec3(-1, -1, 0)),
+    normalize(vec3(1, 0, 1)), normalize(vec3(-1, 0, -1)),
+    normalize(vec3(0, 1, 1)), normalize(vec3(0, -1, -1)),
+    normalize(vec3(1, 1, 1)), normalize(vec3(-1, -1, -1)),
+    normalize(vec3(-1, 1, 1)), normalize(vec3(1, -1, -1))
+);
+
 
 float ShadowCalculation(vec3 fragPos, int index)
 {
@@ -122,7 +146,7 @@ float LinearizeDepth(float depth) {
 }
 
 #define myT vec3
-#define myL 2
+#define myL 1
 #define SphericalHarmonicsTL(T, L) T[(L + 1)*(L + 1)]
 #define SphericalHarmonics SphericalHarmonicsTL(myT, myL)
 #define shSize(L) ((L + 1)*(L + 1))
@@ -334,38 +358,74 @@ vec3 GetIrradianceFromSH(SphericalHarmonics shRadiance, vec3 direction) {
 
 }
 
+int clampToNearestDirectionINT(vec3 position) {
+    float maxDot = -1.0; // Initialize to the smallest possible value
+    int bestMatchIndex = 0;
+    int secondMatchIndex = 0;
+    int thirdMatchIndex = 0;
+
+
+    // Iterate through all predefined directions
+    for (int i = 0; i < 16; ++i) {
+        float dotProduct = dot(position, directions[i]);
+
+        // Find the direction with the largest dot product (smallest angle)
+        if (dotProduct > maxDot) {
+            maxDot = dotProduct;
+            bestMatchIndex = i;
+        }
+    }
+
+    // Return the closest direction
+    return bestMatchIndex;
+}
+
+
 vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
     vec3 gridCoords = (fragWorldPos - gridWorldPos) / spacing;
     ivec3 base = ivec3(floor(gridCoords));
     vec3 a = gridCoords - base;
     //int id = int(imageLoad(probeGrid, base + offset).x);
-    int probe_id = int(texelFetch(probeGrid, base + offset,0).r);
+    int probeID = int(texelFetch(probeGrid, base + offset,0).r);
     vec3 probe_worldPos = (base + offset) + gridWorldPos * spacing;
 
 
-    SphericalHarmonics shRadiance;
-    shRadiance[0] = L1SH_0[probe_id][0];
-    shRadiance[1] = L1SH_0[probe_id][1];
-    shRadiance[2] = L1SH_0[probe_id][2];
+    #if (myL >= 1)
+        SphericalHarmonics shRadiance;
+        shRadiance[0] = L1SH_0[probeID];
+	    shRadiance[1] = L1SH_1[probeID];
+	    shRadiance[2] = L1SH_2[probeID];
+	    shRadiance[3] = L1SH_3[probeID];
+    #endif
 
-    shRadiance[3] = L1SH_1[probe_id][0];
-    shRadiance[4] = L1SH_1[probe_id][1];
-    shRadiance[5] = L1SH_1[probe_id][2];
-
-    shRadiance[6] = L1SH_2[probe_id][0];
-    shRadiance[7] = L1SH_2[probe_id][1];
-    shRadiance[8] = L1SH_2[probe_id][2];
+    #if (myL >= 2)
+		shRadiance[4] = L1SH_4[probeID];
+		shRadiance[5] = L1SH_5[probeID];
+		shRadiance[6] = L1SH_6[probeID];
+		shRadiance[7] = L1SH_7[probeID];
+		shRadiance[8] = L1SH_8[probeID];
+	#endif
 
     //vec3 v = (probe_worldPos - fragWorldPos);
-    vec3 dir = fragWorldPos - probe_worldPos;
+    vec3 dir =  probe_worldPos - fragWorldPos;
     vec3 probe_color =  GetRadianceFromSH(shRadiance, dir);
 
+
+    //int directionIndex = clampToNearestDirectionINT(dir);
+    //int flattenedIndex = int(floor(probeID * 16 + directionIndex));
+    //float probeDepth = depthSto[flattenedIndex];
+
+
+    //probeDepth *= 15;
+    //vec3 probeLenght = directions[directionIndex] *  probeDepth;
     
 
     vec3 v = normalize(probe_worldPos - fragWorldPos); // TODO: no need to normalize if only checking sign
     float vdotn = dot(v, Normal);
     vec3 weights = mix(1. - a, a, offset);
-    if(vdotn > 0)
+
+
+    if(vdotn > 0 ) //&& length(probeLenght) < length(dir))
         weight = weights.x * weights.y * weights.z;
     else
         weight = 0.;        
@@ -375,10 +435,13 @@ vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
     return probe_color;
 }
 
+
+
 vec3 GetIndirectLighting(vec3 WorldPos, vec3 Normal) { // Interpolate visible probes
     float w;
     vec3 light;
     float sumW = 0.;
+    
     vec3 indirectLighting = vec3(0.);
     light = GetProbe(WorldPos, ivec3(0, 0, 0), w, Normal);
     indirectLighting += w * light;
@@ -405,10 +468,10 @@ vec3 GetIndirectLighting(vec3 WorldPos, vec3 Normal) { // Interpolate visible pr
     indirectLighting += w * light;
     sumW += w;
     indirectLighting /= sumW;
-    
-    
     return indirectLighting;
 }
+
+
 
 
 
@@ -424,6 +487,8 @@ void main() {
     // Retrieve data from G-buffer
     vec3 FragPos_view = texture(gPostion, UV).rgb;
     vec3 Normal_view = normalize(texture(gNormal, UV).rgb);
+    vec3 trueNormal = texture(gTrueNormal, UV).rgb;
+
 
 
     vec3 albedo = texture(gAlbeido, UV).rgb;
@@ -451,48 +516,87 @@ void main() {
 
     vec3 Lo = vec3(0.0);
     vec3 spec = vec3(0.0);
-    for (int i = 0; i < MAXLIGHTS; ++i) {
-        if (LightRadius[i] == 0) continue;
 
-        // Calculate distance between light and fragment
-        vec3 L = normalize(LightPositions_worldspace[i] - FragPos);
-        float distance = length(LightPositions_worldspace[i] - FragPos);
-        float attenuation = 1.0 / (1.0 + LightLinears[i] * distance + LightQuadratics[i] * (distance * distance));
-        vec3 radiance = LightColors[i] * attenuation;
+    if(lightingState == 0){
+        for (int i = 0; i < MAXLIGHTS; ++i) {
+            if (LightRadius[i] == 0) continue;
 
-        // Cook-Torrance BRDF
-        vec3 H = normalize(Vpos + L);
-        float NDF = DistributionGGX(N, H, roughness);
-        float G = GeometrySmith(N, Vpos, L, roughness);
-        vec3 F = fresnelSchlick(max(dot(H, Vpos), 0.0), F0);
+            // Calculate distance between light and fragment
+            vec3 L = normalize(LightPositions_worldspace[i] - FragPos);
+            float distance = length(LightPositions_worldspace[i] - FragPos);
+            float attenuation = 1.0 / (1.0 + LightLinears[i] * distance + LightQuadratics[i] * (distance * distance));
+            vec3 radiance = LightColors[i] * attenuation;
 
-        vec3 numerator = NDF * G * F;
-        float denominator = 4.0 * max(dot(N, Vpos), 0.0) * max(dot(N, L), 0.0) + 0.0001;
-        vec3 specular = numerator / denominator;
+            // Cook-Torrance BRDF
+            vec3 H = normalize(Vpos + L);
+            float NDF = DistributionGGX(N, H, roughness);
+            float G = GeometrySmith(N, Vpos, L, roughness);
+            vec3 F = fresnelSchlick(max(dot(H, Vpos), 0.0), F0);
 
-        vec3 kS = F;
-        vec3 kD = (1.0 - kS) * (1.0 - metallic);
-        float NdotL = max(dot(N, L), 0.0);
-        float shadow = ShadowCalculation(FragPos , i);
-        //the 1.3 makes it a little brighter
-        Lo += ((kD * albedo) * (1.0f - shadow) / PI + specular) * radiance * NdotL * (1.0f - shadow);
-        spec += specular * radiance * NdotL * (1.0 - shadow);
+            vec3 numerator = NDF * G * F;
+            float denominator = 4.0 * max(dot(N, Vpos), 0.0) * max(dot(N, L), 0.0) + 0.0001;
+            vec3 specular = numerator / denominator;
 
-
+            vec3 kS = F;
+            vec3 kD = (1.0 - kS) * (1.0 - metallic);
+            float NdotL = max(dot(N, L), 0.0);
+            float shadow = ShadowCalculation(FragPos , i);
+            //the 1.3 makes it a little brighter
+            Lo += ((kD * albedo) * (1.0f - shadow) / PI + specular) * radiance * NdotL * (1.0f - shadow);
+            spec += specular * radiance * NdotL * (1.0 - shadow);
+        }
     }
+
+    if(lightingState == 1){
+        for (int i = 0; i < MAXLIGHTS; ++i) {
+            if (LightRadius[i] == 0) continue;
+            vec3 NTrue = normalize(trueNormal);
+            // Calculate distance between light and fragment
+            vec3 L = normalize(LightPositions_worldspace[i] - FragPos);
+            float distance = length(LightPositions_worldspace[i] - FragPos);
+            float attenuation = 1.0 / (1.0 + LightLinears[i] * distance + LightQuadratics[i] * (distance * distance));
+            vec3 radiance = LightColors[i] * attenuation;
+
+            // Cook-Torrance BRDF
+            vec3 H = normalize(Vpos + L);
+            float NDF = DistributionGGX(NTrue, H, roughness);
+            float G = GeometrySmith(NTrue, Vpos, L, roughness);
+            vec3 F = fresnelSchlick(max(dot(H, Vpos), 0.0), F0);
+
+            vec3 numerator = NDF * G * F;
+            float denominator = 4.0 * max(dot(NTrue, Vpos), 0.0) * max(dot(NTrue, L), 0.0) + 0.0001;
+            vec3 specular = numerator / denominator;
+
+            vec3 kS = F;
+            vec3 kD = (1.0 - kS) * (1.0 - metallic);
+            float NdotL = max(dot(NTrue, L), 0.0);
+            float shadow = ShadowCalculation(FragPos , i);
+            //the 1.3 makes it a little brighter
+            Lo += ((kD * vec3(1)) * (1.0f - shadow) / PI + specular) * radiance * NdotL * (1.0f - shadow);
+            spec += specular * radiance * NdotL * (1.0 - shadow);
+        }
+    }
+
+
      
-    vec3 trueNormal = texture(gTrueNormal, UV).rgb;
 
     vec3 indirectLighting = GetIndirectLighting(FragPos,trueNormal);
 
     vec3 adjustedIndirectLighting = indirectLighting;
-    float factor = min(1, roughness * 1.5);
-    adjustedIndirectLighting *= (0.6) * vec3(factor);
-    adjustedIndirectLighting = max(adjustedIndirectLighting, vec3(0));
-    adjustedIndirectLighting *= albedo.rgb * 1.5;
+    //float factor = min(1, roughness * 1.5);
+   // adjustedIndirectLighting *= (0.4) * vec3(factor);
+   // adjustedIndirectLighting = max(adjustedIndirectLighting, vec3(0));
+   // adjustedIndirectLighting *= albedo * 1.5;
+
+
+    
+    
+
+    
     
     vec3 ambient = vec3(ao);// + adjustedIndirectLighting ;
-    vec3 color = ambient * (Lo + adjustedIndirectLighting);
+    vec3 color = ambient * (Lo + indirectLighting);
+
 
     // HDR and gamma correction
     color = color / (color + vec3(1.0));
@@ -508,7 +612,11 @@ void main() {
     //ivec3 postionVoxel = ivec3(voxel_pos);
     //vec3 storedValue = vec3(imageLoad(voxelTextureColor, postionVoxel));
     //gLighting = vec4(vec3(ids[0]/ 4000.0f),1);
-    //gLighting = vec4(indirectLighting ,1);
-    //gLighting = vec4(adjustedIndirectLighting ,1);
-    gLighting = vec4(color, spec);// + vec4(albedo * 0.2,1);
+    if(lightingState == 0)
+        gLighting = vec4(color, spec);// + vec4(albedo * 0.2,1);
+    if(lightingState == 1)
+        gLighting = vec4(Lo ,1);
+    if(lightingState == 2)
+        gLighting = vec4(indirectLighting,1);
+
 }

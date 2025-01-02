@@ -2,6 +2,8 @@
 #include "Scene/SceneManager.h"
 #include "Engine/Core/Common.h"
 #include "Engine/Core/DecalInstance.h"
+#include "Engine/Renderer/Bloom.h"
+
 
 #include <random>
 
@@ -100,6 +102,8 @@ namespace Renderer
 	Shader s_downScale;
 	Shader s_upScale;
 
+	BloomRenderer emmisiveRenderer;
+
 
 	StorageBuffer SHBuffer;
 	Texture3D probeTexture;
@@ -120,6 +124,11 @@ namespace Renderer
 
 	//some objects will be withheld from rendering in the gemoetry render
 	std::vector<GameObject*> NeedRendering;
+
+
+	//state stuff
+	int lightingState = 0;
+
 
 
 
@@ -307,9 +316,14 @@ namespace Renderer
 		//this is the projection to voxlize the scene from orgin (0,0,0) while the other one is the view of the camera
 		//voxel_orth = glm::ortho(-((float)voxelize_scene_albedo.GetWidth() / 2.0f), (float)voxelize_scene_albedo.GetWidth() / 2.0f, (float)voxelize_scene_albedo.GetWidth() / 2.0f, -((float)voxelize_scene_albedo.GetWidth() / 2.0f), -(float)voxelize_scene_albedo.GetWidth()/2.0f, (float)voxelize_scene_albedo.GetWidth()/2.0f);
 		float spacing = 1;
-		probeTexture.Create(glm::ceil(25 * 1/ spacing), glm::ceil(5 * 1 / spacing), glm::ceil(30 * 1 / spacing));
-		probeGrid.Configure(25,5,30, spacing, glm::vec3(-6,1,-14));
-		SHBuffer.Configure(probeGrid.probes.size() * sizeof(glm::mat3) * 3 + probeGrid.probes.size() * 256 * sizeof(float));
+		glm::vec3 propgationGridSize = glm::vec3(15, 7, 15);
+		probeTexture.Create(glm::ceil(propgationGridSize.x * 1 / spacing), glm::ceil(propgationGridSize.y * 1 / spacing), glm::ceil(propgationGridSize.z * 1 / spacing));
+		probeGrid.Configure(propgationGridSize.x, propgationGridSize.y, propgationGridSize.z, spacing, glm::vec3(-6.4,-1.4 + 6,-7.4));
+		//probeGrid.AddProbe(glm::vec3(6, 1, 2));
+		SHBuffer.Configure(6000 * sizeof(glm::vec3) * 9);
+
+
+		emmisiveRenderer.Init(Backend::GetWidth(), Backend::GetHeight());
 
 		return 0;
 	}
@@ -627,6 +641,16 @@ namespace Renderer
 		s_lighting.SetFloat("spacing", probeGrid.spacing);
 
 
+		if (Input::KeyPressed('f')) {
+			lightingState++;
+			if (lightingState > 2)
+				lightingState = 0;
+		}
+			
+
+		s_lighting.SetInt("lightingState", lightingState);
+
+
 		RenderPlane();
 
 		//-------------------------------------------------SSR-------------------------
@@ -650,11 +674,11 @@ namespace Renderer
 		RenderPlane();
 
 
+		//-------------------------------------------------EMISSIVE-----------------------------------
+		emmisiveRenderer.RenderBloomTexture(gbuffer.gEmission, 0.005f);
 
 
 		//---------------------------------------------------Post-------------------------------------
-		
-
 		glBindFramebuffer(GL_FRAMEBUFFER, FinalFrameFBO);
 		glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -665,7 +689,7 @@ namespace Renderer
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, ssrBuffer.gSSR);
 		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, gbuffer.gEmission);
+		glBindTexture(GL_TEXTURE_2D, emmisiveRenderer.BloomTexture());
 
 
 		RenderPlane();

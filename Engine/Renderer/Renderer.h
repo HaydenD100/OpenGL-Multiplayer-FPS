@@ -100,7 +100,8 @@ namespace Renderer
 	extern Shader s_probeirradiance;
 	extern StorageBuffer SHBuffer;
 	extern Texture3D probeTexture;
-
+	extern Shader s_downScale;
+	extern Shader s_upScale;
 
 
     int init();
