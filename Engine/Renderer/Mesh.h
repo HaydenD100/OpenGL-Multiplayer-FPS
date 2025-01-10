@@ -39,12 +39,17 @@ public:
 
     void Render(GLuint programID);
     glm::vec3 GetVertices(int index);
-    const char* GetTextureName();
+    std::string  GetTextureName();
     std::string GetName();
     void SetName(std::string name);
     void SetTexture(Texture* texture);
     size_t VerticiesSize();
     glm::vec3 GetVertex(int i);
+
+    //used to bind info to a raycasting buffer, returns size of data just appended to buffer
+    int BindVertices(int offset, int modelMatrixIndex);
+    int BindIndices(int offset);
+
 
 
     std::vector<unsigned short> indices;

@@ -1,6 +1,7 @@
 #include "Probe.h"
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Core/Scene/SceneManager.h"
+#include "Engine/Renderer/Raycaster.h"
 
 
 void ProbeGrid::ShowProbes() {
@@ -89,6 +90,15 @@ void ProbeGrid::Bake(std::vector<Light> lights) {
 
 	for (int i = 0; i < probes.size(); i++) {
 		probes[i].Irradiance();
+		
+		//Raycaster::queueRay(glm::vec3(0, 0, 1), probes[i].GetTransform().position, glm::length(glm::vec3(0, 0, 1)), probes[i].ProbeID());
+		//Raycaster::queueRay(glm::vec3(0, 1, 0), probes[i].GetTransform().position, glm::length(glm::vec3(0, 1, 0)), probes[i].ProbeID());
+		//Raycaster::queueRay(glm::vec3(0, 1, 1), probes[i].GetTransform().position, glm::length(glm::vec3(0, 1, 1)), probes[i].ProbeID());
+		//Raycaster::queueRay(glm::vec3(1, 0, 0), probes[i].GetTransform().position, glm::length(glm::vec3(1, 0, 0)), probes[i].ProbeID());
+		//Raycaster::queueRay(glm::vec3(1, 0, 1), probes[i].GetTransform().position, glm::length(glm::vec3(1, 0, 1)), probes[i].ProbeID());
+		//Raycaster::queueRay(glm::vec3(1, 1, 0), probes[i].GetTransform().position, glm::length(glm::vec3(1, 1, 0)), probes[i].ProbeID());
+		//Raycaster::queueRay(glm::vec3(1, 1, 1), probes[i].GetTransform().position, glm::length(glm::vec3(1, 1, 1)), probes[i].ProbeID());
+		
 	}
 	glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
 
@@ -96,9 +106,6 @@ void ProbeGrid::Bake(std::vector<Light> lights) {
 
 
 	glClearColor(0, 0, 0, 1);
-
-	std::cout << "Done Baking \n";
-
 }
 
 Probe::Probe(glm::vec3 postion) {
@@ -253,6 +260,16 @@ void Probe::Bake() {
 			Renderer::s_probe.SetMat4("M", ModelMatrix);
 			gameobjectRender->RenderObject(Renderer::s_probe.GetShaderID());
 		}
+		std::vector<Light> lights = SceneManager::GetCurrentScene()->getLights();
+		for (int i = 0; i < lights.size(); i++) {
+			Renderer::s_probe.SetVec3("color", lights[i].colour / 8.0f);
+			glm::mat4 positionMatrix = glm::mat4(); // create an identity matrix;
+			positionMatrix = glm::translate(positionMatrix, lights[i].position); //position is a vec3
+			Renderer::s_probe.SetMat4("M", positionMatrix);
+			AssetManager::GetModel("light_cube")->RenderModel(Renderer::s_probe.GetShaderID());
+		}
+		Renderer::s_probe.SetVec3("color", glm::vec3(0.0));
+
 
 	}
 

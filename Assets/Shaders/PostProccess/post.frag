@@ -16,7 +16,8 @@ void main() {
     vec4 ssr = texture(gSSR, UV).rgba;
     vec2 texSize  = textureSize(gSSR, 0).xy;
     vec4 emissive = vec4(texture(gEmissive, UV).rgb,1); 
+
     
-    gFinal = lighting  + ssr + emissive ;
+    gFinal = lighting + ssr + emissive ;
 
 }

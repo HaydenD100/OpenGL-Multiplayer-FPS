@@ -25,6 +25,9 @@
 #undef far
 
 
+//TODO :: code is not mem safe gotta fix that
+
+
 
 enum ControlFlag : uint8_t {
 	CONNECTED= 1,

@@ -103,6 +103,11 @@ namespace Renderer
 	extern Shader s_downScale;
 	extern Shader s_upScale;
 	extern Shader s_SolidColor;
+	extern ComputeShader cs_Raycaster;
+
+	extern StorageBuffer SHBuffer;
+
+
 
 
 

@@ -8,7 +8,6 @@ layout(location = 5) in ivec4 boneIds;
 layout(location = 6) in vec4 weights;
 
 out vec2 UV;
-out mat3 TBN; // Tangent-Bitangent-Normal matrix
 out vec3 FragPos;
 out vec3 Normal;
 
@@ -33,25 +32,12 @@ void main()
         BoneTransform     += finalBonesMatrices[boneIds[2]] * weights[2];
         BoneTransform     += finalBonesMatrices[boneIds[3]] * weights[3];
         WorldPos = M * BoneTransform * vec4(vertexPosition_modelspace,1);
-
-        mat3 normalMatrix = transpose(inverse(mat3(M)));
-        vec3 normal = normalize(mat3(BoneTransform)  * vertexNormal_modelspace);
-        vec3 tangent = normalize(mat3(BoneTransform)  * vertexTangent_modelspace);
-        vec3 bitangent = normalize(mat3(BoneTransform)  * vertexBitangent_modelspace);
-
-        TBN = mat3(tangent, bitangent, normal); // Construct TBN matrix for transforming the normal map
     }
     else{
         WorldPos = M * vec4(vertexPosition_modelspace,1.0f);
-        mat3 normalMatrix = transpose(inverse(mat3(M)));
-        vec3 normal = normalize(normalMatrix * vertexNormal_modelspace);
-        vec3 tangent = normalize(normalMatrix * vertexTangent_modelspace);
-        vec3 bitangent = normalize(normalMatrix * vertexBitangent_modelspace);
-
-        TBN = mat3(tangent, bitangent, normal); // Construct TBN matrix for transforming the normal map
     }
     UV = vertexUV;
-    Normal = vertexNormal_modelspace;
+    Normal = (M * vec4(vertexNormal_modelspace,0)).xyz;
     FragPos = vec3(WorldPos);
     gl_Position = P * V * WorldPos;
 }

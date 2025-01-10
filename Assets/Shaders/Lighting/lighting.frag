@@ -2,22 +2,18 @@
 layout (location = 0) out vec4 gLighting;
 
 layout(std430, binding = 7) buffer ShCoeffient {
-   vec3 L1SH_0[3750 * 2];
-   vec3 L1SH_1[3750 * 2];
-   vec3 L1SH_2[3750 * 2];
-   vec3 L1SH_3[3750 * 2];
+    vec3 L1SH_0[3750 * 2];
+    vec3 L1SH_1[3750 * 2];
+    vec3 L1SH_2[3750 * 2];
+    vec3 L1SH_3[3750 * 2];
 
-   vec3 L1SH_4[3750 * 2];
-   vec3 L1SH_5[3750 * 2];
-   vec3 L1SH_6[3750 * 2];
-   vec3 L1SH_7[3750 * 2];
+    vec3 L1SH_4[3750 * 2];
+    vec3 L1SH_5[3750 * 2];
+    vec3 L1SH_6[3750 * 2];
+    vec3 L1SH_7[3750 * 2];
 
-  vec3 L1SH_8[3750 * 2];
-
-
-
-  
-
+    vec3 L1SH_8[3750 * 2];
+    mat3 probeVisbilty[3750 * 2];
 };
 
 layout(binding = 6) uniform sampler3D probeGrid;
@@ -92,7 +88,7 @@ float ShadowCalculation(vec3 fragPos, int index, vec3 N){
     float shadow = 0.0;
     //float bias = 0.2;
     //float bias =0.1  ;
-    float bias = max(0.05 * (1.0 - dot(N, normalize(lightDir))), 0.005f);
+    float bias = max(0.2 * (1.0 - dot(N, normalize(lightDir))), 0.005f);
 
     int samples = 20;
     float viewDistance = length(viewPos - fragPos);
@@ -149,7 +145,7 @@ float LinearizeDepth(float depth) {
 }
 
 #define myT vec3
-#define myL 1
+#define myL 2
 #define SphericalHarmonicsTL(T, L) T[(L + 1)*(L + 1)]
 #define SphericalHarmonics SphericalHarmonicsTL(myT, myL)
 #define shSize(L) ((L + 1)*(L + 1))
@@ -383,6 +379,27 @@ int clampToNearestDirectionINT(vec3 position) {
     return bestMatchIndex;
 }
 
+vec3 NormalizePoint(vec3 point, vec3 minPoint, vec3 maxPoint) {
+    return (point - minPoint) / (maxPoint - minPoint);
+}
+
+vec3 interpolate1D(vec3 v1, vec3 v2, float x){
+    return v1*(1-x) + v2*x;
+}
+vec3 interpolate2D(vec3 v1, vec3 v2, vec3 v3, vec3 v4, float x, float y){
+
+    vec3 s = interpolate1D(v1, v2, x);
+    vec3 t = interpolate1D(v3, v4, x);
+    return interpolate1D(s, t, y);
+}
+
+vec3 interpolate3D(vec3 v1, vec3 v2, vec3 v3, vec3 v4, vec3 v5, vec3 v6, vec3 v7, vec3 v8, float x, float y, float z)
+{
+    vec3 s = interpolate2D(v1, v2, v3, v4, x, y);
+    vec3 t = interpolate2D(v5, v6, v7, v8, x, y);
+    return interpolate1D(s, t, z);
+}
+
 
 vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
     vec3 gridCoords = (fragWorldPos - gridWorldPos) / spacing;
@@ -413,14 +430,17 @@ vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
     vec3 dir =  probe_worldPos - fragWorldPos;
     vec3 probe_color =  GetRadianceFromSH(shRadiance, dir);
 
+    float visibility;
+    if(offset == ivec3(0,0,1)){ visibility = probeVisbilty[probeID][0][0];}
+    else if(offset == ivec3(0,1,0)){ visibility = probeVisbilty[probeID][0][1];}
+    else if(offset == ivec3(0,1,1)){ visibility = probeVisbilty[probeID][0][2];}
+    else if(offset == ivec3(1,0,0)){ visibility = probeVisbilty[probeID][1][0];}
+    else if(offset == ivec3(1,0,1)){ visibility = probeVisbilty[probeID][1][1];}
+    else if(offset == ivec3(1,1,0)){ visibility = probeVisbilty[probeID][1][2];}
+    else if(offset == ivec3(1,1,1)){ visibility = probeVisbilty[probeID][2][0];}
 
-    //int directionIndex = clampToNearestDirectionINT(dir);
-    //int flattenedIndex = int(floor(probeID * 16 + directionIndex));
-    //float probeDepth = depthSto[flattenedIndex];
 
 
-    //probeDepth *= 15;
-    //vec3 probeLenght = directions[directionIndex] *  probeDepth;
     
 
     vec3 v = normalize(probe_worldPos - fragWorldPos); // TODO: no need to normalize if only checking sign
@@ -428,7 +448,7 @@ vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
     vec3 weights = mix(1. - a, a, offset);
 
 
-    if(vdotn > 0 ) //&& length(probeLenght) < length(dir))
+    if(vdotn > -0.0 ) //&& length(probeLenght) < length(dir))
         weight = weights.x * weights.y * weights.z;
     else
         weight = 0.;        
@@ -598,8 +618,8 @@ void main() {
 
     
     
-    vec3 ambient = vec3(ao);// + adjustedIndirectLighting ;
-    vec3 color = Lo + adjustedIndirectLighting;
+    vec3 ambient = ao * vec3(1);// + adjustedIndirectLighting ;
+    vec3 color = ambient * Lo + adjustedIndirectLighting;
 
 
     // HDR and gamma correction

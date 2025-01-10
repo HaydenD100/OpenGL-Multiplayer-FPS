@@ -1,12 +1,14 @@
 Todo
 
+
+--------Engine--------
 - Particle System, would be good for glass/explosives
 - Better UI, add support for Dear MyGui
-- reflection textures
 - animations
 - settings menu
 
 
+--------Game--------
 Animation stuff
 death
 walk 

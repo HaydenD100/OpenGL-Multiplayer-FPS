@@ -73,7 +73,6 @@ namespace Player
 		if (proxy) {
 			proxy->m_collisionFilterGroup = GROUP_PLAYER;
 			proxy->m_collisionFilterMask = GROUP_STATIC | GROUP_DYNAMIC;
-			// TODO: Add the constraint to the world
 		}
 		btBroadphaseProxy* otherProxy = player_body->GetRigidBody()->getBroadphaseHandle();
 		if (otherProxy) {
@@ -106,7 +105,6 @@ namespace Player
 		if (proxy) {
 			proxy->m_collisionFilterGroup = GROUP_PLAYER;
 			proxy->m_collisionFilterMask = GROUP_STATIC | GROUP_DYNAMIC;
-			// TODO: Add the constraint to the world
 		}
 		
 		//std::cout << "loading player model" << std::endl;
@@ -253,7 +251,7 @@ namespace Player
 	}
 
 
-	//TODO :: This is a mess I should clean this up at somepoint
+	//TODO :: This is a mess I should clean this up at some point
 	void Player::Update(float deltaTime) {
 		if (isDead && timeSinceDeath < glfwGetTime() - animationDeathTime) {
 			Respawn();

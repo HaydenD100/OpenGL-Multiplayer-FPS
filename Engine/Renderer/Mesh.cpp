@@ -54,7 +54,6 @@ Mesh::Mesh(const char* path) {
 
     indexer::indexVBO(vertices, uvs, normals, tangents, bitangents, indices, indexed_vertices, indexed_uvs, indexed_normals, indexed_tangents, indexed_bitangents);
 
-    //TODO: Make this dynamic so I can change to a diff mesh
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(glm::vec3), &indexed_vertices[0], GL_STATIC_DRAW);
@@ -78,9 +77,6 @@ Mesh::Mesh(const char* path) {
     glGenBuffers(1, &bitangentbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, bitangentbuffer);
     glBufferData(GL_ARRAY_BUFFER, indexed_bitangents.size() * sizeof(glm::vec3), &indexed_bitangents[0], GL_STATIC_DRAW);
-
-
-
 
     for (unsigned int i = 0; i < indexed_vertices.size(); i++)
     {
@@ -205,10 +201,6 @@ void Mesh::Render(GLuint programID) {
         glUniform1i(glGetUniformLocation(programID, "IsEmissive"), currentTexture->IsEmissive());
     }
 
-
-
-
-
     // 1st attribute buffer : vertices
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -320,7 +312,7 @@ void Mesh::SetName(std::string name) {
     this->name = name;
 }
 
-const char* Mesh::GetTextureName() {
+std::string Mesh::GetTextureName() {
     return texture->GetName();
 }
 size_t Mesh::VerticiesSize() {
@@ -328,6 +320,19 @@ size_t Mesh::VerticiesSize() {
 }
 glm::vec3 Mesh::GetVertex(int i) {
     return indexed_vertices[i];
+}    
+int Mesh::BindVertices(int offset, int modelMatrixIndex) {
+    const int size = indexed_vertices.size();
+    std::vector<glm::vec4> vertciesWithM;
+    for (int i = 0; i < indexed_vertices.size(); i++) {
+        vertciesWithM.push_back(glm::vec4(indexed_vertices[i], modelMatrixIndex));
+    }
+    glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, vertciesWithM.size() * sizeof(glm::vec4), &vertciesWithM[0]);
+    return vertciesWithM.size() * sizeof(glm::vec4);
+}
+int Mesh::BindIndices(int offset) {
+    glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, indices.size() * sizeof(unsigned short), &indices[0]);
+    return indices.size() * sizeof(unsigned short);
 }
 
 

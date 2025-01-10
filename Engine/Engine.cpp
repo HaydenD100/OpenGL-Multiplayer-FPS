@@ -3,6 +3,7 @@
 #include <ctime>
 #include <iostream>
 #include "Engine/Networking/NetworkManager.h"
+#include "Engine/Renderer/Raycaster.h"
 
 
 
@@ -68,11 +69,13 @@ namespace Engine
 
 		//--------------------------------------------PROBE-------------------------------------------	
 		Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->getLights());
-
+		Renderer::cs_Raycaster.Use();
+		Renderer::probeTexture.Bind(6);
+		Raycaster::Bind();
+		Raycaster::Compute();
 
 		float endLoadTime = glfwGetTime() - startLoadTime;
 		std::cout << "Load took " << endLoadTime << "s \n";
-
 
 		while (Backend::IsWindowOpen()) {
 
@@ -109,6 +112,8 @@ namespace Engine
 
 
 			//TODO :: put this in the scnene or somthing idk why its still here in ENGINE.cpp
+			// TDOO :: acctualy I want to make a UI class, and also change the UI shader this is really old when i was first learning
+			// OpenGL, so it needs to be updated, and maybe just replaced with myGUI
 			std::ostringstream oss;
 			oss << "FPS: " << FPS;
 			Renderer::RenderText(oss.str().c_str(), 660, 585, 15);
@@ -130,10 +135,12 @@ namespace Engine
 
 			oss.str(""); oss.clear();
 			oss.precision(4);
-			oss << "P1:" << Player::GetKills() << " P2:" << Player::GetDeaths();
-			Renderer::RenderText(oss.str().c_str(), 350, 560, 20);
-
-			//AssetManager::CleanUp();
+			oss << "Player Kills " << Player::GetKills();
+			Renderer::RenderText(oss.str().c_str(), 0, 530, 15);
+			oss.str(""); oss.clear();
+			oss.precision(4);
+			oss << "Enemy Kills " << Player::GetDeaths();
+			Renderer::RenderText(oss.str().c_str(), 0, 500, 15);
 
 			
 			Renderer::SwapBuffers(Backend::GetWindowPointer());

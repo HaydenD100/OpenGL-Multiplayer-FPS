@@ -7,8 +7,6 @@ layout (location = 0) out vec3 cubeMap;
 in vec2 UV;
 in vec3 FragPos;
 in vec3 Normal;
-in mat3 TBN;
-
 
 layout (binding = 0) uniform sampler2D diffuse;
 layout (binding = 1) uniform sampler2D normal;
@@ -18,6 +16,7 @@ layout (binding = 3) uniform sampler2D metalic;
 
 uniform float Roughness;
 uniform float Metalic;
+uniform vec3 color;
 
 
 uniform vec3 viewPos;
@@ -107,6 +106,13 @@ float LinearizeDepth(float depth) {
 
 void main()
 {    
+
+    if(color != vec3(0)){
+        cubeMap = color;
+        return;
+    }
+
+
     vec3 MaterialDiffuseColor = texture(diffuse, UV).rgb;
 
     float MaterialRoughness = Roughness;
@@ -124,7 +130,7 @@ void main()
      float metallic  = MaterialMetalic;
     float roughness = MaterialRoughness;
 
-    vec3 N = normalize(TBN * normalMap);
+    vec3 N = normalize(Normal);
     vec3 V = normalize(viewPos - FragPos);
 
     // Reflectance at normal incidence
@@ -163,12 +169,12 @@ void main()
     }
 
     vec3 ambient = vec3(1) * MaterialDiffuseColor;
-    vec3 color = ambient * Lo;
+    vec3 Lightcolor = ambient * Lo;
 
     // HDR and gamma correction
-    color = color / (color + vec3(1.0));
-
-    cubeMap = vec3(color);
+    Lightcolor = Lightcolor / (Lightcolor + vec3(1.0));
+    //Lightcolor = N;
+    cubeMap = vec3(Lightcolor);
     gl_FragDepth =  LinearizeDepth(gl_FragCoord.z);
 
 }

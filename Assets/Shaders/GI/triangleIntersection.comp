@@ -1,0 +1,169 @@
+#version 430 core
+
+#define MAXRAYS 100000
+
+layout (local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
+
+layout(binding = 6) uniform sampler3D probeGrid;
+
+layout(std430, binding = 7) buffer ShCoeffient {
+    vec3 L1SH_0[3750 * 2];
+    vec3 L1SH_1[3750 * 2];
+    vec3 L1SH_2[3750 * 2];
+    vec3 L1SH_3[3750 * 2];
+
+    vec3 L1SH_4[3750 * 2];
+    vec3 L1SH_5[3750 * 2];
+    vec3 L1SH_6[3750 * 2];
+    vec3 L1SH_7[3750 * 2];
+
+    vec3 L1SH_8[3750 * 2];
+    mat3 probeVisbilty[3750 * 2];
+};
+
+layout(std430, binding = 8) buffer VertexBuffer {
+    vec4 vertices[]; // Array of unique vertex positions
+    //W holds the ModelMatrix index for transformations to worldSpace
+};
+layout(std430, binding = 9) buffer IndexBuffer {
+    uint indices[]; // Array of indices referencing vertices
+};
+layout(std430, binding = 10) buffer ModelMatrixBuffer {
+    mat4 M[]; // Array of model matrix for the triangels
+};
+layout(std430, binding = 11) buffer rayOriginBuffer {
+    vec4 rayOrigin[]; // Array of model matrix for the triangels
+};
+layout(std430, binding = 12) buffer rayDirectionBuffer {
+    vec3 rayDirection[]; // Array of model matrix for the triangels
+};
+layout(std430, binding = 13) buffer rayLengthBuffer {
+    float rayLength[]; // Array of model matrix for the triangels
+};
+
+uniform int indicesSize;
+
+uniform vec3 gridWorldPos;
+uniform vec3 volume;
+uniform float spacing;
+
+
+
+bool TriIntersectBoolVersion(vec3 origin, vec3 direction, float rayMin, float rayMax, vec3 v0, vec3 v1, vec3 v2) {
+
+	vec3 a = v0 - v1;
+	vec3 b = v2 - v0;
+	vec3 p = v0 - origin;
+	vec3 n = cross(b, a);
+	float r = dot(direction, n);
+
+    //ignore back face
+	//if (r > 0)
+	//	return false;
+
+	// some other early out
+	if (abs(r) < 0.00001)
+		return false; // you removed this on the ragdoll renderer, maybe it introduces artefacts?
+
+	vec3 q = cross( p, direction );
+	r = 1.0 / r;
+	float u = dot( q, b )*r;
+	float v = dot( q, a )*r;
+	float t = dot( n, p )*r;
+
+	if( u<0.0 || v<0.0 || (u+v)>1.0 )
+		t = -1.0;
+
+	if (t > rayMin && t < rayMax) {
+		return true;
+	}
+	return false;
+}
+
+float DistanceSquared( vec3 A, vec3 B ) {
+    vec3 C = A - B;
+    return dot( C, C );
+}
+
+
+
+bool PointInOrOn( vec3 P1, vec3 P2, vec3 A, vec3 B )
+{
+    vec3 CP1 = cross(B - A, P1 - A);
+    vec3 CP2 = cross(B - A, P2 - A);
+    return dot( CP1, CP2 ) >= 0;
+
+}
+
+bool PointInTriangle( vec3 px, vec3 p0, vec3 p1, vec3 p2 )
+{
+    
+    return PointInOrOn(px, p0, p1, p2) && PointInOrOn(px, p1, p2, p0) && PointInOrOn(px, p2, p0, p1);
+}
+
+vec3 IntersectPlane(vec3 rayO, vec3 rayDir, vec3 p0, vec3 p1, vec3 p2)
+{
+    vec3 D = rayDir;
+    vec3 N = cross(p1-p0, p2-p0);
+    vec3 X = rayO + D * dot(p0 - rayO, N) / dot(D, N);
+
+    return X;
+}
+bool IntersectTriangle(vec3 rayO, vec3 rayDir, float rayLenght, vec3 p0, vec3 p1, vec3 p2)
+{
+    vec3 X = IntersectPlane(rayO, rayDir, p0, p1, p2);
+    vec3 OX = X - rayO;
+    //if(length(OX) > rayLenght)
+        //return false;
+    return PointInTriangle(X, p0, p1, p2);
+}
+
+void main(){
+    //One ray per workgroup and then each invocation takes 1/32 (32 being Nivida's invocation size per workgroup of the triangles in sections to calculate
+    uint trianglesperInvocation = indicesSize / 32;
+
+    //to make this more efficient when i have lots of rays ill linearize the xyz cords instead of just using only the x cord
+    uint workGroupID = gl_WorkGroupID.x;
+    uint workInvocationID = gl_LocalInvocationID.x;
+    uint startTriangleIndex =  workInvocationID * trianglesperInvocation;
+    uint endTriangleIndex = min(startTriangleIndex + trianglesperInvocation, uint(indicesSize));
+
+
+   
+    int probeID = int(rayOrigin[workGroupID].w);
+
+
+    int id = 1;
+
+
+    for(int i = 0; i < trianglesperInvocation; i++){
+        uint idx0 = indices[startTriangleIndex + i * 3 + 0];
+        uint idx1 = indices[startTriangleIndex + i * 3 + 1];
+        uint idx2 = indices[startTriangleIndex + i * 3 + 2];
+
+        // Fetch vertices for the triangle and then transform them into world space
+        vec4 v0 = M[int(vertices[idx0].w)] * vertices[idx0];
+        vec4 v1 = M[int(vertices[idx1].w)] * vertices[idx1];
+        vec4 v2 = M[int(vertices[idx2].w)] * vertices[idx2];
+
+        // No need for this yet but later i'm keeping this here just incase I want to use this script for calculating color and light
+        //vec3 normal = normalize(cross(v1 - v0, v2 - v0));
+
+        //if intersect then return
+        bool intersect = TriIntersectBoolVersion(rayOrigin[workGroupID].xyz,rayDirection[workGroupID],rayLength[workGroupID] - 0.01 ,rayLength[workGroupID] + 0.01,v0.xyz,v1.xyz,v2.xyz);
+        if(intersect){
+            //so we know the probe isnt in view
+           id = 0;
+           break;
+        }
+    }
+    if(rayDirection[workGroupID] == vec3(0,0,1)){ probeVisbilty[probeID][0][0] = id;}
+    else if(rayDirection[workGroupID] == vec3(0,1,0)){ probeVisbilty[probeID][0][1] = id;}
+    else if(rayDirection[workGroupID] == vec3(0,1,1)){ probeVisbilty[probeID][0][2] = id;}
+    else if(rayDirection[workGroupID] == vec3(1,0,0)){ probeVisbilty[probeID][1][0] = id;}
+    else if(rayDirection[workGroupID] == vec3(1,0,1)){ probeVisbilty[probeID][1][1] = id;}
+    else if(rayDirection[workGroupID] == vec3(1,1,0)){ probeVisbilty[probeID][1][2] = id;}
+    else if(rayDirection[workGroupID] == vec3(1,1,1)){ probeVisbilty[probeID][2][0] = id;}
+
+    probeVisbilty[probeID][2][2] = probeID ;
+}

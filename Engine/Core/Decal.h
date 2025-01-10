@@ -138,7 +138,6 @@ private:
     };
 
 
-    //TODO:: Fix this so all decals are renderer in one draw call
     GLuint vertexbuffer;
     GLuint uvbuffer;
     GLuint normalbuffer;

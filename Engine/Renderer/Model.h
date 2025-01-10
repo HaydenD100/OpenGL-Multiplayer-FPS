@@ -45,6 +45,10 @@ public:
     bool RenderAll();
     std::string GetName();
 
+    int VertexInfoBind(int offset, int modelMatrixIndex);
+    int IndicesInfoBind(int offset);
+
+
     std::vector<glm::vec3> GetColliderShapeVerticies();
     size_t GetColliderShapeVerticiesSize();
 

@@ -92,7 +92,7 @@ bool BloomRenderer::Init(unsigned int windowWidth, unsigned int windowHeight)
 	mSrcViewportSizeFloat = glm::vec2((float)windowWidth, (float)windowHeight);
 
 	// Framebuffer
-	const unsigned int num_bloom_mips = 6; // TODO: Play around with this value
+	const unsigned int num_bloom_mips = 6;
 	bool status = mFBO.Init(windowWidth, windowHeight, num_bloom_mips);
 	if (!status) {
 		std::cerr << "Failed to initialize bloom FBO - cannot create bloom renderer!\n";

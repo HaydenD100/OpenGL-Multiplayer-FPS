@@ -205,10 +205,31 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scenem) {
 
 void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
     // process all the node's meshes (if any)
+    Texture* meshTexture = texture;
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         Mesh model_mesh = processMesh(mesh, scene);
+
+        if (scene->mNumMaterials > 0) {
+            aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+            aiString materialName;//The name of the material found in mesh file
+            aiString texturePathDiffuse;
+
+
+            material->Get(AI_MATKEY_NAME, materialName);//Get the material name (pass by reference)
+            material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), texturePathDiffuse);
+
+            auto texture = scene->GetEmbeddedTexture(texturePathDiffuse.C_Str());
+            if (texture) {
+                std::cout << "Emb \n";
+                AssetManager::AddTexture(Texture(material, scene));
+                meshTexture = AssetManager::GetTexture(materialName.C_Str());
+            }
+            std::cout << "Mesh Material Name: " << materialName.C_Str() << "\n";
+        }
+            
+            
         model_mesh.SetTexture(texture);
         int name_count = 0;
         for (int i = 0; i < meshes.size(); i++) {
@@ -318,4 +339,19 @@ AABB Model::generateAABB()
 
 std::string Model::GetName() {
     return name;
+}
+
+int Model::VertexInfoBind(int offset, int modelMatrixIndex) {
+    int size = 0;
+    for (int i = 0; i < meshes.size(); i++) {
+        size += meshes[i].BindVertices(offset, modelMatrixIndex);
+    }
+    return size;
+}
+int Model::IndicesInfoBind(int offset) {
+    int size = 0;
+    for (int i = 0; i < meshes.size(); i++) {
+        size += meshes[i].BindIndices(offset);
+    }
+    return size;
 }

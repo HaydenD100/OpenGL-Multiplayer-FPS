@@ -1,8 +1,6 @@
 #include "Scene.h"
 
 
-//TODO :: I want to pull all of the updating and rendering out the scene manager.
-
 Scene::Scene() {
 
 }
@@ -13,7 +11,7 @@ void Scene::LoadAssets() {
 	//Thank you to tokyosplif for some of the models and sounds
 
 	AssetManager::AddTexture("normal", "Assets/Textures/uvmap.png", "Assets/Normals/no_normal.png", 0.0,0.0);
-	AssetManager::AddTexture("white", "Assets/Textures/white.png", "Assets/Normals/bricks_normal.png", 0.5, 0.0);
+	AssetManager::AddTexture("white", "Assets/Textures/white.png", "Assets/Normals/no_normal.png", 0.5, 0.0);
 
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
 	AssetManager::AddTexture("red_glass", "Assets/Textures/red_glass.png", 0.1, 0.9);
@@ -31,7 +29,7 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("concrete", "Assets/Textures/fence.png", "Assets/Normals/fence_normal.png", 0.9, 0);
 	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png", 0.5, 0.5);
 	AssetManager::AddTexture("door", "Assets/Textures/door.png", "Assets/Normals/door_normal.png", 0.6, 0);
-	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png", 0.4, 0.4);
+	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png", 0.2, 0.7);
 	AssetManager::AddTexture("drawer", "Assets/Textures/drawerred.png", "Assets/Normals/drawer_normal.png", 0.7, 0);
 	AssetManager::AddTexture("lamp", "Assets/Textures/lamp.png", "Assets/Normals/lamp_normal.png", 0.7, 0.1);
 	AssetManager::AddTexture("beige_wall", "Assets/Textures/beige_wall.jpg", "Assets/Normals/beige_wall_normal.jpg", 0.7, 0);
@@ -82,6 +80,8 @@ void Scene::LoadAssets() {
 
 	AssetManager::AddModel("light_cube", Model("Assets/Objects/FBX/light_cube.fbx", AssetManager::GetTexture("uvmap")));
 
+	AssetManager::AddModel("Room", "Assets/Objects/Map1/shapespark-example-room.fbx", AssetManager::GetTexture("uvmap"));
+
 
 	AssetManager::AddModel("fence1", Model("Assets/Objects/fence1.fbx", AssetManager::GetTexture("concrete")));
 	AssetManager::AddModel("fence2", Model("Assets/Objects/fence2.fbx", AssetManager::GetTexture("concrete")));
@@ -116,6 +116,7 @@ void Scene::LoadAssets() {
 	AssetManager::GetModel("double_barrel_hand")->GetMeshByName("meshId3_name-mesh")->SetTexture(AssetManager::GetTexture("double_barrel_shotgun_wooden_grip_back"));
 	AssetManager::GetModel("double_barrel_hand")->GetMeshByName("meshId10_name-mesh")->SetTexture(AssetManager::GetTexture("double_barrel_shotgun_metal_receiver"));
 	AssetManager::GetModel("double_barrel_hand")->GetMeshByName("Arms_L_R_Mesh_002-mesh")->SetTexture(AssetManager::GetTexture("arm"));
+
 
 
 	//AssetManager::AddModel("map_floor", Model("Assets/Objects/Map1/floors.fbx", AssetManager::GetTexture("wooden_floor")));
@@ -178,19 +179,8 @@ void Scene::Load() {
 
 		AssetManager::AddGameObject("map_indirectLight", AssetManager::GetModel("map_indirectLight"), glm::vec3(0, 6, 0), true, 0, Concave);
 		//AssetManager::GetGameObject("map_indirectLight")->SetRotationX(-1.5708f);
-
 		
 		// Sets renderer
-		/*
-		std::vector<std::string> faces{
-			"Assets/Skybox/daylight/right.png",
-				"Assets/Skybox/daylight/left.png",
-				"Assets/Skybox/daylight/top.png",
-				"Assets/Skybox/daylight/bottom.png",
-				"Assets/Skybox/daylight/front.png",
-				"Assets/Skybox/daylight/back.png"
-		};
-		*/
 		std::vector<std::string> faces{
 			"Assets/Skybox/Space/right.png",
 				"Assets/Skybox/Space/left.png",
@@ -229,7 +219,6 @@ void Scene::Load() {
 			Light light(glm::vec3(-4.44, 6.6, 0), glm::vec3(1, 0, 0.847) * 8.0f, 0.22, 0.20);
 			lights.push_back(light);
 		}
-		
 
 		{
 			Light light(glm::vec3(0, 11, -2.4), glm::vec3(1, 0.922, 0.678) * 8.0f, 0.07, 0.017);

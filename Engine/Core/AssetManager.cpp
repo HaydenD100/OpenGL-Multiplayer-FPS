@@ -186,6 +186,11 @@ namespace AssetManager
 	}
 
 	size_t AssetManager::AddTexture(Texture texture) {
+		//Make sure textures cant have the same name
+		for (int i = 0; i < Textures.size(); i++) {
+			if (Textures[i].GetName() == texture.GetName())
+				return i;
+		}
 		Textures.push_back(texture);
 		return Textures.size() - 1;
 	}

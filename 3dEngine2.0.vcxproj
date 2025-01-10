@@ -51,6 +51,7 @@
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -197,6 +198,7 @@
     <ClCompile Include="Engine\Networking\NetworkManager.cpp" />
     <ClCompile Include="Engine\Renderer\Texture3D.cpp" />
     <ClCompile Include="Engine\Renderer\Probe.cpp" />
+    <ClCompile Include="Engine\Renderer\Raycaster.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Saves\mainScene.json" />
@@ -213,10 +215,14 @@
     <None Include="Assets\Shaders\Editor\Editor.vert" />
     <None Include="Assets\Shaders\Final\final.frag" />
     <None Include="Assets\Shaders\Final\final.vert" />
+    <None Include="Assets\Shaders\fxaa\fxaa.frag" />
+    <None Include="Assets\Shaders\fxaa\fxaa.vert" />
+    <None Include="Assets\Shaders\GI\irradiance.comp" />
     <None Include="Assets\Shaders\GI\irradiance.frag" />
     <None Include="Assets\Shaders\GI\irradiance.vert" />
     <None Include="Assets\Shaders\GI\probe.frag" />
     <None Include="Assets\Shaders\GI\probe.vert" />
+    <None Include="Assets\Shaders\GI\probeCheck.comp" />
     <None Include="Assets\Shaders\GI\renderProbes.frag" />
     <None Include="Assets\Shaders\GI\renderProbes.vert" />
     <None Include="Assets\Shaders\Lighting\lighting.frag" />
@@ -300,6 +306,7 @@
     <ClInclude Include="Engine\Networking\NetworkManager.h" />
     <ClInclude Include="Engine\Renderer\Texture3D.h" />
     <ClInclude Include="Engine\Renderer\Probe.h" />
+    <ClInclude Include="Engine\Renderer\Raycaster.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="github\screenshots\3DEngine.png" />

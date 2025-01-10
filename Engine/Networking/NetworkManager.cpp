@@ -527,6 +527,9 @@ namespace NetworkManager
 
 			else
 				SendDataToServer(sendbuf);
+
+
+			free(sendbuf);
 		}
 
 		return 0;

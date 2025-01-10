@@ -151,7 +151,10 @@ void main()
     // Get color
     vec2 texcoord = clamp(coords.xy,0,1);
     vec3 SSR1 = texture(gFinal, texcoord).xyz * clamp(ReflectionMultiplier, 0.0, 0.9) * Fresnel;
-    vec3 SSR = textureLod(gFinal, coords.xy, 0).rgb * clamp(ReflectionMultiplier, 0.0, 0.9) * Fresnel;
+    //vec3 SSR = textureLod(gFinal, coords.xy, 0).rgb * clamp(ReflectionMultiplier, 0.0, 0.9) * Fresnel;
 
-	gSSR = vec4(SSR,Metallic);
+   if(texture(gRMA,texcoord).z == 1 && Metallic > 0.01)
+        gSSR = vec4(texture(gFinal, UV).xyz, Metallic);
+   else
+	gSSR = vec4(SSR1, Metallic);
 }

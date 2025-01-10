@@ -159,6 +159,9 @@
     <ClCompile Include="Engine\Renderer\Bloom.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Renderer\Raycaster.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Scene\Scene.h">
@@ -311,6 +314,9 @@
     <ClInclude Include="Engine\Renderer\Bloom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Renderer\Raycaster.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\SkyBoxShader.vert" />
@@ -359,6 +365,10 @@
     <None Include="Assets\Shaders\Bloom\upscale.frag" />
     <None Include="Assets\Shaders\SolidColour\solidColour.frag" />
     <None Include="Assets\Shaders\SolidColour\solidColour.vert" />
+    <None Include="Assets\Shaders\fxaa\fxaa.vert" />
+    <None Include="Assets\Shaders\fxaa\fxaa.frag" />
+    <None Include="Assets\Shaders\GI\irradiance.comp" />
+    <None Include="Assets\Shaders\GI\probeCheck.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

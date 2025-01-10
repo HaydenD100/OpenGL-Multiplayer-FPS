@@ -6,6 +6,7 @@
 struct StorageBuffer {
 	void Configure(int size);
 	void Bind(int index);
+	void Bind();
 
 	GLuint GetID();
 

@@ -3,7 +3,7 @@
 #include "Engine/Core/Common.h"
 #include "Engine/Core/DecalInstance.h"
 #include "Engine/Renderer/Bloom.h"
-
+#include "Engine/Renderer/Raycaster.h"
 
 #include <random>
 
@@ -99,6 +99,9 @@ namespace Renderer
 	Shader s_probeRender;
 	Shader s_probeirradiance;
 	Shader s_SolidColor;
+	Shader s_fxaa;
+	ComputeShader cs_Raycaster;
+
 
 
 	Shader s_downScale;
@@ -114,10 +117,13 @@ namespace Renderer
 
 	GBuffer gbuffer;
 
-
+	//TODO make a general buffer class
 	BufferLighting lightingBuffer;
+	BufferLighting postBuffer;
+
 	BufferSSAO ssaoBuffer;
 	BufferSSR ssrBuffer;
+	BufferSSR fxaaBuffer;
 
 	ProbeGrid probeGrid;
 
@@ -140,7 +146,6 @@ namespace Renderer
 		s_skybox.Load("Assets/Shaders/SkyBoxShader.vert", "Assets/Shaders/SkyBoxShader.frag");
 		s_geomerty.Load("Assets/Shaders/Deffered/geomerty.vert", "Assets/Shaders/Deffered/geomerty.frag");
 		s_ssao.Load("Assets/Shaders/SSAO/ssao.vert", "Assets/Shaders/SSAO/ssao.frag");
-
 		s_screen.Load("Assets/Shaders/Texture_Render/Texture_Render.vert", "Assets/Shaders/Texture_Render/Texture_Render.frag");
 		s_transparent.Load("Assets/Shaders/Transparent/transparent.vert", "Assets/Shaders/Transparent/transparent.frag");
 		s_shadow.Load("Assets/Shaders/Shadow/depth.vert", "Assets/Shaders/Shadow/depth.frag", "Assets/Shaders/Shadow/depth.geom");
@@ -155,18 +160,16 @@ namespace Renderer
 		s_downScale.Load("Assets/Shaders/Bloom/bloom.vert", "Assets/Shaders/Bloom/downscale.frag");
 		s_upScale.Load("Assets/Shaders/Bloom/bloom.vert", "Assets/Shaders/Bloom/upscale.frag");
 		s_SolidColor.Load("Assets/Shaders/SolidColour/solidColour.vert", "Assets/Shaders/SolidColour/solidColour.frag");
+		s_fxaa.Load("Assets/Shaders/fxaa/fxaa.vert", "Assets/Shaders/fxaa/fxaa.frag");
+		cs_Raycaster.Load("Assets/Shaders/GI/triangleIntersection.comp");
 
 
-
-
+		//TODO :: change this so the texture bindings are defined in the GLSL shader
 		
 		s_lighting.Use();
-
-
 		for (int i = 0; i < 26; i++) {
 			s_lighting.SetInt("depthMap[" + std::to_string(i) + "]", 8 + i);
 		}
-
 
 
 		s_skybox.Use();
@@ -283,6 +286,9 @@ namespace Renderer
 		ssaoBuffer.Configure();
 		ssrBuffer.Configure(Backend::GetWidth(), Backend::GetHeight());
 		lightingBuffer.Configure();
+		postBuffer.Configure();
+
+		fxaaBuffer.Configure(Backend::GetWidth(), Backend::GetHeight());
 
 		static const GLfloat g_quad_vertex_buffer_data[] = {
 		-1.0f, -1.0f, 0.0f,
@@ -321,16 +327,21 @@ namespace Renderer
 		GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0};
 		glDrawBuffers(1, DrawBuffers);
 
+		Raycaster::Init();
 
 		//this is the projection to voxlize the scene from orgin (0,0,0) while the other one is the view of the camera
 		//voxel_orth = glm::ortho(-((float)voxelize_scene_albedo.GetWidth() / 2.0f), (float)voxelize_scene_albedo.GetWidth() / 2.0f, (float)voxelize_scene_albedo.GetWidth() / 2.0f, -((float)voxelize_scene_albedo.GetWidth() / 2.0f), -(float)voxelize_scene_albedo.GetWidth()/2.0f, (float)voxelize_scene_albedo.GetWidth()/2.0f);
 		float spacing = 1;
 		glm::vec3 propgationGridSize = glm::vec3(15, 7, 15);
-		probeTexture.Create(glm::ceil(propgationGridSize.x * 1 / spacing), glm::ceil(propgationGridSize.y * 1 / spacing), glm::ceil(propgationGridSize.z * 1 / spacing));
-		probeGrid.Configure(propgationGridSize.x, propgationGridSize.y, propgationGridSize.z, spacing, glm::vec3(-6.4,-1.4 + 6,-7.4));
-		//probeGrid.AddProbe(glm::vec3(6, 1, 2));
-		SHBuffer.Configure(6000 * sizeof(glm::vec3) * 9);
+		//glm::vec3 propgationGridSize = glm::vec3(2, 1, 1);
+		glm::vec3 gridPos = glm::vec3(-6.4, -1.4 + 6, -7.4);
+		//glm::vec3 gridPos = glm::vec3(-2.2, 9.6, -2.8);
 
+
+		probeTexture.Create(glm::ceil(propgationGridSize.x * 1 / spacing), glm::ceil(propgationGridSize.y * 1 / spacing), glm::ceil(propgationGridSize.z * 1 / spacing));
+		probeGrid.Configure(propgationGridSize.x, propgationGridSize.y, propgationGridSize.z, spacing, gridPos);
+		//probeGrid.AddProbe(glm::vec3(6, 1, 2));
+		SHBuffer.Configure(7500 * sizeof(glm::vec3) * 9 + 7500 * sizeof(glm::mat4));
 
 		emmisiveRenderer.Init(Backend::GetWidth(), Backend::GetHeight());
 
@@ -420,6 +431,7 @@ namespace Renderer
 			shader.SetMat4("M", ModelMatrix);
 
 			gameobjectRender->RenderObject(shader.GetShaderID());
+
 		}
 	}
 	void Renderer::RenderText(const char* text,int x, int y, int size) {
@@ -432,7 +444,19 @@ namespace Renderer
 
 
 		//--------------------------------------------PROBE-------------------------------------------	
+		
+		//Should really only do this with one probe in the grid for debugging purposes
 		//Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->getLights());
+		//cs_Raycaster.Use();
+		//probeTexture.Bind(6);
+		//Raycaster::Bind();
+		//Raycaster::Compute();
+		//cs_Raycaster.SetVec3("gridWorldPos", probeGrid.postion);
+		//cs_Raycaster.SetVec3("volume", probeGrid.volume);
+		//cs_Raycaster.SetFloat("spacing", probeGrid.spacing);
+		//cs_Raycaster.SetInt("indicesSize", Raycaster::GetIndicesSize());
+
+		
 
 		//-------------------------------------------GBUFFER-----------------------------------------
 
@@ -548,6 +572,9 @@ namespace Renderer
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glm::vec3 cameraPosition = Camera::GetPosition(); // Camera position
 
+
+		//TODO :: CHANGE THIS TO OIT this gets slow if theres too many transparent objects
+	
 		std::sort(NeedRendering.begin(), NeedRendering.end(),
 			[&cameraPosition](const GameObject* a, const GameObject* b) {
 				float distanceA = glm::length(a->GetPosition() - cameraPosition);
@@ -707,10 +734,12 @@ namespace Renderer
 
 
 		//---------------------------------------------------Post-------------------------------------
-		glBindFramebuffer(GL_FRAMEBUFFER, FinalFrameFBO);
-		glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
+
+
+
+		postBuffer.Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+
 		s_Post.Use();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, lightingBuffer.gLighting);
@@ -718,8 +747,6 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, ssrBuffer.gSSR);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, emmisiveRenderer.BloomTexture());
-
-
 		RenderPlane();
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -728,9 +755,11 @@ namespace Renderer
 
 		//--------------------------------------------------Final-------------------------------------
 
-		s_final.Use();
+		s_fxaa.Use();
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, FinalFrameTexture); //FinalFrameTexture);
+		glBindTexture(GL_TEXTURE_2D, postBuffer.gLighting); //FinalFrameTexture);
+		s_fxaa.SetFloat("viewportWidth", Backend::GetWidth());
+		s_fxaa.SetFloat("viewportHeight", Backend::GetHeight());
 
 		RenderPlane();
 
