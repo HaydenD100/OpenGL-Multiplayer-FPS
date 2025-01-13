@@ -47,6 +47,14 @@ namespace Backend
 		glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+		/*
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		ImGui::StyleColorsDark();
+		ImGui_ImplGlfw_InitForOpenGL(window, true);
+		ImGui_ImplOpenGL3_Init("#version 430");
+		*/
 		Renderer::init();
 		return 0;
 	}

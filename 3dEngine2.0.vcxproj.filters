@@ -369,6 +369,8 @@
     <None Include="Assets\Shaders\fxaa\fxaa.frag" />
     <None Include="Assets\Shaders\GI\irradiance.comp" />
     <None Include="Assets\Shaders\GI\probeCheck.comp" />
+    <None Include="Assets\Shaders\Water\water.vert" />
+    <None Include="Assets\Shaders\Water\water.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

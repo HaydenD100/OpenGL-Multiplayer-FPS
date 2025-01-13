@@ -128,6 +128,8 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("map_test1", Model("Assets/Maps/dusty_1.fbx", AssetManager::GetTexture("brick")));
 
 	AssetManager::AddModel("map_indirectLight", Model("Assets/Maps/lightingTest.obj", AssetManager::GetTexture("white")));
+	AssetManager::AddModel("water", Model("Assets/Objects/FBX/water_test.obj", AssetManager::GetTexture("white")));
+
 
 	Model* model = AssetManager::GetModel("map_test1");
 	model->GetMeshByName("floor.001")->SetTexture(AssetManager::GetTexture("sand_ground"));
@@ -178,7 +180,8 @@ void Scene::Load() {
 
 
 		AssetManager::AddGameObject("map_indirectLight", AssetManager::GetModel("map_indirectLight"), glm::vec3(0, 6, 0), true, 0, Concave);
-		//AssetManager::GetGameObject("map_indirectLight")->SetRotationX(-1.5708f);
+		AssetManager::AddGameObject("water_test", AssetManager::GetModel("water"), glm::vec3(3, 10, -3), true, 0, Concave);
+		AssetManager::GetGameObject("water_test")->SetShaderType("water");
 		
 		// Sets renderer
 		std::vector<std::string> faces{
@@ -221,7 +224,7 @@ void Scene::Load() {
 		}
 
 		{
-			Light light(glm::vec3(0, 11, -2.4), glm::vec3(1, 0.922, 0.678) * 8.0f, 0.07, 0.017);
+			Light light(glm::vec3(0, 12, -2.4), glm::vec3(1, 0.922, 0.678) * 8.0f, 0.07, 0.017);
 			lights.push_back(light);
 		}
 		

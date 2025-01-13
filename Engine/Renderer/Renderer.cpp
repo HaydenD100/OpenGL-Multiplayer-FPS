@@ -100,6 +100,7 @@ namespace Renderer
 	Shader s_probeirradiance;
 	Shader s_SolidColor;
 	Shader s_fxaa;
+	Shader s_water;
 	ComputeShader cs_Raycaster;
 
 
@@ -132,6 +133,8 @@ namespace Renderer
 
 	//some objects will be withheld from rendering in the gemoetry render
 	std::vector<GameObject*> NeedRendering;
+	std::vector<GameObject*> overlay;
+	std::vector<GameObject*> waterObjects;
 
 
 	//state stuff
@@ -161,6 +164,9 @@ namespace Renderer
 		s_upScale.Load("Assets/Shaders/Bloom/bloom.vert", "Assets/Shaders/Bloom/upscale.frag");
 		s_SolidColor.Load("Assets/Shaders/SolidColour/solidColour.vert", "Assets/Shaders/SolidColour/solidColour.frag");
 		s_fxaa.Load("Assets/Shaders/fxaa/fxaa.vert", "Assets/Shaders/fxaa/fxaa.frag");
+		s_water.Load("Assets/Shaders/Water/water.vert", "Assets/Shaders/Water/water.frag");
+
+
 		cs_Raycaster.Load("Assets/Shaders/GI/triangleIntersection.comp");
 
 
@@ -332,7 +338,7 @@ namespace Renderer
 		//this is the projection to voxlize the scene from orgin (0,0,0) while the other one is the view of the camera
 		//voxel_orth = glm::ortho(-((float)voxelize_scene_albedo.GetWidth() / 2.0f), (float)voxelize_scene_albedo.GetWidth() / 2.0f, (float)voxelize_scene_albedo.GetWidth() / 2.0f, -((float)voxelize_scene_albedo.GetWidth() / 2.0f), -(float)voxelize_scene_albedo.GetWidth()/2.0f, (float)voxelize_scene_albedo.GetWidth()/2.0f);
 		float spacing = 1;
-		glm::vec3 propgationGridSize = glm::vec3(15, 7, 15);
+		glm::vec3 propgationGridSize = glm::vec3(15, 9, 15);
 		//glm::vec3 propgationGridSize = glm::vec3(2, 1, 1);
 		glm::vec3 gridPos = glm::vec3(-6.4, -1.4 + 6, -7.4);
 		//glm::vec3 gridPos = glm::vec3(-2.2, 9.6, -2.8);
@@ -401,6 +407,8 @@ namespace Renderer
 
 	void Renderer::RenderAllObjects(Shader& shader) {
 		NeedRendering.clear();
+		overlay.clear();
+		waterObjects.clear();
 		glm::mat4 ViewMatrix = Camera::getViewMatrix();
 		for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
 			GameObject* gameobjectRender = AssetManager::GetGameObject(i);
@@ -526,8 +534,6 @@ namespace Renderer
 			AssetManager::GetModel("light_cube")->RenderModel(s_SolidColor.GetShaderID());
 		}
 
-
-
 		if(Input::KeyDown('g'))
 			probeGrid.ShowProbes();
 
@@ -562,10 +568,6 @@ namespace Renderer
 		
 		//-----------------------------------------Transaprent stuff---------------------------------------
 		s_transparent.Use();
-
-		//SetLights(SceneManager::GetCurrentScene()->getLights());
-
-
 		s_transparent.SetMat4("P", Camera::getProjectionMatrix());
 		s_transparent.SetMat4("V", Camera::getViewMatrix());
 		s_transparent.SetVec3("viewPos", Camera::GetPosition());
@@ -583,10 +585,15 @@ namespace Renderer
 				return distanceA > distanceB; // Sort by descending distance (farthest first)
 			});
 
-		std::vector<GameObject*> overlay; 
+
+
 		for (int i = 0; i < NeedRendering.size(); i++) {
 			if (NeedRendering[i]->GetShaderType() == "Overlay") {
 				overlay.push_back(NeedRendering[i]);
+				continue;
+			}
+			if (NeedRendering[i]->GetShaderType() == "water") {
+				waterObjects.push_back(NeedRendering[i]);
 				continue;
 			}
 			auto transforms = NeedRendering[i]->GetFinalBoneMatricies();
@@ -610,9 +617,33 @@ namespace Renderer
 		}
 
 
+		s_water.Use();
+		s_water.SetMat4("P", Camera::getProjectionMatrix());
+		s_water.SetMat4("V", Camera::getViewMatrix());
+		s_water.SetVec3("viewPos", Camera::GetPosition());
+		s_water.SetFloat("time", glfwGetTime());
+		for (int i = 0; i < waterObjects.size(); i++) {
+			auto transforms = waterObjects[i]->GetFinalBoneMatricies();
+			if (transforms[0] != glm::mat4(1)) {
+				s_water.SetBool("animated", true);
+				for (int i = 0; i < transforms.size(); ++i) {
+					std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
+					s_water.SetMat4(pos.c_str(), transforms[i]);
+				}
+			}
+			else {
+				s_water.SetBool("animated", false);
+			}
+			glm::mat4 ModelMatrix = waterObjects[i]->GetModelMatrix();
+			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;
+			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
+
+			s_water.SetMat3("normalMatrix3", normalMatrix);
+			s_water.SetMat4("M", ModelMatrix);
+			waterObjects[i]->RenderObject(s_water.GetShaderID());
+		}
+
 		glDisable(GL_BLEND);
-
-
 
 		//---------------------------------------------------Overlay-------------------------------------
 		s_geomerty.Use();

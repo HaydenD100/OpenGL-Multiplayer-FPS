@@ -12,6 +12,8 @@ in vec2 offsetBL;
 in vec2 offsetBR;
 in vec2 texCoordOffset;
 
+//TokyoSplif code
+
 // FXAA implementation
 vec3 Fxaa(sampler2D tex) {
     // Constants for FXAA
@@ -64,7 +66,6 @@ vec3 Fxaa(sampler2D tex) {
 }
 
 void main() {
-    // Apply FXAA to the input texture
     vec3 result = Fxaa(inputTexture);
     //result = texture(inputTexture, TexCoords).xyz;
     // Output the final color

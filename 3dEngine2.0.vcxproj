@@ -251,6 +251,8 @@
     <None Include="Assets\Shaders\Voxel\voxel.vert" />
     <None Include="Assets\Shaders\Voxel\voxel_display.frag" />
     <None Include="Assets\Shaders\Voxel\voxel_display.vert" />
+    <None Include="Assets\Shaders\Water\water.frag" />
+    <None Include="Assets\Shaders\Water\water.vert" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />
