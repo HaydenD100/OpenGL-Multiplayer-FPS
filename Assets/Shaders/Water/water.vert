@@ -53,33 +53,17 @@ void main()
         BoneTransform     += finalBonesMatrices[boneIds[2]] * weights[2];
         BoneTransform     += finalBonesMatrices[boneIds[3]] * weights[3];
         animationTrnasformed =  BoneTransform * vec4(vertexPosition_modelspace,1);
-
-        mat3 normalMatrix = transpose(inverse(mat3(V * M)));
-        vec3 normal = normalize(normalMatrix * mat3(BoneTransform)  * vertexNormal_modelspace);
-        vec3 tangent = normalize(normalMatrix * mat3(BoneTransform)  * vertexTangent_modelspace);
-        vec3 bitangent = normalize(normalMatrix * mat3(BoneTransform)  * vertexBitangent_modelspace);
-
-        TBN = mat3(tangent, bitangent, normal); // Construct TBN matrix for transforming the normal map
     }
     else{
         animationTrnasformed =  vec4(vertexPosition_modelspace,1.0f);
-        mat3 normalMatrix = transpose(inverse(mat3(V * M)));
-        vec3 normal = normalize(normalMatrix * vertexNormal_modelspace);
-        vec3 tangent = normalize(normalMatrix * vertexTangent_modelspace);
-        vec3 bitangent = normalize(normalMatrix * vertexBitangent_modelspace);
-
-        TBN = mat3(tangent, bitangent, normal); // Construct TBN matrix for transforming the normal map
     }
 
     // Calculate wave 1 displacement
     float wave1 = amplitude1 * sin(dot(animationTrnasformed.xz, direction1) * frequency1 + time * speed1);
-    
     // Calculate wave 2 displacement
     float wave2 = amplitude2 * sin(dot(animationTrnasformed.xz, direction2) * frequency2 + time * speed2);
-    
     // Calculate wave 3 displacement
     float wave3 = amplitude3 * sin(dot(animationTrnasformed.xz, direction3) * frequency3 + time * speed3) - 1;
-
     // Sum of the waves
     float totalWave = wave1 + wave2 + pow(2.718281828459045,wave3);
     
@@ -115,7 +99,7 @@ void main()
     TrueNormal = vec3(M * vec4(normal,0));
     worldPos = M * vec4(displacedPosition,1);
     viewPos = V * worldPos;
-    FragPos = viewPos.xyz; 
+    FragPos = worldPos.xyz; 
     UV = vertexUV;
     gl_Position = P * viewPos;
 

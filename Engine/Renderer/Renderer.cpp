@@ -101,6 +101,8 @@ namespace Renderer
 	Shader s_SolidColor;
 	Shader s_fxaa;
 	Shader s_water;
+	Shader s_textShader;
+
 	ComputeShader cs_Raycaster;
 
 
@@ -166,6 +168,8 @@ namespace Renderer
 		s_fxaa.Load("Assets/Shaders/fxaa/fxaa.vert", "Assets/Shaders/fxaa/fxaa.frag");
 		s_water.Load("Assets/Shaders/Water/water.vert", "Assets/Shaders/Water/water.frag");
 
+		s_textShader.Load("Assets/Shaders/textShader.vert", "Assets/Shaders/textShader.frag");
+
 
 		cs_Raycaster.Load("Assets/Shaders/GI/triangleIntersection.comp");
 
@@ -175,6 +179,11 @@ namespace Renderer
 		s_lighting.Use();
 		for (int i = 0; i < 26; i++) {
 			s_lighting.SetInt("depthMap[" + std::to_string(i) + "]", 8 + i);
+		}
+
+		s_water.Use();
+		for (int i = 0; i < 26; i++) {
+			s_water.SetInt("depthMap[" + std::to_string(i) + "]", 8 + i);
 		}
 
 
@@ -356,7 +365,7 @@ namespace Renderer
 
 
 	
-	void Renderer::SetLights(std::vector<Light> lights) {
+	void Renderer::SetLights(std::vector<Light> lights, Shader* shader) {
 		// Upload lights data to the GPU
 		std::vector<glm::vec3> lightPositions;
 		std::vector<glm::vec3> lightDirection;
@@ -381,14 +390,14 @@ namespace Renderer
 		}
 
 
-		s_lighting.SetVec3Array("LightPositions_worldspace", lightPositions);
-		s_lighting.SetVec3Array("Lightdirection", lightDirection);
-		s_lighting.SetVec3Array("LightColors", lightColors);
-		s_lighting.SetFloatArray("LightLinears", LightLinears);
-		s_lighting.SetFloatArray("LightQuadratics", LightQuadratics);
-		s_lighting.SetFloatArray("LightRadius", LightRadius);
-		s_lighting.SetFloatArray("LightCutOff", LightCutoff);
-		s_lighting.SetFloatArray("LightOuterCutOff", LightOuterCutOff);
+		shader->SetVec3Array("LightPositions_worldspace", lightPositions);
+		shader->SetVec3Array("Lightdirection", lightDirection);
+		shader->SetVec3Array("LightColors", lightColors);
+		shader->SetFloatArray("LightLinears", LightLinears);
+		shader->SetFloatArray("LightQuadratics", LightQuadratics);
+		shader->SetFloatArray("LightRadius", LightRadius);
+		shader->SetFloatArray("LightCutOff", LightCutoff);
+		shader->SetFloatArray("LightOuterCutOff", LightOuterCutOff);
 
 		// Upload depth maps (cubemap for shadow mapping)
 		for (int i = 0; i < lights.size(); i++) {
@@ -622,6 +631,10 @@ namespace Renderer
 		s_water.SetMat4("V", Camera::getViewMatrix());
 		s_water.SetVec3("viewPos", Camera::GetPosition());
 		s_water.SetFloat("time", glfwGetTime());
+		s_water.SetVec3("viewPos", Camera::GetPosition());
+
+		SetLights(lights, &s_water);
+
 		for (int i = 0; i < waterObjects.size(); i++) {
 			auto transforms = waterObjects[i]->GetFinalBoneMatricies();
 			if (transforms[0] != glm::mat4(1)) {
@@ -699,7 +712,7 @@ namespace Renderer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		s_lighting.Use();
-		SetLights(lights);
+		SetLights(lights,&s_lighting);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);

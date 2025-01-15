@@ -103,6 +103,8 @@ namespace Renderer
 	extern Shader s_downScale;
 	extern Shader s_upScale;
 	extern Shader s_SolidColor;
+	extern Shader s_textShader;
+
 	extern ComputeShader cs_Raycaster;
 
 	extern StorageBuffer SHBuffer;
@@ -130,7 +132,7 @@ namespace Renderer
 
 
     // Shader
-    void SetLights(std::vector<Light> lights);
+    void SetLights(std::vector<Light> lights, Shader* shader);
     void RenderScene();
     void RenderPlane();
 

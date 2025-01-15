@@ -180,7 +180,7 @@ void Scene::Load() {
 
 
 		AssetManager::AddGameObject("map_indirectLight", AssetManager::GetModel("map_indirectLight"), glm::vec3(0, 6, 0), true, 0, Concave);
-		AssetManager::AddGameObject("water_test", AssetManager::GetModel("water"), glm::vec3(3, 10, -3), true, 0, Concave);
+		AssetManager::AddGameObject("water_test", AssetManager::GetModel("water"), glm::vec3(-1, 10, -6), true, 0, Concave);
 		AssetManager::GetGameObject("water_test")->SetShaderType("water");
 		
 		// Sets renderer

@@ -18,7 +18,7 @@ const float step = 0.1;
 const float minRayStep = 0.1;
 const float maxSteps = 30;
 const int numBinarySearchSteps = 10;
-const float reflectionSpecularFalloffExponent = 0.0;
+const float reflectionSpecularFalloffExponent = 3.0;
 
 //Credits to imanolfotia for the code, you can find there video and the code at https://imanolfotia.com/blog/1
 
@@ -153,8 +153,8 @@ void main()
     vec3 SSR1 = texture(gFinal, texcoord).xyz * clamp(ReflectionMultiplier, 0.0, 0.9) * Fresnel;
     //vec3 SSR = textureLod(gFinal, coords.xy, 0).rgb * clamp(ReflectionMultiplier, 0.0, 0.9) * Fresnel;
 
-   if(texture(gRMA,texcoord).z == 1 && Metallic > 0.01)
-        gSSR = vec4(texture(gFinal, UV).xyz, Metallic);
+   if(texture(gRMA,texcoord).z > 0.99)
+        gSSR = vec4(texture(gFinal, UV).xyz, 1);
    else
-	gSSR = vec4(SSR1, Metallic);
+        gSSR = vec4(SSR1, Metallic);
 }
