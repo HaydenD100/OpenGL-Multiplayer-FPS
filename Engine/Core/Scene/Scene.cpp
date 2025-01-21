@@ -10,8 +10,7 @@ void Scene::LoadAssets() {
 	AnimationManager::ClearAnimations();
 	//Thank you to tokyosplif for some of the models and sounds
 
-	AssetManager::AddTexture("normal", "Assets/Textures/uvmap.png", "Assets/Normals/no_normal.png", 0.0,0.0);
-	AssetManager::AddTexture("white", "Assets/Textures/white.png", "Assets/Normals/no_normal.png", 0.5, 0.0);
+	AssetManager::AddTexture("white", "Assets/Textures/white.png", 0.5, 0.0);
 
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
 	AssetManager::AddTexture("red_glass", "Assets/Textures/red_glass.png", 0.1, 0.9);
@@ -127,6 +126,10 @@ void Scene::LoadAssets() {
 	//AssetManager::GetModel("map_test1")->GetMeshByName("Map_floor")->SetTexture(AssetManager::GetTexture("wooden_floor"));
 	AssetManager::AddModel("map_test1", Model("Assets/Maps/dusty_1.fbx", AssetManager::GetTexture("brick")));
 
+	AssetManager::AddModel("map_test2", Model("Assets/Maps/other_map.obj", AssetManager::GetTexture("white")));
+	AssetManager::AddModel("couch", Model("Assets/Objects/FBX/couch.fbx", AssetManager::GetTexture("white")));
+
+
 	AssetManager::AddModel("map_indirectLight", Model("Assets/Maps/lightingTest.obj", AssetManager::GetTexture("white")));
 	AssetManager::AddModel("water", Model("Assets/Objects/FBX/water_test.obj", AssetManager::GetTexture("white")));
 
@@ -178,8 +181,14 @@ void Scene::Load() {
 		//AssetManager::AddGameObject("map_test1", AssetManager::GetModel("map_test1"), glm::vec3(0, 0, 0), true, 0, Concave);
 		//AssetManager::GetGameObject("map_test1")->SetRotationX(-1.5708f);
 
+		
+		//AssetManager::AddGameObject("map_indirectLight", AssetManager::GetModel("map_indirectLight"), glm::vec3(0, 6, 0), true, 0, Concave);
+		AssetManager::AddGameObject("map_test2", AssetManager::GetModel("map_test2"), glm::vec3(0, 6, 0), true, 0, Concave);
 
-		AssetManager::AddGameObject("map_indirectLight", AssetManager::GetModel("map_indirectLight"), glm::vec3(0, 6, 0), true, 0, Concave);
+		//AssetManager::AddGameObject("couch", AssetManager::GetModel("couch"), glm::vec3(-1.69, 6.4, -3.56), true, 0, Box);
+
+		//AssetManager::GetGameObject("couch")->SetRotationX(-1.5708f);
+
 		AssetManager::AddGameObject("water_test", AssetManager::GetModel("water"), glm::vec3(-1, 10, -6), true, 0, Concave);
 		AssetManager::GetGameObject("water_test")->SetShaderType("water");
 		
@@ -219,10 +228,13 @@ void Scene::Load() {
 		*/
 
 		{
-			Light light(glm::vec3(-4.44, 6.6, 0), glm::vec3(1, 0, 0.847) * 8.0f, 0.22, 0.20);
+			Light light(glm::vec3(-3.27, 7.2, 3.42), glm::vec3(1, 0.11, 0) * 6.0f, 0.22, 0.20);
 			lights.push_back(light);
 		}
-
+		{
+			Light light(glm::vec3(-4.44, 6.6, 0), glm::vec3(0, 0.573, 1) * 6.0f, 0.22, 0.20);
+			lights.push_back(light);
+		}
 		{
 			Light light(glm::vec3(0, 12, -2.4), glm::vec3(1, 0.922, 0.678) * 8.0f, 0.07, 0.017);
 			lights.push_back(light);

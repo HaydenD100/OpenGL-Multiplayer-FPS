@@ -102,48 +102,35 @@ namespace Renderer
 	Shader s_fxaa;
 	Shader s_water;
 	Shader s_textShader;
-
-	ComputeShader cs_Raycaster;
-
-
-
 	Shader s_downScale;
 	Shader s_upScale;
 
-	BloomRenderer emmisiveRenderer;
+	ComputeShader cs_Raycaster;
 
+	BloomRenderer emmisiveRenderer;
 
 	StorageBuffer SHBuffer;
 	Texture3D probeTexture;
 
-
-
-	GBuffer gbuffer;
-
 	//TODO make a general buffer class
-	BufferLighting lightingBuffer;
-	BufferLighting postBuffer;
-
+	GBuffer gbuffer;
 	BufferSSAO ssaoBuffer;
 	BufferSSR ssrBuffer;
 	BufferSSR fxaaBuffer;
-
+	BufferLighting lightingBuffer;
+	BufferLighting postBuffer;
 	ProbeGrid probeGrid;
-
-
-	
 
 	//some objects will be withheld from rendering in the gemoetry render
 	std::vector<GameObject*> NeedRendering;
 	std::vector<GameObject*> overlay;
 	std::vector<GameObject*> waterObjects;
 
+	//Generate all the probes on another thread while the assets are loading
+	std::thread ProbeGridThread;
 
-	//state stuff
+	//state stuff for enabling/disabling indirect lighting for showcase
 	int lightingState = 0;
-
-
-
 
 	void Renderer::LoadAllShaders() {
 		
@@ -347,20 +334,30 @@ namespace Renderer
 		//this is the projection to voxlize the scene from orgin (0,0,0) while the other one is the view of the camera
 		//voxel_orth = glm::ortho(-((float)voxelize_scene_albedo.GetWidth() / 2.0f), (float)voxelize_scene_albedo.GetWidth() / 2.0f, (float)voxelize_scene_albedo.GetWidth() / 2.0f, -((float)voxelize_scene_albedo.GetWidth() / 2.0f), -(float)voxelize_scene_albedo.GetWidth()/2.0f, (float)voxelize_scene_albedo.GetWidth()/2.0f);
 		float spacing = 1;
-		glm::vec3 propgationGridSize = glm::vec3(15, 9, 15);
+		glm::vec3 propgationGridSize = glm::vec3(25, 12, 18);
 		//glm::vec3 propgationGridSize = glm::vec3(2, 1, 1);
-		glm::vec3 gridPos = glm::vec3(-6.4, -1.4 + 6, -7.4);
-		//glm::vec3 gridPos = glm::vec3(-2.2, 9.6, -2.8);
+		//glm::vec3 gridPos = glm::vec3(-6.4, -1.4 + 6, -7.4);
+		glm::vec3 gridPos = glm::vec3(-13.6, -1.4 + 6, -6);
 
 
 		probeTexture.Create(glm::ceil(propgationGridSize.x * 1 / spacing), glm::ceil(propgationGridSize.y * 1 / spacing), glm::ceil(propgationGridSize.z * 1 / spacing));
 		probeGrid.Configure(propgationGridSize.x, propgationGridSize.y, propgationGridSize.z, spacing, gridPos);
+		
 		//probeGrid.AddProbe(glm::vec3(6, 1, 2));
 		SHBuffer.Configure(7500 * sizeof(glm::vec3) * 9 + 7500 * sizeof(glm::mat4));
 
 		emmisiveRenderer.Init(Backend::GetWidth(), Backend::GetHeight());
 
 		return 0;
+	}
+
+	void Renderer::BeforeRender() {
+
+		Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->getLights());
+		//Renderer::cs_Raycaster.Use();
+		//Renderer::probeTexture.Bind(6);
+		//Raycaster::Bind();
+		//Raycaster::Compute();
 	}
 
 
@@ -486,7 +483,7 @@ namespace Renderer
 		s_geomerty.SetMat4("P", Camera::getProjectionMatrix());
 		s_geomerty.SetMat4("V", Camera::getViewMatrix());
 
-		glBindTextureUnit(4, AssetManager::GetTexture("normal")->GetTextureNormal());
+		//glBindTextureUnit(4, AssetManager::GetTexture("normal")->GetTextureNormal());
 
 
 		NeedRendering.clear();
@@ -726,6 +723,8 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, ssaoBuffer.gSSAO);
 		glActiveTexture(GL_TEXTURE5);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gTrueNormal);
+		glBindTextureUnit(8, gbuffer.gEmission);
+
 
 		SHBuffer.Bind(7);
 		probeTexture.Bind(6);

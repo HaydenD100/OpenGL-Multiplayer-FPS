@@ -22,9 +22,6 @@ namespace Engine
 
 	int Engine::Run() {
 
-		
-
-		
 		NetworkManager::Init();
 		std::cout << "==================================CONNECT/HOST=========================================================================\n";
 		std::cout << "ENTER 0 to create/host a Game OR Type the IP of the server to join:";
@@ -67,12 +64,12 @@ namespace Engine
 		NetworkManager::SendPackets();
 
 
+
 		//--------------------------------------------PROBE-------------------------------------------	
-		Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->getLights());
-		Renderer::cs_Raycaster.Use();
-		Renderer::probeTexture.Bind(6);
-		Raycaster::Bind();
-		Raycaster::Compute();
+
+		Renderer::BeforeRender();
+		std::cout << "here2 \n";
+
 
 		float endLoadTime = glfwGetTime() - startLoadTime;
 		std::cout << "Load took " << endLoadTime << "s \n";

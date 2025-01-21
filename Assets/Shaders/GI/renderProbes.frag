@@ -33,7 +33,7 @@ uniform int probeID;
 //Credits to https://www.shadertoy.com/view/wtt3W2
 
 #define myT vec3
-#define myL 2
+#define myL 1
 #define SphericalHarmonicsTL(T, L) T[(L + 1)*(L + 1)]
 #define SphericalHarmonics SphericalHarmonicsTL(myT, myL)
 #define shSize(L) ((L + 1)*(L + 1))

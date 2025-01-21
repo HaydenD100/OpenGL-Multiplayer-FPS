@@ -40,6 +40,9 @@ private:
 
 struct ProbeGrid {
 	std::vector<Probe> probes;
+	int doneConfigure = 0;
+	//Generate all the probes on another thread while the assets are loading
+
 
 	void Configure(float width, float height, float depth, float spacing, glm::vec3 start) {
 
@@ -56,7 +59,10 @@ struct ProbeGrid {
 			}
 		}
 		std::cout << "Done configure \n";
+		doneConfigure = 1;
 	}
+
+
 
 	void AddProbe(glm::vec3 postion) {
 		probes.push_back(Probe(postion));

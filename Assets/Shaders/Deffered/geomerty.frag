@@ -27,6 +27,8 @@ uniform float Metalic;
 uniform mat4 V;
 
 uniform bool IsEmissive;
+uniform bool HasNormalMap = true;
+
 
 
 
@@ -52,7 +54,10 @@ void main()
     gPosition = FragPos;
     // also store the per-fragment normals into the gbuffer
     gRMA = vec4(MaterialRoughness,MaterialMetalic,0,0);
-    gNormal = vec4(transformedNormal, 0);
+    if(HasNormalMap)
+        gNormal = vec4(transformedNormal, 0);
+    else
+        gNormal = V * vec4(TrueNormal, 0);
     gAlbedo = vec4(MaterialDiffuseColor, 1); // RGB for Albedo, R for Specular Intensity
     gTrueNormal = vec4(TrueNormal,0);  // Use transpose of TBN to inverse the transformation
     if(IsEmissive){

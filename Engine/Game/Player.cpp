@@ -649,6 +649,9 @@ namespace PlayerTwo
 
 
 		Animator::PlayAnimation(AssetManager::GetSkinnedAnimation("bean_death"), "PlayerTwo",0);
+		
+
+		std::cout << "here1 \n";
 	}
 	void PlayerTwo::SetData(std::string interact, std::string gunname, glm::vec3 position, glm::vec3 rotation) {
 		interactingWithName = interact;

@@ -29,28 +29,6 @@ Texture::Texture(const char* name, const char* path, float Roughness, float Meta
 	}
 
 	stbi_image_free(data);
-
-	glGenTextures(1, &textureNormal);
-	glBindTexture(GL_TEXTURE_2D, textureNormal);
-
-	// Set the texture wrapping/filtering options (on the currently bound texture object)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	// Load and generate the texture
-	int width1, height1;
-	unsigned char* data1 = stbi_load("Assets/Normals/no_normal.png", &width1, &height1, 0, STBI_rgb_alpha);
-	if (data1) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width1, height1, 0, GL_RGBA, GL_UNSIGNED_BYTE, data1);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else {
-		std::cout << "Failed to load texture" << std::endl;
-	}
-
-	stbi_image_free(data1);
 }
 
 Texture::Texture(const char* name, const char* path, const char* normalPath, float Roughness, float Metalic) {

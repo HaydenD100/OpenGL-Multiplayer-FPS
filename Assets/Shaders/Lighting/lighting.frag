@@ -26,8 +26,8 @@ uniform float spacing;
 
 
 in vec2 UV;
-//becuase we are binding cubemaps per light and the max texture bindings is 32 we have to limit the lights to 26
-#define MAXLIGHTS 26
+//becuase we are binding cubemaps per light and the max texture bindings is 32 we have to limit the lights
+#define MAXLIGHTS 24
 
 layout(binding = 0) uniform sampler2D gPostion;    // View-space position
 layout(binding = 1) uniform sampler2D gNormal;     // View-space normal
@@ -35,6 +35,7 @@ layout(binding = 2) uniform sampler2D gAlbeido;
 layout(binding = 3) uniform sampler2D gPBR;
 layout(binding = 4) uniform sampler2D ssaoTexture;
 layout(binding = 5) uniform sampler2D gTrueNormal;
+layout(binding = 8) uniform sampler2D gEmssive;
 
 
 uniform sampler2D gFinal; 
@@ -145,7 +146,7 @@ float LinearizeDepth(float depth) {
 }
 
 #define myT vec3
-#define myL 2
+#define myL 1
 #define SphericalHarmonicsTL(T, L) T[(L + 1)*(L + 1)]
 #define SphericalHarmonics SphericalHarmonicsTL(myT, myL)
 #define shSize(L) ((L + 1)*(L + 1))
@@ -448,7 +449,7 @@ vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
     vec3 weights = mix(1. - a, a, offset);
 
 
-    if(vdotn > -0.0 ) //&& length(probeLenght) < length(dir))
+    if(vdotn > -0.0) //&& length(probeLenght) < length(dir))
         weight = weights.x * weights.y * weights.z;
     else
         weight = 0.;        
@@ -488,6 +489,7 @@ vec3 GetIndirectLighting(vec3 WorldPos, vec3 Normal) { // Interpolate visible pr
     indirectLighting += w * light;
     sumW += w;
     light = GetProbe(WorldPos, ivec3(1, 1, 1), w, Normal);
+    
     indirectLighting += w * light;
     sumW += w;
     indirectLighting /= sumW;
@@ -517,6 +519,8 @@ void main() {
     vec3 albedo = texture(gAlbeido, UV).rgb;
 
     float skybox = texture(gPBR, UV).z;
+    vec3 emisive = texture(gEmssive, UV).rgb;
+
 
     if(skybox == 1){
         if(isDead)
@@ -531,8 +535,8 @@ void main() {
 
     // Transform view-space position to world-space position
     vec3 FragPos = (inverseV * vec4(FragPos_view, 1.0)).xyz;
-    //vec3 N = normalize((transpose(V) * vec4(Normal_view, 0.0)).xyz);
-    vec3 N = trueNormal;
+    vec3 N = normalize((transpose(V) * vec4(Normal_view, 0.0)).xyz);
+    //vec3 N = trueNormal;
     vec3 Vpos = normalize(viewPos - FragPos);
 
     // Reflectance at normal incidence
@@ -574,7 +578,7 @@ void main() {
     if(lightingState == 1){
         for (int i = 0; i < MAXLIGHTS; ++i) {
             if (LightRadius[i] == 0) continue;
-            vec3 NTrue = normalize(trueNormal);
+            vec3 NTrue = normalize(N);
             // Calculate distance between light and fragment
             vec3 L = normalize(LightPositions_worldspace[i] - FragPos);
             float distance = length(LightPositions_worldspace[i] - FragPos);
@@ -631,7 +635,7 @@ void main() {
     if(lightingState == 0)
         gLighting = vec4(color, spec);// + vec4(albedo * 0.2,1);
     if(lightingState == 1)
-        gLighting = vec4(Lo ,spec);
+        gLighting = vec4(Normal_view ,1);
     if(lightingState == 2)
         gLighting = vec4(adjustedIndirectLighting,1);
 

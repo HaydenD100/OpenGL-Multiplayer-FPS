@@ -23,7 +23,8 @@
 #include "Engine/Renderer/Probe.h"
 #include "Engine/Renderer/StorageBuffer.h"
 
-
+#include <thread>
+#include <mutex>
 
 
 
@@ -128,6 +129,9 @@ namespace Renderer
     void RendererSkyBox(glm::mat4 view, glm::mat4 projection, SkyBox skybox);
 
     void RenderAllObjects(Shader& shader);
+
+	//anything that needs to be ran before the gameLoop;
+	void BeforeRender();
 
 
 

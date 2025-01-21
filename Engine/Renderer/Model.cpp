@@ -222,11 +222,11 @@ void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
 
             auto texture = scene->GetEmbeddedTexture(texturePathDiffuse.C_Str());
             if (texture) {
-                std::cout << "Emb \n";
+                //std::cout << "Emb \n";
                 AssetManager::AddTexture(Texture(material, scene));
                 meshTexture = AssetManager::GetTexture(materialName.C_Str());
             }
-            std::cout << "Mesh Material Name: " << materialName.C_Str() << "\n";
+            //std::cout << "Mesh Material Name: " << materialName.C_Str() << "\n";
         }
             
             
