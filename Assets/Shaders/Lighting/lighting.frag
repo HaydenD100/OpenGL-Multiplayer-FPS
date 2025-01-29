@@ -13,7 +13,7 @@ layout(std430, binding = 7) buffer ShCoeffient {
     vec3 L1SH_7[3750 * 2];
 
     vec3 L1SH_8[3750 * 2];
-    mat3 probeVisbilty[3750 * 2];
+    vec3 hit[10];
 };
 
 layout(binding = 6) uniform sampler3D probeGrid;
@@ -431,19 +431,6 @@ vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
     vec3 dir =  probe_worldPos - fragWorldPos;
     vec3 probe_color =  GetRadianceFromSH(shRadiance, dir);
 
-    float visibility;
-    if(offset == ivec3(0,0,1)){ visibility = probeVisbilty[probeID][0][0];}
-    else if(offset == ivec3(0,1,0)){ visibility = probeVisbilty[probeID][0][1];}
-    else if(offset == ivec3(0,1,1)){ visibility = probeVisbilty[probeID][0][2];}
-    else if(offset == ivec3(1,0,0)){ visibility = probeVisbilty[probeID][1][0];}
-    else if(offset == ivec3(1,0,1)){ visibility = probeVisbilty[probeID][1][1];}
-    else if(offset == ivec3(1,1,0)){ visibility = probeVisbilty[probeID][1][2];}
-    else if(offset == ivec3(1,1,1)){ visibility = probeVisbilty[probeID][2][0];}
-
-
-
-    
-
     vec3 v = normalize(probe_worldPos - fragWorldPos); // TODO: no need to normalize if only checking sign
     float vdotn = dot(v, Normal);
     vec3 weights = mix(1. - a, a, offset);
@@ -465,7 +452,7 @@ vec3 GetIndirectLighting(vec3 WorldPos, vec3 Normal) { // Interpolate visible pr
     float w;
     vec3 light;
     float sumW = 0.;
-    
+   
     vec3 indirectLighting = vec3(0.);
     light = GetProbe(WorldPos, ivec3(0, 0, 0), w, Normal);
     indirectLighting += w * light;
@@ -493,6 +480,7 @@ vec3 GetIndirectLighting(vec3 WorldPos, vec3 Normal) { // Interpolate visible pr
     indirectLighting += w * light;
     sumW += w;
     indirectLighting /= sumW;
+
     return indirectLighting;
 }
 
@@ -632,10 +620,13 @@ void main() {
     if(isDead)
         color = color + vec3(1,-0.2,-0.2);
         
+
+    vec3 gridCoords = (FragPos - gridWorldPos) / spacing;
+
     if(lightingState == 0)
         gLighting = vec4(color, spec);// + vec4(albedo * 0.2,1);
     if(lightingState == 1)
-        gLighting = vec4(Normal_view ,1);
+        gLighting = vec4( hit[0],1);
     if(lightingState == 2)
         gLighting = vec4(adjustedIndirectLighting,1);
 

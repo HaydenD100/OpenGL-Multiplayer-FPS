@@ -309,6 +309,10 @@ void Mesh::Render(GLuint programID) {
 glm::vec3 Mesh::GetVertices(int index) {
     return indexed_vertices[index];
 }
+unsigned short Mesh::GetIndex(int i) {
+    return indices[i];
+}
+
 void Mesh::SetTexture(Texture* texture) {
     this->texture = texture;
 }

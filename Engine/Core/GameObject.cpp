@@ -564,4 +564,12 @@ void GameObject::SetDontCull(bool cull) {
 }
 
 
+void GameObject::IncludInRayCast() {
+	includedInRayCast = true;
+}
+bool GameObject::IncludedInRayCast() {
+	return includedInRayCast;
+}
+
+
 

@@ -36,6 +36,8 @@ public:
     void SetTexture(Texture* texture);
     size_t VerticiesSize();
     glm::vec3 GetVertex(int i);
+    unsigned short GetIndex(int i);
+
 
     //used to bind info to a raycasting buffer, returns size of data just appended to buffer
     int BindVertices(int offset, int modelMatrixIndex);
@@ -51,6 +53,8 @@ public:
     std::vector<glm::vec3> indexed_bitangents;
     std::vector<glm::ivec4> indexed_jointIDs;
     std::vector<glm::vec4> indexed_weights;
+
+    std::vector<glm::vec3> vertices;
 
 
 private:

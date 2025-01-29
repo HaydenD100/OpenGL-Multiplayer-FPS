@@ -34,4 +34,6 @@ namespace Camera
 
 	glm::vec3 ComputeRay();
 	btCollisionWorld::ClosestRayResultCallback GetRayHit(float Maxoffset = 0);
+	glm::vec3 GetMouseRay(glm::mat4 projection, glm::mat4 view, int windowWidth, int windowHeight, int mouseX, int mouseY);
+
 }

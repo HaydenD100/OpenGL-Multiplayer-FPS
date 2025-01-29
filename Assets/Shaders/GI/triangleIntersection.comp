@@ -18,7 +18,7 @@ layout(std430, binding = 7) buffer ShCoeffient {
     vec3 L1SH_7[3750 * 2];
 
     vec3 L1SH_8[3750 * 2];
-    mat3 probeVisbilty[3750 * 2];
+    vec3 hit[10];
 };
 
 layout(std430, binding = 8) buffer VertexBuffer {
@@ -58,8 +58,8 @@ bool TriIntersectBoolVersion(vec3 origin, vec3 direction, float rayMin, float ra
 	float r = dot(direction, n);
 
     //ignore back face
-	//if (r > 0)
-	//	return false;
+	if (r > 0)
+	    return false;
 
 	// some other early out
 	if (abs(r) < 0.00001)
@@ -78,6 +78,38 @@ bool TriIntersectBoolVersion(vec3 origin, vec3 direction, float rayMin, float ra
 		return true;
 	}
 	return false;
+}
+
+float TriIntersect(vec3 origin, vec3 direction, float rayMin, float rayMax, vec3 v0, vec3 v1, vec3 v2) {
+    vec3 a = v0 - v1;
+    vec3 b = v2 - v0;
+    vec3 p = v0 - origin;
+    vec3 n = cross(b, a);
+    float r = dot(direction, n);
+
+    // Ignore back faces
+    if (r > 0.0)
+        return -1.0;
+
+    // Check if ray is parallel to the triangle
+    if (abs(r) < 1e-6)
+        return -1.0;
+
+    vec3 q = cross(p, direction);
+    r = 1.0 / r;
+    float u = dot(q, b) * r;
+    float v = dot(q, a) * r;
+    float t = dot(n, p) * r;
+
+    // Check if intersection is within the triangle
+    if (u < 0.0 || v < 0.0 || (u + v) > 1.0)
+        t = -1.0;
+
+    // Check if t is within the valid range
+    if (t > rayMin && t < rayMax)
+        return t;
+
+    return -1.0;
 }
 
 float DistanceSquared( vec3 A, vec3 B ) {
@@ -133,37 +165,28 @@ void main(){
     int probeID = int(rayOrigin[workGroupID].w);
 
 
-    int id = 1;
+    int intersectCheck = 0;
+    vec3 hitPosition = vec3(0.0);
 
 
     for(int i = 0; i < trianglesperInvocation; i++){
-        uint idx0 = indices[startTriangleIndex + i * 3 + 0];
-        uint idx1 = indices[startTriangleIndex + i * 3 + 1];
-        uint idx2 = indices[startTriangleIndex + i * 3 + 2];
 
         // Fetch vertices for the triangle and then transform them into world space
-        vec4 v0 = M[int(vertices[idx0].w)] * vertices[idx0];
-        vec4 v1 = M[int(vertices[idx1].w)] * vertices[idx1];
-        vec4 v2 = M[int(vertices[idx2].w)] * vertices[idx2];
+        vec4 v0 = M[int(vertices[i * 3 + 0].w)] * vec4(vertices[i * 3 + 0].xyz,0);
+        vec4 v1 = M[int(vertices[i * 3 + 1].w)] * vec4(vertices[i * 3 + 0].xyz,1);
+        vec4 v2 = M[int(vertices[i * 3 + 2].w)] * vec4(vertices[i * 3 + 0].xyz,2);
 
         // No need for this yet but later i'm keeping this here just incase I want to use this script for calculating color and light
         //vec3 normal = normalize(cross(v1 - v0, v2 - v0));
 
         //if intersect then return
-        bool intersect = TriIntersectBoolVersion(rayOrigin[workGroupID].xyz,rayDirection[workGroupID],rayLength[workGroupID] - 0.01 ,rayLength[workGroupID] + 0.01,v0.xyz,v1.xyz,v2.xyz);
-        if(intersect){
+        float intersect = TriIntersect(rayOrigin[workGroupID].xyz,rayDirection[workGroupID],rayLength[workGroupID] - 0.01 ,rayLength[workGroupID] + 0.01,v0.xyz,v1.xyz,v2.xyz);
+        if(intersect != -1){
             //so we know the probe isnt in view
-           id = 0;
+           intersectCheck = 1;
+           hitPosition = rayOrigin[workGroupID].xyz + rayDirection[workGroupID] * intersect;
            break;
         }
     }
-    if(rayDirection[workGroupID] == vec3(0,0,1)){ probeVisbilty[probeID][0][0] = id;}
-    else if(rayDirection[workGroupID] == vec3(0,1,0)){ probeVisbilty[probeID][0][1] = id;}
-    else if(rayDirection[workGroupID] == vec3(0,1,1)){ probeVisbilty[probeID][0][2] = id;}
-    else if(rayDirection[workGroupID] == vec3(1,0,0)){ probeVisbilty[probeID][1][0] = id;}
-    else if(rayDirection[workGroupID] == vec3(1,0,1)){ probeVisbilty[probeID][1][1] = id;}
-    else if(rayDirection[workGroupID] == vec3(1,1,0)){ probeVisbilty[probeID][1][2] = id;}
-    else if(rayDirection[workGroupID] == vec3(1,1,1)){ probeVisbilty[probeID][2][0] = id;}
-
-    probeVisbilty[probeID][2][2] = probeID ;
+    hit[workGroupID] = hitPosition;
 }

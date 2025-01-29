@@ -63,7 +63,8 @@ namespace Engine
 		NetworkManager::SendControl(CONNECTED);
 		NetworkManager::SendPackets();
 
-
+		SoftwareRaycaster::Init();
+		SoftwareRaycaster::FillBuffers();
 
 		//--------------------------------------------PROBE-------------------------------------------	
 

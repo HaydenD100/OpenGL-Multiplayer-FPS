@@ -225,6 +225,7 @@
     <None Include="Assets\Shaders\GI\probeCheck.comp" />
     <None Include="Assets\Shaders\GI\renderProbes.frag" />
     <None Include="Assets\Shaders\GI\renderProbes.vert" />
+    <None Include="Assets\Shaders\GI\triangleIntersection.comp" />
     <None Include="Assets\Shaders\Lighting\lighting.frag" />
     <None Include="Assets\Shaders\Lighting\lighting.vert" />
     <None Include="Assets\Shaders\PostProccess\post.frag" />
@@ -246,11 +247,6 @@
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.vert" />
     <None Include="Assets\Shaders\Transparent\transparent.frag" />
     <None Include="Assets\Shaders\Transparent\transparent.vert" />
-    <None Include="Assets\Shaders\Voxel\voxel.frag" />
-    <None Include="Assets\Shaders\Voxel\voxel.geom" />
-    <None Include="Assets\Shaders\Voxel\voxel.vert" />
-    <None Include="Assets\Shaders\Voxel\voxel_display.frag" />
-    <None Include="Assets\Shaders\Voxel\voxel_display.vert" />
     <None Include="Assets\Shaders\Water\water.frag" />
     <None Include="Assets\Shaders\Water\water.vert" />
   </ItemGroup>

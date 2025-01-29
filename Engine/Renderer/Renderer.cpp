@@ -105,12 +105,16 @@ namespace Renderer
 	Shader s_downScale;
 	Shader s_upScale;
 
+
+
 	ComputeShader cs_Raycaster;
 
 	BloomRenderer emmisiveRenderer;
 
 	StorageBuffer SHBuffer;
 	Texture3D probeTexture;
+	Texture3D voxelizedScene;
+
 
 	//TODO make a general buffer class
 	GBuffer gbuffer;
@@ -154,10 +158,8 @@ namespace Renderer
 		s_SolidColor.Load("Assets/Shaders/SolidColour/solidColour.vert", "Assets/Shaders/SolidColour/solidColour.frag");
 		s_fxaa.Load("Assets/Shaders/fxaa/fxaa.vert", "Assets/Shaders/fxaa/fxaa.frag");
 		s_water.Load("Assets/Shaders/Water/water.vert", "Assets/Shaders/Water/water.frag");
-
 		s_textShader.Load("Assets/Shaders/textShader.vert", "Assets/Shaders/textShader.frag");
-
-
+		
 		cs_Raycaster.Load("Assets/Shaders/GI/triangleIntersection.comp");
 
 
@@ -337,11 +339,15 @@ namespace Renderer
 		glm::vec3 propgationGridSize = glm::vec3(25, 12, 18);
 		//glm::vec3 propgationGridSize = glm::vec3(2, 1, 1);
 		//glm::vec3 gridPos = glm::vec3(-6.4, -1.4 + 6, -7.4);
-		glm::vec3 gridPos = glm::vec3(-13.6, -1.4 + 6, -6);
+		glm::vec3 gridPos = glm::vec3(-13.6, -1.4, -6);
 
 
 		probeTexture.Create(glm::ceil(propgationGridSize.x * 1 / spacing), glm::ceil(propgationGridSize.y * 1 / spacing), glm::ceil(propgationGridSize.z * 1 / spacing));
 		probeGrid.Configure(propgationGridSize.x, propgationGridSize.y, propgationGridSize.z, spacing, gridPos);
+
+
+		//voxel stuff
+		//voxelizedScene
 		
 		//probeGrid.AddProbe(glm::vec3(6, 1, 2));
 		SHBuffer.Configure(7500 * sizeof(glm::vec3) * 9 + 7500 * sizeof(glm::mat4));
@@ -354,10 +360,18 @@ namespace Renderer
 	void Renderer::BeforeRender() {
 
 		Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->getLights());
-		//Renderer::cs_Raycaster.Use();
+		Raycaster::FillBuffers();
+		int gridX = 10;
+		int gridY = 10;
+		int lenght = 15;
+
+		Raycaster::queueRay(glm::vec3(0, 0, 1), glm::vec3(-1.97, 10.7, -0.8),20,0);
+
+		Renderer::cs_Raycaster.Use();
 		//Renderer::probeTexture.Bind(6);
-		//Raycaster::Bind();
-		//Raycaster::Compute();
+		SHBuffer.Bind(7);
+		Raycaster::Bind();
+		Raycaster::Compute();
 	}
 
 
@@ -455,7 +469,12 @@ namespace Renderer
 
 	void Renderer::RenderScene() {
 
-
+		Raycaster::queueRay(glm::vec3(0, 0, 1), glm::vec3(-1.97, 10.7, -0.8), 20, 0);
+		Renderer::cs_Raycaster.Use();
+		//Renderer::probeTexture.Bind(6);
+		SHBuffer.Bind(7);
+		Raycaster::Bind();
+		Raycaster::Compute();
 
 		//--------------------------------------------PROBE-------------------------------------------	
 		
@@ -683,6 +702,20 @@ namespace Renderer
 
 			overlay[i]->RenderObject(s_geomerty.GetShaderID());
 		}
+
+
+		//softwareRayCastingStuff
+		/*
+		s_SolidColor.Use();
+		s_SolidColor.SetMat4("P", Camera::getProjectionMatrix());
+		s_SolidColor.SetMat4("V", Camera::getViewMatrix());
+		s_SolidColor.SetBool("animated", false);
+		s_SolidColor.SetBool("IsEmissive", false);
+		s_SolidColor.SetMat4("M", glm::mat4(1));
+		s_SolidColor.SetVec3("color", glm::vec3(0.5, 0, 0.5));
+		SoftwareRaycaster::RenderVerticies();
+		*/
+
 
 
 		//---------------------------------------------------SSAO-------------------------------------

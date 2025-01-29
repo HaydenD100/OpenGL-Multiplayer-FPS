@@ -355,3 +355,19 @@ int Model::IndicesInfoBind(int offset) {
     }
     return size;
 }
+
+std::vector<glm::vec3> Model::GetVerticies() {
+    std::vector<glm::vec3> vertices;
+
+    for (int mesh = 0; mesh < meshes.size(); mesh++) {
+
+        for (int i = 0; i < meshes[mesh].indices.size(); i++) {
+            unsigned short index = meshes[mesh].GetIndex(i);
+            glm::vec3 vertex = meshes[mesh].GetVertex(index);
+
+
+            vertices.push_back(vertex);
+        }
+    }
+    return vertices;
+}

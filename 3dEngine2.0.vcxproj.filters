@@ -351,11 +351,6 @@
     <None Include="Assets\Shaders\SSR\SSR.vert" />
     <None Include="Assets\Shaders\PostProccess\post.frag" />
     <None Include="Assets\Shaders\PostProccess\post.vert" />
-    <None Include="Assets\Shaders\Voxel\voxel.vert" />
-    <None Include="Assets\Shaders\Voxel\voxel.frag" />
-    <None Include="Assets\Shaders\Voxel\voxel_display.vert" />
-    <None Include="Assets\Shaders\Voxel\voxel_display.frag" />
-    <None Include="Assets\Shaders\Voxel\voxel.geom" />
     <None Include="Assets\Shaders\GI\probe.vert" />
     <None Include="Assets\Shaders\GI\probe.frag" />
     <None Include="Assets\Shaders\GI\irradiance.vert" />
@@ -371,6 +366,7 @@
     <None Include="Assets\Shaders\GI\probeCheck.comp" />
     <None Include="Assets\Shaders\Water\water.vert" />
     <None Include="Assets\Shaders\Water\water.frag" />
+    <None Include="Assets\Shaders\GI\triangleIntersection.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

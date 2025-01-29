@@ -109,6 +109,8 @@ public:
 	bool IsDynamic();
 	bool DontCull();
 	void SetDontCull(bool cull);
+	void IncludInRayCast();
+	bool IncludedInRayCast();
 
 private:
 	Transform transform = Transform();
@@ -132,6 +134,7 @@ private:
 	bool render = true;
 	bool dontCull = false;
 	bool shouldDelete = false;
+	bool includedInRayCast = false;
 
 	//change to this
 	std::vector<glm::mat4> m_FinalBoneMatrices;

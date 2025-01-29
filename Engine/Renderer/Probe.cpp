@@ -90,15 +90,6 @@ void ProbeGrid::Bake(std::vector<Light> lights) {
 
 	for (int i = 0; i < probes.size(); i++) {
 		probes[i].Irradiance();
-		
-		//Raycaster::queueRay(glm::vec3(0, 0, 1), probes[i].GetTransform().position, glm::length(glm::vec3(0, 0, 1)), probes[i].ProbeID());
-		//Raycaster::queueRay(glm::vec3(0, 1, 0), probes[i].GetTransform().position, glm::length(glm::vec3(0, 1, 0)), probes[i].ProbeID());
-		//Raycaster::queueRay(glm::vec3(0, 1, 1), probes[i].GetTransform().position, glm::length(glm::vec3(0, 1, 1)), probes[i].ProbeID());
-		//Raycaster::queueRay(glm::vec3(1, 0, 0), probes[i].GetTransform().position, glm::length(glm::vec3(1, 0, 0)), probes[i].ProbeID());
-		//Raycaster::queueRay(glm::vec3(1, 0, 1), probes[i].GetTransform().position, glm::length(glm::vec3(1, 0, 1)), probes[i].ProbeID());
-		//Raycaster::queueRay(glm::vec3(1, 1, 0), probes[i].GetTransform().position, glm::length(glm::vec3(1, 1, 0)), probes[i].ProbeID());
-		//Raycaster::queueRay(glm::vec3(1, 1, 1), probes[i].GetTransform().position, glm::length(glm::vec3(1, 1, 1)), probes[i].ProbeID());
-		
 	}
 	glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
 

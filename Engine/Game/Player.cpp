@@ -5,6 +5,9 @@
 #include <random>
 
 
+#include "Engine/Renderer/Raycaster.h"
+
+
 namespace Player
 {
 	glm::vec3 forward;
@@ -466,6 +469,13 @@ namespace Player
 
 		}
 
+		if (Input::KeyPressed('l')) {
+			glm::vec3 direction = Camera::GetDirection();
+			std::cout << "RayDir: " << direction.x << " " << direction.y << " " << direction.z << "\n";
+			SoftwareRaycaster::queueRay(Camera::GetPosition(), direction, 20);
+			SoftwareRaycaster::Compute();
+		}
+
 	}
 	
 	glm::vec3 Player::getPosition() {
@@ -651,7 +661,6 @@ namespace PlayerTwo
 		Animator::PlayAnimation(AssetManager::GetSkinnedAnimation("bean_death"), "PlayerTwo",0);
 		
 
-		std::cout << "here1 \n";
 	}
 	void PlayerTwo::SetData(std::string interact, std::string gunname, glm::vec3 position, glm::vec3 rotation) {
 		interactingWithName = interact;

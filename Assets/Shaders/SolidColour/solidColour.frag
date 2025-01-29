@@ -14,7 +14,6 @@ in vec3 TrueNormal;
 
 
 uniform mat4 V;
-
 uniform bool IsEmissive;
 uniform vec3 color;
 uniform float Roughness;
