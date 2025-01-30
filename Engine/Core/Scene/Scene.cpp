@@ -191,6 +191,7 @@ void Scene::Load() {
 
 
 		AssetManager::AddGameObject("raytest", AssetManager::GetModel("light_cube"), glm::vec3(0, 4, 0), true, 0, Concave);
+		//AssetManager::AddGameObject("raytest1", AssetManager::GetModel("light_cube"), glm::vec3(-1.94, 2.03, -0.76813), true, 0, Concave);
 
 		
 		// Sets renderer

@@ -53,6 +53,8 @@ public:
     size_t GetColliderShapeVerticiesSize();
 
     std::vector<glm::vec3> GetVerticies();
+    std::vector<glm::vec4> GetVerticiesPadded();
+
 
     auto& GetBoneInfoMap() { return m_BoneInfoMap; }
     int& GetBoneCount() { return m_BoneCounter; }

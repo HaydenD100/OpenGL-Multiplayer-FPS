@@ -371,3 +371,18 @@ std::vector<glm::vec3> Model::GetVerticies() {
     }
     return vertices;
 }
+std::vector<glm::vec4> Model::GetVerticiesPadded() {
+    std::vector<glm::vec4> vertices;
+
+    for (int mesh = 0; mesh < meshes.size(); mesh++) {
+
+        for (int i = 0; i < meshes[mesh].indices.size(); i++) {
+            unsigned short index = meshes[mesh].GetIndex(i);
+            glm::vec4 vertex = glm::vec4(meshes[mesh].GetVertex(index),1);
+
+
+            vertices.push_back(vertex);
+        }
+    }
+    return vertices;
+}

@@ -471,8 +471,8 @@ namespace Player
 
 		if (Input::KeyPressed('l')) {
 			glm::vec3 direction = Camera::GetDirection();
-			std::cout << "RayDir: " << direction.x << " " << direction.y << " " << direction.z << "\n";
-			SoftwareRaycaster::queueRay(Camera::GetPosition(), direction, 20);
+			//SoftwareRaycaster::queueRay(Camera::GetPosition(), direction, 20);
+			SoftwareRaycaster::queueRay(glm::vec3(0, 4.5, 0), glm::vec3(0.6, -1, 1), 20);
 			SoftwareRaycaster::Compute();
 		}
 

@@ -365,13 +365,13 @@ namespace Renderer
 		int gridY = 10;
 		int lenght = 15;
 
-		Raycaster::queueRay(glm::vec3(0, 0, 1), glm::vec3(-1.97, 10.7, -0.8),20,0);
+		//Raycaster::queueRay(glm::vec3(0, 0, 1), glm::vec3(-1.97, 10.7, -0.8),20);
 
-		Renderer::cs_Raycaster.Use();
+		//Renderer::cs_Raycaster.Use();
 		//Renderer::probeTexture.Bind(6);
-		SHBuffer.Bind(7);
-		Raycaster::Bind();
-		Raycaster::Compute();
+		//SHBuffer.Bind(7);
+		//Raycaster::Bind();
+		//Raycaster::Compute();
 	}
 
 
@@ -469,11 +469,9 @@ namespace Renderer
 
 	void Renderer::RenderScene() {
 
-		Raycaster::queueRay(glm::vec3(0, 0, 1), glm::vec3(-1.97, 10.7, -0.8), 20, 0);
-		Renderer::cs_Raycaster.Use();
-		//Renderer::probeTexture.Bind(6);
+		Raycaster::queueRay(glm::vec3(0, 4.5, 0), glm::vec3(0.6, -1, 1), 20);
+		//SoftwareRaycaster::queueRay(glm::vec3(0, 0, 1), glm::vec3(-1.97, 6.7, -0.8), 20);
 		SHBuffer.Bind(7);
-		Raycaster::Bind();
 		Raycaster::Compute();
 
 		//--------------------------------------------PROBE-------------------------------------------	
@@ -704,7 +702,7 @@ namespace Renderer
 		}
 
 
-		//softwareRayCastingStuff
+		//------------------------------------------------RAYCAST DEBUG--------------------------------
 		/*
 		s_SolidColor.Use();
 		s_SolidColor.SetMat4("P", Camera::getProjectionMatrix());
@@ -713,7 +711,7 @@ namespace Renderer
 		s_SolidColor.SetBool("IsEmissive", false);
 		s_SolidColor.SetMat4("M", glm::mat4(1));
 		s_SolidColor.SetVec3("color", glm::vec3(0.5, 0, 0.5));
-		SoftwareRaycaster::RenderVerticies();
+		Raycaster::RenderVerticies();
 		*/
 
 
@@ -736,7 +734,7 @@ namespace Renderer
 
 
 		RenderPlane();
-		//---------------------------------------------------Lighting-------------------------------------
+		//---------------------------------------------------LIGHTING-------------------------------------
 
 		lightingBuffer.Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

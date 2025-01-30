@@ -1,6 +1,7 @@
 #version 430 core
 
 #define MAXRAYS 100000
+#define MAXLENGTH 999999
 
 layout (local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
 
@@ -21,18 +22,14 @@ layout(std430, binding = 7) buffer ShCoeffient {
     vec3 hit[10];
 };
 
-layout(std430, binding = 8) buffer VertexBuffer {
-    vec4 vertices[]; // Array of unique vertex positions
-    //W holds the ModelMatrix index for transformations to worldSpace
-};
-layout(std430, binding = 9) buffer IndexBuffer {
-    uint indices[]; // Array of indices referencing vertices
+layout(std430, binding = 9) buffer VertexBuffer {
+    vec4 vertices[]; 
 };
 layout(std430, binding = 10) buffer ModelMatrixBuffer {
     mat4 M[]; // Array of model matrix for the triangels
 };
 layout(std430, binding = 11) buffer rayOriginBuffer {
-    vec4 rayOrigin[]; // Array of model matrix for the triangels
+    vec3 rayOrigin[]; // Array of model matrix for the triangels
 };
 layout(std430, binding = 12) buffer rayDirectionBuffer {
     vec3 rayDirection[]; // Array of model matrix for the triangels
@@ -41,13 +38,18 @@ layout(std430, binding = 13) buffer rayLengthBuffer {
     float rayLength[]; // Array of model matrix for the triangels
 };
 
-uniform int indicesSize;
+struct RayResult {
+	bool hitFound;
+	vec3 baryPosition;
+};
+
+uniform int verticiesSize;
 
 uniform vec3 gridWorldPos;
 uniform vec3 volume;
 uniform float spacing;
 
-
+shared float shortestLength;
 
 bool TriIntersectBoolVersion(vec3 origin, vec3 direction, float rayMin, float rayMax, vec3 v0, vec3 v1, vec3 v2) {
 
@@ -150,43 +152,88 @@ bool IntersectTriangle(vec3 rayO, vec3 rayDir, float rayLenght, vec3 p0, vec3 p1
     return PointInTriangle(X, p0, p1, p2);
 }
 
+
+
+
+//GLM GTX code adapated for glsl 
+RayResult TriangleIntersectionTestGLM(vec3 orig, vec3 dir,vec3 v0, vec3 v1, vec3 v2) {
+    RayResult rayResult;
+	rayResult.hitFound = false;
+        
+	vec3 e1 = v1 - v0;
+	vec3 e2 = v2 - v0;
+
+	vec3 p = cross(dir, e2);
+	float a = dot(e1, p);
+
+	const float epsilon = 0.0001;
+	if (a > -epsilon && a < epsilon)
+		return rayResult;
+
+	float f = 1.0f / a;
+	vec3 s = orig - v0;
+
+	rayResult.baryPosition.x = f * dot(s, p);
+	if (rayResult.baryPosition.x < 0.0f || rayResult.baryPosition.x > 1.0f)
+		return rayResult;
+
+	vec3 q = cross(s, e1);
+	rayResult.baryPosition.y = f * dot(dir, q);
+	if (rayResult.baryPosition.y < 0.0f || (rayResult.baryPosition.x + rayResult.baryPosition.y) > 1.0f)
+		return rayResult;
+
+	rayResult.baryPosition.z = f * dot(e2, q);
+    if(rayResult.baryPosition.z >= 0.0f){
+        rayResult.hitFound = true;
+    }
+
+	return rayResult;
+}
+    
+
+
+
 void main(){
     //One ray per workgroup and then each invocation takes 1/32 (32 being Nivida's invocation size per workgroup of the triangles in sections to calculate
-    uint trianglesperInvocation = indicesSize / 32;
 
     //to make this more efficient when i have lots of rays ill linearize the xyz cords instead of just using only the x cord
     uint workGroupID = gl_WorkGroupID.x;
     uint workInvocationID = gl_LocalInvocationID.x;
-    uint startTriangleIndex =  workInvocationID * trianglesperInvocation;
-    uint endTriangleIndex = min(startTriangleIndex + trianglesperInvocation, uint(indicesSize));
-
-
    
-    int probeID = int(rayOrigin[workGroupID].w);
+    //int probeID = int(rayOrigin[workGroupID].w);
 
-
-    int intersectCheck = 0;
-    vec3 hitPosition = vec3(0.0);
-
-
-    for(int i = 0; i < trianglesperInvocation; i++){
-
-        // Fetch vertices for the triangle and then transform them into world space
-        vec4 v0 = M[int(vertices[i * 3 + 0].w)] * vec4(vertices[i * 3 + 0].xyz,0);
-        vec4 v1 = M[int(vertices[i * 3 + 1].w)] * vec4(vertices[i * 3 + 0].xyz,1);
-        vec4 v2 = M[int(vertices[i * 3 + 2].w)] * vec4(vertices[i * 3 + 0].xyz,2);
-
-        // No need for this yet but later i'm keeping this here just incase I want to use this script for calculating color and light
-        //vec3 normal = normalize(cross(v1 - v0, v2 - v0));
-
-        //if intersect then return
-        float intersect = TriIntersect(rayOrigin[workGroupID].xyz,rayDirection[workGroupID],rayLength[workGroupID] - 0.01 ,rayLength[workGroupID] + 0.01,v0.xyz,v1.xyz,v2.xyz);
-        if(intersect != -1){
-            //so we know the probe isnt in view
-           intersectCheck = 1;
-           hitPosition = rayOrigin[workGroupID].xyz + rayDirection[workGroupID] * intersect;
-           break;
-        }
+    if(workInvocationID == 0){
+        shortestLength = MAXLENGTH;
     }
-    hit[workGroupID] = hitPosition;
+    float shortestLengthLOCAL = MAXLENGTH;
+
+    vec3 debugInfo = vec3(0.0);
+
+
+    for (int i = 0; i < verticiesSize; i += 3) {
+        vec3 v0 = vertices[i].xyz;
+        vec3 v1 = vertices[i + 1].xyz;
+        vec3 v2 = vertices[i + 2].xyz;
+
+        RayResult result;
+        result = TriangleIntersectionTestGLM(rayOrigin[workGroupID].xyz, rayDirection[workGroupID], v0, v1, v2);
+
+        if(result.baryPosition.z > rayLength[workGroupID] || !result.hitFound){
+            continue;
+        }
+        if(result.baryPosition.z > 0 && result.baryPosition.z < shortestLengthLOCAL){
+            shortestLengthLOCAL = result.baryPosition.z;
+            debugInfo.x += 1;
+
+        }
+	}
+
+    if(shortestLengthLOCAL != MAXLENGTH){
+        hit[0] = rayOrigin[workGroupID].xyz + rayDirection[workGroupID].xyz * shortestLengthLOCAL;
+        //hit[0] =  debugInfo.xyz;
+    }
+    hit[1] =  debugInfo.xyz;
+
+    
+
 }

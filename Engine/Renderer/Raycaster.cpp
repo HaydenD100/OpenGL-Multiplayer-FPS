@@ -14,21 +14,18 @@ namespace Raycaster
 	GLuint rayLengthBuffer = 0;
 
 	std::vector<glm::vec3> raysDirection;
-	std::vector<glm::vec4> raysOrigin;
+	std::vector<glm::vec3> raysOrigin;
 	std::vector<float> raysLength;
+
+	std::vector<glm::vec4> verticies;
+
+
+	unsigned int vertexBufferDebug;
 
 	int indicesSize = 0;
 
 
 	void Init() {
-		glGenBuffers(1, &vertexBuffer);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, vertexBuffer);
-		//TODO :: Dynamicaly calculate size
-		glBufferData(GL_SHADER_STORAGE_BUFFER, 100000 * sizeof(glm::vec4), NULL, GL_DYNAMIC_DRAW); // 0 means no data, size is set later
-
-		glGenBuffers(1, &indicesBuffer);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, indicesBuffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, 100000 * sizeof(unsigned int), NULL, GL_DYNAMIC_DRAW); // 0 means no data, size is set later
 
 		glGenBuffers(1, &modelMatrixBuffer);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, modelMatrixBuffer);
@@ -50,36 +47,39 @@ namespace Raycaster
 
 	}
 	void FillBuffers() {
-		size_t objectListSize = AssetManager::GetGameObjectsSize();
-		int vertexBufferOffset = 0;
-		int indicesBufferOffset = 0;
-		indicesSize = 0;
+		size_t objectListSize = AssetManager::GetGameObjectsSize();	
+		verticies.clear();
 
 		for (int i = 0; i < objectListSize; i++) {
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, vertexBuffer);
-			vertexBufferOffset += AssetManager::GetGameObject(i)->GetModel()->VertexInfoBind(vertexBufferOffset,i);
+			GameObject* object = AssetManager::GetGameObject(i);
+			//for now just keep tbis the map as it only has a few verticies
+			if (!object->IncludedInRayCast())
+				continue;
 
-			glBindBuffer(GL_SHADER_STORAGE_BUFFER, indicesBuffer);
-			indicesBufferOffset += AssetManager::GetGameObject(i)->GetModel()->IndicesInfoBind(indicesBufferOffset);
+			std::vector<glm::vec4> verticesModel = object->GetModel()->GetVerticiesPadded();
+			std::cout << verticesModel.size() << "\n";
+			copy(verticesModel.begin(), verticesModel.end(), back_inserter(verticies));
 
 			glBindBuffer(GL_SHADER_STORAGE_BUFFER, modelMatrixBuffer);
-			glm::mat4 modelMatrix = AssetManager::GetGameObject(i)->GetModelMatrix();
+			glm::mat4 modelMatrix = object->GetModelMatrix();
 			glBufferSubData(GL_SHADER_STORAGE_BUFFER, i * sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(modelMatrix));
 		}
-		indicesSize = indicesBufferOffset / sizeof(unsigned short);
-		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+		std::cout << "verticies size GPU" << verticies.size() << "\n";
+
+		glGenBuffers(1, &vertexBuffer);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, vertexBuffer);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, verticies.size() * sizeof(glm::vec4), &verticies[0], GL_STATIC_DRAW);
 	}
 
 	void CleanUp() {
 
 	}
 	void Bind() {
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, vertexBuffer);
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 9, indicesBuffer);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 9, vertexBuffer);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 10, modelMatrixBuffer);
 
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, rayOriginBuffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, raysOrigin.size() * sizeof(glm::vec4), &raysOrigin[0], GL_DYNAMIC_DRAW);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, raysOrigin.size() * sizeof(glm::vec3), &raysOrigin[0], GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 11, rayOriginBuffer);
 
 
@@ -94,7 +94,10 @@ namespace Raycaster
 	}
 
 	void Compute() {
-		//std::cout << raysDirection.size() << "\n";
+
+		Renderer::cs_Raycaster.Use();
+		Bind();
+		Renderer::cs_Raycaster.SetInt("verticiesSize", verticies.size());
 		glDispatchCompute(raysDirection.size(), 1, 1);
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_BUFFER_UPDATE_BARRIER_BIT);
 
@@ -102,13 +105,32 @@ namespace Raycaster
 		raysOrigin.clear();
 		raysLength.clear();
 	}
-	void queueRay(glm::vec3 rayDirection, glm::vec3 rayOrigin, float length, int probeID){
+	void queueRay(glm::vec3 rayOrigin, glm::vec3 rayDirection, float length) {
 		raysDirection.push_back(rayDirection);
-		raysOrigin.push_back(glm::vec4(rayOrigin, probeID));
+		raysOrigin.push_back(glm::vec4(rayOrigin, 0));
 		raysLength.push_back(length);
 	}	
+
 	int GetIndicesSize() {
 		return indicesSize;
+	}
+	void RenderVerticies() {
+		// 1st attribute buffer : vertices
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+		glVertexAttribPointer(
+			0,                  // attribute
+			3,                  // size
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			0,                  // stride
+			(void*)0            // array buffer offset
+		);
+
+		glDrawArrays(GL_TRIANGLES, 0, verticies.size());
+
+		//glDisableVertexAttribArray(0);  // Cleanup if necessary
+		//glBindVertexArray(0);  // Unbind VAO
 	}
 
 
@@ -151,7 +173,7 @@ namespace SoftwareRaycaster
 			std::cout << verticesModel.size() << "\n";
 			copy(verticesModel.begin(), verticesModel.end(), back_inserter(verticies));
 		}
-		std::cout << "verticies size " << verticies.size() << "\n";
+		std::cout << "verticies size SOFTWARE " << verticies.size() << "\n";
 
 		glGenBuffers(1, &vertexBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -204,6 +226,8 @@ namespace SoftwareRaycaster
 
 	}
 
+
+
 	
 
 	float TriangleIntersectionTest(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, int rayIndex) {
@@ -212,8 +236,8 @@ namespace SoftwareRaycaster
 		float lenght = raysLength[rayIndex];
 		glm::vec3 result;
 		
-		glm::intersectRayTriangle(origin, direction, p1, p2, p3, result);
-		//std::cout << "resx " << result.x << " resy " << result.y << " resz " << result.z << " \n";
+		//glm::intersectRayTriangle(origin, direction, p1, p2, p3, result);
+		TriangleIntersectionTest2(origin, direction, p1, p2, p3, result);
 
 		if (result.z == 0 || result.z > lenght)
 			return -1;
@@ -223,38 +247,34 @@ namespace SoftwareRaycaster
 
 		return result.z;
 	}
-	float TriangleIntersectionTest2(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, int rayIndex) {
-		glm::vec3 origin = raysOrigin[rayIndex];
-		glm::vec3 direction = raysDirection[rayIndex];
-		float length = raysLength[rayIndex];
+	float TriangleIntersectionTest2(const glm::vec3& orig, const glm::vec3& dir,
+		const glm::vec3& v0, const glm::vec3& v1, const glm::vec3& v2,
+		glm::vec3& baryPosition) {
 
-		glm::vec3 a = p1 - p2;
-		glm::vec3 b = p3 - p1;
-		glm::vec3 p = origin - p1; // Vector from triangle vertex to ray origin
-		glm::vec3 n = cross(b, a); // Normal of the triangle plane
-		float r = glm::dot(direction, n); // Ray and triangle normal
+		glm::vec3 e1 = v1 - v0;
+		glm::vec3 e2 = v2 - v0;
 
-		// If the ray is parallel to the triangle, ignore it
-		if (abs(r) < 1e-6)
-			return -1.0;
+		glm::vec3 p = glm::cross(dir, e2);
+		float a = glm::dot(e1, p);
 
-		// Calculate intersection point using the determinant method
-		glm::vec3 q = glm::cross(p, direction);
-		r = 1.0f / r;
+		const float epsilon = 0.0001;
+		if (a > -epsilon && a < epsilon)
+			return false;
 
-		float u = glm::dot(q, b) * r;
-		float v = glm::dot(q, a) * r;
-		float t = glm::dot(n, p) * r;
+		float f = 1.0f / a;
+		glm::vec3 s = orig - v0;
 
-		// Check if intersection is within the triangle
-		if (u < 0.0f || v < 0.0f || (u + v) > 1.0f)
-			return -1.0f;
+		baryPosition.x = f * glm::dot(s, p);
+		if (baryPosition.x < 0.0f || baryPosition.x > 1.0f)
+			return false;
 
-		// Check if t is within valid ray bounds (epsilon for precision errors)
-		if (t > 0.001f && t < length)
-			return t;
+		glm::vec3 q = glm::cross(s, e1);
+		baryPosition.y = f * glm::dot(dir, q);
+		if (baryPosition.y < 0.0f || (baryPosition.x + baryPosition.y) > 1.0f)
+			return false;
 
-		return -1.0f;
+		baryPosition.z = f * glm::dot(e2, q);
+		return baryPosition.z >= 0.0f;
 	}
 
 	void RenderVerticies() {
