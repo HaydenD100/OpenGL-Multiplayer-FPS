@@ -452,33 +452,14 @@ vec3 GetIndirectLighting(vec3 WorldPos, vec3 Normal) { // Interpolate visible pr
     float w;
     vec3 light;
     float sumW = 0.;
-   
     vec3 indirectLighting = vec3(0.);
-    light = GetProbe(WorldPos, ivec3(0, 0, 0), w, Normal);
-    indirectLighting += w * light;
-    sumW += w;
-    light = GetProbe(WorldPos, ivec3(0, 0, 1), w, Normal);
-    indirectLighting += w * light;
-    sumW += w;
-    light = GetProbe(WorldPos, ivec3(0, 1, 0), w, Normal);
-    indirectLighting += w * light;
-    sumW += w;
-    light = GetProbe(WorldPos, ivec3(0, 1, 1), w, Normal);
-    indirectLighting += w * light;
-    sumW += w;
-    light = GetProbe(WorldPos, ivec3(1, 0, 0), w, Normal);
-    indirectLighting += w * light;
-    sumW += w;
-    light = GetProbe(WorldPos, ivec3(1, 0, 1), w, Normal);
-    indirectLighting += w * light;
-    sumW += w;
-    light = GetProbe(WorldPos, ivec3(1, 1, 0), w, Normal);
-    indirectLighting += w * light;
-    sumW += w;
-    light = GetProbe(WorldPos, ivec3(1, 1, 1), w, Normal);
-    
-    indirectLighting += w * light;
-    sumW += w;
+
+    for (int i = 0; i < 8; i++) {
+        ivec3 offset = ivec3(i, i/2, i/4) & ivec3(1);
+        light = GetProbe(WorldPos, offset, w, Normal);
+        indirectLighting += w * light;
+        sumW += w;
+    }
     indirectLighting /= sumW;
 
     return indirectLighting;
