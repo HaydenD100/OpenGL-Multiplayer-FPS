@@ -570,6 +570,14 @@ void GameObject::IncludInRayCast() {
 bool GameObject::IncludedInRayCast() {
 	return includedInRayCast;
 }
+bool GameObject::IncludedInGI() {
+	return includedInGI;
+}
+void GameObject::IncludInGI(bool state) {
+	includedInGI = state;
+}
+
+
 
 
 

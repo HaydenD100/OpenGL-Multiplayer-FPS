@@ -28,7 +28,7 @@
 
 //gamestuff
 static const int spawnpointsize = 1;
-static glm::vec3 spawnpoints[spawnpointsize] = { glm::vec3(2, 12, -2.4)};
+static glm::vec3 spawnpoints[spawnpointsize] = { glm::vec3(-10, 8, -3.19)};
 //static glm::vec3 spawnpoints[spawnpointsize] = { glm::vec3(11, 4.5, 11), glm::vec3(10, 4, -7.43), glm::vec3(8.52, 3, 10.7),glm::vec3(11.2, 4, -1.42) };
 
 

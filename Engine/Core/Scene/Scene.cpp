@@ -11,6 +11,8 @@ void Scene::LoadAssets() {
 	//Thank you to tokyosplif for some of the models and sounds
 
 	AssetManager::AddTexture("white", "Assets/Textures/white.png", 0.5, 0.0);
+	AssetManager::AddTexture("white_light", "Assets/Textures/white.png", 0.5, 0.0);
+	AssetManager::GetTexture("white_light")->SetEmissive(true);
 
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
 	AssetManager::GetTexture("uvmap")->SetEmissive(true);
@@ -26,7 +28,7 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("window", "Assets/Textures/window.png", 0.7, 0);
 	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png","Assets/Normals/window_normal.png", 0.5, 0);
 	AssetManager::AddTexture("sand", "Assets/Textures/sandyGround.png", "Assets/Normals/sand_normal.png", 0.9, 0);
-	AssetManager::AddTexture("concrete", "Assets/Textures/fence.png", "Assets/Normals/fence_normal.png", 0.9, 0);
+	AssetManager::AddTexture("concrete_fence", "Assets/Textures/fence.png", "Assets/Normals/fence_normal.png", 0.9, 0);
 	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png", 0.5, 0.5);
 	AssetManager::AddTexture("door", "Assets/Textures/door.png", "Assets/Normals/door_normal.png", 0.6, 0);
 	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png", 0.2, 0.7);
@@ -39,7 +41,10 @@ void Scene::LoadAssets() {
 	//AssetManager::AddTexture("sand_ground", "Assets/Textures/sand_ground.jpg", "Assets/Normals/sand_ground_normal.jpg", "Assets/Roughness/sand_ground_roughness.jpg", 0);
 	AssetManager::AddTexture("sand_ground", "Assets/Textures/brick.png", "Assets/Normals/test.jpg", 0.1f, 0.9f);
 
-	AssetManager::AddTexture("concrete", "Assets/Textures/concrete.png", "Assets/Normals/concrete_normal.png", "Assets/Roughness/concrete_roughness.png", "Assets/Metalic/concrete_metalic.png");
+
+
+	//Mehdi Shahsavan credits for some of these models
+	AssetManager::AddTexture("ladder", "Assets/Textures/ladder.png", "Assets/Normals/ladder_normal.png", "Assets/Roughness/ladder_roughness.png", "Assets/Metalic/ladder_metallic.png");
 
 	AssetManager::AddTexture("pallet", "Assets/Textures/pallet.png", "Assets/Normals/pallet_normal.png", "Assets/Roughness/pallet_roughness.png", "Assets/Metalic/pallet_metallic.png");
 	//AssetManager::AddTexture("barrel", "Assets/Textures/barrel.jpg", "Assets/Normals/barrel_normal.jpg", "Assets/Roughness/barrel_roughness.jpg", "Assets/Metalic/barrel_metallic.jpg");
@@ -51,7 +56,15 @@ void Scene::LoadAssets() {
 
 
 	AssetManager::AddTexture("shotgun", "Assets/Textures/remington.png", "Assets/Normals/remington_normal.png", "Assets/Roughness/remington_roughness.png","Assets/Metalic/remington_metallic.png");
+	AssetManager::AddTexture(Texture("shelf"));
+	AssetManager::AddTexture(Texture("vase"));
+	AssetManager::AddTexture(Texture("plant"));
+	AssetManager::AddTexture(Texture("Industrial_Light"));
+	AssetManager::AddTexture(Texture("smokespot_bench_bench"));
 
+	
+
+	
 	//Double Barel
 	AssetManager::AddTexture("double_barrel_shotgun_main_barrel", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_normal.png", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_metallic.jpg");
 	AssetManager::AddTexture("double_barrel_shotgun_wooden_grip_back", "Assets/Objects/FBX/DoubleBarrel/Woooden Grip Back_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Woooden Grip Back_normal.png", "Assets/Objects/FBX/DoubleBarrel/Woooden Grip Back_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Woooden Grip Back_metallic.jpg");
@@ -69,8 +82,20 @@ void Scene::LoadAssets() {
 	//AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 	AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("glass")));
 
-	AssetManager::AddModel("swat", Model("Assets/Objects/FBX/swat_death.dae", AssetManager::GetTexture("uvmap")));
-	
+	AssetManager::AddModel("ladder", Model("Assets/Objects/FBX/ladder.fbx", AssetManager::GetTexture("ladder")));
+	AssetManager::AddModel("shelf", Model("Assets/Objects/FBX/shelf.fbx", AssetManager::GetTexture("shelf")));
+	AssetManager::AddModel("vase", Model("Assets/Objects/FBX/vase.fbx", AssetManager::GetTexture("vase")));
+	AssetManager::GetModel("vase")->GetMeshByName("Mesh.001")->SetTexture(AssetManager::GetTexture("plant"));
+	AssetManager::GetModel("vase")->GetMeshByName("Mesh.002")->SetTexture(AssetManager::GetTexture("plant"));
+
+	AssetManager::AddModel("Bench", Model("Assets/Objects/FBX/Bench.fbx", AssetManager::GetTexture("smokespot_bench_bench")));
+
+
+	AssetManager::AddModel("ceiling_light", Model("Assets/Objects/FBX/ceiling_light.fbx", AssetManager::GetTexture("Industrial_Light")));
+	AssetManager::GetModel("ceiling_light")->GetMeshByName("l1.001")->SetTexture(AssetManager::GetTexture("white_light"));
+	AssetManager::GetModel("ceiling_light")->GetMeshByName("l1")->SetTexture(AssetManager::GetTexture("white_light"));
+
+
 	AssetManager::AddModel("playertwo", Model("Assets/Objects/FBX/bean_death.dae","Assets/Objects/player_mesh.obj", AssetManager::GetTexture("uvmap")));
 	AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 	
@@ -132,6 +157,8 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("water", Model("Assets/Objects/FBX/water_test.obj", AssetManager::GetTexture("white")));
 
 
+
+
 	Model* model = AssetManager::GetModel("map_test1");
 	model->GetMeshByName("floor.001")->SetTexture(AssetManager::GetTexture("sand_ground"));
 	model->GetMeshByName("barrel1")->SetTexture(AssetManager::GetTexture("barrel"));
@@ -183,6 +210,9 @@ void Scene::Load() {
 		//AssetManager::AddGameObject("map_indirectLight", AssetManager::GetModel("map_indirectLight"), glm::vec3(0, 6, 0), true, 0, Concave);
 		AssetManager::AddGameObject("map_test2", AssetManager::GetModel("map_test2"), glm::vec3(0, 0, 0), true, 0, Concave);
 		AssetManager::GetGameObject("map_test2")->IncludInRayCast();
+		AssetManager::GetGameObject("map_test2")->IncludInGI(true);
+
+
 		//AssetManager::AddGameObject("statue", AssetManager::GetModel("statue"), glm::vec3(0, 9.6, 0), true, 0, Convex);
 		//AssetManager::GetGameObject("statue")->SetRotationX(-1.5708f);
 
@@ -190,9 +220,20 @@ void Scene::Load() {
 		AssetManager::GetGameObject("water_test")->SetShaderType("water");
 
 
-		AssetManager::AddGameObject("raytest", AssetManager::GetModel("light_cube"), glm::vec3(0, 4, 0), true, 0, Concave);
-		//AssetManager::AddGameObject("raytest1", AssetManager::GetModel("light_cube"), glm::vec3(-1.94, 2.03, -0.76813), true, 0, Concave);
+		AssetManager::AddGameObject("ladder", AssetManager::GetModel("ladder"), glm::vec3(0, 3.55, 0), true, 0, Convex);
+		AssetManager::GetGameObject("ladder")->SetRotationX(-1.5708f);
 
+		AssetManager::AddGameObject("vase", AssetManager::GetModel("vase"), glm::vec3(-3.74, 3.55, -3.5), true, 0, Convex);
+		AssetManager::GetGameObject("vase")->SetRotationX(-1.5708f);
+
+		AssetManager::AddGameObject("shelf", AssetManager::GetModel("shelf"), glm::vec3(4.30, 3.55, 2.97), true, 0, Convex);
+		AssetManager::GetGameObject("shelf")->SetRotationX(-1.5708f);
+
+		AssetManager::AddGameObject("ceiling_light", AssetManager::GetModel("ceiling_light"), glm::vec3(-4.12, 3.55, 2.22), true, 0, Convex);
+		AssetManager::GetGameObject("ceiling_light")->SetRotationX(-1.5708f);
+
+		AssetManager::AddGameObject("Bench", AssetManager::GetModel("Bench"), glm::vec3(-11.2, 3.55, -3.72), true, 0, Convex);
+		AssetManager::GetGameObject("Bench")->SetRotationX(-1.5708f);
 		
 		// Sets renderer
 		std::vector<std::string> faces{
@@ -238,11 +279,11 @@ void Scene::Load() {
 			lights.push_back(light);
 		}
 		{
-			Light light(glm::vec3(0, 6, -2.4), glm::vec3(1, 0.922, 0.678) * 8.0f, 0.07, 0.017);
+			Light light(glm::vec3(0, 6, -2.4), glm::vec3(1, 0.922, 0.678) * 7.5f, 0.07, 0.017);
 			lights.push_back(light);
 		}
 		{
-			Light light(glm::vec3(0, 9, -2.4), glm::vec3(1, 0.922, 0.678) * 10.0f, 0.07, 0.017);
+			Light light(glm::vec3(-8, 9, 3.2), glm::vec3(1, 0.878, 0.471) * 6.0f, 0.07, 0.017);
 			lights.push_back(light);
 		}
 		
@@ -269,7 +310,7 @@ void Scene::Update(float deltaTime) {
 
 
 	for (int i = 0; i < lights.size(); i++) {
-		if(glm::distance(lights[i].position,Player::getPosition()) < lights[i].updateDistance || lights[i].Dynamic)
+		if(glm::distance(lights[i].position,Player::getPosition()) < lights[i].updateDistance && lights[i].Dynamic)
 			lights[i].GenerateShadows();
 	}
 

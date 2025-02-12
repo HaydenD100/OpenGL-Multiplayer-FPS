@@ -217,7 +217,7 @@
     <None Include="Assets\Shaders\Final\final.vert" />
     <None Include="Assets\Shaders\fxaa\fxaa.frag" />
     <None Include="Assets\Shaders\fxaa\fxaa.vert" />
-    <None Include="Assets\Shaders\GI\irradiance.comp" />
+    <None Include="Assets\Shaders\GI\ddgiProbes.comp" />
     <None Include="Assets\Shaders\GI\irradiance.frag" />
     <None Include="Assets\Shaders\GI\irradiance.vert" />
     <None Include="Assets\Shaders\GI\probe.frag" />

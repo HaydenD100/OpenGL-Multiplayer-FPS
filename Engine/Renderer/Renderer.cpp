@@ -336,11 +336,10 @@ namespace Renderer
 		//this is the projection to voxlize the scene from orgin (0,0,0) while the other one is the view of the camera
 		//voxel_orth = glm::ortho(-((float)voxelize_scene_albedo.GetWidth() / 2.0f), (float)voxelize_scene_albedo.GetWidth() / 2.0f, (float)voxelize_scene_albedo.GetWidth() / 2.0f, -((float)voxelize_scene_albedo.GetWidth() / 2.0f), -(float)voxelize_scene_albedo.GetWidth()/2.0f, (float)voxelize_scene_albedo.GetWidth()/2.0f);
 		float spacing = 1;
-		glm::vec3 propgationGridSize = glm::vec3(25, 12, 18);
-		//glm::vec3 propgationGridSize = glm::vec3(2, 1, 1);
-		//glm::vec3 gridPos = glm::vec3(-6.4, -1.4 + 6, -7.4);
+		glm::vec3 propgationGridSize = glm::vec3(22, 12, 14);
+		//glm::vec3 propgationGridSize = glm::vec3(1, 1, 1);
 		glm::vec3 gridPos = glm::vec3(-13.6, -1.4, -6);
-
+		//glm::vec3 gridPos = glm::vec3(0, 4.7, 0);
 
 		probeTexture.Create(glm::ceil(propgationGridSize.x * 1 / spacing), glm::ceil(propgationGridSize.y * 1 / spacing), glm::ceil(propgationGridSize.z * 1 / spacing));
 		probeGrid.Configure(propgationGridSize.x, propgationGridSize.y, propgationGridSize.z, spacing, gridPos);
@@ -360,7 +359,7 @@ namespace Renderer
 	void Renderer::BeforeRender() {
 
 		Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->getLights());
-		Raycaster::FillBuffers();
+		//Raycaster::FillBuffers();
 		int gridX = 10;
 		int gridY = 10;
 		int lenght = 15;
@@ -469,10 +468,10 @@ namespace Renderer
 
 	void Renderer::RenderScene() {
 
-		Raycaster::queueRay(glm::vec3(0, 4.5, 0), glm::vec3(0.6, -1, 1), 20);
 		//SoftwareRaycaster::queueRay(glm::vec3(0, 0, 1), glm::vec3(-1.97, 6.7, -0.8), 20);
-		SHBuffer.Bind(7);
-		Raycaster::Compute();
+		//SHBuffer.Bind(7);
+		//probeGrid.BindCubeMapArray(5);
+		//Raycaster::Compute();
 
 		//--------------------------------------------PROBE-------------------------------------------	
 		
@@ -821,6 +820,9 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, ssrBuffer.gSSR);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, emmisiveRenderer.BloomTexture());
+
+		probeGrid.Bind(15);
+
 		RenderPlane();
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

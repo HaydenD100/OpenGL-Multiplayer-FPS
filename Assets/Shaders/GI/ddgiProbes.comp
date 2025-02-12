@@ -1,0 +1,434 @@
+#version 460
+
+#define MAXRAYS 100000
+#define MAXLENGTH 999999
+
+layout (local_size_x = 32, local_size_y = 1, local_size_z = 1) in;
+
+layout(binding = 6) uniform sampler3D probeGrid;
+
+layout(std430, binding = 7) buffer ShCoeffient {
+    vec3 L1SH_0[3750 * 2];
+    vec3 L1SH_1[3750 * 2];
+    vec3 L1SH_2[3750 * 2];
+    vec3 L1SH_3[3750 * 2];
+
+    vec3 L1SH_4[3750 * 2];
+    vec3 L1SH_5[3750 * 2];
+    vec3 L1SH_6[3750 * 2];
+    vec3 L1SH_7[3750 * 2];
+
+    vec3 L1SH_8[3750 * 2];
+    vec3 hit[10];
+};
+
+layout(std430, binding = 9) readonly buffer VertexBuffer {
+    vec4 vertices[]; 
+};
+layout(std430, binding = 10) readonly buffer ModelMatrixBuffer {
+    mat4 M[]; 
+};
+layout(std430, binding = 11) readonly buffer rayOriginBuffer {
+    vec3 rayOrigin[]; 
+};
+layout(std430, binding = 12) readonly buffer rayDirectionBuffer {
+    vec3 rayDirection[]; 
+};
+layout(std430, binding = 13) readonly buffer rayLengthBuffer {
+    float rayLength[]; 
+};
+layout(std430, binding = 14) readonly buffer rayInfoBuffer {
+    vec4 rayInfo[]; 
+};
+// Declare SSBO containing bindless handles
+//layout(std430, binding = 15) buffer imageCubeHandels{
+    //uvec2 cubemapHandles[];
+//};
+//layout(rgba16f) uniform imageCube cubemapImage; 
+layout(binding = 5, rgba16f) uniform imageCubeArray probeImageMaps;
+
+
+struct RayResult {
+	bool hitFound;
+	vec3 baryPosition;
+};
+
+uniform int verticiesSize;
+
+uniform vec3 gridWorldPos;
+uniform vec3 volume;
+uniform float spacing;
+
+shared float shortestLength;
+
+#define MAXLIGHTS 26
+uniform vec3 LightColors[MAXLIGHTS];
+uniform vec3 lightPos[MAXLIGHTS];
+uniform vec3 Lightdirection[MAXLIGHTS];
+uniform float LightLinears[MAXLIGHTS];
+uniform float LightQuadratics[MAXLIGHTS];
+uniform float LightRadius[MAXLIGHTS];
+uniform float LightCutOff[MAXLIGHTS];
+uniform float LightOuterCutOff[MAXLIGHTS];
+uniform samplerCube depthMap[MAXLIGHTS];
+
+
+vec4 sampleCubeArray(vec3 dir, int index) {
+    vec3 absDir = abs(dir);
+    float maxComp = max(absDir.x, max(absDir.y, absDir.z));
+    
+    int face;
+    vec2 uv;
+    
+    if(maxComp == absDir.x) {
+        bool positive = dir.x > 0;
+        face = positive ? 0 : 1;
+        uv = vec2(positive ? -dir.z : dir.z, -dir.y) / absDir.x;
+    } else if(maxComp == absDir.y) {
+        bool positive = dir.y > 0;
+        face = positive ? 2 : 3;
+        uv = vec2(dir.x, positive ? dir.z : -dir.z) / absDir.y;
+    } else {
+        bool positive = dir.z > 0;
+        face = positive ? 4 : 5;
+        uv = vec2(positive ? dir.x : -dir.x, -dir.y) / absDir.z;
+    }
+    
+    uv = uv * 0.5 + 0.5; // Convert to [0,1] range
+    ivec2 size = imageSize(probeImageMaps).xy;
+    ivec2 coord = ivec2(uv * vec2(size));
+        
+    return imageLoad(probeImageMaps, ivec3(coord, index * 6 + face));
+}
+
+void writeCubeArray(vec3 dir, int index, vec4 color) {
+    vec3 absDir = abs(dir);
+    float maxComp = max(absDir.x, max(absDir.y, absDir.z));
+    
+    int face;
+    vec2 uv;
+    
+    if(maxComp == absDir.x) {
+        bool positive = dir.x > 0;
+        face = positive ? 0 : 1;
+        uv = vec2(positive ? -dir.z : dir.z, -dir.y) / absDir.x;
+    } else if(maxComp == absDir.y) {
+        bool positive = dir.y > 0;
+        face = positive ? 2 : 3;
+        uv = vec2(dir.x, positive ? dir.z : -dir.z) / absDir.y;
+    } else {
+        bool positive = dir.z > 0;
+        face = positive ? 4 : 5;
+        uv = vec2(positive ? dir.x : -dir.x, -dir.y) / absDir.z;
+    }
+    
+    uv = uv * 0.5 + 0.5; // Convert to [0,1] range
+    ivec2 size = imageSize(probeImageMaps).xy;
+    ivec2 coord = ivec2(uv * vec2(size));
+    
+    imageStore(probeImageMaps, ivec3(coord, index * 6 + face), color);
+}
+
+
+bool TriIntersectBoolVersion(vec3 origin, vec3 direction, float rayMin, float rayMax, vec3 v0, vec3 v1, vec3 v2) {
+
+	vec3 a = v0 - v1;
+	vec3 b = v2 - v0;
+	vec3 p = v0 - origin;
+	vec3 n = cross(b, a);
+	float r = dot(direction, n);
+
+    //ignore back face
+	if (r > 0)
+	    return false;
+
+	// some other early out
+	if (abs(r) < 0.00001)
+		return false; // you removed this on the ragdoll renderer, maybe it introduces artefacts?
+
+	vec3 q = cross( p, direction );
+	r = 1.0 / r;
+	float u = dot( q, b )*r;
+	float v = dot( q, a )*r;
+	float t = dot( n, p )*r;
+
+	if( u<0.0 || v<0.0 || (u+v)>1.0 )
+		t = -1.0;
+
+	if (t > rayMin && t < rayMax) {
+		return true;
+	}
+	return false;
+}
+
+float TriIntersect(vec3 origin, vec3 direction, float rayMin, float rayMax, vec3 v0, vec3 v1, vec3 v2) {
+    vec3 a = v0 - v1;
+    vec3 b = v2 - v0;
+    vec3 p = v0 - origin;
+    vec3 n = cross(b, a);
+    float r = dot(direction, n);
+
+    // Ignore back faces
+    if (r > 0.0)
+        return -1.0;
+
+    // Check if ray is parallel to the triangle
+    if (abs(r) < 1e-6)
+        return -1.0;
+
+    vec3 q = cross(p, direction);
+    r = 1.0 / r;
+    float u = dot(q, b) * r;
+    float v = dot(q, a) * r;
+    float t = dot(n, p) * r;
+
+    // Check if intersection is within the triangle
+    if (u < 0.0 || v < 0.0 || (u + v) > 1.0)
+        t = -1.0;
+
+    // Check if t is within the valid range
+    if (t > rayMin && t < rayMax)
+        return t;
+
+    return -1.0;
+}
+
+float DistanceSquared( vec3 A, vec3 B ) {
+    vec3 C = A - B;
+    return dot( C, C );
+}
+
+
+
+bool PointInOrOn( vec3 P1, vec3 P2, vec3 A, vec3 B )
+{
+    vec3 CP1 = cross(B - A, P1 - A);
+    vec3 CP2 = cross(B - A, P2 - A);
+    return dot( CP1, CP2 ) >= 0;
+
+}
+
+bool PointInTriangle( vec3 px, vec3 p0, vec3 p1, vec3 p2 )
+{
+    
+    return PointInOrOn(px, p0, p1, p2) && PointInOrOn(px, p1, p2, p0) && PointInOrOn(px, p2, p0, p1);
+}
+
+vec3 IntersectPlane(vec3 rayO, vec3 rayDir, vec3 p0, vec3 p1, vec3 p2)
+{
+    vec3 D = rayDir;
+    vec3 N = cross(p1-p0, p2-p0);
+    vec3 X = rayO + D * dot(p0 - rayO, N) / dot(D, N);
+
+    return X;
+}
+bool IntersectTriangle(vec3 rayO, vec3 rayDir, float rayLenght, vec3 p0, vec3 p1, vec3 p2)
+{
+    vec3 X = IntersectPlane(rayO, rayDir, p0, p1, p2);
+    vec3 OX = X - rayO;
+    //if(length(OX) > rayLenght)
+        //return false;
+    return PointInTriangle(X, p0, p1, p2);
+}
+
+
+
+
+//GLM GTX code adapated for glsl 
+RayResult TriangleIntersectionTestGLM(vec3 orig, vec3 dir,vec3 v0, vec3 v1, vec3 v2) {
+    RayResult rayResult;
+	rayResult.hitFound = false;
+        
+	vec3 e1 = v1 - v0;
+	vec3 e2 = v2 - v0;
+
+	vec3 p = cross(dir, e2);
+	float a = dot(e1, p);
+
+	const float epsilon = 0.0001;
+	if (a > -epsilon && a < epsilon)
+		return rayResult;
+
+	float f = 1.0f / a;
+	vec3 s = orig - v0;
+
+	rayResult.baryPosition.x = f * dot(s, p);
+	if (rayResult.baryPosition.x < 0.0f || rayResult.baryPosition.x > 1.0f)
+		return rayResult;
+
+	vec3 q = cross(s, e1);
+	rayResult.baryPosition.y = f * dot(dir, q);
+	if (rayResult.baryPosition.y < 0.0f || (rayResult.baryPosition.x + rayResult.baryPosition.y) > 1.0f)
+		return rayResult;
+
+	rayResult.baryPosition.z = f * dot(e2, q);
+    if(rayResult.baryPosition.z >= 0.0f){
+        rayResult.hitFound = true;
+    }
+
+	return rayResult;
+}
+    
+//------------------------------------Direct Lighting--------------------------
+
+vec3 gridSamplingDisk[20] = vec3[]
+(
+   vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
+   vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+   vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
+   vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
+   vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
+);
+
+const float PI = 3.14159265359;
+const float far_plane = 25.0; // Constant, moved outside main
+float ShadowCalculation(vec3 fragPos, int index, vec3 viewPos)
+{
+    vec3 fragToLight = fragPos - lightPos[index];
+    float currentDepth = length(fragToLight);
+    float shadow = 0.0;
+    float bias = 0.2;
+
+    int samples = 20;
+    float viewDistance = length(viewPos - fragPos);
+    float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
+    for(int i = 0; i < samples; ++i)
+    {
+        float closestDepth = texture(depthMap[index], fragToLight + gridSamplingDisk[i] * diskRadius).r;
+        closestDepth *= far_plane;   // undo mapping [0;1]
+        if(currentDepth - bias > closestDepth)
+            shadow += 1.0;
+    }
+    shadow /= float(samples);  
+    
+    return shadow;
+}
+// ----------------------------------------------------------------------------
+float DistributionGGX(vec3 N, vec3 H, float roughness) {
+    float a = roughness * roughness;
+    float a2 = a * a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH * NdotH;
+
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+
+    return a2 / denom;
+}
+// ----------------------------------------------------------------------------
+float GeometrySchlickGGX(float NdotV, float roughness) {
+    float k = (roughness + 1.0);
+    k = (k * k) / 8.0;
+
+    return NdotV / (NdotV * (1.0 - k) + k);
+}
+// ----------------------------------------------------------------------------
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    return GeometrySchlickGGX(NdotV, roughness) * GeometrySchlickGGX(NdotL, roughness);
+}
+// ----------------------------------------------------------------------------
+vec3 fresnelSchlick(float cosTheta, vec3 F0) {
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+// ----------------------------------------------------------------------------
+
+
+vec3 DirectLighting(vec3 FragPos,vec3 N, vec3 viewPos,vec3 albedo, float roughness,float metalic){
+    vec3 F0 = mix(vec3(0.04), albedo, metalic);
+    vec3 V = normalize(viewPos - FragPos);
+    vec3 Lo = vec3(0.0);
+    vec3 spec = vec3(0.0);
+    for (int i = 0; i < MAXLIGHTS; ++i) {
+        if (LightRadius[i] == 0) continue;
+
+        // Calculate distance between light and fragment
+        vec3 L = normalize(lightPos[i] - FragPos);
+        float distance = length(lightPos[i] - FragPos);
+        float attenuation = 1.0 / (1.0 + LightLinears[i] * distance + LightQuadratics[i] * (distance * distance));
+        vec3 radiance = LightColors[i] * attenuation;
+
+        // Cook-Torrance BRDF
+        vec3 H = normalize(V + L);
+        float NDF = DistributionGGX(N, H, roughness);
+        float G = GeometrySmith(N, V, L, roughness);
+        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+        vec3 numerator = NDF * G * F;
+        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
+        vec3 specular = numerator / denominator;
+
+        vec3 kS = F;
+        vec3 kD = (1.0 - kS) * (1.0 - metalic);
+        float NdotL = max(dot(N, L), 0.0);
+        float shadow = ShadowCalculation(FragPos , i,viewPos);
+        //the 1.3 makes it a little brighter
+        Lo += ((kD * albedo) * (1.0f - shadow) / PI + specular) * radiance * NdotL * (1.0f - shadow);
+        spec += specular * radiance * NdotL * (1.0 - shadow);
+
+
+    }
+
+    return Lo;
+}
+
+
+void main(){
+    //One ray per workgroup and then each invocation takes 1/32 (32 being Nivida's invocation size per workgroup of the triangles in sections to calculate
+
+    //to make this more efficient when i have lots of rays ill linearize the xyz cords instead of just using only the x cord
+    uint workGroupID = gl_WorkGroupID.x;
+    uint workInvocationID = gl_LocalInvocationID.x;
+   
+    //int probeID = int(rayOrigin[workGroupID].w);
+
+    if(workInvocationID == 0){
+        shortestLength = MAXLENGTH;
+    }
+    float shortestLengthLOCAL = MAXLENGTH;
+    vec3 currentV0 = vec3(0);
+    vec3 currentV1 = vec3(0);
+    vec3 currentV2 = vec3(0);
+
+    vec3 debugInfo = vec3(0.0);
+
+
+    for (int i = 0; i < verticiesSize; i += 3) {
+        vec3 v0 = vertices[i].xyz;
+        vec3 v1 = vertices[i + 1].xyz;
+        vec3 v2 = vertices[i + 2].xyz;
+
+        RayResult result;
+        result = TriangleIntersectionTestGLM(rayOrigin[workGroupID].xyz, rayDirection[workGroupID], v0, v1, v2);
+
+        if(result.baryPosition.z > rayLength[workGroupID] || !result.hitFound){
+            continue;
+        }
+        if(result.baryPosition.z > 0 && result.baryPosition.z < shortestLengthLOCAL){
+            shortestLengthLOCAL = result.baryPosition.z;
+            currentV0 = v0;
+            currentV1 = v1;
+            currentV2 = v2;
+        }
+	}
+
+    if(shortestLengthLOCAL != MAXLENGTH){
+        vec3 hitPos = rayOrigin[workGroupID].xyz + rayDirection[workGroupID].xyz * shortestLengthLOCAL;
+        //hit[0] = hitPos;
+        if(rayInfo[workGroupID].x == 1){
+            int probeID = int(rayInfo[workGroupID].y);
+
+            vec3 e1 = currentV1 - currentV0;
+	        vec3 e2 = currentV2 - currentV0;
+            vec3 N = cross(e1,e2);
+
+            vec3 directLighting = DirectLighting(hitPos,N,rayOrigin[workGroupID].xyz,vec3(1,1,1),0.5,0.5);
+            //directLighting = vec3(1,0,0);
+
+            writeCubeArray(rayDirection[workGroupID].xyz,probeID,vec4( N,1));
+        }
+        
+        //hit[0] =  debugInfo.xyz;
+    }
+}

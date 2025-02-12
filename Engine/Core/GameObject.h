@@ -111,6 +111,9 @@ public:
 	void SetDontCull(bool cull);
 	void IncludInRayCast();
 	bool IncludedInRayCast();
+	void IncludInGI(bool state);
+
+	bool IncludedInGI();
 
 private:
 	Transform transform = Transform();
@@ -135,6 +138,7 @@ private:
 	bool dontCull = false;
 	bool shouldDelete = false;
 	bool includedInRayCast = false;
+	bool includedInGI = false;
 
 	//change to this
 	std::vector<glm::mat4> m_FinalBoneMatrices;

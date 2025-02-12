@@ -168,6 +168,8 @@ namespace AssetManager
 
 
 	Model* AssetManager::GetModel(std::string name) {
+		if (&models[name] == nullptr)
+			std::cout << "Model: " << name << " doesnt exsit \n";
 		return &models[name];
 	}
 	Model* AssetManager::AddModel(std::string name, const char* path, Texture* texture) {
@@ -239,6 +241,7 @@ namespace AssetManager
 			if (GameObjects[i].GetName() == name)
 				return &GameObjects[i];
 		}
+		std::cout << "Object: " << name << " doesnt exsit \n";
 		return nullptr;
 	}
 	
@@ -265,6 +268,8 @@ namespace AssetManager
 			if (Textures[i].GetName() == name)
 				return &Textures[i];
 		}
+		std::cout << "Texture: " << name << " doesnt exsit \n";
+
 		return nullptr;
 	}
 

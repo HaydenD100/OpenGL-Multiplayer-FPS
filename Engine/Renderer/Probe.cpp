@@ -1,4 +1,4 @@
-#include "Probe.h"
+﻿#include "Probe.h"
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Core/Scene/SceneManager.h"
 #include "Engine/Renderer/Raycaster.h"
@@ -28,6 +28,7 @@ void ProbeGrid::ShowProbes() {
 
 
 void ProbeGrid::Bake(std::vector<Light> lights) {
+	std::cout << "starting baking lighting \n";
 	Renderer::s_probe.Use();
 
 	// Upload lights data to the GPU
@@ -89,7 +90,7 @@ void ProbeGrid::Bake(std::vector<Light> lights) {
 
 
 	for (int i = 0; i < probes.size(); i++) {
-		probes[i].Irradiance();
+		probes[i].Irradiance(); 
 	}
 	glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
 
@@ -97,6 +98,9 @@ void ProbeGrid::Bake(std::vector<Light> lights) {
 
 
 	glClearColor(0, 0, 0, 1);
+
+	std::cout << "Done \n";
+
 }
 
 Probe::Probe(glm::vec3 postion) {
@@ -131,6 +135,29 @@ Probe::Probe(glm::vec3 postion) {
 
 
 
+	glGenTextures(1, &probeCubemapBindless);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, probeCubemapBindless);
+	for (unsigned int i = 0; i < 6; ++i) {
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, DDGIPROBESIZE, DDGIPROBESIZE, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+
+	/*
+
+	probeCubemapBindlessHandle = glGetImageHandleARB(
+		probeCubemapBindless, // Texture
+		0,                    // Mip level
+		GL_TRUE,              // Layered (true for cubemaps)
+		0,                    // Layer (ignored for cubemaps)
+		GL_RGB16F            // Format (must match texture)
+	);
+	glMakeImageHandleResidentARB(probeCubemapBindlessHandle, GL_READ_WRITE);
+	*/
 	// Create and configure the depth texture
 
 	glGenTextures(1, &Depth);
@@ -172,7 +199,13 @@ Probe::Probe(glm::vec3 postion) {
 
 	captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.001f, 15.0f);
 
+	const int rays = 100;
+	for (int i = 0; i < rays; i++ ) {
+		Raycaster::queueRay(postion, glm::vec3(0,0,0), 25, glm::vec4(1, probeID, 0, 0));
+	}
 
+
+	
 }
 
 void Probe::Irradiance() {
@@ -237,9 +270,7 @@ void Probe::Bake() {
 		for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
 			GameObject* gameobjectRender = AssetManager::GetGameObject(i);
 
-			if (!gameobjectRender->ShouldRender())
-				continue;
-			if (gameobjectRender->GetShaderType() != "Default") {
+			if (gameobjectRender->GetShaderType() != "Default" || !gameobjectRender->ShouldRender() || !gameobjectRender->IncludedInGI()) {
 				continue;
 			}
 
@@ -250,18 +281,7 @@ void Probe::Bake() {
 			Renderer::s_probe.SetMat3("normalMatrix3", normalMatrix);
 			Renderer::s_probe.SetMat4("M", ModelMatrix);
 			gameobjectRender->RenderObject(Renderer::s_probe.GetShaderID());
-		}
-		std::vector<Light> lights = SceneManager::GetCurrentScene()->getLights();
-		for (int i = 0; i < lights.size(); i++) {
-			Renderer::s_probe.SetVec3("color", lights[i].colour / 8.0f);
-			glm::mat4 positionMatrix = glm::mat4(); // create an identity matrix;
-			positionMatrix = glm::translate(positionMatrix, lights[i].position); //position is a vec3
-			Renderer::s_probe.SetMat4("M", positionMatrix);
-			AssetManager::GetModel("light_cube")->RenderModel(Renderer::s_probe.GetShaderID());
-		}
-		Renderer::s_probe.SetVec3("color", glm::vec3(0.0));
-
-
+		}		
 	}
 
 }

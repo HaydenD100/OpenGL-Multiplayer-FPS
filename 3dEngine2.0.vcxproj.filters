@@ -362,11 +362,11 @@
     <None Include="Assets\Shaders\SolidColour\solidColour.vert" />
     <None Include="Assets\Shaders\fxaa\fxaa.vert" />
     <None Include="Assets\Shaders\fxaa\fxaa.frag" />
-    <None Include="Assets\Shaders\GI\irradiance.comp" />
     <None Include="Assets\Shaders\GI\probeCheck.comp" />
     <None Include="Assets\Shaders\Water\water.vert" />
     <None Include="Assets\Shaders\Water\water.frag" />
     <None Include="Assets\Shaders\GI\triangleIntersection.comp" />
+    <None Include="Assets\Shaders\GI\ddgiProbes.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

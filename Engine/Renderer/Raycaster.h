@@ -10,7 +10,7 @@ namespace Raycaster
 	void FillBuffers();
 	void Bind();
 	void Compute();
-	void queueRay(glm::vec3 rayOrigin, glm::vec3 rayDirection, float length);
+	void queueRay(glm::vec3 rayOrigin, glm::vec3 rayDirection, float length, glm::vec4 rayInfo);
 	int GetIndicesSize();
 	void RenderVerticies();
 

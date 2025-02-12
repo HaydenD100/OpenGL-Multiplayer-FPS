@@ -19,6 +19,8 @@ public:
     //static int CurrentTextureNumber;
     Texture() = default;
     Texture(const char* name, const char* path, float roughness, float metalic);
+    Texture(std::string name);
+
     Texture(const char* name, const char* path, const char* normalPath, float roughness, float metalic);
     Texture(const char* name, const char* path, const char* normalPath, const char* roughnessPath, const char* metalicPath);
     Texture(aiMaterial* material, const aiScene* scene);

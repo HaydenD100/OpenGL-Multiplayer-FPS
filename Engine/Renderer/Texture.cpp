@@ -30,6 +30,107 @@ Texture::Texture(const char* name, const char* path, float Roughness, float Meta
 
 	stbi_image_free(data);
 }
+Texture::Texture(std::string name) {
+    this->name = name;
+
+
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    // Set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Load and generate the texture
+    int width, height;
+    std::string path = "Assets/Textures/" + name + ".png";
+    unsigned char* data = stbi_load(path.c_str(), &width, &height, 0, STBI_rgb_alpha);
+
+    if (data) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else {
+        std::cout << "Failed to load texture " + name + ".png" << std::endl;
+    }
+    stbi_image_free(data);
+
+
+    glGenTextures(1, &textureNormal);
+    glBindTexture(GL_TEXTURE_2D, textureNormal);
+
+    // Set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Load and generate the texture
+    int width1, height1;
+
+    path = "Assets/Normals/" + name + "_normal.png";
+    unsigned char* data1 = stbi_load(path.c_str(), &width1, &height1, 0, STBI_rgb_alpha);
+    if (data1) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width1, height1, 0, GL_RGBA, GL_UNSIGNED_BYTE, data1);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else {
+        std::cout << "Failed to load texture " + name + "_normal.png" << std::endl;
+    }
+
+    stbi_image_free(data1);
+
+    glGenTextures(1, &textureRoughness);
+    glBindTexture(GL_TEXTURE_2D, textureRoughness);
+
+    // Set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Load and generate the texture
+    int width2, height2;
+    path = "Assets/Roughness/" + name + "_roughness.png";
+    unsigned char* data2 = stbi_load(path.c_str(), &width2, &height2, 0, STBI_rgb_alpha);
+    if (data2) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width2, height2, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else {
+        std::cout << "Failed to load texture " + name + "_roughness.png" << std::endl;
+    }
+
+    stbi_image_free(data2);
+
+    glGenTextures(1, &textureMetalic);
+    glBindTexture(GL_TEXTURE_2D, textureMetalic);
+
+    // Set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Load and generate the texture
+    int width3, height3;
+    path = "Assets/Metalic/" + name + "_metalic.png";
+
+    unsigned char* data3 = stbi_load(path.c_str(), &width3, &height3, 0, STBI_rgb_alpha);
+    if (data3) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width3, height3, 0, GL_RGBA, GL_UNSIGNED_BYTE, data3);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else {
+        std::cout << "Failed to load texture " + name + "_metallic.png" << std::endl;
+    }
+
+    stbi_image_free(data3);
+
+}
+
 
 Texture::Texture(const char* name, const char* path, const char* normalPath, float Roughness, float Metalic) {
     this->name = name;

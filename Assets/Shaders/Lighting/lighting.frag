@@ -583,7 +583,7 @@ void main() {
     float factor = min(1, roughness * 1.5);
     //adjustedIndirectLighting *= (0.4) * vec3(factor);
     //adjustedIndirectLighting = max(adjustedIndirectLighting, vec3(0));
-    adjustedIndirectLighting *= albedo * 1;
+    adjustedIndirectLighting *= albedo * 1.0;
 
 
     

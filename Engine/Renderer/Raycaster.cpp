@@ -12,9 +12,13 @@ namespace Raycaster
 	GLuint rayDirectionBuffer = 0;
 	GLuint rayOriginBuffer = 0;
 	GLuint rayLengthBuffer = 0;
+	GLuint rayInfoBuffer = 0;
+
 
 	std::vector<glm::vec3> raysDirection;
 	std::vector<glm::vec3> raysOrigin;
+	std::vector<glm::vec4> raysInfo;
+
 	std::vector<float> raysLength;
 
 	std::vector<glm::vec4> verticies;
@@ -41,6 +45,10 @@ namespace Raycaster
 
 		glGenBuffers(1, &rayLengthBuffer);
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, rayLengthBuffer);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, 0, NULL, GL_DYNAMIC_DRAW); // 0 means no data, size is set later
+
+		glGenBuffers(1, &rayInfoBuffer);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, rayInfoBuffer);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, 0, NULL, GL_DYNAMIC_DRAW); // 0 means no data, size is set later
 
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
@@ -91,6 +99,10 @@ namespace Raycaster
 		glBindBuffer(GL_SHADER_STORAGE_BUFFER, rayLengthBuffer);
 		glBufferData(GL_SHADER_STORAGE_BUFFER, raysLength.size() * sizeof(float), &raysLength[0], GL_DYNAMIC_DRAW);
 		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 13, rayLengthBuffer);
+
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, rayInfoBuffer);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, raysInfo.size() * sizeof(glm::vec4), &raysInfo[0], GL_DYNAMIC_DRAW);
+		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 14, rayInfoBuffer);
 	}
 
 	void Compute() {
@@ -101,14 +113,15 @@ namespace Raycaster
 		glDispatchCompute(raysDirection.size(), 1, 1);
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_BUFFER_UPDATE_BARRIER_BIT);
 
-		raysDirection.clear();
-		raysOrigin.clear();
-		raysLength.clear();
+		//raysDirection.clear();
+		//raysOrigin.clear();
+		//raysLength.clear();
 	}
-	void queueRay(glm::vec3 rayOrigin, glm::vec3 rayDirection, float length) {
+	void queueRay(glm::vec3 rayOrigin, glm::vec3 rayDirection, float length, glm::vec4 rayInfo) {
 		raysDirection.push_back(rayDirection);
 		raysOrigin.push_back(glm::vec4(rayOrigin, 0));
 		raysLength.push_back(length);
+		raysInfo.push_back(rayInfo);
 	}	
 
 	int GetIndicesSize() {
@@ -201,7 +214,7 @@ namespace SoftwareRaycaster
 			if (closestHit != maxLength) {
 				glm::vec3 cartesian = raysOrigin[ray] + raysDirection[ray] * closestHit;
 				std::cout << "x " << cartesian.x << " y " << cartesian.y << " z " << cartesian.z << " \n";
-				AssetManager::GetGameObject("raytest")->setPosition(cartesian);
+				//AssetManager::GetGameObject("raytest")->setPosition(cartesian);
 			}
 			else {
 				std::cout << "No Hit \n";
