@@ -1,19 +1,11 @@
 #pragma once
-#include <GL/glew.h>
-//#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "Engine/Core/Common/RenderCommon.h"
+#include "Engine/Core/GameObject.h"
 
 #include <vector>
 #include <string>
 
-#include "Engine/Core/GameObject.h"
-#include "Engine/Core/AssetManager.h"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
 //------------------IMPORTANT--------------------------
 //This and the Animation Manager should not be used for animations, this will only transform the gameobject over keyframes while the Skinned Animations and Animator use bones that will munipluate the verticies this was added before I implemented SkinnedAnimations

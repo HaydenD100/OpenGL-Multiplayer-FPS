@@ -1,5 +1,10 @@
 #include "Animation.h"
+#include "Engine/Core/GameObject.h"
+#include "Engine/Core/AssetManager.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 KeyFrame::KeyFrame(glm::vec3 Position, glm::quat Rotation, glm::vec3 Scale, float Duration) {
 	position = Position;
 	rotation = Rotation;

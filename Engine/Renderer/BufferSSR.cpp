@@ -1,4 +1,5 @@
 #include "BufferSSR.h"
+#include <iostream>
 
 BufferSSR::BufferSSR() {
 

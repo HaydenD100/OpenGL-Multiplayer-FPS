@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Core\Common\RenderCommon.h" />
     <ClCompile Include="Engine\Core\Debug\BulletDebug.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
     <ClCompile Include="Engine\Backend.cpp" />
@@ -180,7 +181,6 @@
     <ClCompile Include="Engine\Game\Gun.cpp" />
     <ClCompile Include="Engine\Game\Player.cpp" />
     <ClCompile Include="Engine\Loaders\loader.cpp" />
-    <ClCompile Include="Engine\Loaders\ShaderLoader.cpp" />
     <ClCompile Include="Engine\Loaders\stb_image.cpp" />
     <ClCompile Include="Engine\Loaders\vboindexer.cpp" />
     <ClCompile Include="Engine\Renderer\Model.cpp" />
@@ -254,6 +254,7 @@
     <Text Include="todo.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Core\Common\GameCommon.h" />
     <ClInclude Include="Engine\Core\Debug\BulletDebug.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />
     <ClInclude Include="Engine\Backend.h" />
@@ -263,7 +264,9 @@
     <ClInclude Include="Engine\Core\Common.h" />
     <ClInclude Include="Engine\Core\Decal.h" />
     <ClInclude Include="Engine\Core\DecalInstance.h" />
+    <ClInclude Include="Engine\Core\Common\Defines.h" />
     <ClInclude Include="Engine\Core\GameObject.h" />
+    <ClInclude Include="Engine\Core\Common\Header.h" />
     <ClInclude Include="Engine\Core\Input.h" />
     <ClInclude Include="Engine\Renderer\Bloom.h" />
     <ClInclude Include="Engine\Renderer\BufferLighting.h" />
@@ -288,7 +291,6 @@
     <ClInclude Include="Engine\Loaders\loader.hpp" />
     <ClInclude Include="Engine\Loaders\nlohmann\json.hpp" />
     <ClInclude Include="Engine\Loaders\nlohmann\json_fwd.hpp" />
-    <ClInclude Include="Engine\Loaders\ShaderLoader.hpp" />
     <ClInclude Include="Engine\Loaders\stb_image.h" />
     <ClInclude Include="Engine\Loaders\vboindexer.h" />
     <ClInclude Include="Engine\Pathfinding\Pathfinding.h" />

@@ -1,16 +1,12 @@
 #pragma once
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "Engine/Core/Common/RenderCommon.h"
+
 #include <iostream>
 #include <vector>
 #include "Engine/Loaders/stb_image.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include "Engine/Core/Common.h"
 
 
 class Texture

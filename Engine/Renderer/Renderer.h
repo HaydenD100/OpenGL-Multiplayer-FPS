@@ -1,17 +1,8 @@
 #pragma once
-#include <GL/glew.h>
-//#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <map>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "Engine/Core/Common/RenderCommon.h"
 
 
-#include "Loaders/ShaderLoader.hpp"
-#include "Loaders/Loader.hpp"
-#include "Engine/Core/UI/Text2D.h" 
-#include "Loaders/stb_image.h"
-#include "Engine/Core/Lights/Light.h"
+
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Animation/SkinnedAnimatior.h"
 #include "Engine/Renderer/Shader.h"
@@ -22,6 +13,7 @@
 #include "Engine/Renderer/Texture3D.h"
 #include "Engine/Renderer/Probe.h"
 #include "Engine/Renderer/StorageBuffer.h"
+#include "Engine/Core/Lights/Light.h"
 
 #include <thread>
 #include <mutex>
@@ -116,8 +108,6 @@ namespace Renderer
 
     int init();
     void LoadAllShaders();
-
-
     void ClearScreen();
     void SwapBuffers(GLFWwindow* window);
 

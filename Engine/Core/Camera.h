@@ -1,13 +1,8 @@
 #pragma once
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include "Input.h"
+#include "Engine/Core/Common/RenderCommon.h"
 #include "Common.h"
-#include "Physics/Physics.h"
+
+
 
 namespace Camera
 {

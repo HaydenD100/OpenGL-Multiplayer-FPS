@@ -1,14 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-
-#include "Engine/Core/Camera.h"
-#include "Engine/Core/GameObject.h"
-#include "Engine/Game/Player.h"
-#include "Engine/Core/AssetManager.h"
 #include "Engine/Animation/SkinnedAnimatior.h"
-
-#include "Engine/Networking/NetworkManager.h"
 
 enum GunType
 {

@@ -1,7 +1,5 @@
 #pragma once
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "Engine/Core/Common/RenderCommon.h"
 #include "Engine/Core/Input.h"
 #include "Engine/Renderer/Renderer.h"
 

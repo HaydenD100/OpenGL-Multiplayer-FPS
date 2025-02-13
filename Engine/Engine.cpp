@@ -1,12 +1,17 @@
 #include "Engine.h"
-#include "Engine/Physics/BulletPhysics.h"
 #include <ctime>
 #include <iostream>
-#include "Engine/Networking/NetworkManager.h"
+
+#include "Backend.h"
 #include "Engine/Renderer/Raycaster.h"
-
-
-
+#include "Engine/Core/Scene/SceneManager.h"
+#include "Engine/Core/Scene/Scene.h"
+#include "Engine/Renderer/Renderer.h"
+#include "Engine/Core/Input.h"
+#include "Engine/Core/Camera.h"
+#include "Engine/Core/UI/Text2D.h"
+#include "Engine/Audio/Audio.h"
+#include "Engine/Networking/NetworkManager.h"
 
 //rewrite of my first 3D Engine
 //Not sure what im going to call it yet 
@@ -21,6 +26,8 @@ namespace Engine
 	bool Editing = false;
 
 	int Engine::Run() {
+
+		Backend::init();
 
 		NetworkManager::Init();
 		std::cout << "==================================CONNECT/HOST=========================================================================\n";
@@ -38,21 +45,21 @@ namespace Engine
 
 		//init Engine comps
 		AssetManager::Init();
-
 		Input::Init();
 		Input::HideCursor();
 		Text2D::initText2D("Assets/Fonts/Holstein.DDS");
 		AudioManager::Init();
 		PhysicsManagerBullet::Init();
-		Scene basicScene = Scene();
-		SceneManager::Init();
-		SceneManager::CreateScene(basicScene);
+
 		float startLoadTime = glfwGetTime();
+
+		SceneManager::Init();
+		SceneManager::CreateScene(Scene());
 		SceneManager::LoadScene(0);
 
 		//EditorManager::Init();
 
-		// For speed computation
+
 		double lastTimeDT = glfwGetTime();
 		double previousTime = glfwGetTime();
 		int frameCount = 0;
@@ -101,7 +108,6 @@ namespace Engine
 				
 			Input::CenterMouse();
 			SceneManager::Update(dt);
-			AnimationManager::Update(dt);
 			Camera::Update(dt);
 			//SceneManager::Render();
 			Renderer::RenderScene();

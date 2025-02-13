@@ -1,10 +1,8 @@
 #pragma once
 #include <vector>
 #include <string>
-
-#include "Engine/Core/Common.h"
-#include "Engine/Renderer/Renderer.h"
-
+#include "Engine/Core/Common/Header.h"
+#include "Engine/Core/Decal.h"
 #include "Engine/Core/GameObject.h"
 
 class Decal;

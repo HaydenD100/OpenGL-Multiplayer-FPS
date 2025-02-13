@@ -2,8 +2,8 @@
 #include "Engine/Animation/SkinnedAnimatior.h"
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Game/Player.h"
-
-
+#include "Engine/Audio/Audio.h"
+#include "Engine/Backend.h"
 //BUGS
 //physics objects were glitchy
 //weird gun glitch where u cant switch weapons

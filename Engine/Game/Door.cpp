@@ -1,5 +1,8 @@
 #include "Door.h"
 #include "Engine/Animation/Animation.h"
+#include "Engine/Core/AssetManager.h"
+#include "Engine/Game/Player.h"
+#include "Engine/Audio/Audio.h"
 
 Door::Door(std::string Name, Model* door, Model* frame, glm::vec3 position, glm::vec3 GameObjectRotation, bool inWards) {
 	name = Name;

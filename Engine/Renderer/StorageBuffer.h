@@ -1,7 +1,6 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#pragma once
+#include "Engine/Core/Common/RenderCommon.h"
+
 
 struct StorageBuffer {
 	void Configure(int size);

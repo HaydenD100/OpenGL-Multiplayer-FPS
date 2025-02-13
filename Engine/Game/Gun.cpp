@@ -1,5 +1,11 @@
 #include "Gun.h"
 #include "Engine/Core/Scene/SceneManager.h"
+#include "Engine/Core/GameObject.h"
+#include "Engine/Game/Player.h"
+#include "Engine/Core/AssetManager.h"
+#include "Engine/Networking/NetworkManager.h"
+#include "Engine/Core/Camera.h"
+#include "Engine/Core/Input.h"
 #include <sstream>
 
 

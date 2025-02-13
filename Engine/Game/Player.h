@@ -1,17 +1,9 @@
 #pragma once
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
+#include "Engine/Core/Common/Defines.h"
+#include "Engine/Core/Common/GameCommon.h"
+#include "Engine/Core/GameObject.h"
 #include <string>
-
-#include "Engine/Audio/Audio.h"
-#include "Core/Input.h"
-#include "Core/Camera.h"
 #include "Engine/Game/Gun.h"
-#include "Engine/Core/Common.h"
 
 namespace Player
 {

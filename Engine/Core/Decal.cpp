@@ -1,6 +1,8 @@
 #include "Decal.h"
 #include "DecalInstance.h"
-
+#include "Engine/Renderer/Renderer.h"
+#include "Engine/Physics/BulletPhysics.h"
+#include "Engine/Core/GameObject.h"
 
 Decal::Decal(std::string name, Texture* texture, glm::vec3 size) {
     this->texture = texture;

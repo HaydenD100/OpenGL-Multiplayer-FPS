@@ -1,6 +1,5 @@
 #pragma once
-#include "Engine/Core/Common.h"
-#include "glm/gtx/intersect.hpp"
+#include "Engine/Core/Common/RenderCommon.h"
 
 
 namespace Raycaster

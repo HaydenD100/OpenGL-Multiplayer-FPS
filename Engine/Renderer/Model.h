@@ -1,23 +1,12 @@
 #pragma once
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include "bullet/btBulletDynamicsCommon.h"
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <map>
 #include <vector>
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Renderer/Mesh.h"
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include "Engine/Core/Common.h"
+#include "Engine/Animation/Bone.h"
+#include "Engine/Core/Common/RenderCommon.h"
+
 
 struct BoneInfo {
     int id;

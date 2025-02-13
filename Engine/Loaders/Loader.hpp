@@ -1,8 +1,4 @@
 #pragma once
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,6 +8,8 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include "Engine/Core/Common/Header.h"
+
 
 #define FOURCC_DXT1 0x31545844 // Equivalent to "DXT1" in ASCII
 #define FOURCC_DXT3 0x33545844 // Equivalent to "DXT3" in ASCII

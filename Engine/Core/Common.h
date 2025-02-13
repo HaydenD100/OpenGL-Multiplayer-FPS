@@ -1,42 +1,11 @@
 #pragma once
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "Engine/Core/Common/Header.h"
+
 #include "bullet/btBulletDynamicsCommon.h"
 #include <array>     // For std::array
-#include <glm/vec3.hpp>  // For glm::vec3
-
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <vector>
-#include "Engine/Renderer/Texture.h"
-
-
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
-#define WINDOWTITILE "Engine 2.0"
-
-//Rendering stuff
-#define MAXDECALS 3000
-
-//gamestuff
-static const int spawnpointsize = 1;
-static glm::vec3 spawnpoints[spawnpointsize] = { glm::vec3(-10, 8, -3.19)};
-//static glm::vec3 spawnpoints[spawnpointsize] = { glm::vec3(11, 4.5, 11), glm::vec3(10, 4, -7.43), glm::vec3(8.52, 3, 10.7),glm::vec3(11.2, 4, -1.42) };
-
-
-
-
-
-
-
 
 
 struct Transform{

@@ -1,20 +1,13 @@
 #pragma once
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "Engine/Core/Common/Defines.h"
+#include "Engine/Core/Common/RenderCommon.h"
+
 #include <map>
 #include <vector>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 
-enum LightType
-{
-	PointLight,
-	Spotlight,
-	DirectionalLight,
-};
+
 
 
 struct Light
@@ -30,15 +23,11 @@ struct Light
 	float radius;
 	float cutoff;
 	float outercutoff;
-	float aspect;
-	float near;
-	float far;
 
 	//shadowStuff
 	GLuint depthCubemap = 0;
 	GLuint depthMapFBO = 0 ;
 
-	const int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 	std::vector<glm::mat4> shadowTransforms;
 	glm::mat4 shadowProj;
 

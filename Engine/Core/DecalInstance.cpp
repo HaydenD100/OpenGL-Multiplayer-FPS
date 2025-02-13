@@ -1,6 +1,7 @@
 #include "DecalInstance.h"
-#include "Engine/Core/Decal.h"
-
+#include "Engine/Core/Common.h"
+#include "Engine/Renderer/Renderer.h"
+#include <iostream>
 
 DecalInstance::DecalInstance(glm::vec3 position, glm::vec3 normal, Decal* decal, GameObject* Parent) {
 	this->decal = decal;

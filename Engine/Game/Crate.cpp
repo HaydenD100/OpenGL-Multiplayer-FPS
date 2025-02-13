@@ -1,5 +1,4 @@
 #include "Crate.h"
-#include "Engine/Core/Common.h"
 
 Crate::Crate(glm::vec3 position, std::string name, Model* model) {
 	this->name = name;

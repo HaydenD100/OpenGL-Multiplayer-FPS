@@ -1,26 +1,12 @@
 #pragma once
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
+#include "Engine/Core/Common/Defines.h"
 #include <vector>
 #include <string>
-
-#include "Common.h"
-#include "Engine/Renderer/Renderer.h"
-
-#include "../Loaders/vboindexer.h"
-#include "../Loaders/Loader.hpp"
 #include "Engine/Physics/BulletPhysics.h"
 #include "Engine/Renderer/Model.h"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
-#include "Loaders/nlohmann/json.hpp"
+//#include "Loaders/nlohmann/json.hpp"
 
 
 //Just a little reminder that scaling will scale the model but not the collider or the AABB from frustum culling yet
@@ -37,7 +23,6 @@ public:
 	GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape);
 	GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape, float width, float height, float depth);
 
-	void LoadModel(const char* path);
 	glm::mat4 GetModelMatrix();
 	glm::mat4 GetLocalModelMatrix();
 	

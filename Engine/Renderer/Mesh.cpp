@@ -1,9 +1,12 @@
 #include "Mesh.h"
 #include "Engine/Loaders/Loader.hpp"
-#include "Engine/Loaders/vboindexer.h"
 #include "Engine/Loaders/stb_image.h"
 #include "Engine/Core/AssetManager.h"
-
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include "Engine/Loaders/vboindexer.h"
+#include "bullet/btBulletDynamicsCommon.h"
 
 
 
@@ -198,13 +201,8 @@ void Mesh::Render(GLuint programID) {
 
         glBindTextureUnit(2, currentTexture->GetTextureRoughness());
         glBindTextureUnit(3, currentTexture->GetTextureMetalic());
-
-        
-
-
         glUniform1f(glGetUniformLocation(programID, "Roughness"), currentTexture->GetRoughness());
         glUniform1f(glGetUniformLocation(programID, "Metalic"), currentTexture->GetMetalic());
-
         glUniform1i(glGetUniformLocation(programID, "IsEmissive"), currentTexture->IsEmissive());
     }
 

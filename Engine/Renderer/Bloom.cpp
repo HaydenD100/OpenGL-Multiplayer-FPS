@@ -1,6 +1,6 @@
 #include "Bloom.h"
-
-
+#include <Engine/Renderer/Renderer.h>
+#include <iostream>
 
 
 bool bloomFBO::Init(unsigned int windowWidth, unsigned int windowHeight, unsigned int mipChainLength)

@@ -1,10 +1,9 @@
 #pragma once
-#include "Engine/Core/GameObject.h"
-#include "string"
-#include "Engine/Core/AssetManager.h"
-//#include "Engine/Physics/Physics.h"
-#include "Engine/Game/Player.h"
-#include "Engine/Audio/Audio.h"
+#include <string>
+#include "Engine/Core/Common/Defines.h"
+#include "Engine/Renderer/Model.h"
+
+//TODO:: redo this
 
 class Door
 {

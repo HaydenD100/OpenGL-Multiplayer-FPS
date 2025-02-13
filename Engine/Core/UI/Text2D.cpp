@@ -1,5 +1,9 @@
 #include "Text2D.h"
 #include "Engine/Core/Common.h"
+#include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/Renderer.h"
+#include "Loaders/Loader.hpp"
+
 
 namespace Text2D
 {
@@ -8,6 +12,9 @@ namespace Text2D
 	unsigned int Text2DUVBufferID;
 	unsigned int Text2DShaderID;
 	unsigned int Text2DUniformID;
+
+	Shader s_textShader;
+	
 
 	GLuint GetProgramID() {
 		return Text2DShaderID;
@@ -22,12 +29,12 @@ namespace Text2D
 		glGenBuffers(1, &Text2DUVBufferID);
 
 		// Initialize Shader
-		Text2DShaderID = LoadShaders::LoadShaders("Assets/Shaders/textShader.vert", "Assets/Shaders/textShader.frag");
-		glUseProgram(Text2DShaderID);
+		s_textShader.Load("Assets/Shaders/textShader.vert", "Assets/Shaders/textShader.frag");
+		s_textShader.Use();
 
 		
 		// Initialize uniforms' IDs
-		Text2DUniformID = glGetUniformLocation(Text2DShaderID, "textShader");
+		Text2DUniformID = glGetUniformLocation(s_textShader.GetShaderID(), "textShader");
 	}
 
 	void Text2D::printText2D(const char* text, int x, int y, int size) {
@@ -75,7 +82,7 @@ namespace Text2D
 		glBufferData(GL_ARRAY_BUFFER, UVs.size() * sizeof(glm::vec2), &UVs[0], GL_STATIC_DRAW);
 
 		// Bind shader
-		glUseProgram(Text2DShaderID);
+		s_textShader.Use();
 
 		// Bind texture
 		glActiveTexture(GL_TEXTURE0);

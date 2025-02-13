@@ -1,19 +1,12 @@
 #pragma once
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "Engine/Core/Common/Header.h"
 #include <glm/glm.hpp>
 #include "Engine/Backend.h"
-#include "Engine/Core/Common.h"
 #include <iostream>
 #include <cctype>
 
 
-#define MOUSE_SENSITIVITY = 0.002f;
 
-enum Controls {
-	RESPAWN = 'p',
-	PLAYERINFO = 'o'
-};
 
 namespace Input
 {

@@ -1,15 +1,10 @@
 #pragma once
-#include "bullet/btBulletDynamicsCommon.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <vector>
+#include "Engine/Core/Common/RenderCommon.h"
 #include "Engine/Renderer/Texture.h"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-#include "Engine/Loaders/vboindexer.h"
+
+
 struct Mesh {
 public:
     Mesh(const char* path);

@@ -3,7 +3,9 @@
 #include "Engine/Loaders/vboindexer.h"
 #include "Engine/Loaders/stb_image.h"
 #include "Engine/Core/AssetManager.h"
-#include "Engine/Core/Camera.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 
 Model::Model(Mesh mesh, Texture* texture) {
