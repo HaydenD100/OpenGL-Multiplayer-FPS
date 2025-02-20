@@ -19,7 +19,7 @@ namespace Camera
 	float maxAngle = 1.5;
 	
 	glm::mat4 ViewMatrix;
-	glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(initialFoV), (float)Backend::GetWidth()/ (float)Backend::GetHeight(), 0.1f, 100.0f);
+	glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(initialFoV), (float)Backend::GetWidth() / (float)Backend::GetHeight(), 0.1f, 100.0f);
 
 
 	glm::vec3 Camera::GetPosition() {
@@ -61,6 +61,10 @@ namespace Camera
 	void Camera::SetPosition(glm::vec3 pos) {
 		position = pos;
 	}
+	void RecalcuteProjectionMatrix() {
+		ProjectionMatrix = glm::perspective(glm::radians(initialFoV), (float)Backend::GetWidth() / (float)Backend::GetHeight(), NEAR_PLANE, FAR_PLANE);
+	}
+
 
 	glm::vec3 GetMouseRay(glm::mat4 projection, glm::mat4 view, int windowWidth, int windowHeight, int mouseX, int mouseY) {
 		float x = (2.0f * mouseX) / (float)windowWidth - 1.0f;
@@ -122,9 +126,10 @@ namespace Camera
 
 
 	void Camera::Update(float dt) {
-		if (verticalAngle <= maxAngle && verticalAngle >= -maxAngle)
-			verticalAngle += Input::GetSensitivity() * float(Backend::GetHeight() / 2 - Input::GetMouseY());
-		else if (verticalAngle > maxAngle)
+		//if (verticalAngle <= maxAngle && verticalAngle >= -maxAngle)
+
+		verticalAngle += Input::GetSensitivity() * float(Backend::GetHeight() / 2 - Input::GetMouseY());
+		if (verticalAngle > maxAngle)
 			verticalAngle = maxAngle;
 		else if (verticalAngle < -maxAngle)
 			verticalAngle = -maxAngle;
@@ -146,9 +151,9 @@ namespace Camera
 		// Projection matrix
 		// Camera matrix
 		ViewMatrix = glm::lookAt(
-			position,           // Camera is here 
-			position + direction, // and looks here : at the same position, plus "direction"
-			up                  // Head is up (set to 0,-1,0 to look upside-down)
+			position,           
+			position + direction,
+			up                  
 		);
 
 		frustrum = createFrustumFromCamera(Backend::GetWidth() / Backend::GetHeight(), glm::radians(initialFoV*2.0f), 0.1f, 100.0f);

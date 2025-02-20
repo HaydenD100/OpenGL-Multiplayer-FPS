@@ -14,5 +14,6 @@ namespace Backend
 	int GetHeight();
 	int GetWidth();
 	void SetWindowResolution(int width, int height);
-
+	bool WindowResized();
+	void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 }

@@ -162,6 +162,9 @@
     <ClCompile Include="Engine\Core\Common\RenderCommon.h">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Game\Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Scene\Scene.h">
@@ -323,11 +326,13 @@
     <ClInclude Include="Engine\Core\Common\GameCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Game\Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\SkyBoxShader.vert" />
     <None Include="Assets\Shaders\SkyBoxShader.frag" />
-    <None Include="Assets\Saves\mainScene.json" />
     <None Include="Assets\Shaders\SSAO\ssao.vert" />
     <None Include="Assets\Shaders\Lighting\lighting.vert" />
     <None Include="Assets\Shaders\Lighting\lighting.frag" />
@@ -360,7 +365,6 @@
     <None Include="Assets\Shaders\GI\probe.vert" />
     <None Include="Assets\Shaders\GI\probe.frag" />
     <None Include="Assets\Shaders\GI\irradiance.vert" />
-    <None Include="Assets\Shaders\GI\irradiance.frag" />
     <None Include="Assets\Shaders\GI\renderProbes.vert" />
     <None Include="Assets\Shaders\GI\renderProbes.frag" />
     <None Include="Assets\Shaders\Bloom\upscale.frag" />
@@ -373,6 +377,9 @@
     <None Include="Assets\Shaders\Water\water.frag" />
     <None Include="Assets\Shaders\GI\triangleIntersection.comp" />
     <None Include="Assets\Shaders\GI\ddgiProbes.comp" />
+    <None Include="Assets\Shaders\GI\irradiance.frag" />
+    <None Include="Assets\Shaders\GI\probeGeom.vert" />
+    <None Include="Assets\Shaders\GI\probeGeom.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

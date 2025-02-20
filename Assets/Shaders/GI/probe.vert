@@ -9,35 +9,15 @@ layout(location = 6) in vec4 weights;
 
 out vec2 UV;
 out vec3 FragPos;
-out vec3 Normal;
+out vec3 WorldPos;
 
-uniform mat4 MVP;
-uniform mat4 M;
 uniform mat4 V;
 uniform mat4 P;
 
-uniform mat3 normalMatrix3;
-
-const int MAX_BONES = 200;
-const int MAX_BONE_INFLUENCE = 4;
-uniform mat4 finalBonesMatrices[MAX_BONES];
-uniform bool animated;
-
 void main()
-{	vec4 WorldPos;
-
-    if(animated){
-        mat4 BoneTransform = finalBonesMatrices[boneIds[0]] * weights[0];
-        BoneTransform     += finalBonesMatrices[boneIds[1]] * weights[1];
-        BoneTransform     += finalBonesMatrices[boneIds[2]] * weights[2];
-        BoneTransform     += finalBonesMatrices[boneIds[3]] * weights[3];
-        WorldPos = M * BoneTransform * vec4(vertexPosition_modelspace,1);
-    }
-    else{
-        WorldPos = M * vec4(vertexPosition_modelspace,1.0f);
-    }
+{	
+    WorldPos = vertexPosition_modelspace;
     UV = vertexUV;
-    Normal = (M * vec4(vertexNormal_modelspace,0)).xyz;
-    FragPos = vec3(WorldPos);
-    gl_Position = P * V * WorldPos;
+    gl_Position = P * V * vec4(vertexPosition_modelspace,1);
+
 }

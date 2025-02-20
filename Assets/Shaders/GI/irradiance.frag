@@ -1,12 +1,16 @@
-﻿#version 430 core
+#version 430 core
 layout (location = 1) out vec4  irradianceOut;
 
 in vec2 UV;
 in vec3 FragPos;
 in vec3 WorldPos;
 
-layout (binding = 0) uniform samplerCube environmentMap;
-layout (binding = 1) uniform samplerCube depthCubeMap;
+//layout (binding = 0) uniform samplerCube environmentMap;
+
+layout (binding = 0) uniform samplerCube gDiffuse;
+layout (binding = 1) uniform samplerCube gNormal;
+layout (binding = 2) uniform samplerCube gPosition;
+layout (binding = 3) uniform samplerCube depthCubeMap;
 
 uniform int probeID;
 uniform vec3 probe_world_Pos;
@@ -15,12 +19,7 @@ uniform vec3 volume;
 uniform float spacing;
 
 
-//we could do this in a compute shader
-
-
-
-
-
+//TODO we could do this in a compute shader
 
 layout(std430, binding = 7) buffer ShCoeffient {
     vec3 L1SH_0[3750];
@@ -32,9 +31,9 @@ layout(std430, binding = 7) buffer ShCoeffient {
     vec3 L1SH_5[3750];
     vec3 L1SH_6[3750];
     vec3 L1SH_7[3750];
+    vec3 L1SH_8[3750];
 
-    vec3 L1SH_8[3750 * 2];
-    mat3 probeVisbilty[3750 * 2];
+    mat4 probeDepthEncoded[3750];
 };
 
 layout(rgba16f, binding = 6)  uniform image3D probeGrid;
@@ -43,11 +42,23 @@ layout(rgba16f, binding = 6)  uniform image3D probeGrid;
 //Credits to https://www.shadertoy.com/view/wtt3W2
 
 #define myT vec3
-#define myL 1
+#define myL 3
 #define SphericalHarmonicsTL(T, L) T[(L + 1)*(L + 1)]
 #define SphericalHarmonics SphericalHarmonicsTL(myT, myL)
 #define shSize(L) ((L + 1)*(L + 1))
 #define reflectTex iChannel0
+
+#define MAXLIGHTS 17
+
+uniform vec3 LightColors[MAXLIGHTS];
+uniform vec3 lightPos[MAXLIGHTS];
+uniform vec3 Lightdirection[MAXLIGHTS];
+uniform float LightLinears[MAXLIGHTS];
+uniform float LightQuadratics[MAXLIGHTS];
+uniform float LightRadius[MAXLIGHTS];
+uniform float LightCutOff[MAXLIGHTS];
+uniform float LightOuterCutOff[MAXLIGHTS];
+uniform samplerCube depthMap[MAXLIGHTS];
 
 
 // Constants
@@ -69,6 +80,131 @@ const vec3 directions[16] = vec3[](
     normalize(vec3(1, 1, 1)), normalize(vec3(-1, -1, -1)),
     normalize(vec3(-1, 1, 1)), normalize(vec3(1, -1, -1))
 );
+
+
+
+//------------------------------------DIRECT LIGHING--------------------
+
+const float far_plane = 25.0; // Constant, moved outside main
+vec3 gridSamplingDisk[20] = vec3[]
+(
+   vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
+   vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+   vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
+   vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
+   vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
+);
+
+float ShadowCalculation(vec3 fragPos, int index)
+{
+    vec3 fragToLight = fragPos - lightPos[index];
+    float currentDepth = length(fragToLight);
+    float shadow = 0.0;
+    float bias = 0.2;
+
+    int samples = 20;
+    float viewDistance = length(probe_world_Pos - fragPos);
+    float diskRadius = (1.0 + (viewDistance / far_plane)) / 25.0;
+    for(int i = 0; i < samples; ++i)
+    {
+        float closestDepth = texture(depthMap[index], fragToLight + gridSamplingDisk[i] * diskRadius).r;
+        closestDepth *= far_plane;   // undo mapping [0;1]
+        if(currentDepth - bias > closestDepth)
+            shadow += 1.0;
+    }
+    shadow /= float(samples);  
+    
+    return shadow;
+}
+
+// ----------------------------------------------------------------------------
+float DistributionGGX(vec3 N, vec3 H, float roughness) {
+    float a = roughness * roughness;
+    float a2 = a * a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH * NdotH;
+
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+
+    return a2 / denom;
+}
+// ----------------------------------------------------------------------------
+float GeometrySchlickGGX(float NdotV, float roughness) {
+    float k = (roughness + 1.0);
+    k = (k * k) / 8.0;
+
+    return NdotV / (NdotV * (1.0 - k) + k);
+}
+// ----------------------------------------------------------------------------
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    return GeometrySchlickGGX(NdotV, roughness) * GeometrySchlickGGX(NdotL, roughness);
+}
+// ----------------------------------------------------------------------------
+vec3 fresnelSchlick(float cosTheta, vec3 F0) {
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+// ----------------------------------------------------------------------------
+
+
+vec3 DirectLighting(vec3 p, float b){
+    vec3 diffuse = textureLod(gDiffuse, p, b).rgb;
+    vec3 FragPos = textureLod(gPosition, p, b).rgb;
+
+    vec3 N = normalize(textureLod(gNormal, p, b)).xyz;
+    vec3 V = normalize(probe_world_Pos - FragPos);
+
+    float metallic = 0.1;
+    float roughness = 1;
+
+
+    // Reflectance at normal incidence
+    vec3 F0 = mix(vec3(0.04), diffuse, metallic);
+
+    vec3 Lo = vec3(0.0);
+    vec3 spec = vec3(0.0);
+    for (int i = 0; i < MAXLIGHTS; ++i) {
+        if (LightRadius[i] == 0) continue;
+
+        // Calculate distance between light and fragment
+        vec3 L = normalize(lightPos[i] - FragPos);
+        float distance = length(lightPos[i] - FragPos);
+        float attenuation = 1.0 / (1.0 + LightLinears[i] * distance + LightQuadratics[i] * (distance * distance));
+        vec3 radiance = LightColors[i] * attenuation;
+
+        // Cook-Torrance BRDF
+        vec3 H = normalize(V + L);
+        float NDF = DistributionGGX(N, H, roughness);
+        float G = GeometrySmith(N, V, L, roughness);
+        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+        vec3 numerator = NDF * G * F;
+        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
+        vec3 specular = numerator / denominator;
+
+        vec3 kS = F;
+        vec3 kD = (1.0 - kS) * (1.0 - metallic);
+        float NdotL = max(dot(N, L), 0.0);
+        float shadow = ShadowCalculation(FragPos , i);
+        //the 1.3 makes it a little brighter
+        Lo += ((kD * diffuse) * (1.0f - shadow) / PI + specular) * radiance * NdotL * (1.0f - shadow);
+        spec += specular * radiance * NdotL * (1.0 - shadow);
+
+
+    }
+    vec3 ambient = vec3(1) * diffuse;
+    vec3 Lightcolor = ambient * Lo;
+
+    // HDR and gamma correction
+    //Lightcolor = Lightcolor / (Lightcolor + vec3(1.0));
+    //Lightcolor = N;
+    return Lightcolor;
+    //return vec3(1);
+}
+
+
 
 
 SphericalHarmonics shZero() {
@@ -95,11 +231,12 @@ vec3 SpherePoints_GoldenAngle(float i, float numSamples) {
     return vec3(radius * vec2(cos(theta), sin(theta)), z);
 }
 vec3 sampleReflectionMap(vec3 p, float b) {
-    vec3 col = textureLod(environmentMap, p, b).rgb;
-    
-    // fake HDR
-    //col *= 1.0 + 1.0 * smoothstep(0.5, 1.0, dot(LUMA, col));
-    
+    //vec3 col = textureLod(gDiffuse, p, b).rgb;
+    vec3 col = DirectLighting(p,b);
+    return col;
+}
+vec3 sampleDepthMap(vec3 p, float b) {
+    vec3 col = textureLod(depthCubeMap, p, b).rgb;
     return col;
 }
 void shAddWeighted(inout SphericalHarmonics accumulatorSh, in SphericalHarmonics sh, myT weight)
@@ -183,7 +320,7 @@ SphericalHarmonics CubeMapToRadianceSH() {
     // Initialise sh to 0
     SphericalHarmonics shRadiance = shZero();
 
-    vec2 ts = vec2(textureSize(environmentMap, 0));
+    vec2 ts = vec2(textureSize(gDiffuse, 0));
     float maxMipMap = log2(max(ts.x, ts.y));
 
     float lodBias = maxMipMap - 5.0;
@@ -202,6 +339,28 @@ SphericalHarmonics CubeMapToRadianceSH() {
     return shRadiance;
 }
 
+SphericalHarmonics DepthMapToRadianceSH() {
+    // Initialise sh to 0
+    SphericalHarmonics shRadiance = shZero();
+
+    vec2 ts = vec2(textureSize(depthCubeMap, 0));
+    float maxMipMap = log2(max(ts.x, ts.y));
+
+    float lodBias = maxMipMap - 5.0;
+    
+
+    for (int i=0; i < ENV_SMPL_NUM; ++i) {
+        vec3 direction = SpherePoints_GoldenAngle(float(i), float(ENV_SMPL_NUM));
+        vec3 radiance = sampleDepthMap(direction, lodBias);
+        shAddWeighted(shRadiance, shEvaluate(direction), radiance);
+    }
+
+    // integrating over a sphere so each sample has a weight of 4*PI/samplecount (uniform solid angle, for each sample)
+    float shFactor = 4.0 * PI / float(ENV_SMPL_NUM);
+    shScale(shRadiance, vec3(shFactor));
+
+    return shRadiance;
+}
 
 #define NORM2SNORM(value) (value * 2.0 - 1.0)
 #define SNORM2NORM(value) (value * 0.5 + 0.5)
@@ -381,7 +540,9 @@ void main()
      vec3 direction = WorldPos;
      // Normalized pixel coordinates (from 0 to 1)
      
-     SphericalHarmonics shRadiance = CubeMapToRadianceSH();
+	SphericalHarmonics shRadiance = CubeMapToRadianceSH();
+	SphericalHarmonics shDepth = DepthMapToRadianceSH();
+
 
      vec3 col;
 	 col =  GetRadianceFromSH(shRadiance, direction);
@@ -398,6 +559,11 @@ void main()
 		L1SH_7[probeID] = shRadiance[7];
 		L1SH_8[probeID] = shRadiance[8];
 	#endif
+
+	probeDepthEncoded[probeID] = mat4(shDepth[0].x,shDepth[1].x,shDepth[2].x,shDepth[3].x,
+									  shDepth[4].x,shDepth[5].x,shDepth[6].x,shDepth[7].x,
+									  shDepth[8].x,shDepth[9].x,shDepth[10].x,shDepth[11].x,
+									  shDepth[12].x,shDepth[13].x,shDepth[14].x,shDepth[15].x);
 
 
 
@@ -421,6 +587,5 @@ void main()
 
 	ivec3 texturePosition = ivec3(floor(pos));
 	imageStore(probeGrid, texturePosition, vec4(probeID));
-
 
 }

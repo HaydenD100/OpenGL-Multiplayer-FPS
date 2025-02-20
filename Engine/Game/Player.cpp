@@ -1,15 +1,15 @@
 #include "Player.h"
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Core/Scene/SceneManager.h"
-#include "Engine/Physics/BulletPhysics.h"
-#include "Engine/Core/Camera.h"
-#include "Engine/Audio/Audio.h"
-#include "Core/Input.h"
 #include <random>
 
 #include "Engine/Networking/NetworkManager.h"
 #include "Engine/Renderer/Raycaster.h"
-
+#include "Engine/Physics/BulletPhysics.h"
+#include "Engine/Core/Camera.h"
+#include "Engine/Audio/Audio.h"
+#include "Engine/Core/Input.h"
+#include "Engine/Core/Common/GameCommon.h"
 
 namespace Player
 {
@@ -22,8 +22,8 @@ namespace Player
 	std::string interactingWithName = "nothing";
 	float interactDistance = 3;
 
-	float swayIntensity = 0.02f; 
-	float swaySpeed = 2.0f;
+	float swayIntensity = 0.0f; 
+	float swaySpeed = 0.0f;
 	float smoothFactor = 0.1f;
 	float speed = 5000;
 
@@ -157,11 +157,7 @@ namespace Player
 
 				}
 			}
-
-
-
 			return;
-
 		}
 
 		if (WeaponManager::GetGunByName(gunName)->currentammo > 0) {
@@ -263,14 +259,12 @@ namespace Player
 			Respawn();
 		}
 
-		if (isDead) {
+		if (isDead) 
 			return;
-		}
+
 			
 
-
 		GameObject* player =  AssetManager::GetGameObject("player");
-
 		GameObject* head = AssetManager::GetGameObject("player_head");
 		player->setRotation(glm::vec3(horizontalAngle,0, 0));
 		head->setRotation(glm::vec3(-verticalAngle, horizontalAngle, 0));
@@ -280,9 +274,6 @@ namespace Player
 			Camera::SetVerticalAngle(verticalAngle);
 		Camera::SetHorizontalAngle(horizontalAngle);
 		Camera::SetPosition(head->getPosition());
-
-		if (gunName != "nothing")
-			WeaponManager::GetGunByName(gunName)->Update(deltaTime, reloading, aiming);
 
 		bool IsGrounded = OnGround();
 		if (IsGrounded) {
@@ -312,31 +303,29 @@ namespace Player
 		
 		// Right vector
 		glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0,1,0)));
-
-		
 		// Move forward
 		glm::vec3 movement = glm::vec3(0, player->GetRigidBody()->getLinearVelocity().y(), 0);
-		if (Input::KeyDown('w')) {
+		if (Input::KeyDown(FORWARD)) {
 			movement += forward;
 		}
 		
 		// Move backward
-		if (Input::KeyDown('s')) {
+		if (Input::KeyDown(BACKWARD)) {
 			movement += -forward;
 		}
 		
 		// Strafe right
-		if (Input::KeyDown('d')) {
+		if (Input::KeyDown(RIGHT)) {
 			movement += right;
 		}
 		
 		// Strafe left
-		if (Input::KeyDown('a')) {
+		if (Input::KeyDown(LEFT)) {
 			movement += -right;
 		}
 		
 		// Jump
-		if (Input::KeyDown(' ') && IsGrounded) {
+		if (Input::KeyDown(JUMP) && IsGrounded) {
 			movement.y = 1 * jumpforce;
 		}
 		if (Input::LeftShiftDown()) {
@@ -361,16 +350,9 @@ namespace Player
 		//fallout4 did it so why not? TODO:: fix delta time
 		movement.x = movement.x * 0.003f;
 		movement.z = movement.z * 0.003f;
-
-		/*
-		if (movement.x > MaxSpeed) movement.x = MaxSpeed;
-		if (movement.x < -MaxSpeed) movement.x = -MaxSpeed;
-		if (movement.z > MaxSpeed) movement.z = MaxSpeed;
-		if (movement.z < -MaxSpeed) movement.z = -MaxSpeed;
-		*/
 		
 		player->GetRigidBody()->setLinearVelocity(glmToBtVector3(movement));
-		if (Input::KeyPressed('e')) {
+		if (Input::KeyPressed(INTERACT)) {
 			btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit();
 			if (hit.m_collisionObject != nullptr) {
 				GameObject* gameobject = AssetManager::GetGameObject(hit.m_collisionObject->getUserIndex());
@@ -378,17 +360,17 @@ namespace Player
 					interactingWithName = gameobject->GetName();
 			}
 		}
-		if (Input::KeyPressed('g')) {
+		if (Input::KeyPressed(SPRAYPAINT)) {
 			Graffite();
 		}
-		if (Input::KeyPressed('t')) {
+		if (Input::KeyPressed(CYCLESPRAY)) {
 			if (decal_index == decal_count -1)
 				decal_index = 0;
 			else
 				decal_index++;
 		}
 		
-		if (Input::KeyPressed('r') && !reloading && !aiming && gunName != "nothing" && WeaponManager::GetGunByName(getCurrentGun())->type != Melee) {
+		if (Input::KeyPressed(RELOAD) && !reloading && !aiming && gunName != "nothing" && WeaponManager::GetGunByName(getCurrentGun())->type != Melee) {
 			reloading = true;
 			reloadingTime = glfwGetTime();
 			WeaponManager::GetGunByName(gunName)->Reload();
@@ -417,15 +399,7 @@ namespace Player
 			else if (Input::LeftMouseDown() && WeaponManager::GetGunByName(gunName)->type == Auto && glfwGetTime() - WeaponManager::GetGunByName(gunName)->lastTimeShot > 60.0f / WeaponManager::GetGunByName(gunName)->firerate && !reloading) {
 				Shoot();
 			}
-			
-			//TODO:: FIX bad alloc error
-			/*
-			if (Input::KeyPressed('q') && !reloading) {
-				SceneManager::GetCurrentScene()->AddGunPickUp(GunPickUp(getCurrentGun(), getPosition() + glm::vec3(0, 1, 0) + Camera::GetDirection(), Camera::GetDirection() * 7.0f));
-				AssetManager::GetGameObject(gunName)->SetRender(false);
-				gunName = "nothing";
-			}
-			*/
+			WeaponManager::GetGunByName(gunName)->Update(deltaTime, reloading, aiming);	
 		}
 		
 		//optimize this
@@ -444,7 +418,7 @@ namespace Player
 		
 		horizontalAngle += Input::GetSensitivity() * float(Backend::GetWidth() / 2 - Input::GetMouseX());
 
-		if ((Input::KeyDown('w') || Input::KeyDown('a') || Input::KeyDown('s') || Input::KeyDown('d')) && footstepTime + footstep_interval < glfwGetTime()  && IsGrounded) {
+		if ((Input::KeyDown(FORWARD) || Input::KeyDown(LEFT) || Input::KeyDown(BACKWARD) || Input::KeyDown(RIGHT)) && footstepTime + footstep_interval < glfwGetTime()  && IsGrounded) {
 			AudioManager::PlaySound("foot_step" + std::to_string((rand() % 4) + 1), player->getPosition());
 			NetworkManager::SendSound("foot_step" + std::to_string((rand() % 4) + 1), player->getPosition());
 			footstepTime = glfwGetTime();
@@ -471,14 +445,6 @@ namespace Player
 
 
 		}
-
-		if (Input::KeyPressed('l')) {
-			glm::vec3 direction = Camera::GetDirection();
-			//SoftwareRaycaster::queueRay(Camera::GetPosition(), direction, 20);
-			SoftwareRaycaster::queueRay(glm::vec3(0, 4.5, 0), glm::vec3(0.6, -1, 1), 20);
-			SoftwareRaycaster::Compute();
-		}
-
 	}
 	
 	glm::vec3 Player::getPosition() {
@@ -570,10 +536,6 @@ namespace Player
 			Gun* gun = WeaponManager::GetGunByName(inv[i]);
 			gun->currentammo = gun->ammo;
 		}
-
-
-
-
 	}
 
 	int GetKills() {

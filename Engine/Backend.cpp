@@ -1,7 +1,8 @@
 #include "Backend.h"
 #include "Engine/Core/UI/UI.h"
+#include "Engine/Renderer/Renderer.h"
 #include <iostream>
-
+#include "Engine/Core/Camera.h"
 
 
 
@@ -9,10 +10,8 @@ namespace Backend
 {
 	GLFWwindow* window;
 	bool windowOpen = true;
-	int width = 1280;
-	int height = 720;
-
-
+	int width = DEFAULT_WIDTH;
+	int height = DEFAULT_HEIGHT;
 
 	int Backend::init() {
 		glewExperimental = true; // Needed for core profile
@@ -30,7 +29,7 @@ namespace Backend
 #endif
 
 		// Open a window and create its OpenGL context
-		window = glfwCreateWindow(width, height , WINDOWTITILE, nullptr, nullptr);
+		window = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, WINDOWTITILE, nullptr, nullptr);
 
 		if (window == nullptr) {
 			glfwTerminate();
@@ -46,8 +45,7 @@ namespace Backend
 		glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 		glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-		
+		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 		
 		Renderer::init();
 		return 0;
@@ -73,5 +71,14 @@ namespace Backend
 	void SetWindowResolution(int Width, int Height) {
 		width = Width;
 		height = Height;
+	}
+
+	void framebuffer_size_callback(GLFWwindow* window, int m_width, int m_height) {
+		std::cout << "Window resized to: " << m_width << "x" << m_height << std::endl;
+		height = m_height;
+		width = m_width;
+		glViewport(0, 0, width, height);
+		Renderer::ConfigureFrameBuffers();
+		Camera::RecalcuteProjectionMatrix();
 	}
 }

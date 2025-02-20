@@ -1,8 +1,7 @@
 #pragma once
 #include "Engine/Core/Common/Header.h"
-
 #include "bullet/btBulletDynamicsCommon.h"
-#include <array>     // For std::array
+#include <array>     
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>

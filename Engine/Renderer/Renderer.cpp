@@ -63,6 +63,7 @@ namespace Renderer
 	//deffered rendering stuff
 	GLuint quad_vertexbuffer;
 	GLuint depthTexture;
+	GLuint cubeVBO;
 
 	//ssao
 	std::vector<glm::vec3> ssaoKernel;
@@ -98,6 +99,7 @@ namespace Renderer
 	Shader s_voxel;
 	Shader s_voxel_display;
 	Shader s_probe;
+	Shader s_probeDeffered;
 	Shader s_probeRender;
 	Shader s_probeirradiance;
 	Shader s_SolidColor;
@@ -152,6 +154,7 @@ namespace Renderer
 		s_SSR.Load("Assets/Shaders/SSR/SSR.vert", "Assets/Shaders/SSR/SSR.frag");
 		s_Post.Load("Assets/Shaders/PostProccess/post.vert", "Assets/Shaders/PostProccess/post.frag");
 		s_probe.Load("Assets/Shaders/GI/probe.vert", "Assets/Shaders/GI/probe.frag");
+		s_probeDeffered.Load("Assets/Shaders/GI/probeGeom.vert", "Assets/Shaders/GI/probeGeom.frag");
 		s_probeRender.Load("Assets/Shaders/GI/renderProbes.vert", "Assets/Shaders/GI/renderProbes.frag");
 		s_probeirradiance.Load("Assets/Shaders/GI/irradiance.vert", "Assets/Shaders/GI/irradiance.frag");
 		s_lighting.Load("Assets/Shaders/Lighting/lighting.vert", "Assets/Shaders/Lighting/lighting.frag");
@@ -209,8 +212,6 @@ namespace Renderer
 		for (size_t i = 0; i < ssaoKernel.size(); i++) {
 			s_ssao.SetVec3("samples[" + std::to_string(i) + "]", ssaoKernel[i]);
 		}
-		s_ssao.SetFloat("ScreenWidth", Backend::GetWidth());
-		s_ssao.SetFloat("ScreenHeight", Backend::GetHeight());
 		s_ssao.SetInt("gPosition", 0);
 		s_ssao.SetInt("gNormal", 1);
 		s_ssao.SetInt("texNoise", 2);
@@ -218,7 +219,6 @@ namespace Renderer
 		s_decal.Use();
 		s_decal.SetInt("decalTexture", 1);
 		s_decal.SetInt("gDepth", 3);
-		s_decal.SetVec2("resolution", glm::vec2(Backend::GetWidth(), Backend::GetHeight()));
 
 		s_Post.Use();
 		s_Post.SetInt("gLighting", 0);
@@ -235,14 +235,13 @@ namespace Renderer
 		s_SSR.SetInt("gRMA", 4);    
 
 		s_probe.Use();
-		for (int i = 0; i < 26; i++) {
-			s_probe.SetInt("depthMap[" + std::to_string(i) + "]", 4 + i);
+		for (int i = 0; i < 17; i++) {
+			s_probe.SetInt("depthMap[" + std::to_string(i) + "]", 6 + i);
 		}
-		s_probe.SetInt("diffuse", 0);
-		s_probe.SetInt("normal", 1);
-		s_probe.SetInt("roughness", 2);
-		s_probe.SetInt("metalic", 3);
-
+		s_probeirradiance.Use();
+		for (int i = 0; i < 17; i++) {
+			s_probeirradiance.SetInt("depthMap[" + std::to_string(i) + "]", 5 + i);
+		}
 
 		std::cout << "Done loading shaders \n";
 	}
@@ -286,15 +285,7 @@ namespace Renderer
 
 
 		LoadAllShaders();
-
-
-		gbuffer.Configure();
-		ssaoBuffer.Configure();
-		ssrBuffer.Configure(Backend::GetWidth(), Backend::GetHeight());
-		lightingBuffer.Configure();
-		postBuffer.Configure();
-
-		fxaaBuffer.Configure(Backend::GetWidth(), Backend::GetHeight());
+		ConfigureFrameBuffers();
 
 		static const GLfloat g_quad_vertex_buffer_data[] = {
 		-1.0f, -1.0f, 0.0f,
@@ -309,6 +300,56 @@ namespace Renderer
 		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
 
+		float skyboxVertices[108] = {
+			// positions          
+			-1.0f,  1.0f, -1.0f,
+			-1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+
+			-1.0f, -1.0f,  1.0f,
+			-1.0f, -1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f,  1.0f,
+			-1.0f, -1.0f,  1.0f,
+
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+
+			-1.0f, -1.0f,  1.0f,
+			-1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f, -1.0f,  1.0f,
+			-1.0f, -1.0f,  1.0f,
+
+			-1.0f,  1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			-1.0f,  1.0f,  1.0f,
+			-1.0f,  1.0f, -1.0f,
+
+			-1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f,  1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f,  1.0f,
+			 1.0f, -1.0f,  1.0f
+		};
+
+		glGenVertexArrays(1, &cubeVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+
+
 
 		glGenTextures(1, &noiseTexture);
 		glBindTexture(GL_TEXTURE_2D, noiseTexture);
@@ -318,6 +359,42 @@ namespace Renderer
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+
+
+		
+		Raycaster::Init();
+
+		//this is the projection to voxlize the scene from orgin (0,0,0) while the other one is the view of the camera
+		//voxel_orth = glm::ortho(-((float)voxelize_scene_albedo.GetWidth() / 2.0f), (float)voxelize_scene_albedo.GetWidth() / 2.0f, (float)voxelize_scene_albedo.GetWidth() / 2.0f, -((float)voxelize_scene_albedo.GetWidth() / 2.0f), -(float)voxelize_scene_albedo.GetWidth()/2.0f, (float)voxelize_scene_albedo.GetWidth()/2.0f);
+		float spacing = 1;
+		glm::vec3 propgationGridSize = glm::vec3(22, 12, 14);
+		//glm::vec3 propgationGridSize = glm::vec3(1, 4, 1);
+		glm::vec3 gridPos = glm::vec3(-13.6, -1.2, -6);
+		//glm::vec3 gridPos = glm::vec3(0, 2.7, 0);
+
+		probeTexture.Create(glm::ceil(propgationGridSize.x / spacing), glm::ceil(propgationGridSize.y / spacing), glm::ceil(propgationGridSize.z / spacing));
+		probeGrid.Configure(propgationGridSize.x, propgationGridSize.y, propgationGridSize.z, spacing, gridPos);
+
+
+		//voxel stuff
+		//voxelizedScene
+		
+		//probeGrid.AddProbe(glm::vec3(6, 1, 2));
+		SHBuffer.Configure(7500 * sizeof(glm::vec3) * 9 + 7500 * sizeof(glm::mat4));
+
+
+
+		return 0;
+	}
+	void ConfigureFrameBuffers() {
+		std::cout << "Config buffers \n";
+		gbuffer.Configure();
+		ssaoBuffer.Configure();
+		ssrBuffer.Configure(Backend::GetWidth(), Backend::GetHeight());
+		lightingBuffer.Configure();
+		postBuffer.Configure();
+		fxaaBuffer.Configure(Backend::GetWidth(), Backend::GetHeight());
+		emmisiveRenderer.Init(Backend::GetWidth(), Backend::GetHeight());
 
 
 		//TODO :: I hate this i wish i could just get it work in the gbuffer but ive spent to long trying to fix it 
@@ -330,33 +407,12 @@ namespace Renderer
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, FinalFrameTexture, 0);
 
-		GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0};
+		GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
 		glDrawBuffers(1, DrawBuffers);
 
-		Raycaster::Init();
 
-		//this is the projection to voxlize the scene from orgin (0,0,0) while the other one is the view of the camera
-		//voxel_orth = glm::ortho(-((float)voxelize_scene_albedo.GetWidth() / 2.0f), (float)voxelize_scene_albedo.GetWidth() / 2.0f, (float)voxelize_scene_albedo.GetWidth() / 2.0f, -((float)voxelize_scene_albedo.GetWidth() / 2.0f), -(float)voxelize_scene_albedo.GetWidth()/2.0f, (float)voxelize_scene_albedo.GetWidth()/2.0f);
-		float spacing = 1;
-		glm::vec3 propgationGridSize = glm::vec3(22, 12, 14);
-		//glm::vec3 propgationGridSize = glm::vec3(1, 1, 1);
-		glm::vec3 gridPos = glm::vec3(-13.6, -1.4, -6);
-		//glm::vec3 gridPos = glm::vec3(0, 4.7, 0);
-
-		probeTexture.Create(glm::ceil(propgationGridSize.x * 1 / spacing), glm::ceil(propgationGridSize.y * 1 / spacing), glm::ceil(propgationGridSize.z * 1 / spacing));
-		probeGrid.Configure(propgationGridSize.x, propgationGridSize.y, propgationGridSize.z, spacing, gridPos);
-
-
-		//voxel stuff
-		//voxelizedScene
-		
-		//probeGrid.AddProbe(glm::vec3(6, 1, 2));
-		SHBuffer.Configure(7500 * sizeof(glm::vec3) * 9 + 7500 * sizeof(glm::mat4));
-
-		emmisiveRenderer.Init(Backend::GetWidth(), Backend::GetHeight());
-
-		return 0;
 	}
+
 
 	void Renderer::BeforeRender() {
 
@@ -367,7 +423,6 @@ namespace Renderer
 		int lenght = 15;
 
 		//Raycaster::queueRay(glm::vec3(0, 0, 1), glm::vec3(-1.97, 10.7, -0.8),20);
-
 		//Renderer::cs_Raycaster.Use();
 		//Renderer::probeTexture.Bind(6);
 		//SHBuffer.Bind(7);
@@ -476,9 +531,9 @@ namespace Renderer
 		//Raycaster::Compute();
 
 		//--------------------------------------------PROBE-------------------------------------------	
-		
-		//Should really only do this with one probe in the grid for debugging purposes
 		//Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->getLights());
+
+		//Should really only do this with one probe in the grid for debugging purposes
 		//cs_Raycaster.Use();
 		//probeTexture.Bind(6);
 		//Raycaster::Bind();
@@ -558,7 +613,7 @@ namespace Renderer
 			AssetManager::GetModel("light_cube")->RenderModel(s_SolidColor.GetShaderID());
 		}
 
-		if(Input::KeyDown('g'))
+		if(Input::KeyDown(SHOWPROBES))
 			probeGrid.ShowProbes();
 
 		//-----------------------------------------Decal---------------------------------------
@@ -570,6 +625,7 @@ namespace Renderer
 		s_decal.SetMat4("V", Camera::getViewMatrix());
 		s_decal.SetMat4("inverseV", glm::inverse(Camera::getViewMatrix()));
 		s_decal.SetMat4("inverseP", glm::inverse(Camera::getProjectionMatrix()));
+		s_decal.SetVec2("resolution", glm::vec2(Backend::GetWidth(), Backend::GetHeight()));
 
 		std::vector<DecalInstance>* decals = AssetManager::GetAllDecalInstances();
 		for (int i = 0; i < decals->size(); i++) {
@@ -730,8 +786,8 @@ namespace Renderer
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, noiseTexture);
 		s_ssao.SetMat4("projection", Camera::getProjectionMatrix());		
-
-
+		s_ssao.SetFloat("ScreenWidth", Backend::GetWidth());
+		s_ssao.SetFloat("ScreenHeight", Backend::GetHeight());
 
 
 		RenderPlane();
@@ -842,7 +898,6 @@ namespace Renderer
 		RenderPlane();
 
 		glDisable(GL_DEPTH_TEST);
-
 	}
 
 
@@ -872,7 +927,7 @@ namespace Renderer
 		return currentProgramID;
 	}
 
-	void RenderPlane() {
+	void Renderer::RenderPlane() {
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
 		glVertexAttribPointer(
@@ -886,5 +941,25 @@ namespace Renderer
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glDisableVertexAttribArray(0);
+	}
+	void Renderer::RenderCube() {
+		glDepthMask(GL_FALSE);
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+		glVertexAttribPointer(
+			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+			3,                  // size
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			0,                  // stride
+			(void*)0            // array buffer offset
+		);
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		glDisableVertexAttribArray(0);
+		glDepthMask(GL_TRUE);
+
+
 	}
 }

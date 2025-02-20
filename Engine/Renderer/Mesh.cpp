@@ -191,13 +191,16 @@ void Mesh::Render(GLuint programID) {
     }
 
 
-    if (Renderer::GetCurrentProgramID() != Renderer::s_SolidColor.GetShaderID()) {
+    if (programID != Renderer::s_SolidColor.GetShaderID()) {
         glBindTextureUnit(0, currentTexture->GetTexture());
 
         if (currentTexture->GetTextureNormal() == NULL)
             glUniform1i(glGetUniformLocation(programID, "HasNormalMap"), false);
-        else
+        else {
             glBindTextureUnit(1, currentTexture->GetTextureNormal());
+            glUniform1i(glGetUniformLocation(programID, "HasNormalMap"), true);
+        }
+           
 
         glBindTextureUnit(2, currentTexture->GetTextureRoughness());
         glBindTextureUnit(3, currentTexture->GetTextureMetalic());

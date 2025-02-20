@@ -9,8 +9,8 @@
 
 #define MAX_LIGHTS 100
 
-#define DEFAULT_WIDTH 960//832
-#define DEFAULT_HEIGHT 540//468
+#define DEFAULT_WIDTH 1280
+#define DEFAULT_HEIGHT 720
 
 
 const int PROBESIZE = 64;

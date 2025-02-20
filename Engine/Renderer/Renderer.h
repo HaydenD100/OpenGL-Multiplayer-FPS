@@ -89,6 +89,7 @@ namespace Renderer
     extern Shader s_decal;
 	extern ProbeGrid probeGrid;
 	extern Shader s_probe;
+	extern Shader s_probeDeffered;
 	extern Shader s_probeRender;
 	extern Shader s_probeirradiance;
 	extern StorageBuffer SHBuffer;
@@ -108,6 +109,7 @@ namespace Renderer
 
     int init();
     void LoadAllShaders();
+	void ConfigureFrameBuffers();
     void ClearScreen();
     void SwapBuffers(GLFWwindow* window);
 
@@ -128,6 +130,7 @@ namespace Renderer
     // Shader
     void SetLights(std::vector<Light> lights, Shader* shader);
     void RenderScene();
+	void RenderCube();
     void RenderPlane();
 
 }

@@ -27,11 +27,23 @@
 #define FAR_PLANE 200.0f
 
 #define WINDOWTITILE "Engine 2.0"
-
 #define MAXDECALS 3000
 
 #define MOUSE_SENSITIVITY = 0.002f;
+
 enum Controls {
 	RESPAWN = 'p',
-	PLAYERINFO = 'o'
+	PLAYERINFO = 'o',
+	FORWARD = 'w',
+	LEFT = 'a',
+	RIGHT = 'd',
+	BACKWARD = 's',
+	JUMP = ' ',
+	RELOAD = 'r',
+	INTERACT = 'e',
+	SPRAYPAINT = 'g',
+	CYCLESPRAY = 't',
+	RELOADSHADERS = 'h',
+	BAKEGI= 'j',
+	SHOWPROBES = 'y'
 };

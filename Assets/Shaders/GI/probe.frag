@@ -1,22 +1,17 @@
 #version 430 core
-layout (location = 0) out vec3 cubeMap;
+layout (location = 3) out vec3 cubeMap;
 
-#define MAXLIGHTS 26
+#define MAXLIGHTS 17
 
 
 in vec2 UV;
 in vec3 FragPos;
-in vec3 Normal;
+in vec3 WorldPos;
 
-layout (binding = 0) uniform sampler2D diffuse;
-layout (binding = 1) uniform sampler2D normal;
-layout (binding = 2) uniform sampler2D roughness;
-layout (binding = 3) uniform sampler2D metalic;
+layout (binding = 0) uniform samplerCube gDiffuse;
+layout (binding = 1) uniform samplerCube gNormal;
+layout (binding = 2) uniform samplerCube gPosition;
 
-
-uniform float Roughness;
-uniform float Metalic;
-uniform vec3 color;
 
 
 uniform vec3 viewPos;
@@ -107,30 +102,21 @@ float LinearizeDepth(float depth) {
 void main()
 {    
 
-    if(color != vec3(0)){
-        cubeMap = color;
-        return;
-    }
-
-
-    vec3 MaterialDiffuseColor = texture(diffuse, UV).rgb;
-
-    float MaterialRoughness = Roughness;
-    if(MaterialRoughness == -1)
-        MaterialRoughness = texture(roughness, UV).r;
-
-    float MaterialMetalic = Metalic;
-    if(MaterialRoughness == -1)
-        MaterialMetalic =texture(metalic, UV).r;
+    vec3 MaterialDiffuseColor = texture(gDiffuse, WorldPos).rgb;
+    vec3 FragPos = texture(gPosition,WorldPos).rgb;
+    float MaterialRoughness = 0.5;
+    //if(MaterialRoughness == -1)
+        //MaterialRoughness = texture(roughness, UV).r;
+    float MaterialMetalic = 0.1;
+    //if(MaterialRoughness == -1)
+        //MaterialMetalic =texture(metalic, UV).r;
     
     // Sample the normal map and transform it to world space using the TBN matrix
-    vec3 normalMap = texture(normal, UV).rgb;
-    normalMap = normalMap * 2.0 - 1.0; // Convert from [0,1] range to [-1,1]
 
      float metallic  = MaterialMetalic;
     float roughness = MaterialRoughness;
 
-    vec3 N = normalize(Normal);
+    vec3 N = normalize(texture(gNormal,WorldPos)).xyz;
     vec3 V = normalize(viewPos - FragPos);
 
     // Reflectance at normal incidence
@@ -174,7 +160,6 @@ void main()
     // HDR and gamma correction
     Lightcolor = Lightcolor / (Lightcolor + vec3(1.0));
     //Lightcolor = N;
-    cubeMap = vec3(Lightcolor);
-    gl_FragDepth =  LinearizeDepth(gl_FragCoord.z);
-
+    cubeMap = vec3(1,0,0);
+    //cubeMap = Lightcolor;
 }

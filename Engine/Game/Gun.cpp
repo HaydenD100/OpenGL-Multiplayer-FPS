@@ -36,7 +36,6 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 	}
 	else {
 		gun->setPosition(weaponOffSet + (direction * -kickbackOffset * 1.0f/60.0f));
-
 		//TokyoSpliffs code
 		float xSwayTarget = 0.0f;
 		float ySwayTarget = 0.0f;
@@ -55,13 +54,11 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 			ySwayTarget = -0.5f;
 		}
 
-		float speed = 2.0f;
-		swayPosition.x = finlerpTo(swayPosition.x, xSwayTarget, 1/60, speed);
-		swayPosition.y = finlerpTo(swayPosition.y, ySwayTarget, 1/60, speed);
-		gun->addPosition(swayPosition);
+		float speed = 0.0f;
+		//swayPosition.x = finlerpTo(swayPosition.x, xSwayTarget, 1/60, speed);
+		//swayPosition.y = finlerpTo(swayPosition.y, ySwayTarget, 1/60, speed);
+		//gun->addPosition(swayPosition);
 	}
-	
-
 	for (int i = 1; i <= firesounds; i++) {
 		AudioManager::GetSound(gunsShotName + std::to_string(i))->SetPosition(Player::getPosition());
 	}

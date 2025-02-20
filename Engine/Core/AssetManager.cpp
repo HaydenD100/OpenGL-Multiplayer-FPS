@@ -30,6 +30,7 @@ namespace AssetManager
 		DecalInstances.resize(MAXDECALS);
 
 		missing_texture = Texture("missing_texture", "Assets/Textures/missing_texture.png", 0, 0);
+
 	}
 
 	void AssetManager::ClearAssets() {

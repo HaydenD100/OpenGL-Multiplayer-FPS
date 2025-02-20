@@ -21,9 +21,9 @@ layout(std430, binding = 7) buffer ShCoeffient {
     vec3 L1SH_5[3750];
     vec3 L1SH_6[3750];
     vec3 L1SH_7[3750];
+    vec3 L1SH_8[3750];
 
-    vec3 L1SH_8[3750 * 2];
-    mat3 probeVisbilty[3750 * 2];
+    mat4 probeDepthEncoded[3750];
 };
 
 layout(rgba16f, binding = 6)  uniform image3D probeGrid;
@@ -33,7 +33,7 @@ uniform int probeID;
 //Credits to https://www.shadertoy.com/view/wtt3W2
 
 #define myT vec3
-#define myL 1
+#define myL 3
 #define SphericalHarmonicsTL(T, L) T[(L + 1)*(L + 1)]
 #define SphericalHarmonics SphericalHarmonicsTL(myT, myL)
 #define shSize(L) ((L + 1)*(L + 1))
@@ -244,6 +244,43 @@ myT shEvaluateDiffuse(SphericalHarmonics sh, vec3 direction) {
 	return result;   
 }
 
+vec3 EvaluateDepth(SphericalHarmonics sh, vec3 direction){
+
+	SphericalHarmonics directionSh = shEvaluate(direction);
+	// https://cseweb.ucsd.edu/~ravir/papers/envmap/envmap.pdf equation 8
+
+	const float A[5] = float[5](
+		 1.0,
+		 2.0 / 3.0,
+		 1.0 / 4.0,
+		 0.0,
+		-1.0f / 24.0
+	);
+
+	int i = 0;
+
+	myT result = sh[i] * directionSh[i] * A[0]; ++i;
+	result += sh[i] * directionSh[i] * A[1]; ++i;
+	result += sh[i] * directionSh[i] * A[1]; ++i;
+	result += sh[i] * directionSh[i] * A[1]; ++i;
+
+	result += sh[i] * directionSh[i] * A[2]; ++i;
+	result += sh[i] * directionSh[i] * A[2]; ++i;
+	result += sh[i] * directionSh[i] * A[2]; ++i;
+	result += sh[i] * directionSh[i] * A[2]; ++i;
+	result += sh[i] * directionSh[i] * A[2]; ++i;
+	result += sh[i] * directionSh[i] * A[4]; ++i;
+	result += sh[i] * directionSh[i] * A[4]; ++i;
+	result += sh[i] * directionSh[i] * A[4]; ++i;
+	result += sh[i] * directionSh[i] * A[4]; ++i;
+	result += sh[i] * directionSh[i] * A[4]; ++i;
+	result += sh[i] * directionSh[i] * A[4]; ++i;
+	result += sh[i] * directionSh[i] * A[4]; ++i;
+
+
+	return result; 
+}
+
 vec3 GetRadianceFromSH(SphericalHarmonics shRadiance, vec3 direction) {
     SphericalHarmonics shDirection = shEvaluate(direction);
 
@@ -332,17 +369,31 @@ void main()
 		shRadiance[8] = L1SH_8[probeID];
 	#endif
 	
+	SphericalHarmonics shDepth;
+	shDepth[0] = vec3(probeDepthEncoded[probeID][0][0]);
+	shDepth[1] = vec3(probeDepthEncoded[probeID][0][1]);
+	shDepth[2] = vec3(probeDepthEncoded[probeID][0][2]);
+	shDepth[3] = vec3(probeDepthEncoded[probeID][0][3]);
 
+	shDepth[4] = vec3(probeDepthEncoded[probeID][1][0]);
+	shDepth[5] = vec3(probeDepthEncoded[probeID][1][1]);
+	shDepth[6] = vec3(probeDepthEncoded[probeID][1][2]);
+	shDepth[7] = vec3(probeDepthEncoded[probeID][1][3]);
 
-	//shRadiance[3] = L1SH_1[probeID][0];
-	//shRadiance[4] = L1SH_1[probeID][1];
-	//shRadiance[5] = L1SH_1[probeID][2];
+	shDepth[8]  = vec3(probeDepthEncoded[probeID][2][0]);
+	shDepth[9]  = vec3(probeDepthEncoded[probeID][2][1]);
+	shDepth[10] = vec3(probeDepthEncoded[probeID][2][2]);
+	shDepth[11] = vec3(probeDepthEncoded[probeID][2][3]);
 
-	//shRadiance[6] = L1SH_2[probeID][0];
-	//shRadiance[7] = L1SH_2[probeID][1];
-	//shRadiance[8] = L1SH_2[probeID][2];
+	shDepth[12] = vec3(probeDepthEncoded[probeID][3][0]);
+	shDepth[13] = vec3(probeDepthEncoded[probeID][3][1]);
+	shDepth[14] = vec3(probeDepthEncoded[probeID][3][2]);
+	shDepth[15] = vec3(probeDepthEncoded[probeID][3][3]);
+	float depth =  GetRadianceFromSH(shDepth, WorldPos).x;
+
 
 	col =  GetRadianceFromSH(shRadiance, WorldPos);
+
 	int probeDepthDirection = clampToNearestDirectionINT(WorldPos);
 
 	int flattenedIndex = int(floor(probeID * 16 + probeDepthDirection));
@@ -359,5 +410,6 @@ void main()
 	//gAlbedo = vec4(depth,0,0, 1); // RGB for Albedo, R for Specular Intensity
 
 	gAlbedo = vec4(col, 1); // RGB for Albedo, R for Specular Intensity
+	//gAlbedo = vec4(depth,depth,depth, 1); // RGB for Albedo, R for Specular Intensity
 
 }

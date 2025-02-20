@@ -162,6 +162,7 @@
     <ClCompile Include="Engine\Core\DecalInstance.cpp" />
     <ClCompile Include="Engine\Core\GameObject.cpp" />
     <ClCompile Include="Engine\Core\Input.cpp" />
+    <ClCompile Include="Engine\Game\Game.cpp" />
     <ClCompile Include="Engine\Renderer\Bloom.cpp" />
     <ClCompile Include="Engine\Renderer\BufferLighting.cpp" />
     <ClCompile Include="Engine\Renderer\BufferSSAO.cpp" />
@@ -201,7 +202,6 @@
     <ClCompile Include="Engine\Renderer\Raycaster.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Saves\mainScene.json" />
     <None Include="Assets\Shaders\Bloom\downscale.frag" />
     <None Include="Assets\Shaders\Bloom\bloom.vert" />
     <None Include="Assets\Shaders\Bloom\upscale.frag" />
@@ -218,11 +218,13 @@
     <None Include="Assets\Shaders\fxaa\fxaa.frag" />
     <None Include="Assets\Shaders\fxaa\fxaa.vert" />
     <None Include="Assets\Shaders\GI\ddgiProbes.comp" />
-    <None Include="Assets\Shaders\GI\irradiance.frag" />
     <None Include="Assets\Shaders\GI\irradiance.vert" />
+    <None Include="Assets\Shaders\GI\irradiance.frag" />
     <None Include="Assets\Shaders\GI\probe.frag" />
     <None Include="Assets\Shaders\GI\probe.vert" />
     <None Include="Assets\Shaders\GI\probeCheck.comp" />
+    <None Include="Assets\Shaders\GI\probeGeom.frag" />
+    <None Include="Assets\Shaders\GI\probeGeom.vert" />
     <None Include="Assets\Shaders\GI\renderProbes.frag" />
     <None Include="Assets\Shaders\GI\renderProbes.vert" />
     <None Include="Assets\Shaders\GI\triangleIntersection.comp" />
@@ -268,6 +270,7 @@
     <ClInclude Include="Engine\Core\GameObject.h" />
     <ClInclude Include="Engine\Core\Common\Header.h" />
     <ClInclude Include="Engine\Core\Input.h" />
+    <ClInclude Include="Engine\Game\Game.h" />
     <ClInclude Include="Engine\Renderer\Bloom.h" />
     <ClInclude Include="Engine\Renderer\BufferLighting.h" />
     <ClInclude Include="Engine\Renderer\BufferSSAO.h" />

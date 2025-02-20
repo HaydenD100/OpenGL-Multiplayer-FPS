@@ -8,6 +8,7 @@ namespace Camera
 {
 	glm::mat4 getViewMatrix();
 	glm::mat4 getProjectionMatrix();
+	void RecalcuteProjectionMatrix();
 
 	glm::vec3 GetPosition();
 	void SetHorizontalAngle(float angle);

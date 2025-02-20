@@ -10,8 +10,14 @@ public:
 	Probe(glm::vec3 postion);
 	void Bake();
 	void Irradiance();
+	void ReLight();
 	Transform GetTransform();
-	GLuint GetCubeMap();
+	GLuint GetCubeAlbedo();
+	GLuint GetCubeNormal();
+	GLuint GetCubePosition();
+	GLuint GetCubeLighting();
+
+
 	GLuint GetDepthCubeMap();
 	GLuint GetIrradianceCubeMap();
 
@@ -22,10 +28,16 @@ public:
 	GLuint64 DepthBindlessHandle = 0;
 private:
 	Transform transform;
-	GLuint probeCubemap = 0;
+	GLuint probeLighting = 0;
+	GLuint probeAlbedo = 0;
+	GLuint probeNormal = 0;
+	GLuint probePosition = 0;
+
 	GLuint probeIrradianceCubemap = 0;
 	GLuint probeFBO = 0;
+	GLuint gbufferFBO = 0;
 	GLuint Depth = 0;
+	GLuint m_depth = 0;
 
 	GLuint probeTextureBuffer = 0;
 

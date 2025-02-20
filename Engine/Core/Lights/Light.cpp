@@ -57,7 +57,7 @@ void Light::SetUpShadows() {
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, SHADOW_NEAR_PLANE, radius);
+	shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 25.0f);
 
 	shadowTransforms.push_back(shadowProj *
 		glm::lookAt(position, position + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
@@ -86,7 +86,7 @@ void Light::GenerateShadows() {
 		std::string pos = "shadowMatrices[" + std::to_string(i) + "]";
 		glUniformMatrix4fv(glGetUniformLocation(Renderer::GetCurrentProgramID(), pos.c_str()), 1, GL_FALSE, &shadowTransforms[i][0][0]);
 	}
-	glUniform1f(glGetUniformLocation(Renderer::GetCurrentProgramID(), "far_plane"), this->radius);
+	glUniform1f(glGetUniformLocation(Renderer::GetCurrentProgramID(), "far_plane"), 25.0f);
 	Renderer::s_shadow.SetVec3("lightPos", position);
 
 	Renderer::RenderAllObjects(Renderer::s_shadow);

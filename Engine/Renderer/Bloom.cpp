@@ -1,6 +1,8 @@
 #include "Bloom.h"
-#include <Engine/Renderer/Renderer.h>
 #include <iostream>
+
+#include <Engine/Renderer/Renderer.h>
+#include <Engine/Backend.h>
 
 
 bool bloomFBO::Init(unsigned int windowWidth, unsigned int windowHeight, unsigned int mipChainLength)
@@ -190,7 +192,7 @@ void BloomRenderer::RenderBloomTexture(unsigned int srcTexture, float filterRadi
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	// Restore viewport
-	glViewport(0, 0, mSrcViewportSize.x, mSrcViewportSize.y);
+	glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
 }
 
 GLuint BloomRenderer::BloomTexture()
