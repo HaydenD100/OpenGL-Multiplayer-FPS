@@ -183,7 +183,6 @@ void Scene::Load() {
 
 	AssetManager::AddGameObject("vase", AssetManager::GetModel("vase"), glm::vec3(-3.74, 3.55, -3.5), true, 0, Convex);
 	AssetManager::GetGameObject("vase")->SetRotationX(-1.5708f);
-	AssetManager::GetGameObject("vase")->IncludInGI(true);
 
 	AssetManager::AddGameObject("shelf", AssetManager::GetModel("shelf"), glm::vec3(4.30, 3.55, 2.97), true, 0, Convex);
 	AssetManager::GetGameObject("shelf")->SetRotationX(-1.5708f);

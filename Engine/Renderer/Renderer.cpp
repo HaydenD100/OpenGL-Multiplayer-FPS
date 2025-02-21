@@ -524,14 +524,13 @@ namespace Renderer
 	}
 
 	void Renderer::RenderScene() {
-
 		//SoftwareRaycaster::queueRay(glm::vec3(0, 0, 1), glm::vec3(-1.97, 6.7, -0.8), 20);
 		//SHBuffer.Bind(7);
 		//probeGrid.BindCubeMapArray(5);
 		//Raycaster::Compute();
 
 		//--------------------------------------------PROBE-------------------------------------------	
-		//Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->getLights());
+		//Renderer::probeGrid.ReLight(SceneManager::GetCurrentScene()->getLights(),1);
 
 		//Should really only do this with one probe in the grid for debugging purposes
 		//cs_Raycaster.Use();

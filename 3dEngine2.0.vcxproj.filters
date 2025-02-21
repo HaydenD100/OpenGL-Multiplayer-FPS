@@ -380,6 +380,7 @@
     <None Include="Assets\Shaders\GI\irradiance.frag" />
     <None Include="Assets\Shaders\GI\probeGeom.vert" />
     <None Include="Assets\Shaders\GI\probeGeom.frag" />
+    <None Include="Assets\Shaders\GI\irradiance.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

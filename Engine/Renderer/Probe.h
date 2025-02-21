@@ -47,6 +47,7 @@ private:
 
 	unsigned int probeID;
 	static unsigned int probeCount;
+	
 
 	glm::mat4 captureProjection;
 	glm::mat4 captureViews[6];
@@ -59,6 +60,7 @@ private:
 struct ProbeGrid {
 	std::vector<Probe> probes;
 	int doneConfigure = 0;
+	int updatedIndex = 0;
 	//Generate all the probes on another thread while the assets are loading
 
 
@@ -118,6 +120,7 @@ struct ProbeGrid {
 	}
 
 	void Bake(std::vector<Light> lights);
+	void ReLight(std::vector<Light> lights, int probeRelightCount);
 	void ShowProbes();
 
 

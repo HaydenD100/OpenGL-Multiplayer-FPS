@@ -141,6 +141,72 @@ void ProbeGrid::Bake(std::vector<Light> lights) {
 	std::cout << "Done Baking \n";
 }
 
+void ProbeGrid::ReLight(std::vector<Light> lights, int probeRelightCount) {
+	glViewport(0, 0, PROBESIZE, PROBESIZE);
+	glClearColor(0, 0, 0, 1);
+
+	glDisable(GL_CULL_FACE);
+
+	std::vector<glm::vec3> lightPositions;
+	std::vector<glm::vec3> lightDirection;
+
+	std::vector<glm::vec3> lightColors;
+	std::vector<float> LightLinears;
+	std::vector<float> LightQuadratics;
+	std::vector<float> LightRadius;
+	std::vector<float> LightCutoff;
+	std::vector<float> LightOuterCutOff;
+
+
+	for (const auto& light : lights) {
+		lightPositions.push_back(light.position);
+		lightDirection.push_back(light.direction);
+		lightColors.push_back(light.colour);
+		LightLinears.push_back(light.linear);
+		LightQuadratics.push_back(light.quadratic);
+		LightRadius.push_back(light.radius);
+		LightCutoff.push_back(light.cutoff);
+		LightOuterCutOff.push_back(light.outercutoff);
+	}
+
+	Renderer::s_probeirradiance.Use();
+	Renderer::s_probeirradiance.SetVec3("gridWorldPos", postion);
+	Renderer::s_probeirradiance.SetVec3("volume", volume);
+	Renderer::s_probeirradiance.SetFloat("spacing", spacing);
+
+	Renderer::s_probeirradiance.SetVec3Array("lightPos", lightPositions);
+	Renderer::s_probeirradiance.SetVec3Array("Lightdirection", lightDirection);
+	Renderer::s_probeirradiance.SetVec3Array("LightColors", lightColors);
+	Renderer::s_probeirradiance.SetFloatArray("LightLinears", LightLinears);
+	Renderer::s_probeirradiance.SetFloatArray("LightQuadratics", LightQuadratics);
+	Renderer::s_probeirradiance.SetFloatArray("LightRadius", LightRadius);
+	Renderer::s_probeirradiance.SetFloatArray("LightCutOff", LightCutoff);
+	Renderer::s_probeirradiance.SetFloatArray("LightOuterCutOff", LightOuterCutOff);
+
+	// Upload depth maps (cubemap for shadow mapping)
+	for (int i = 0; i < lights.size() && i < 17; i++) {
+		glActiveTexture(GL_TEXTURE5 + i); // Activate texture unit i
+		glBindTexture(GL_TEXTURE_CUBE_MAP, lights[i].depthCubemap); // Bind the depth cubemap to the texture unit
+	}
+
+	Renderer::probeTexture.ImageBind(6);
+	Renderer::SHBuffer.Bind(7);
+
+	int temp_index = updatedIndex + probeRelightCount;
+	while(updatedIndex < temp_index){
+		if (updatedIndex >= probes.size() - 1) {
+			updatedIndex = 0;
+			break;
+		}
+		probes[updatedIndex].Irradiance();
+		updatedIndex++;
+	}
+	glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
+	glEnable(GL_CULL_FACE);
+	glClearColor(0, 0, 0, 1);
+
+}
+
 Probe::Probe(glm::vec3 postion) {
 	transform.position = postion;
 
