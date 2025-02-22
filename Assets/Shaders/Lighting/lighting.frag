@@ -16,6 +16,7 @@ layout(std430, binding = 7) buffer ShCoeffient {
     mat4 probeDepthEncoded[3750];
 };
 
+
 layout(binding = 6) uniform sampler3D probeGrid;
 
 
@@ -146,7 +147,7 @@ float LinearizeDepth(float depth) {
 }
 
 #define myT vec3
-#define myL 3
+#define myL 2
 #define SphericalHarmonicsTL(T, L) T[(L + 1)*(L + 1)]
 #define SphericalHarmonics SphericalHarmonicsTL(myT, myL)
 #define shSize(L) ((L + 1)*(L + 1))
@@ -452,14 +453,14 @@ float GetDepthFromProbe(int probeID, vec3 dir){
 	shDepth[7] = vec3(probeDepthEncoded[probeID][1][3]);
 
 	shDepth[8]  = vec3(probeDepthEncoded[probeID][2][0]);
-	shDepth[9]  = vec3(probeDepthEncoded[probeID][2][1]);
-	shDepth[10] = vec3(probeDepthEncoded[probeID][2][2]);
-	shDepth[11] = vec3(probeDepthEncoded[probeID][2][3]);
+	//shDepth[9]  = vec3(probeDepthEncoded[probeID][2][1]);
+	//shDepth[10] = vec3(probeDepthEncoded[probeID][2][2]);
+	//shDepth[11] = vec3(probeDepthEncoded[probeID][2][3]);
 
-	shDepth[12] = vec3(probeDepthEncoded[probeID][3][0]);
-	shDepth[13] = vec3(probeDepthEncoded[probeID][3][1]);
-	shDepth[14] = vec3(probeDepthEncoded[probeID][3][2]);
-	shDepth[15] = vec3(probeDepthEncoded[probeID][3][3]);
+	//shDepth[12] = vec3(probeDepthEncoded[probeID][3][0]);
+	//shDepth[13] = vec3(probeDepthEncoded[probeID][3][1]);
+	//shDepth[14] = vec3(probeDepthEncoded[probeID][3][2]);
+	//shDepth[15] = vec3(probeDepthEncoded[probeID][3][3]);
 	return GetRadianceFromSH(shDepth, dir).x;
 }
 
@@ -468,7 +469,6 @@ vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
     vec3 gridCoords = (fragWorldPos - gridWorldPos) / spacing;
     ivec3 base = ivec3(floor(gridCoords));
     vec3 a = gridCoords - base;
-    //int id = int(imageLoad(probeGrid, base + offset).x);
     int probeID = int(texelFetch(probeGrid, base + offset,0).r);
     vec3 probe_worldPos = (base + offset) + gridWorldPos * spacing;
 
@@ -515,6 +515,7 @@ vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
     //return gridCoords;  
     return probe_color;
 }
+
 
 
 
@@ -624,16 +625,13 @@ void main() {
     vec3 color = ao * Lo + adjustedIndirectLighting;
     
 
-
     // HDR and gamma correction
     color = color / (color + vec3(1.0));
     // color = albedo.xyz;
     // color = albedo.xyz;
     if(isDead)
         color = color + vec3(1,-0.2,-0.2);
-        
 
-    vec3 gridCoords = (FragPos - gridWorldPos) / spacing;
 
     if(lightingState == 0)
         gLighting = vec4(color, spec);// + vec4(albedo * 0.2,1);
@@ -641,9 +639,7 @@ void main() {
         
          directlight =  directlight / ( directlight + vec3(1.0));
         gLighting = vec4( directlight,1);
-        gLighting = vec4(N,1);
     }
-        
     if(lightingState == 2)
         gLighting = vec4(adjustedIndirectLighting,1);
 

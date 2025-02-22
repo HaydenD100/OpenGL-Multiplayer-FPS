@@ -9,9 +9,18 @@ layout (binding = 1) uniform sampler2D normal;
 layout (binding = 2) uniform sampler2D roughness;
 layout (binding = 3) uniform sampler2D metalic;
 
+layout(rgba16f, binding = 6)  uniform image3D probeGrid;
+
+
 uniform float Roughness;
 uniform float Metalic;
 uniform vec3 color;
+
+uniform vec3 position;
+uniform vec3 gridWorldPos;
+uniform vec3 volume;
+uniform float spacing;
+uniform int probeID;
 
 in vec2 UV;
 in vec3 FragPos;
@@ -59,4 +68,10 @@ void main()
         gAlbedo = MaterialDiffuseColor;
     }
     gl_FragDepth =  LinearizeDepth(gl_FragCoord.z);
+
+    vec3 pos = (position - gridWorldPos) / spacing;
+	ivec3 texturePosition = ivec3(floor(pos));
+	imageStore(probeGrid, texturePosition, vec4(probeID));
+
+
 }

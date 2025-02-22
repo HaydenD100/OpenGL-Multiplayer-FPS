@@ -11,6 +11,7 @@ public:
 	void Bake();
 	void Irradiance();
 	void ReLight();
+	void CreateBindless();
 	Transform GetTransform();
 	GLuint GetCubeAlbedo();
 	GLuint GetCubeNormal();
@@ -24,8 +25,11 @@ public:
 	unsigned int ProbeID();
 
 	//used for DDGI
-	GLuint64 probeCubemapBindlessHandle = 0;
-	GLuint64 DepthBindlessHandle = 0;
+	GLuint64 h_gAlbedo = 0;
+	GLuint64 h_gNormal = 0;
+	GLuint64 h_gPosition = 0;
+	GLuint64 h_gdepth = 0;
+
 private:
 	Transform transform;
 	GLuint probeLighting = 0;
@@ -40,10 +44,6 @@ private:
 	GLuint m_depth = 0;
 
 	GLuint probeTextureBuffer = 0;
-
-
-	GLuint probeCubemapBindless = 0;
-	GLuint DepthBindless = 0;
 
 	unsigned int probeID;
 	static unsigned int probeCount;
@@ -61,6 +61,11 @@ struct ProbeGrid {
 	std::vector<Probe> probes;
 	int doneConfigure = 0;
 	int updatedIndex = 0;
+	GLuint b_handles;
+	GLuint b_probePosition;
+	std::vector<GLuint64> handels;
+	std::vector<glm::vec3> positions;
+
 	//Generate all the probes on another thread while the assets are loading
 
 
@@ -69,10 +74,7 @@ struct ProbeGrid {
 		volume = glm::vec3(width, height, depth);
 		postion = start;
 		this->spacing = spacing;
-		glGenTextures(1, &CubeMapArrayBuffer);
-		glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, CubeMapArrayBuffer);
-		glTexStorage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 1, GL_RGBA16F, DDGIPROBESIZE, DDGIPROBESIZE, width/spacing * height/spacing * depth/spacing * 6);
-
+	
 		std::cout << "Starting configure \n";
 		std::vector<GLubyte> blackData(width * height * 4, 0); // RGBA all zeros (black)
 
@@ -80,32 +82,26 @@ struct ProbeGrid {
 			for (float y = 0; y < height; y += spacing) {
 				for (float z = 0; z < depth; z += spacing) {
 					probes.push_back(Probe(glm::vec3(x, y, z) + start));
-					//redudant right now
-					GLuint64 handle = probes[probes.size() - 1].probeCubemapBindlessHandle;
-					probeTextureHandles.push_back(glm::uvec2(static_cast<uint32_t>(handle & 0xFFFFFFFF), static_cast<uint32_t>(handle >> 32)));
-
-					glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, CubeMapArrayBuffer);
-					for (int face = 0; face < 6; ++face) {
-						glTexSubImage3D(GL_TEXTURE_CUBE_MAP_ARRAY, 0, 0, 0, probes[probes.size()-1].ProbeID() * 6 + face,
-							width, height, 1, GL_RGBA16F, GL_UNSIGNED_BYTE, blackData.data());
-					}
+					positions.push_back(glm::vec3(x, y, z));
+					
 				}
 			}
 		}
-		glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, CubeMapArrayBuffer);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+		glCreateBuffers(1, &b_probePosition);
+
+		glNamedBufferStorage(
+			b_probePosition,
+			sizeof(glm::vec3) * positions.size(),
+			(const void*)positions.data(),
+			GL_DYNAMIC_STORAGE_BIT
+		);
 
 
-
-		glCreateBuffers(1, &textureBuffer);
-		glBufferData(GL_SHADER_STORAGE_BUFFER, probeTextureHandles.size() * sizeof(glm::uvec2), &probeTextureHandles[0], GL_STATIC_DRAW);
 		std::cout << "Done configure \n";
 		doneConfigure = 1;
 	}
+	void FillBuffer();
 
 	void Bind(int index) {
 		//glBindBufferBase(GL_SHADER_STORAGE_BUFFER, index, textureBuffer);

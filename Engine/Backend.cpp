@@ -46,11 +46,6 @@ namespace Backend
 		glfwSetInputMode(window, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-		int maxLayers;
-		glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &maxLayers);
-		printf("Max cubemap array layers: %d\n", maxLayers);
-
 		
 		Renderer::init();
 		return 0;

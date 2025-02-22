@@ -269,13 +269,13 @@ vec3 EvaluateDepth(SphericalHarmonics sh, vec3 direction){
 	result += sh[i] * directionSh[i] * A[2]; ++i;
 	result += sh[i] * directionSh[i] * A[2]; ++i;
 	result += sh[i] * directionSh[i] * A[2]; ++i;
-	result += sh[i] * directionSh[i] * A[4]; ++i;
-	result += sh[i] * directionSh[i] * A[4]; ++i;
-	result += sh[i] * directionSh[i] * A[4]; ++i;
-	result += sh[i] * directionSh[i] * A[4]; ++i;
-	result += sh[i] * directionSh[i] * A[4]; ++i;
-	result += sh[i] * directionSh[i] * A[4]; ++i;
-	result += sh[i] * directionSh[i] * A[4]; ++i;
+	//result += sh[i] * directionSh[i] * A[4]; ++i;
+	//result += sh[i] * directionSh[i] * A[4]; ++i;
+	//result += sh[i] * directionSh[i] * A[4]; ++i;
+	//result += sh[i] * directionSh[i] * A[4]; ++i;
+	//result += sh[i] * directionSh[i] * A[4]; ++i;
+	//result += sh[i] * directionSh[i] * A[4]; ++i;
+	//result += sh[i] * directionSh[i] * A[4]; ++i;
 
 
 	return result; 

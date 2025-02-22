@@ -100,6 +100,8 @@ namespace Renderer
 	extern Shader s_textShader;
 
 	extern ComputeShader cs_Raycaster;
+	extern ComputeShader cs_probeIrradiance;
+
 
 	extern StorageBuffer SHBuffer;
 
