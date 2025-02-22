@@ -157,9 +157,16 @@ void ProbeGrid::ReLight(std::vector<Light> lights, int probeRelightCount) {
 	Renderer::cs_probeIrradiance.SetVec3("gridWorldPos", postion);
 	Renderer::cs_probeIrradiance.SetVec3("volume", volume);
 	Renderer::cs_probeIrradiance.SetFloat("spacing", spacing);
+
+
+
 	Renderer::cs_probeIrradiance.SetInt("start_index", updatedIndex);
 
-	
+	updatedIndex += probeRelightCount;
+	if (updatedIndex > probes.size()) {
+		probeRelightCount = updatedIndex - probes.size();
+		updatedIndex = 0;
+	}
 
 	Renderer::cs_probeIrradiance.SetVec3Array("lightPos", lightPositions);
 	Renderer::cs_probeIrradiance.SetVec3Array("Lightdirection", lightDirection);
@@ -182,7 +189,7 @@ void ProbeGrid::ReLight(std::vector<Light> lights, int probeRelightCount) {
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 9, b_probePosition);
 
 
-	glDispatchCompute(probes.size(), 1, 1);
+	glDispatchCompute(probeRelightCount, 1, 1);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 	/*
 

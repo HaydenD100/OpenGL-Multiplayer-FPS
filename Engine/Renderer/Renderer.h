@@ -131,6 +131,7 @@ namespace Renderer
 
     // Shader
     void SetLights(std::vector<Light> lights, Shader* shader);
+	void SetLightsAllShaders(std::vector<Light> lights);
     void RenderScene();
 	void RenderCube();
     void RenderPlane();

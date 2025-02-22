@@ -530,7 +530,7 @@ namespace Renderer
 		//Raycaster::Compute();
 
 		//--------------------------------------------PROBE-------------------------------------------	
-		//Renderer::probeGrid.ReLight(SceneManager::GetCurrentScene()->getLights(),1);
+		Renderer::probeGrid.ReLight(SceneManager::GetCurrentScene()->getLights(), UPDATEDPROBECOUNTPERFRAME);
 
 		//Should really only do this with one probe in the grid for debugging purposes
 		//cs_Raycaster.Use();

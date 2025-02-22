@@ -214,10 +214,10 @@ void Scene::Load() {
 	}
 	{
 		Light light(glm::vec3(0, 6, -2.4), glm::vec3(1, 0.922, 0.678) * 7.5f, 0.07, 0.017);
-		lights.push_back(light);
+		//lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-8, 9, 3.2), glm::vec3(1, 0.878, 0.471) * 6.0f, 0.07, 0.017);
+		Light light(glm::vec3(-8, 8, 5), glm::vec3(1, 0.878, 0.471) * 9.0f, 0.045, 0.0075);
 		lights.push_back(light);
 	}
 
@@ -229,6 +229,16 @@ void Scene::Load() {
 
 void Scene::Update(float deltaTime) {
 	//problem should pull this out
+
+// Initialize in your update loop (e.g., inside your render loop)
+	float time = glfwGetTime(); // Get current time in seconds
+	float amplitude = 2.0f;     // How far the light moves (adjust as needed)
+	float speed = 0.5f;         // Oscillation speed (adjust as needed)
+
+	// Calculate new Z position
+	float newY = 8 + amplitude * glm::sin(time * speed);
+	// Update light position
+	lights[2].position.y = newY;
 
 	for (int i = 0; i < lights.size(); i++) {
 		if(glm::distance(lights[i].position,Player::getPosition()) < lights[i].updateDistance && lights[i].Dynamic)
