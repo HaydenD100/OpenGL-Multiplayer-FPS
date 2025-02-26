@@ -71,6 +71,9 @@ struct ProbeGrid {
 
 	void Configure(float width, float height, float depth, float spacing, glm::vec3 start) {
 
+		width = width * 1 / spacing;
+		height = height * 1 / spacing;
+		depth = depth * 1 / spacing;
 		volume = glm::vec3(width, height, depth);
 		postion = start;
 		this->spacing = spacing;
@@ -78,11 +81,11 @@ struct ProbeGrid {
 		std::cout << "Starting configure \n";
 		std::vector<GLubyte> blackData(width * height * 4, 0); // RGBA all zeros (black)
 
-		for (float x = 0; x < width; x += spacing) {
-			for (float y = 0; y < height; y += spacing) {
-				for (float z = 0; z < depth; z += spacing) {
-					probes.push_back(Probe(glm::vec3(x, y, z) + start));
-					positions.push_back(glm::vec3(x, y, z));
+		for (float x = 0; x < width; x++) {
+			for (float y = 0; y < height; y++) {
+				for (float z = 0; z < depth; z++) {
+					probes.push_back(Probe(glm::vec3(x / spacing, y / spacing, z / spacing) + start));
+					positions.push_back(glm::vec3(x / spacing, y / spacing, z / spacing));
 					
 				}
 			}
@@ -116,7 +119,7 @@ struct ProbeGrid {
 	}
 
 	void Bake(std::vector<Light> lights);
-	void ReLight(std::vector<Light> lights, int probeRelightCount);
+	void ReLight(int probeRelightCount);
 	void ShowProbes();
 
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/Common/Defines.h"
 static const int spawnpointsize = 1;
-static glm::vec3 spawnpoints[spawnpointsize] = { glm::vec3(-10, 8, -3.19) };
+static glm::vec3 spawnpoints[spawnpointsize] = { glm::vec3(0, 1.5, 0) };
 
 
 //Player Data

@@ -152,7 +152,7 @@ namespace Renderer
 		s_final.Load("Assets/Shaders/Final/final.vert", "Assets/Shaders/Final/final.frag");
 		s_SSR.Load("Assets/Shaders/SSR/SSR.vert", "Assets/Shaders/SSR/SSR.frag");
 		s_Post.Load("Assets/Shaders/PostProccess/post.vert", "Assets/Shaders/PostProccess/post.frag");
-		s_probe.Load("Assets/Shaders/GI/probe.vert", "Assets/Shaders/GI/probe.frag");
+		//s_probe.Load("Assets/Shaders/GI/probe.vert", "Assets/Shaders/GI/probe.frag");
 		s_probeDeffered.Load("Assets/Shaders/GI/probeGeom.vert", "Assets/Shaders/GI/probeGeom.frag");
 		s_probeRender.Load("Assets/Shaders/GI/renderProbes.vert", "Assets/Shaders/GI/renderProbes.frag");
 		s_probeirradiance.Load("Assets/Shaders/GI/irradiance.vert", "Assets/Shaders/GI/irradiance.frag");
@@ -173,7 +173,7 @@ namespace Renderer
 		
 		s_lighting.Use();
 		for (int i = 0; i < 26; i++) {
-			s_lighting.SetInt("depthMap[" + std::to_string(i) + "]", 8 + i);
+			s_lighting.SetInt("lights[" + std::to_string(i) + "].depthMap", 8 + i);
 		}
 
 		s_water.Use();
@@ -235,13 +235,9 @@ namespace Renderer
 		s_SSR.SetInt("gFinal", 3);   
 		s_SSR.SetInt("gRMA", 4);    
 
-		s_probe.Use();
-		for (int i = 0; i < 17; i++) {
-			s_probe.SetInt("depthMap[" + std::to_string(i) + "]", 6 + i);
-		}
 		cs_probeIrradiance.Use();
 		for (int i = 0; i < 17; i++) {
-			cs_probeIrradiance.SetInt("depthMap[" + std::to_string(i) + "]", 5 + i);
+			cs_probeIrradiance.SetInt("lights[" + std::to_string(i) + "].depthMap", 5 + i);
 		}
 
 		std::cout << "Done loading shaders \n";
@@ -368,9 +364,9 @@ namespace Renderer
 		//this is the projection to voxlize the scene from orgin (0,0,0) while the other one is the view of the camera
 		//voxel_orth = glm::ortho(-((float)voxelize_scene_albedo.GetWidth() / 2.0f), (float)voxelize_scene_albedo.GetWidth() / 2.0f, (float)voxelize_scene_albedo.GetWidth() / 2.0f, -((float)voxelize_scene_albedo.GetWidth() / 2.0f), -(float)voxelize_scene_albedo.GetWidth()/2.0f, (float)voxelize_scene_albedo.GetWidth()/2.0f);
 		float spacing = 1;
-		glm::vec3 propgationGridSize = glm::vec3(22, 12, 14);
+		glm::vec3 propgationGridSize = glm::vec3(22, 11, 20);
 		//glm::vec3 propgationGridSize = glm::vec3(1, 4, 1);
-		glm::vec3 gridPos = glm::vec3(-13.6, -1.2, -6);
+		glm::vec3 gridPos = glm::vec3(-11.6, -1.2, -6);
 		//glm::vec3 gridPos = glm::vec3(0, 2.7, 0);
 
 		probeTexture.Create(glm::ceil(propgationGridSize.x / spacing), glm::ceil(propgationGridSize.y / spacing), glm::ceil(propgationGridSize.z / spacing));
@@ -381,7 +377,7 @@ namespace Renderer
 		//voxelizedScene
 		
 		//probeGrid.AddProbe(glm::vec3(6, 1, 2));
-		SHBuffer.Configure(7500 * sizeof(glm::vec3) * 9 + 7500 * sizeof(glm::mat4));
+		SHBuffer.Configure(7500 * sizeof(glm::vec3) );
 
 
 
@@ -445,35 +441,43 @@ namespace Renderer
 		std::vector<float> LightOuterCutOff;
 
 
-		for (const auto& light : lights) {
-			lightPositions.push_back(light.position);
-			lightDirection.push_back(light.direction);
-			lightColors.push_back(light.colour);
-			LightLinears.push_back(light.linear);
-			LightQuadratics.push_back(light.quadratic);
-			LightRadius.push_back(light.radius);
-			LightCutoff.push_back(light.cutoff);
-			LightOuterCutOff.push_back(light.outercutoff);
-		}
+		for (int i = 0; i < lights.size();i++) {
+			//ightPositions.push_back(light.position);
+			//lightDirection.push_back(light.direction);
+			//lightColors.push_back(light.colour);
+			//LightLinears.push_back(light.linear);
+			//LightQuadratics.push_back(light.quadratic);
+			//LightRadius.push_back(light.radius);
+			//LightCutoff.push_back(light.cutoff);
+			//LightOuterCutOff.push_back(light.outercutoff);
 
+			shader->SetVec3("lights[" + std::to_string(i) + "].position",lights[i].position);
+			shader->SetVec3("lights[" + std::to_string(i) + "].color", lights[i].colour);
+			shader->SetFloat("lights[" + std::to_string(i) + "].linear", lights[i].linear);
+			shader->SetFloat("lights[" + std::to_string(i) + "].quadratic", lights[i].quadratic);
+			shader->SetFloat("lights[" + std::to_string(i) + "].radius", lights[i].quadratic);
 
-		shader->SetVec3Array("LightPositions_worldspace", lightPositions);
-		shader->SetVec3Array("Lightdirection", lightDirection);
-		shader->SetVec3Array("LightColors", lightColors);
-		shader->SetFloatArray("LightLinears", LightLinears);
-		shader->SetFloatArray("LightQuadratics", LightQuadratics);
-		shader->SetFloatArray("LightRadius", LightRadius);
-		shader->SetFloatArray("LightCutOff", LightCutoff);
-		shader->SetFloatArray("LightOuterCutOff", LightOuterCutOff);
-
-		// Upload depth maps (cubemap for shadow mapping)
-		for (int i = 0; i < lights.size(); i++) {
 			glActiveTexture(GL_TEXTURE8 + i); // Activate texture unit i
 			glBindTexture(GL_TEXTURE_CUBE_MAP, lights[i].depthCubemap); // Bind the depth cubemap to the texture unit
 		}
 
 
+		//shader->SetVec3Array("LightPositions_worldspace", lightPositions);
+		//shader->SetVec3Array("Lightdirection", lightDirection);
+		//shader->SetVec3Array("LightColors", lightColors);
+		//shader->SetFloatArray("LightLinears", LightLinears);
+		//shader->SetFloatArray("LightQuadratics", LightQuadratics);
+		//shader->SetFloatArray("LightRadius", LightRadius);
+		//shader->SetFloatArray("LightCutOff", LightCutoff);
+		//shader->SetFloatArray("LightOuterCutOff", LightOuterCutOff);
+
+		// Upload depth maps (cubemap for shadow mapping)
+		//for (int i = 0; i < lights.size(); i++) {
+			//glActiveTexture(GL_TEXTURE8 + i); // Activate texture unit i
+			//glBindTexture(GL_TEXTURE_CUBE_MAP, lights[i].depthCubemap); // Bind the depth cubemap to the texture unit
+		//}
 	}
+
 	
 	void Renderer::ClearScreen() {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -530,7 +534,7 @@ namespace Renderer
 		//Raycaster::Compute();
 
 		//--------------------------------------------PROBE-------------------------------------------	
-		Renderer::probeGrid.ReLight(SceneManager::GetCurrentScene()->getLights(), UPDATEDPROBECOUNTPERFRAME);
+		Renderer::probeGrid.ReLight(UPDATED_PROBE_COUNT_PER_FRAME);
 
 		//Should really only do this with one probe in the grid for debugging purposes
 		//cs_Raycaster.Use();

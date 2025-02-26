@@ -56,111 +56,33 @@ void ProbeGrid::Bake(std::vector<Light> lights) {
 	Renderer::s_probeDeffered.SetFloat("spacing", spacing);
 
 	Renderer::probeTexture.ImageBind(6);
+	glDisable(GL_CULL_FACE);
 
 	for (int i = 0; i < probes.size(); i++) {
 		probes[i].Bake();
 	}
+	glEnable(GL_CULL_FACE);
 
-	glDisable(GL_CULL_FACE);
 
 	FillBuffer();
 
-	ReLight(lights, probes.size());
-	/*
+	ReLight(probes.size());
 
-	std::vector<glm::vec3> lightPositions;
-	std::vector<glm::vec3> lightDirection;
-
-	std::vector<glm::vec3> lightColors;
-	std::vector<float> LightLinears;
-	std::vector<float> LightQuadratics;
-	std::vector<float> LightRadius;
-	std::vector<float> LightCutoff;
-	std::vector<float> LightOuterCutOff;
-
-
-	for (const auto& light : lights) {
-		lightPositions.push_back(light.position);
-		lightDirection.push_back(light.direction);
-		lightColors.push_back(light.colour);
-		LightLinears.push_back(light.linear);
-		LightQuadratics.push_back(light.quadratic);
-		LightRadius.push_back(light.radius);
-		LightCutoff.push_back(light.cutoff);
-		LightOuterCutOff.push_back(light.outercutoff);
-	}
-
-	Renderer::s_probeirradiance.Use();
-	Renderer::s_probeirradiance.SetVec3("gridWorldPos", postion);
-	Renderer::s_probeirradiance.SetVec3("volume", volume);
-	Renderer::s_probeirradiance.SetFloat("spacing", spacing);
-
-	Renderer::s_probeirradiance.SetVec3Array("lightPos", lightPositions);
-	Renderer::s_probeirradiance.SetVec3Array("Lightdirection", lightDirection);
-	Renderer::s_probeirradiance.SetVec3Array("LightColors", lightColors);
-	Renderer::s_probeirradiance.SetFloatArray("LightLinears", LightLinears);
-	Renderer::s_probeirradiance.SetFloatArray("LightQuadratics", LightQuadratics);
-	Renderer::s_probeirradiance.SetFloatArray("LightRadius", LightRadius);
-	Renderer::s_probeirradiance.SetFloatArray("LightCutOff", LightCutoff);
-	Renderer::s_probeirradiance.SetFloatArray("LightOuterCutOff", LightOuterCutOff);
-
-	// Upload depth maps (cubemap for shadow mapping)
-	for (int i = 0; i < lights.size() && i < 17; i++) {
-		glActiveTexture(GL_TEXTURE5 + i); // Activate texture unit i
-		glBindTexture(GL_TEXTURE_CUBE_MAP, lights[i].depthCubemap); // Bind the depth cubemap to the texture unit
-	}
-
-	Renderer::probeTexture.ImageBind(6);
-	Renderer::SHBuffer.Bind(7);
-
-
-	for (int i = 0; i < probes.size(); i++) {
-		probes[i].Irradiance(); 
-	}
-	*/
 	glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
-	glEnable(GL_CULL_FACE);
 	glClearColor(0, 0, 0, 1);
 	std::cout << "Done Baking \n";
 }
 
-void ProbeGrid::ReLight(std::vector<Light> lights, int probeRelightCount) {
-	//glViewport(0, 0, PROBESIZE, PROBESIZE);
-	//glClearColor(0, 0, 0, 1);
+void ProbeGrid::ReLight(int probeRelightCount) {
 
-	//glDisable(GL_CULL_FACE);
-
-	std::vector<glm::vec3> lightPositions;
-	std::vector<glm::vec3> lightDirection;
-
-	std::vector<glm::vec3> lightColors;
-	std::vector<float> LightLinears;
-	std::vector<float> LightQuadratics;
-	std::vector<float> LightRadius;
-	std::vector<float> LightCutoff;
-	std::vector<float> LightOuterCutOff;
-
-
-	for (const auto& light : lights) {
-		lightPositions.push_back(light.position);
-		lightDirection.push_back(light.direction);
-		lightColors.push_back(light.colour);
-		LightLinears.push_back(light.linear);
-		LightQuadratics.push_back(light.quadratic);
-		LightRadius.push_back(light.radius);
-		LightCutoff.push_back(light.cutoff);
-		LightOuterCutOff.push_back(light.outercutoff);
-	}
-	Renderer::cs_probeIrradiance.Use();
+	Scene* scene = SceneManager::GetCurrentScene();
 
 	Renderer::cs_probeIrradiance.Use();
 	Renderer::cs_probeIrradiance.SetVec3("gridWorldPos", postion);
 	Renderer::cs_probeIrradiance.SetVec3("volume", volume);
 	Renderer::cs_probeIrradiance.SetFloat("spacing", spacing);
-
-
-
 	Renderer::cs_probeIrradiance.SetInt("start_index", updatedIndex);
+	Renderer::cs_probeIrradiance.SetVec3("Sky_Color", DEFAULT_SKY_COLOR);
 
 	updatedIndex += probeRelightCount;
 	if (updatedIndex > probes.size()) {
@@ -168,44 +90,29 @@ void ProbeGrid::ReLight(std::vector<Light> lights, int probeRelightCount) {
 		updatedIndex = 0;
 	}
 
-	Renderer::cs_probeIrradiance.SetVec3Array("lightPos", lightPositions);
-	Renderer::cs_probeIrradiance.SetVec3Array("Lightdirection", lightDirection);
-	Renderer::cs_probeIrradiance.SetVec3Array("LightColors", lightColors);
-	Renderer::cs_probeIrradiance.SetFloatArray("LightLinears", LightLinears);
-	Renderer::cs_probeIrradiance.SetFloatArray("LightQuadratics", LightQuadratics);
-	Renderer::cs_probeIrradiance.SetFloatArray("LightRadius", LightRadius);
-	Renderer::cs_probeIrradiance.SetFloatArray("LightCutOff", LightCutoff);
-	Renderer::cs_probeIrradiance.SetFloatArray("LightOuterCutOff", LightOuterCutOff);
 
-	// Upload depth maps (cubemap for shadow mapping)
-	for (int i = 0; i < lights.size() && i < 17; i++) {
+	for (int i = 0; i < scene->GetLightsSize(); i++) {
+		Renderer::cs_probeIrradiance.SetVec3("lights[" + std::to_string(i) + "].position", scene->GetLight(i)->position);
+		Renderer::cs_probeIrradiance.SetVec3("lights[" + std::to_string(i) + "].color", scene->GetLight(i)->colour);
+		Renderer::cs_probeIrradiance.SetFloat("lights[" + std::to_string(i) + "].linear", scene->GetLight(i)->linear);
+		Renderer::cs_probeIrradiance.SetFloat("lights[" + std::to_string(i) + "].quadratic", scene->GetLight(i)->quadratic);
+		Renderer::cs_probeIrradiance.SetFloat("lights[" + std::to_string(i) + "].radius", scene->GetLight(i)->radius);
+
 		glActiveTexture(GL_TEXTURE5 + i); // Activate texture unit i
-		glBindTexture(GL_TEXTURE_CUBE_MAP, lights[i].depthCubemap); // Bind the depth cubemap to the texture unit
+		glBindTexture(GL_TEXTURE_CUBE_MAP, scene->GetLight(i)->depthCubemap); // Bind the depth cubemap to the texture unit
 	}
+
+
 
 	Renderer::probeTexture.ImageBind(6);
 	Renderer::SHBuffer.Bind(7);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, b_handles);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 9, b_probePosition);
 
+	GLuint num_items = probeRelightCount;
+	glDispatchCompute(num_items, 1, 1);
+	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
-	glDispatchCompute(probeRelightCount, 1, 1);
-	glMemoryBarrier(GL_ALL_BARRIER_BITS | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-	/*
-
-	int temp_index = updatedIndex + probeRelightCount;
-	while(updatedIndex < temp_index){
-		if (updatedIndex >= probes.size() - 1) {
-			updatedIndex = 0;
-			break;
-		}
-		probes[updatedIndex].Irradiance();
-		updatedIndex++;
-	}
-	glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
-	glEnable(GL_CULL_FACE);
-	glClearColor(0, 0, 0, 1);
-	*/
 }
 
 void Probe::CreateBindless() {
@@ -230,7 +137,7 @@ Probe::Probe(glm::vec3 postion) {
 	glGenTextures(1, &probeAlbedo);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, probeAlbedo);
 	for (unsigned int i = 0; i < 6; ++i) {
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, PROBESIZE, PROBESIZE, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16F, PROBESIZE, PROBESIZE, 0, GL_RGBA, GL_FLOAT, NULL);
 	}
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

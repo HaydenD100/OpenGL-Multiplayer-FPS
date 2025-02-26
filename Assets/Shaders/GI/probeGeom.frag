@@ -1,5 +1,5 @@
 #version 430 core
-layout (location = 0) out vec3 gPosition;
+layout (location = 0) out vec4 gPosition;
 layout (location = 1) out vec3 gNormal;
 layout (location = 2) out vec3 gAlbedo;  
 
@@ -56,7 +56,7 @@ void main()
 
     vec3 N = normalize(Normal);
 
-    gPosition = FragPos;
+    gPosition = vec4(FragPos,1);
      if(HasNormalMap)
         gNormal = N;
     else

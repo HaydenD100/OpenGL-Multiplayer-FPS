@@ -11,19 +11,17 @@ in vec3 WorldPos;
 
 
 
-layout(std430, binding = 7) buffer ShCoeffient {
-    vec3 L1SH_0[3750];
-    vec3 L1SH_1[3750];
-    vec3 L1SH_2[3750];
-    vec3 L1SH_3[3750];
+layout(std430, binding = 7) readonly buffer ShCoeffient {
+    vec3 L1SH_0[3750 * 2];
+    vec3 L1SH_1[3750 * 2];
+    vec3 L1SH_2[3750* 2];
+    vec3 L1SH_3[3750* 2];
 
-    vec3 L1SH_4[3750];
-    vec3 L1SH_5[3750];
-    vec3 L1SH_6[3750];
-    vec3 L1SH_7[3750];
-    vec3 L1SH_8[3750];
-
-    mat4 probeDepthEncoded[3750];
+    vec3 L1SH_4[3750* 2];
+    vec3 L1SH_5[3750* 2];
+    vec3 L1SH_6[3750* 2];
+    vec3 L1SH_7[3750* 2];
+    vec3 L1SH_8[3750* 2];
 };
 
 layout(rgba16f, binding = 6)  uniform image3D probeGrid;
@@ -368,7 +366,7 @@ void main()
 		shRadiance[7] = L1SH_7[probeID];
 		shRadiance[8] = L1SH_8[probeID];
 	#endif
-	
+	/*
 	SphericalHarmonics shDepth;
 	shDepth[0] = vec3(probeDepthEncoded[probeID][0][0]);
 	shDepth[1] = vec3(probeDepthEncoded[probeID][0][1]);
@@ -389,7 +387,8 @@ void main()
 	shDepth[13] = vec3(probeDepthEncoded[probeID][3][1]);
 	shDepth[14] = vec3(probeDepthEncoded[probeID][3][2]);
 	shDepth[15] = vec3(probeDepthEncoded[probeID][3][3]);
-	float depth =  GetRadianceFromSH(shDepth, WorldPos).x;
+	*/
+	//float depth =  GetRadianceFromSH(shDepth, WorldPos).x;
 
 
 	col =  GetRadianceFromSH(shRadiance, WorldPos);

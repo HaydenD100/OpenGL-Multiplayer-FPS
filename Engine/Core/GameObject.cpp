@@ -430,8 +430,9 @@ void GameObject::setPositionX(float x) {
 
 void GameObject::setPositionY(float y) {
 	transform.position.y = y;
-	body->getWorldTransform().setOrigin(btVector3(transform.position.x, transform.position.y, transform.position.z));
-	//body->getMotionState()->setWorldTransform(t);
+	btTransform& t = body->getWorldTransform();
+	t.setOrigin(btVector3(transform.position.x, transform.position.y, transform.position.z));
+	body->getMotionState()->setWorldTransform(t);
 }
 
 void GameObject::setPositionZ(float z) {

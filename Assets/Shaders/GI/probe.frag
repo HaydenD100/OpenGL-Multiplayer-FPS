@@ -1,5 +1,5 @@
 #version 430 core
-layout (location = 3) out vec3 cubeMap;
+layout (location = 3) out vec4 cubeMap;
 
 #define MAXLIGHTS 17
 
@@ -160,6 +160,6 @@ void main()
     // HDR and gamma correction
     Lightcolor = Lightcolor / (Lightcolor + vec3(1.0));
     //Lightcolor = N;
-    cubeMap = vec3(1,0,0);
+    cubeMap = vec4(1,0,0,1);
     //cubeMap = Lightcolor;
 }

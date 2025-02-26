@@ -40,6 +40,8 @@ public:
 	int DoesGunPickUpExsit(std::string name);
 	Crate* GetCrate(std::string name);
 	std::vector<Light> getLights();
+	Light* GetLight(int i);
+	size_t GetLightsSize();
 	SkyBox GetSkyBox();
 	std::vector<GameObject*> NeedRenderingObjects();
 

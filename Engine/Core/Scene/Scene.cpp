@@ -1,6 +1,7 @@
 #include "Scene.h"
 #include "Engine/Physics/BulletPhysics.h"
 #include "Physics/Physics.h"
+#include "Engine/Core/Input.h"
 
 Scene::Scene() {
 
@@ -46,6 +47,8 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture(Texture("plant"));
 	AssetManager::AddTexture(Texture("Industrial_Light"));
 	AssetManager::AddTexture(Texture("smokespot_bench_bench"));
+
+
 	//Double Barel
 	AssetManager::AddTexture("double_barrel_shotgun_main_barrel", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_normal.png", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_metallic.jpg");
 	AssetManager::AddTexture("double_barrel_shotgun_wooden_grip_back", "Assets/Objects/FBX/DoubleBarrel/Woooden Grip Back_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Woooden Grip Back_normal.png", "Assets/Objects/FBX/DoubleBarrel/Woooden Grip Back_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Woooden Grip Back_metallic.jpg");
@@ -123,12 +126,14 @@ void Scene::LoadAssets() {
 	AssetManager::GetModel("double_barrel_hand")->GetMeshByName("Arms_L_R_Mesh_002-mesh")->SetTexture(AssetManager::GetTexture("arm"));
 
 	AssetManager::AddModel("map_test1", Model("Assets/Maps/dusty_1.fbx", AssetManager::GetTexture("brick")));
-	AssetManager::AddModel("map_test2", Model("Assets/Maps/other_map.obj", AssetManager::GetTexture("white")));
+	AssetManager::AddModel("map_test2", Model("Assets/Maps/other_map1.obj", AssetManager::GetTexture("white")));
 	AssetManager::AddModel("couch", Model("Assets/Objects/FBX/couch.fbx", AssetManager::GetTexture("white")));
 	AssetManager::AddModel("map_indirectLight", Model("Assets/Maps/lightingTest.obj", AssetManager::GetTexture("white")));
 	AssetManager::AddModel("water", Model("Assets/Objects/FBX/water_test.obj", AssetManager::GetTexture("white")));
 
+	AssetManager::AddModel("GI_map_1", Model("Assets/Maps/Gl_Test_1.obj", AssetManager::GetTexture("white")));
 
+	/*
 	Model* model = AssetManager::GetModel("map_test1");
 	model->GetMeshByName("floor.001")->SetTexture(AssetManager::GetTexture("sand_ground"));
 	model->GetMeshByName("barrel1")->SetTexture(AssetManager::GetTexture("barrel"));
@@ -141,7 +146,7 @@ void Scene::LoadAssets() {
 	model->GetMeshByName("pallet5")->SetTexture(AssetManager::GetTexture("pallet"));
 	model->GetMeshByName("pallet4")->SetTexture(AssetManager::GetTexture("pallet"));
 	model->GetMeshByName("pallet3.001")->SetTexture(AssetManager::GetTexture("pallet"));
-
+	*/
 	AssetManager::AddModel("ak47", Model("Assets/Objects/FBX/ak47.fbx", "Assets/Objects/ak47_convex.obj", AssetManager::GetTexture("ak47")));
 	AssetManager::AddModel("door", Model(Mesh("Assets/Objects/door.obj"), AssetManager::GetTexture("door")));
 	AssetManager::AddModel("door_frame", Model(Mesh("Assets/Objects/door_frame.obj"), AssetManager::GetTexture("door")));
@@ -167,32 +172,30 @@ void Scene::LoadAssets() {
 void Scene::Load() { 
 	LoadAssets();
 
-	//AssetManager::AddGameObject("map_test1", AssetManager::GetModel("map_test1"), glm::vec3(0, 0, 0), true, 0, Concave);
-	//AssetManager::GetGameObject("map_test1")->SetRotationX(-1.5708f);
-
-	AssetManager::AddGameObject("map_test2", AssetManager::GetModel("map_test2"), glm::vec3(0, 0, 0), true, 0, Concave);
-	AssetManager::GetGameObject("map_test2")->IncludInRayCast();
-	AssetManager::GetGameObject("map_test2")->IncludInGI(true);
-
-	AssetManager::AddGameObject("water_test", AssetManager::GetModel("water"), glm::vec3(-1, 10, -6), true, 0, Concave);
-	AssetManager::GetGameObject("water_test")->SetShaderType("water");
+	AssetManager::AddGameObject("GI_map_1", AssetManager::GetModel("GI_map_1"), glm::vec3(0, 0, 0), true, 0, Concave);
+	AssetManager::GetGameObject("GI_map_1")->IncludInGI(true);
 
 
-	AssetManager::AddGameObject("ladder", AssetManager::GetModel("ladder"), glm::vec3(0, 3.55, 0), true, 0, Convex);
-	AssetManager::GetGameObject("ladder")->SetRotationX(-1.5708f);
+	//AssetManager::AddGameObject("map_test2", AssetManager::GetModel("map_test2"), glm::vec3(0, 0, 0), true, 0, Concave);
+	//AssetManager::GetGameObject("map_test2")->IncludInRayCast();
+	//AssetManager::GetGameObject("map_test2")->IncludInGI(true);
+	// 
+	//AssetManager::AddGameObject("ladder", AssetManager::GetModel("ladder"), glm::vec3(0, 2, 0), true, 0, Convex);
+	//AssetManager::GetGameObject("ladder")->SetRotationX(-1.5708f);
 
-	AssetManager::AddGameObject("vase", AssetManager::GetModel("vase"), glm::vec3(-3.74, 3.55, -3.5), true, 0, Convex);
+	AssetManager::AddGameObject("vase", AssetManager::GetModel("vase"), glm::vec3(-2.77, 2, -2.5), true, 0, Convex);
 	AssetManager::GetGameObject("vase")->SetRotationX(-1.5708f);
 
-	AssetManager::AddGameObject("shelf", AssetManager::GetModel("shelf"), glm::vec3(4.30, 3.55, 2.97), true, 0, Convex);
-	AssetManager::GetGameObject("shelf")->SetRotationX(-1.5708f);
+	//AssetManager::AddGameObject("shelf", AssetManager::GetModel("shelf"), glm::vec3(4.30, 2, 2.97), true, 0, Convex);
+	//AssetManager::GetGameObject("shelf")->SetRotationX(-1.5708f);
 
-	AssetManager::AddGameObject("ceiling_light", AssetManager::GetModel("ceiling_light"), glm::vec3(-4.12, 3.55, 2.22), true, 0, Convex);
-	AssetManager::GetGameObject("ceiling_light")->SetRotationX(-1.5708f);
+	//AssetManager::AddGameObject("ceiling_light", AssetManager::GetModel("ceiling_light"), glm::vec3(-6.12, 2, -3.5), true, 0, Convex);
+	//AssetManager::GetGameObject("ceiling_light")->SetRotationX(-1.5708f);
 
-	AssetManager::AddGameObject("Bench", AssetManager::GetModel("Bench"), glm::vec3(-11.2, 3.55, -3.72), true, 0, Convex);
-	AssetManager::GetGameObject("Bench")->SetRotationX(-1.5708f);
-		
+	//AssetManager::AddGameObject("Bench", AssetManager::GetModel("Bench"), glm::vec3(-11.2, 3.55, -3.72), true, 0, Convex);
+	//AssetManager::AddGameObject("Bench", AssetManager::GetModel("Bench"), glm::vec3(-1.5, 2, 3.8), true, 0, Convex);
+	//AssetManager::GetGameObject("Bench")->setRotation(glm::vec3(-1.5708f, -1.5708f * 2.0f, 0.0f));
+
 	// Sets renderer
 	std::vector<std::string> faces{
 		"Assets/Skybox/Space/right.png",
@@ -206,18 +209,18 @@ void Scene::Load() {
 
 	{
 		Light light(glm::vec3(-3.27, 1.2, 3.42), glm::vec3(1, 0.11, 0) * 6.0f, 0.22, 0.20);
-		lights.push_back(light);
+		//lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-4.44, 0.6, 0), glm::vec3(0, 0.573, 1) * 6.0f, 0.22, 0.20);
-		lights.push_back(light);
+		Light light(glm::vec3(-4.44, 2, 0), glm::vec3(0, 0.573, 1) * 6.0f, 0.22, 0.20);
+		//lights.push_back(light);
 	}
 	{
 		Light light(glm::vec3(0, 6, -2.4), glm::vec3(1, 0.922, 0.678) * 7.5f, 0.07, 0.017);
 		//lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-8, 8, 5), glm::vec3(1, 0.878, 0.471) * 9.0f, 0.045, 0.0075);
+		Light light(glm::vec3(0, 4, 0), glm::vec3(1, 0.878, 0.471) * 10.0f, 0.014,	0.0007);
 		lights.push_back(light);
 	}
 
@@ -236,9 +239,9 @@ void Scene::Update(float deltaTime) {
 	float speed = 0.5f;         // Oscillation speed (adjust as needed)
 
 	// Calculate new Z position
-	float newY = 8 + amplitude * glm::sin(time * speed);
+	float newY = 9 + amplitude * glm::sin(time * speed);
 	// Update light position
-	lights[2].position.y = newY;
+	lights[0].position.y = newY;
 
 	for (int i = 0; i < lights.size(); i++) {
 		if(glm::distance(lights[i].position,Player::getPosition()) < lights[i].updateDistance && lights[i].Dynamic)
@@ -289,5 +292,14 @@ int Scene::DoesGunPickUpExsit(std::string name) {
 	}
 	return 0;
 }
+
+Light* Scene::GetLight(int i) {
+	return &lights[i];
+}
+size_t Scene::GetLightsSize() {
+	return lights.size();
+}
+
+
 
 

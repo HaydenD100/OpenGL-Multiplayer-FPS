@@ -57,7 +57,7 @@ void Light::SetUpShadows() {
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 25.0f);
+	shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, SHADOW_FAR_PLANE);
 
 	
 

@@ -2,19 +2,18 @@
 layout (location = 0) out vec4 gLighting;
 
 layout(std430, binding = 7) buffer ShCoeffient {
-    vec3 L1SH_0[3750];
-    vec3 L1SH_1[3750];
-    vec3 L1SH_2[3750];
-    vec3 L1SH_3[3750];
+    vec3 L1SH_0[3750 * 2];
+    vec3 L1SH_1[3750 * 2];
+    vec3 L1SH_2[3750* 2];
+    vec3 L1SH_3[3750* 2];
 
-    vec3 L1SH_4[3750];
-    vec3 L1SH_5[3750];
-    vec3 L1SH_6[3750];
-    vec3 L1SH_7[3750];
-    vec3 L1SH_8[3750];
-
-    mat4 probeDepthEncoded[3750];
+    vec3 L1SH_4[3750* 2];
+    vec3 L1SH_5[3750* 2];
+    vec3 L1SH_6[3750* 2];
+    vec3 L1SH_7[3750* 2];
+    vec3 L1SH_8[3750* 2];
 };
+
 
 
 layout(binding = 6) uniform sampler3D probeGrid;
@@ -42,15 +41,27 @@ layout(binding = 8) uniform sampler2D gEmssive;
 uniform sampler2D gFinal; 
 
 
-uniform vec3 LightColors[MAXLIGHTS];
-uniform vec3 LightPositions_worldspace[MAXLIGHTS];
-uniform vec3 Lightdirection[MAXLIGHTS];
-uniform float LightLinears[MAXLIGHTS];
-uniform float LightQuadratics[MAXLIGHTS];
-uniform float LightRadius[MAXLIGHTS];
-uniform float LightCutOff[MAXLIGHTS];
-uniform float LightOuterCutOff[MAXLIGHTS];
-uniform samplerCube depthMap[MAXLIGHTS];
+struct Light{
+    vec3 position;
+    vec3 color;
+    float linear;
+    float quadratic;
+    float radius;
+    samplerCube depthMap;
+};
+uniform Light[MAXLIGHTS] lights;
+
+
+//uniform vec3 LightColors[MAXLIGHTS];
+//uniform vec3 LightPositions_worldspace[MAXLIGHTS];
+//uniform vec3 Lightdirection[MAXLIGHTS];
+//uniform float LightLinears[MAXLIGHTS];
+//uniform float LightQuadratics[MAXLIGHTS];
+//uniform float LightRadius[MAXLIGHTS];
+//uniform float LightCutOff[MAXLIGHTS];
+//uniform float LightOuterCutOff[MAXLIGHTS];
+//uniform samplerCube depthMap[MAXLIGHTS];
+
 
 uniform vec3 viewPos;
 uniform mat4 inverseV; // Inverse of the view matrix
@@ -60,7 +71,8 @@ uniform bool isDead;
 uniform int lightingState;
 
 const float PI = 3.1415926535897932384626433832795;
-const float far_plane = 25.0; // Constant, moved outside main
+const float e = 2.71828182845904;
+const float far_plane = 30.0; // Constant, moved outside main
 vec3 gridSamplingDisk[20] = vec3[]
 (
    vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
@@ -84,8 +96,8 @@ const vec3 directions[16] = vec3[](
 
 
 float ShadowCalculation(vec3 fragPos, int index, vec3 N){
-     vec3 fragToLight = fragPos - LightPositions_worldspace[index];
-     vec3 lightDir = LightPositions_worldspace[index] - fragPos;
+     vec3 fragToLight = fragPos - lights[index].position;
+     vec3 lightDir = lights[index].position - fragPos;
     float currentDepth = length(fragToLight);
     float shadow = 0.0;
     //float bias = 0.2;
@@ -97,7 +109,7 @@ float ShadowCalculation(vec3 fragPos, int index, vec3 N){
     float diskRadius = (1.0 + (viewDistance / far_plane)) / 200;
     for(int i = 0; i < samples; ++i)
     {
-        float closestDepth = texture(depthMap[index], fragToLight + gridSamplingDisk[i] * diskRadius).r;
+        float closestDepth = texture(lights[index].depthMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
         closestDepth *= far_plane;   // undo mapping [0;1]
         if(currentDepth - bias > closestDepth)
             shadow += 1.0;
@@ -147,7 +159,7 @@ float LinearizeDepth(float depth) {
 }
 
 #define myT vec3
-#define myL 2
+#define myL 1
 #define SphericalHarmonicsTL(T, L) T[(L + 1)*(L + 1)]
 #define SphericalHarmonics SphericalHarmonicsTL(myT, myL)
 #define shSize(L) ((L + 1)*(L + 1))
@@ -159,6 +171,9 @@ const float sqrtPI = 1.7724538509055160272981674833411; //sqrt(PI)
 const float goldenAngle = 2.3999632297286533222315555066336; // PI * (3.0 - sqrt(5.0));
 const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
 
+vec3 SigmoidFunction(vec3 inputColor){
+    return 1.0f / 1.0f + pow(vec3(e), -1 * inputColor); 
+}
 
 
 SphericalHarmonics shZero() {
@@ -341,44 +356,8 @@ myT shEvaluateDiffuse(SphericalHarmonics sh, vec3 direction) {
 		result += sh[i] * directionSh[i] * A[4]; ++i;
 	#endif
 
-	return result;   
-}
+	return result;  
 
-vec3 EvaluateDepth(SphericalHarmonics sh, vec3 direction){
-
-	SphericalHarmonics directionSh = shEvaluate(direction);
-	// https://cseweb.ucsd.edu/~ravir/papers/envmap/envmap.pdf equation 8
-
-	const float A[5] = float[5](
-		 1.0,
-		 2.0 / 3.0,
-		 1.0 / 4.0,
-		 0.0,
-		-1.0f / 24.0
-	);
-
-	int i = 0;
-
-	myT result = sh[i] * directionSh[i] * A[0]; ++i;
-	result += sh[i] * directionSh[i] * A[1]; ++i;
-	result += sh[i] * directionSh[i] * A[1]; ++i;
-	result += sh[i] * directionSh[i] * A[1]; ++i;
-
-	result += sh[i] * directionSh[i] * A[2]; ++i;
-	result += sh[i] * directionSh[i] * A[2]; ++i;
-	result += sh[i] * directionSh[i] * A[2]; ++i;
-	result += sh[i] * directionSh[i] * A[2]; ++i;
-	result += sh[i] * directionSh[i] * A[2]; ++i;
-	result += sh[i] * directionSh[i] * A[4]; ++i;
-	result += sh[i] * directionSh[i] * A[4]; ++i;
-	result += sh[i] * directionSh[i] * A[4]; ++i;
-	result += sh[i] * directionSh[i] * A[4]; ++i;
-	result += sh[i] * directionSh[i] * A[4]; ++i;
-	result += sh[i] * directionSh[i] * A[4]; ++i;
-	result += sh[i] * directionSh[i] * A[4]; ++i;
-
-
-	return result; 
 }
 
 vec3 GetRadianceFromSH(SphericalHarmonics shRadiance, vec3 direction) {
@@ -440,31 +419,6 @@ vec3 interpolate3D(vec3 v1, vec3 v2, vec3 v3, vec3 v4, vec3 v5, vec3 v6, vec3 v7
 }
 
 
-float GetDepthFromProbe(int probeID, vec3 dir){
-    SphericalHarmonics shDepth;
-	shDepth[0] = vec3(probeDepthEncoded[probeID][0][0]);
-	shDepth[1] = vec3(probeDepthEncoded[probeID][0][1]);
-	shDepth[2] = vec3(probeDepthEncoded[probeID][0][2]);
-	shDepth[3] = vec3(probeDepthEncoded[probeID][0][3]);
-
-	shDepth[4] = vec3(probeDepthEncoded[probeID][1][0]);
-	shDepth[5] = vec3(probeDepthEncoded[probeID][1][1]);
-	shDepth[6] = vec3(probeDepthEncoded[probeID][1][2]);
-	shDepth[7] = vec3(probeDepthEncoded[probeID][1][3]);
-
-	shDepth[8]  = vec3(probeDepthEncoded[probeID][2][0]);
-	//shDepth[9]  = vec3(probeDepthEncoded[probeID][2][1]);
-	//shDepth[10] = vec3(probeDepthEncoded[probeID][2][2]);
-	//shDepth[11] = vec3(probeDepthEncoded[probeID][2][3]);
-
-	//shDepth[12] = vec3(probeDepthEncoded[probeID][3][0]);
-	//shDepth[13] = vec3(probeDepthEncoded[probeID][3][1]);
-	//shDepth[14] = vec3(probeDepthEncoded[probeID][3][2]);
-	//shDepth[15] = vec3(probeDepthEncoded[probeID][3][3]);
-	return GetRadianceFromSH(shDepth, dir).x;
-}
-
-
 vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
     vec3 gridCoords = (fragWorldPos - gridWorldPos) / spacing;
     ivec3 base = ivec3(floor(gridCoords));
@@ -482,26 +436,21 @@ vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
     #endif
 
     #if (myL >= 2)
-		//shRadiance[4] = L1SH_4[probeID];
-		//shRadiance[5] = L1SH_5[probeID];
-		//shRadiance[6] = L1SH_6[probeID];
-		//shRadiance[7] = L1SH_7[probeID];
-		//shRadiance[8] = L1SH_8[probeID];
+		shRadiance[4] = L1SH_4[probeID];
+		shRadiance[5] = L1SH_5[probeID];
+		shRadiance[6] = L1SH_6[probeID];
+		shRadiance[7] = L1SH_7[probeID];
+		shRadiance[8] = L1SH_8[probeID];
 	#endif
 
 
-
+    
     //vec3 v = (probe_worldPos - fragWorldPos);
-    vec3 dir =  probe_worldPos - fragWorldPos;
+    vec3 dir =   probe_worldPos - fragWorldPos;
+
     vec3 probe_color =  GetRadianceFromSH(shRadiance, dir);
-    float depth = GetDepthFromProbe(probeID,dir);
 
-    float currentDepth = length(dir);
-
-    //if(currentDepth < depth)
-        //return vec3(0.0f);
-
-    vec3 v = normalize(probe_worldPos - fragWorldPos); // TODO: no need to normalize if only checking sign
+    vec3 v = normalize(dir); // TODO: no need to normalize if only checking sign
     float vdotn = dot(v, Normal);
     vec3 weights = mix(1. - a, a, offset);
 
@@ -510,13 +459,9 @@ vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
         weight = weights.x * weights.y * weights.z;
     else
         weight = 0.;        
-
-    //return probe_worldPos;
-    //return gridCoords;  
     return probe_color;
+
 }
-
-
 
 
 vec3 GetIndirectLighting(vec3 WorldPos, vec3 Normal) { // Interpolate visible probes
@@ -587,13 +532,13 @@ void main() {
 
     
     for (int i = 0; i < MAXLIGHTS; ++i) {
-        if (LightRadius[i] == 0) continue;
+        if (lights[i].radius == 0) continue;
 
         // Calculate distance between light and fragment
-        vec3 L = normalize(LightPositions_worldspace[i] - FragPos);
-        float distance = length(LightPositions_worldspace[i] - FragPos);
-        float attenuation = 1.0 / (1.0 + LightLinears[i] * distance + LightQuadratics[i] * (distance * distance));
-        vec3 radiance = LightColors[i] * attenuation;
+        vec3 L = normalize(lights[i].position - FragPos);
+        float distance = length(lights[i].position - FragPos);
+        float attenuation = 1.0 / (1.0 + lights[i].linear * distance + lights[i].quadratic * (distance * distance));
+        vec3 radiance = lights[i].color * attenuation;
 
         // Cook-Torrance BRDF
         vec3 H = normalize(Vpos + L);
@@ -619,7 +564,9 @@ void main() {
 
     vec3 adjustedIndirectLighting = indirectLighting;
     float factor = min(1, roughness * 1.5);
-    adjustedIndirectLighting *= albedo * 1.0;
+    adjustedIndirectLighting *= (0.8) * vec3(factor);
+    adjustedIndirectLighting = max(adjustedIndirectLighting, vec3(0));
+    adjustedIndirectLighting *= albedo * 2;
 
     vec3 directlight = ao * Lo;
     vec3 color = ao * Lo + adjustedIndirectLighting;
