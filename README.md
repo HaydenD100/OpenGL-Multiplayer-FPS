@@ -3,6 +3,10 @@ https://github.com/HaydenD100/3dEngine2.0
 
 ## Changelog
 
+### 3D Engine 2.0 2025/Feburary/27
+The Indirect lighting I implemented last month is now updated In real time instead of being baked at the start. I achieved this by baking “gbuffer” cubemaps for each probe and then relighting the probes over a few frames (800 probes a frame). 
+![screenshot](https://github.com/HaydenD100/3dEngine2.0/blob/1v1/github/screenshots/realtime.png)
+
 ### 3D Engine 2.0 2025/January/01
 The rendering engine now supports indirect global illumination, the indirect lighting is calculated from a spherical harmonics probe grid which is baked at runtime, this lights up areas that would not receive light from only direct lighting, I've included a link displaying the full effect at the end of this entry. Other notable features are Screen Space Reflections as well as emissive/glowing textures as seen by the light source in this screenshot. There was also some refactoring of the rendering code making the code cleaner. 
 Indirect Lighting Showcase: https://www.youtube.com/watch?v=_UIoXB9jr6w

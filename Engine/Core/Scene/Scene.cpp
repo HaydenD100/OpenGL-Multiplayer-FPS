@@ -71,6 +71,9 @@ void Scene::LoadAssets() {
 	//AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 	AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("glass")));
 
+	AssetManager::AddModel("running", Model("Assets/Objects/FBX/Running.fbx", AssetManager::GetTexture("white")));
+
+
 	AssetManager::AddModel("ladder", Model("Assets/Objects/FBX/ladder.fbx", AssetManager::GetTexture("ladder")));
 	AssetManager::AddModel("shelf", Model("Assets/Objects/FBX/shelf.fbx", AssetManager::GetTexture("shelf")));
 	AssetManager::AddModel("vase", Model("Assets/Objects/FBX/vase.fbx", AssetManager::GetTexture("vase")));
@@ -163,9 +166,7 @@ void Scene::LoadAssets() {
 
 	//these are diffrent animations from skinnedanimation
 	AnimationManager::AddAnimation(Animation("Assets/Animations/door_open.fbx", "door_open"));
-	AnimationManager::AddAnimation(Animation("Assets/Animations/door_close.fbx", "door_close"));
-
-	
+	AnimationManager::AddAnimation(Animation("Assets/Animations/door_close.fbx", "door_close"));	
 }
 
 
@@ -185,6 +186,7 @@ void Scene::Load() {
 
 	AssetManager::AddGameObject("vase", AssetManager::GetModel("vase"), glm::vec3(-2.77, 2, -2.5), true, 0, Convex);
 	AssetManager::GetGameObject("vase")->SetRotationX(-1.5708f);
+
 
 	//AssetManager::AddGameObject("shelf", AssetManager::GetModel("shelf"), glm::vec3(4.30, 2, 2.97), true, 0, Convex);
 	//AssetManager::GetGameObject("shelf")->SetRotationX(-1.5708f);
@@ -208,8 +210,8 @@ void Scene::Load() {
 	sky = SkyBox(faces);
 
 	{
-		Light light(glm::vec3(-3.27, 1.2, 3.42), glm::vec3(1, 0.11, 0) * 6.0f, 0.22, 0.20);
-		//lights.push_back(light);
+		Light light(glm::vec3(6.13, 4.5, 5.3), glm::vec3(1, 0.11, 0) * 6.0f, 0.22, 0.20);
+		lights.push_back(light);
 	}
 	{
 		Light light(glm::vec3(-4.44, 2, 0), glm::vec3(0, 0.573, 1) * 6.0f, 0.22, 0.20);
@@ -220,7 +222,7 @@ void Scene::Load() {
 		//lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(0, 4, 0), glm::vec3(1, 0.878, 0.471) * 10.0f, 0.014,	0.0007);
+		Light light(glm::vec3(0, 4, 0), glm::vec3(1, 0.878, 0.471) * 8.0f, 0.014,	0.0007);
 		lights.push_back(light);
 	}
 
@@ -241,7 +243,7 @@ void Scene::Update(float deltaTime) {
 	// Calculate new Z position
 	float newY = 9 + amplitude * glm::sin(time * speed);
 	// Update light position
-	lights[0].position.y = newY;
+	lights[1].position.y = newY;
 
 	for (int i = 0; i < lights.size(); i++) {
 		if(glm::distance(lights[i].position,Player::getPosition()) < lights[i].updateDistance && lights[i].Dynamic)

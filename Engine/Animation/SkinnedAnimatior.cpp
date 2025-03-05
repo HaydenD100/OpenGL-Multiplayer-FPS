@@ -32,7 +32,8 @@ namespace Animator {
                     continue;
                 }
                 currentAnimationInstances[i].m_CurrentTime = fmod(currentAnimationInstances[i].m_CurrentTime, currentAnimationInstances[i].Animation->GetDuration());
-                CalculateBoneTransform(&currentAnimationInstances[i].Animation->GetRootNode(), glm::mat4(1.0f), i);
+                CalculateBoneTransform(&currentAnimationInstances[i].Animation->GetRootNode(), currentAnimationInstances[i].Animation->GetRootNode().transformation, i);
+                
             }
         }
     }

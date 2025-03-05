@@ -23,6 +23,8 @@ class RagDoll
 public:
 	RagDoll() = default;
 	RagDoll(std::string bonePath, std::string GameobjectName);
+	void UpdateRagDoll(float dt);
+	//void CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform, int index);
 	//Make another constructor that takes a custom file
 
 

@@ -60,4 +60,6 @@ private:
 	//holds the model shader ID for Gemoetry
 	GLuint ModelMatrixId;
 
+	SkinnedAnimation m_running;
+
 };

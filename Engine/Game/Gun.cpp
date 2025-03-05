@@ -110,29 +110,32 @@ namespace WeaponManager
 		AssetManager::GetGameObject("knife")->SetRender(false);
 		AssetManager::GetGameObject("knife")->SetParentName("player_head");
 		AssetManager::GetGameObject("knife")->SetShaderType("Overlay");
+		AssetManager::GetGameObject("knife")->SetRotationX(1.5708f);
+
 
 		AssetManager::AddGameObject(GameObject("glock", AssetManager::GetModel("glockhand"), glm::vec3(5, 0, -5), false, 0, Convex));
 		AssetManager::GetGameObject("glock")->SetRender(false);
 		AssetManager::GetGameObject("glock")->SetParentName("player_head");
 		AssetManager::GetGameObject("glock")->SetShaderType("Overlay");
-
+		AssetManager::GetGameObject("glock")->SetRotationX(1.5708f);
 
 		AssetManager::AddGameObject(GameObject("ak47", AssetManager::GetModel("ak47hand"), glm::vec3(0.2, -0.25, -0.2), false, 0, Convex));
 		AssetManager::GetGameObject("ak47")->SetRender(false);
 		AssetManager::GetGameObject("ak47")->SetParentName("player_head");
 		AssetManager::GetGameObject("ak47")->SetShaderType("Overlay"); 
-
+		AssetManager::GetGameObject("ak47")->SetRotationX(1.5708f);
 
 		AssetManager::AddGameObject("shotgun", AssetManager::GetModel("shotgun"), glm::vec3(-3, 2, 3), false, 0, Convex);
 		AssetManager::GetGameObject("shotgun")->SetRender(false);
 		AssetManager::GetGameObject("shotgun")->SetParentName("player_head");
 		AssetManager::GetGameObject("shotgun")->SetShaderType("Overlay");
+		AssetManager::GetGameObject("shotgun")->SetRotationX(1.5708f);
 
 		AssetManager::AddGameObject("double_barrel", AssetManager::GetModel("double_barrel_hand"), glm::vec3(-3, 2, 3), false, 0, Convex);
 		AssetManager::GetGameObject("double_barrel")->SetRender(false);
 		AssetManager::GetGameObject("double_barrel")->SetParentName("player_head");
 		AssetManager::GetGameObject("double_barrel")->SetShaderType("Overlay");
-
+		AssetManager::GetGameObject("double_barrel")->SetRotationX(1.5708f);
 
 		
 		AudioManager::AddSound("Assets/Audio/shotgun_fire.wav", "shotgun_fire1", AssetManager::GetGameObject("shotgun")->getPosition(), 1, 0.4f);

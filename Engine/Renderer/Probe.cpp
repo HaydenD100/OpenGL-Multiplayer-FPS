@@ -46,6 +46,7 @@ void ProbeGrid::FillBuffer() {
 
 void ProbeGrid::Bake(std::vector<Light> lights) {
 	std::cout << "starting baking lighting \n";
+	float start = glfwGetTime();
 	glViewport(0, 0, PROBESIZE, PROBESIZE);
 
 	glClearColor(0, 0, 0, 1);
@@ -70,7 +71,7 @@ void ProbeGrid::Bake(std::vector<Light> lights) {
 
 	glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
 	glClearColor(0, 0, 0, 1);
-	std::cout << "Done Baking \n";
+	std::cout << "Done Baking " << glfwGetTime() - start <<  "s \n";
 }
 
 void ProbeGrid::ReLight(int probeRelightCount) {
