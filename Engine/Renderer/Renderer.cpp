@@ -139,6 +139,8 @@ namespace Renderer
 	//state stuff for enabling/disabling indirect lighting for showcase
 	int lightingState = 0;
 
+	int DebugState = 0;
+
 	void Renderer::LoadAllShaders() {
 		
 
@@ -363,11 +365,11 @@ namespace Renderer
 
 		//this is the projection to voxlize the scene from orgin (0,0,0) while the other one is the view of the camera
 		//voxel_orth = glm::ortho(-((float)voxelize_scene_albedo.GetWidth() / 2.0f), (float)voxelize_scene_albedo.GetWidth() / 2.0f, (float)voxelize_scene_albedo.GetWidth() / 2.0f, -((float)voxelize_scene_albedo.GetWidth() / 2.0f), -(float)voxelize_scene_albedo.GetWidth()/2.0f, (float)voxelize_scene_albedo.GetWidth()/2.0f);
-		float spacing = 1;
-		glm::vec3 propgationGridSize = glm::vec3(22, 11, 16);
+		float spacing = 0.5;
+		glm::vec3 propgationGridSize = glm::vec3(5.5, 6, 5.5);
 		//glm::vec3 propgationGridSize = glm::vec3(1, 4, 1);
-		glm::vec3 gridPos = glm::vec3(-11.6, -1.2, -6);
-		//glm::vec3 gridPos = glm::vec3(0, 2.7, 0);
+		//glm::vec3 gridPos = glm::vec3(-11.6, -1.2, -6);
+		glm::vec3 gridPos = glm::vec3(-2.5, -1, -2.5);
 
 		probeTexture.Create(glm::ceil(propgationGridSize.x / spacing), glm::ceil(propgationGridSize.y / spacing), glm::ceil(propgationGridSize.z / spacing));
 		probeGrid.Configure(propgationGridSize.x, propgationGridSize.y, propgationGridSize.z, spacing, gridPos);
@@ -546,7 +548,7 @@ namespace Renderer
 		//cs_Raycaster.SetFloat("spacing", probeGrid.spacing);
 		//cs_Raycaster.SetInt("indicesSize", Raycaster::GetIndicesSize());
 
-		
+		Renderer::CheckDebugState();
 
 		//-------------------------------------------GBUFFER-----------------------------------------
 
@@ -616,7 +618,7 @@ namespace Renderer
 			AssetManager::GetModel("light_cube")->RenderModel(s_SolidColor.GetShaderID());
 		}
 
-		if(Input::KeyDown(SHOWPROBES))
+		if((DebugState & ShowProbes) == ShowProbes)
 			probeGrid.ShowProbes();
 
 		//-----------------------------------------Decal---------------------------------------
@@ -830,11 +832,7 @@ namespace Renderer
 		s_lighting.SetFloat("spacing", probeGrid.spacing);
 
 
-		if (Input::KeyPressed('f')) {
-			lightingState++;
-			if (lightingState > 2)
-				lightingState = 0;
-		}
+
 			
 
 		s_lighting.SetInt("lightingState", lightingState);
@@ -964,5 +962,25 @@ namespace Renderer
 		glDepthMask(GL_TRUE);
 
 
+	}
+	void Renderer::CheckDebugState() {
+		if (Input::KeyPressed('f')) {
+			lightingState++;
+			if (lightingState > 5)
+				lightingState = 0;
+		}
+		if (Input::KeyPressed(GUITOGGLE)) {
+			if((DebugState & NoGUi) == NoGUi)
+				DebugState = DebugState & !NoGUi;
+			else
+				DebugState = DebugState | NoGUi;
+		}
+		if (Input::KeyPressed(PROBETOGGLE)) {
+			if ((DebugState & ShowProbes) == ShowProbes)
+				DebugState = ShowProbes & !ShowProbes;
+			else
+				DebugState = ShowProbes | ShowProbes;
+		}
+			
 	}
 }

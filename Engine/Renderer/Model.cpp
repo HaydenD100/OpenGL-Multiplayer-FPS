@@ -1,11 +1,13 @@
 #include "Model.h"
 #include "Engine/Loaders/Loader.hpp"
 #include "Engine/Loaders/vboindexer.h"
-#include "Engine/Loaders/stb_image.h"
-#include "Engine/Core/AssetManager.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
+#include "Engine/Loaders/stb_image.h"
+#include "Engine/Core/AssetManager.h"
+
 
 
 Model::Model(Mesh mesh, Texture* texture) {
@@ -18,7 +20,7 @@ Model::Model(Mesh mesh, Texture* texture) {
 
 //Right now this can only load files that support tanget and bit tanget fbx is the most common
 Model::Model(const char* path, Texture* texture) {
-
+    this->name = path;
     Assimp::Importer import;
 
     const aiScene * scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -222,17 +224,34 @@ void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
             material->Get(AI_MATKEY_NAME, materialName);//Get the material name (pass by reference)
             material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), texturePathDiffuse);
 
-            auto texture = scene->GetEmbeddedTexture(texturePathDiffuse.C_Str());
-            if (texture) {
-                //std::cout << "Emb \n";
-                AssetManager::AddTexture(Texture(material, scene));
-                meshTexture = AssetManager::GetTexture(materialName.C_Str());
+            /*
+            if (!this->name.compare("Assets/Maps/test_ity.fbx")) {
+                std::string string_mat = materialName.C_Str();
+                if (!string_mat.empty()) {
+                    if (string_mat.substr(0, 2) == "m_")
+                        string_mat = "tex_" + string_mat.substr(2);
+                    else
+                        string_mat = "tex_" + string_mat;
+                
+                    //TODO THIS IS ALL HARD CODED ILL FIX IT LATER
+                    std::string path = "Assets/Textures/italy_textures/" + string_mat + ".jpeg";
+                    Texture* t_meshtesture = AssetManager::GetTexture(string_mat);
+                    if (t_meshtesture == nullptr) {
+                        AssetManager::AddTexture(Texture(string_mat.c_str(), path.c_str(), 0.8f, 0.0f));
+                    }
+                    t_meshtesture = AssetManager::GetTexture(string_mat);
+                    if (t_meshtesture != nullptr)
+                        meshTexture = t_meshtesture;
+                    else
+                        meshTexture = texture;
+               
+                }
             }
-            //std::cout << "Mesh Material Name: " << materialName.C_Str() << "\n";
+            */
         }
             
             
-        model_mesh.SetTexture(texture);
+        model_mesh.SetTexture(meshTexture);
         int name_count = 0;
         for (int i = 0; i < meshes.size(); i++) {
             if (std::strcmp(meshes[i].GetName().c_str(), mesh->mName.C_Str()) == 0) {
@@ -247,8 +266,8 @@ void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
             model_mesh.SetName(mesh->mName.C_Str());
 
         
-
-        std::cout << model_mesh.GetName() << "\n";
+       
+        std::cout << "Mesh Name: " << model_mesh.GetName() << "\n";
         meshes.push_back(model_mesh);
     }
     // then do the same for each of its children
@@ -387,4 +406,8 @@ std::vector<glm::vec4> Model::GetVerticiesPadded() {
         }
     }
     return vertices;
+}
+
+void Model::SetName(std::string name) {
+    this->name = name;
 }

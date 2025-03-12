@@ -20,6 +20,11 @@
 
 
 
+enum RenderDebugStates {
+	NoGUi = 1,
+	ShowProbes = 2
+};
+
 class SkyBox
 {
 public:
@@ -105,7 +110,7 @@ namespace Renderer
 
 	extern StorageBuffer SHBuffer;
 
-
+	extern int DebugState;
 
 
 
@@ -135,6 +140,7 @@ namespace Renderer
     void RenderScene();
 	void RenderCube();
     void RenderPlane();
+	void CheckDebugState();
 
 }
 

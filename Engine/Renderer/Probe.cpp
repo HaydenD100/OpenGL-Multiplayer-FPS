@@ -57,12 +57,12 @@ void ProbeGrid::Bake(std::vector<Light> lights) {
 	Renderer::s_probeDeffered.SetFloat("spacing", spacing);
 
 	Renderer::probeTexture.ImageBind(6);
-	glDisable(GL_CULL_FACE);
+	//glDisable(GL_CULL_FACE);
 
 	for (int i = 0; i < probes.size(); i++) {
 		probes[i].Bake();
 	}
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 
 
 	FillBuffer();

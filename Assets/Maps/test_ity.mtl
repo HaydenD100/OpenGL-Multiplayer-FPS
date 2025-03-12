@@ -1,0 +1,762 @@
+# Blender 4.1.1 MTL File: 'None'
+# www.blender.org
+
+newmtl 01_-_Default
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_MarketStandPosters.jpg
+
+newmtl Floors
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_FlowerPot.jpg
+
+newmtl Material_#292
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Vase01_Faces.jpg
+
+newmtl Material_#294
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Trash&Paper.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_Trash&Paper.jpg
+
+newmtl Standardmaterial
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_SteppingStones.jpg
+
+newmtl m_AnotherLantern
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.700000 0.700000 0.700000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 3
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_AnotherLantern.jpg
+
+newmtl m_Barrel&Crate
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Barrel&Crate.jpg
+
+newmtl m_Bench&Others
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Bench&Others.jpg
+
+newmtl m_Black
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+
+newmtl m_Chairs&Branches&IronWork
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Restaurant_Chairback&Branch&IronWork.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_Restaurant_Chairback&Branch&IronWork.jpg
+
+newmtl m_Cobbles
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_GroundLevel_Cobbles.jpg
+
+newmtl m_Doors
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Doors.jpg
+
+newmtl m_DoorsRailings
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_DoorOrnament.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_DoorOrnament.jpg
+
+newmtl m_DrinkingFountain
+Ns 10.717731
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_DrinkingFountain.jpg
+
+newmtl m_FloorTiles
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_GroundLevel_Floor.jpg
+
+newmtl m_FountainShape
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Fountain.jpg
+
+newmtl m_FountainWater
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Water.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_Water.jpg
+
+newmtl m_Gieter
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Gieter.jpg
+
+newmtl m_Glass
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 0.530000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_AnotherLanternGlass.jpg
+
+newmtl m_Grass
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_GroundLevel_Grass.jpg
+
+newmtl m_GreenFlowers
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_GreenFlower01.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_GreenFlower01.jpg
+
+newmtl m_GroundLevel_Grass/Dust
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_GroundLevel_Dirt&Grass.jpg
+
+newmtl m_GroundLevel_Trims&Stairs
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_GroundLevel_Trims.jpg
+
+newmtl m_GroundLevel_Vertical
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_GroundLevel_wall.jpg
+
+newmtl m_HangingPlant
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_HangingPlants.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_HangingPlants.jpg
+
+newmtl m_Iron&Flowerpot&mag
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_PeoplesHouseProps_Iron&Flowerpot&mag.jpg
+
+newmtl m_Lavender
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Lavender.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_Lavender.jpg
+
+newmtl m_MarketStand
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_MarketStand.jpg
+
+newmtl m_OliveTreeBark
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_OliveTreeBark.jpg
+
+newmtl m_OliveTreeLeaves
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_OliveTreeLeaves.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_OliveTreeLeaves.jpg
+
+newmtl m_OutDoorChairs
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_OutdoorChairs.jpg
+
+newmtl m_Parasol
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Parasol.jpg
+
+newmtl m_PeoplesHouseFloorTiles
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_PeoplesHouse_FloorTiles.jpg
+
+newmtl m_PeoplesHouseProps
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_PeoplesHouseProps.jpg
+
+newmtl m_PeoplesHouseTilables
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_PeoplesHouse_Tilables.jpg
+
+newmtl m_PeoplesHouse_Black
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+
+newmtl m_PeoplesHouse_Opacitys
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_PeoplesHouse_Railings.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_PeoplesHouse_Railings.jpg
+
+newmtl m_PeoplesHouse_Roof
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_PeoplesHouse_Rooftiles.jpg
+
+newmtl m_PeoplesHouse_Uniques
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_PeoplesHouse_Uniques.jpg
+
+newmtl m_PeoplesHouse_Wall
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_PeoplesHouse_Wall.jpg
+
+newmtl m_PinkFlowers
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_PinkFlowers.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_Flowers.jpg
+
+newmtl m_PurpleFlower
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_PurpleFlower.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_PurpleFlower.jpg
+
+newmtl m_RestaurantBoard
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_ResaurantBoard.jpg
+
+newmtl m_RestaurantChair&FlowerPot
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_FlowerPot&RestaurantChair.jpg
+
+newmtl m_RestaurantFloors
+Ns 10.717731
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Restaurant_TilesFloor.jpg
+
+newmtl m_RestaurantRailings
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Restaurant_railingsTilable.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_Restaurant_RailingsTilable.jpg
+
+newmtl m_RestaurantRimsAndPoles
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Restaurant_TrimsTileable.jpg
+
+newmtl m_RestaurantTable
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_RestaurantTable.jpg
+
+newmtl m_RestaurantUniques
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Restaurant_Uniques&Gutter.jpg
+
+newmtl m_RestaurantWalls
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Restaurant_WallClaylike.jpg
+
+newmtl m_RestaurantWindows&Doors
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Restaurant_Doors&Windows.jpg
+
+newmtl m_Rug01
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Rug01.jpg
+
+newmtl m_Rug2
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Rug02.jpg
+
+newmtl m_Sattelite
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_SatelliteDish.jpg
+
+newmtl m_Scooter
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Scooter.jpg
+
+newmtl m_Shop_Black
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+
+newmtl m_Shop_Floor
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Shop_FloorTiles.jpg
+
+newmtl m_Shop_Opacities
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Shop_Railings&Trims&FlowerWoods.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_Shop_Railings&Trims&FlowerWoods.jpg
+
+newmtl m_Shop_Roof
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Shop_Rooftiles.jpg
+
+newmtl m_Shop_TileAbles
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Shop_Tileables.jpg
+
+newmtl m_Shop_Uniques
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Shop_Uniques.jpg
+
+newmtl m_Shop_Wall
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Shop_WallClaylike.jpg
+
+newmtl m_ShoppingStand
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_ShoppingStand.jpg
+
+newmtl m_ShoppingTable
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_ShoppingTable.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_ShoppingTable.jpg
+
+newmtl m_SmallBushBark
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_SmallBushBark.jpg
+
+newmtl m_SmallBushLeaves
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_SmallBushLeaves.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_SmallBushLeaves.jpg
+
+newmtl m_Street
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_GroundLevel_Concrete.jpg
+
+newmtl m_TrashCan
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Trashcan.jpg
+
+newmtl m_Vase01
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Vase01.jpg
+
+newmtl m_Vase01_Black
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Vase01_Black.jpg
+
+newmtl m_Vase02
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Vase02.jpg
+
+newmtl m_Vase02_Black
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Vase02_Black.jpg
+
+newmtl m_Vase02_Faces
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/p_vase_tex_001_Faces.jpg
+
+newmtl m_Vase03
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Vase03.jpg
+
+newmtl m_WAshingLine
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_WashingLine.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_WashingLine.jpg
+
+newmtl m_YellowFlowers
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_YellowFlowers.jpg
+map_d C:/Users/kokok/Downloads/cityscene-riomaggiore/source/fbx/tex_Opacity_Flowers.jpg

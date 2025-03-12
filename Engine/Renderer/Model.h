@@ -1,5 +1,4 @@
 #pragma once
-
 #include <map>
 #include <vector>
 #include "Engine/Renderer/Texture.h"
@@ -33,6 +32,7 @@ public:
     void RenderAllMeshes(bool state);
     bool RenderAll();
     std::string GetName();
+    void SetName(std::string name);
 
     int VertexInfoBind(int offset, int modelMatrixIndex);
     int IndicesInfoBind(int offset);

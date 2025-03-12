@@ -69,37 +69,54 @@ struct ProbeGrid {
 	//Generate all the probes on another thread while the assets are loading
 
 
-	void Configure(float width, float height, float depth, float spacing, glm::vec3 start) {
+	void Configure(float Width, float Height, float Depth, float spacing, glm::vec3 start) {
+		// Pre-calculate inverse spacing to avoid repeated division
+		const float invSpacing = 1.0f / spacing;
 
-		width = width * 1 / spacing;
-		height = height * 1 / spacing;
-		depth = depth * 1 / spacing;
-		volume = glm::vec3(width, height, depth);
+		// Convert dimensions to integer counts using proper rounding
+		const int width = static_cast<int>(std::round(Width * invSpacing));
+		const int height = static_cast<int>(std::round(Height * invSpacing));
+		const int depth = static_cast<int>(std::round(Depth * invSpacing));
+
+		volume = glm::vec3(width, height, depth) * spacing;
 		postion = start;
 		this->spacing = spacing;
-	
-		std::cout << "Starting configure \n";
-		std::vector<GLubyte> blackData(width * height * 4, 0); // RGBA all zeros (black)
 
-		for (float x = 0; x < width; x++) {
-			for (float y = 0; y < height; y++) {
-				for (float z = 0; z < depth; z++) {
-					probes.push_back(Probe(glm::vec3(x / spacing, y / spacing, z / spacing) + start));
-					positions.push_back(glm::vec3(x / spacing, y / spacing, z / spacing));
-					
+		// Pre-calculate total number of probes to avoid multiple calculations
+		const size_t totalProbes = static_cast<size_t>(width) * height * depth;
+
+		// Reserve memory upfront to prevent reallocations
+		probes.reserve(totalProbes);
+		positions.reserve(totalProbes);
+
+		std::cout << "Starting configure \n";
+
+		// Single precalculation of start offset scaled by inverse spacing
+		const glm::vec3 scaledStart = start * invSpacing;
+
+		// Flattened loop structure with integer indices
+		for (int x = 0; x < width; ++x) {
+			const float xPos = static_cast<float>(x) + scaledStart.x;
+			for (int y = 0; y < height; ++y) {
+				const float yPos = static_cast<float>(y) + scaledStart.y;
+				for (int z = 0; z < depth; ++z) {
+					const float zPos = static_cast<float>(z) + scaledStart.z;
+
+					// Create position vector once and reuse
+					const glm::vec3 pos(xPos, yPos, zPos);
+
+					probes.emplace_back(pos * spacing);
+					positions.push_back(pos * spacing);
 				}
 			}
 		}
 
-		glCreateBuffers(1, &b_probePosition);
-
 		glNamedBufferStorage(
 			b_probePosition,
 			sizeof(glm::vec3) * positions.size(),
-			(const void*)positions.data(),
+			positions.data(),
 			GL_DYNAMIC_STORAGE_BIT
 		);
-
 
 		std::cout << "Done configure \n";
 		doneConfigure = 1;

@@ -27,8 +27,6 @@ namespace Player
 	float smoothFactor = 0.1f;
 	float speed = 5000;
 
-	const float runningSpeed = 8500;
-	const float walkingSpeed = 6000;
 
 	float airSpeed = 1000;
 	float MaxSpeed = 6;
@@ -329,12 +327,16 @@ namespace Player
 			movement.y = 1 * jumpforce;
 		}
 		if (Input::LeftShiftDown()) {
-			speed = runningSpeed;
+			speed = RUNNINGSPEED;
 			footstep_interval = runningfootstep_interval;
+		}
+		else if (Input::KeyDown(CROUCH)) {
+			speed = CRROUCHINGSPEED;
+			footstep_interval = walkingfootstep_interval * 2;
 		}
 			
 		else {
-			speed = walkingSpeed;
+			speed = WALKINGSPEED;
 			footstep_interval = walkingfootstep_interval;
 		}
 			
@@ -377,7 +379,7 @@ namespace Player
 
 		}
 
-		if (Input::RightMouseDown() && !reloading && WeaponManager::GetGunByName(gunName)->type != Melee) {
+		if (Input::RightMouseDown() && !reloading && WeaponManager::GetGunByName(gunName)->type != Melee && gunName != "nothing") {
 			aiming = true;
 		}
 		else {

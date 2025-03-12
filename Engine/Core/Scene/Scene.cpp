@@ -13,10 +13,11 @@ void Scene::LoadAssets() {
 	//Thank you to tokyosplif for some of the models and sounds
 
 	AssetManager::AddTexture("white", "Assets/Textures/white.png", 0.5, 0.0);
+	AssetManager::AddTexture("cornel", "Assets/Textures/cornel-box.png", 0.8, 0.0);
+
+	
 	AssetManager::AddTexture("white_light", "Assets/Textures/white.png", 0.5, 0.0);
 	AssetManager::GetTexture("white_light")->SetEmissive(true);
-	AssetManager::AddTexture("red_glass", "Assets/Textures/red_glass.png", 0.1, 0.9);
-	AssetManager::AddTexture("green_glass", "Assets/Textures/green_glass.png", 0.1, 0.9);
 	AssetManager::AddTexture("panda", "Assets/Textures/panda_decal.png", 0, 0);
 	AssetManager::AddTexture("flower", "Assets/Textures/flower_decal.png", 0, 0);
 	AssetManager::AddTexture("freaky", "Assets/Textures/freaky_decal.png", 0, 0);
@@ -25,18 +26,11 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("crate", "Assets/Textures/crate.png", 0.7, 0);
 	AssetManager::AddTexture("window", "Assets/Textures/window.png", 0.7, 0);
 	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png","Assets/Normals/window_normal.png", 0.5, 0);
-	AssetManager::AddTexture("sand", "Assets/Textures/sandyGround.png", "Assets/Normals/sand_normal.png", 0.9, 0);
-	AssetManager::AddTexture("concrete_fence", "Assets/Textures/fence.png", "Assets/Normals/fence_normal.png", 0.9, 0);
 	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png", 0.5, 0.5);
-	AssetManager::AddTexture("door", "Assets/Textures/door.png", "Assets/Normals/door_normal.png", 0.6, 0);
 	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png", 0.2, 0.7);
 	AssetManager::AddTexture("drawer", "Assets/Textures/drawerred.png", "Assets/Normals/drawer_normal.png", 0.7, 0);
 	AssetManager::AddTexture("lamp", "Assets/Textures/lamp.png", "Assets/Normals/lamp_normal.png", 0.7, 0.1);
-	AssetManager::AddTexture("beige_wall", "Assets/Textures/beige_wall.jpg", "Assets/Normals/beige_wall_normal.jpg", 0.7, 0);
-	AssetManager::AddTexture("wooden_floor", "Assets/Textures/wooden_floor.jpg", "Assets/Normals/wooden_floor_normal.jpg", 0.2, 0.2);
 	AssetManager::AddTexture("arm", "Assets/Textures/Arm_COL.png", "Assets/Normals/Arm_NOR.png", 0.7, 0);
-	AssetManager::AddTexture("brick", "Assets/Textures/brick.png", "Assets/Normals/bricks_normal.png", "Assets/Roughness/brick_roughness.png", 0);
-	AssetManager::AddTexture("sand_ground", "Assets/Textures/brick.png", "Assets/Normals/test.jpg", 0.1f, 0.9f);
 	//Mehdi Shahsavan credits for some of these models
 	AssetManager::AddTexture("ladder", "Assets/Textures/ladder.png", "Assets/Normals/ladder_normal.png", "Assets/Roughness/ladder_roughness.png", "Assets/Metalic/ladder_metallic.png");
 	AssetManager::AddTexture("pallet", "Assets/Textures/pallet.png", "Assets/Normals/pallet_normal.png", "Assets/Roughness/pallet_roughness.png", "Assets/Metalic/pallet_metallic.png");
@@ -55,7 +49,6 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("double_barrel_shotgun_wooden_grip_large", "Assets/Objects/FBX/DoubleBarrel/Wooden Grip Large_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Wooden Grip Large_normal.png", "Assets/Objects/FBX/DoubleBarrel/Wooden Grip Large_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Wooden Grip Large_metallic.jpg");
 	AssetManager::AddTexture("double_barrel_shotgun_metal_receiver", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_normal.png", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_metallic.jpg");
 
-	AssetManager::AddTexture("glass", "Assets/Textures/glass.png", 0.1, 1);
 	AssetManager::AddTexture("transparent", "Assets/Textures/glass.png", 0, 0);
 
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
@@ -134,8 +127,8 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("map_indirectLight", Model("Assets/Maps/lightingTest.obj", AssetManager::GetTexture("white")));
 	AssetManager::AddModel("water", Model("Assets/Objects/FBX/water_test.obj", AssetManager::GetTexture("white")));
 
-	AssetManager::AddModel("GI_map_1", Model("Assets/Maps/Gl_Test_1.obj", AssetManager::GetTexture("white")));
-
+	AssetManager::AddModel("GI_map_1", Model("Assets/Maps/cornel_box.obj", AssetManager::GetTexture("cornel")));
+	
 	/*
 	Model* model = AssetManager::GetModel("map_test1");
 	model->GetMeshByName("floor.001")->SetTexture(AssetManager::GetTexture("sand_ground"));
@@ -177,6 +170,7 @@ void Scene::Load() {
 	AssetManager::GetGameObject("GI_map_1")->IncludInGI(true);
 
 
+
 	//AssetManager::AddGameObject("map_test2", AssetManager::GetModel("map_test2"), glm::vec3(0, 0, 0), true, 0, Concave);
 	//AssetManager::GetGameObject("map_test2")->IncludInRayCast();
 	//AssetManager::GetGameObject("map_test2")->IncludInGI(true);
@@ -184,8 +178,8 @@ void Scene::Load() {
 	//AssetManager::AddGameObject("ladder", AssetManager::GetModel("ladder"), glm::vec3(0, 2, 0), true, 0, Convex);
 	//AssetManager::GetGameObject("ladder")->SetRotationX(-1.5708f);
 
-	AssetManager::AddGameObject("vase", AssetManager::GetModel("vase"), glm::vec3(-2.77, 2, -2.5), true, 0, Convex);
-	AssetManager::GetGameObject("vase")->SetRotationX(-1.5708f);
+	//AssetManager::AddGameObject("vase", AssetManager::GetModel("vase"), glm::vec3(-2.77, 2, -2.5), true, 0, Convex);
+	//AssetManager::GetGameObject("vase")->SetRotationX(-1.5708f);
 
 
 	//AssetManager::AddGameObject("shelf", AssetManager::GetModel("shelf"), glm::vec3(4.30, 2, 2.97), true, 0, Convex);
@@ -211,7 +205,7 @@ void Scene::Load() {
 
 	{
 		Light light(glm::vec3(6.13, 4.5, 5.3), glm::vec3(1, 0.11, 0) * 6.0f, 0.22, 0.20);
-		lights.push_back(light);
+		//lights.push_back(light);
 	}
 	{
 		Light light(glm::vec3(-4.44, 2, 0), glm::vec3(0, 0.573, 1) * 6.0f, 0.22, 0.20);
@@ -222,7 +216,7 @@ void Scene::Load() {
 		//lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(0, 4, 0), glm::vec3(1, 0.878, 0.471) * 8.0f, 0.014,	0.0007);
+		Light light(glm::vec3(0, 3.8, 0), glm::vec3(1, 1, 1) * 10.0f, 0.07, 0.017);
 		lights.push_back(light);
 	}
 
@@ -243,7 +237,7 @@ void Scene::Update(float deltaTime) {
 	// Calculate new Z position
 	float newY = 9 + amplitude * glm::sin(time * speed);
 	// Update light position
-	lights[1].position.y = newY;
+	//lights[1].position.y = newY;
 
 	for (int i = 0; i < lights.size(); i++) {
 		if(glm::distance(lights[i].position,Player::getPosition()) < lights[i].updateDistance && lights[i].Dynamic)

@@ -72,7 +72,7 @@ uniform int lightingState;
 
 const float PI = 3.1415926535897932384626433832795;
 const float e = 2.71828182845904;
-const float far_plane = 30.0; // Constant, moved outside main
+const float far_plane = 25; // Constant, moved outside main
 vec3 gridSamplingDisk[20] = vec3[]
 (
    vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
@@ -419,12 +419,39 @@ vec3 interpolate3D(vec3 v1, vec3 v2, vec3 v3, vec3 v4, vec3 v5, vec3 v6, vec3 v7
 }
 
 
+
 vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
+
+
     vec3 gridCoords = (fragWorldPos - gridWorldPos) / spacing;
     ivec3 base = ivec3(floor(gridCoords));
     vec3 a = gridCoords - base;
     int probeID = int(texelFetch(probeGrid, base + offset,0).r);
     vec3 probe_worldPos = (base + offset) + gridWorldPos * spacing;
+    vec3 dir =   probe_worldPos - fragWorldPos;
+
+    vec3 v = normalize(dir); // TODO: no need to normalize if only checking sign
+    float vdotn = dot(v, Normal);
+    vec3 weights = mix(1. - a, a, offset);
+
+    //There was an issue where it will always sample pos offset, but if the normal is facing in the negative dir then the weight will spit out 0 becuase of the vdotn > -0.0.
+    //I fixed this by checking if the normal is in the negative and then sampling negative offset. theres still a few artifacts where it switches from pos to neg but its alot better then beofre
+ 
+    bool flipped = false;
+    if(vdotn < -0.0) {
+        // Use flipped offset (-offset) and adjust blend factor
+        probeID = int(texelFetch(probeGrid, base - offset, 0).r);
+        probe_worldPos = gridWorldPos + vec3(base - offset) * spacing; // Correct position
+
+        dir = probe_worldPos - fragWorldPos;
+        v = normalize(dir);
+        vdotn = dot(v, Normal);
+
+        // Invert blend factor for flipped direction
+        weights = mix(1.0 - a, a, 1.0 - vec3(offset)); 
+        flipped = true;
+    }
+    
 
 
     #if (myL >= 1)
@@ -444,23 +471,17 @@ vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
 	#endif
 
 
-    
-    //vec3 v = (probe_worldPos - fragWorldPos);
-    vec3 dir =   probe_worldPos - fragWorldPos;
-
     vec3 probe_color =  GetRadianceFromSH(shRadiance, dir);
 
-    vec3 v = normalize(dir); // TODO: no need to normalize if only checking sign
-    float vdotn = dot(v, Normal);
-    vec3 weights = mix(1. - a, a, offset);
 
 
-    if(vdotn > -0.0) //&& length(probeLenght) < length(dir))
+    if(vdotn > -0.0 && probe_color != vec3(0) && !flipped)
+        weight = weights.x * weights.y * weights.z;
+    else if(probe_color != vec3(0) && flipped)
         weight = weights.x * weights.y * weights.z;
     else
-        weight = 0.;        
+        weight = 0.0;        
     return probe_color;
-
 }
 
 
@@ -480,6 +501,7 @@ vec3 GetIndirectLighting(vec3 WorldPos, vec3 Normal) { // Interpolate visible pr
 
     return indirectLighting;
 }
+
 
 
 
@@ -582,12 +604,15 @@ void main() {
 
     if(lightingState == 0)
         gLighting = vec4(color, spec);// + vec4(albedo * 0.2,1);
-    if(lightingState == 1){
-        
-         directlight =  directlight / ( directlight + vec3(1.0));
-        gLighting = vec4( directlight,1);
-    }
+    if(lightingState == 1)
+        gLighting = vec4(directlight / ( directlight + vec3(1.0)),1);
     if(lightingState == 2)
         gLighting = vec4(adjustedIndirectLighting,1);
+    if(lightingState == 3)
+        gLighting = vec4(albedo,1);
+    if(lightingState == 4)
+        gLighting = vec4(N,1);
+    if(lightingState == 5)
+        gLighting = vec4(FragPos,1);
 
 }

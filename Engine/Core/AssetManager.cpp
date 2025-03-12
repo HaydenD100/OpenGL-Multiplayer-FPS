@@ -175,6 +175,7 @@ namespace AssetManager
 	}
 	Model* AssetManager::AddModel(std::string name, const char* path, Texture* texture) {
 		models[name] = Model(path, texture);
+		models[name].SetName(name);
 		return &models[name];
 	}
 	Model* AssetManager::AddModel(std::string name, Model model) {

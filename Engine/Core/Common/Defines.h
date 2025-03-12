@@ -40,11 +40,13 @@ enum Controls {
 	RIGHT = 'd',
 	BACKWARD = 's',
 	JUMP = ' ',
+	CROUCH = 'c',
 	RELOAD = 'r',
 	INTERACT = 'e',
 	SPRAYPAINT = 'g',
 	CYCLESPRAY = 't',
 	RELOADSHADERS = 'h',
 	BAKEGI= 'j',
-	SHOWPROBES = 'y'
+	PROBETOGGLE = 'y',
+	GUITOGGLE = 'u'
 };
