@@ -190,7 +190,7 @@ void Mesh::Render(GLuint programID) {
         currentTexture = AssetManager::GetMissingTexture();
     }
 
-
+    //S_solidColor Shader handels all the materials outside of mesh class
     if (programID != Renderer::s_SolidColor.GetShaderID()) {
         glBindTextureUnit(0, currentTexture->GetTexture());
 
@@ -201,7 +201,6 @@ void Mesh::Render(GLuint programID) {
             glUniform1i(glGetUniformLocation(programID, "HasNormalMap"), true);
         }
            
-
         glBindTextureUnit(2, currentTexture->GetTextureRoughness());
         glBindTextureUnit(3, currentTexture->GetTextureMetalic());
         glUniform1f(glGetUniformLocation(programID, "Roughness"), currentTexture->GetRoughness());

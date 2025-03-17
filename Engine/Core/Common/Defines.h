@@ -2,14 +2,7 @@
 #define GLM_FORCE_SILENT_WARNINGS
 #define GLM_ENABLE_EXPERIMENTAL
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include "glm/gtx/hash.hpp"
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-
-#define SHADOW_MAP_SIZE 1024
+#define SHADOW_MAP_SIZE 4096
 #define SHADOW_NEAR_PLANE 0.05f
 #define SHADOW_FAR_PLANE 30.0f
 #define ENGINE_PI 3.141592653589793238462643
@@ -31,6 +24,14 @@
 #define MAXDECALS 3000
 
 #define MOUSE_SENSITIVITY = 0.002f;
+
+#define RED glm::vec3(1,0,0)
+#define GREEN glm::vec3(0,1,0)
+#define BLUE glm::vec3(0,0,1)
+#define YELLOW glm::vec3(1,1,0)
+#define PURPLE glm::vec3(1,0,1)
+#define CYAN glm::vec3(0,1,1)
+
 
 enum Controls {
 	RESPAWN = 'p',

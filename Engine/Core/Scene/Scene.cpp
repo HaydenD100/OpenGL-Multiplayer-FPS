@@ -8,13 +8,14 @@ Scene::Scene() {
 }
 
 void Scene::LoadAssets() {
-	AssetManager::ClearAssets();
-	AnimationManager::ClearAnimations();
-	//Thank you to tokyosplif for some of the models and sounds
+	//AssetManager::ClearAssets();
+	//AnimationManager::ClearAnimations();
+	//Thank you to Tokyosplif for some of the models and sounds
+	//Mehdi Shahsavan credits for some of these models
+
 
 	AssetManager::AddTexture("white", "Assets/Textures/white.png", 0.5, 0.0);
 	AssetManager::AddTexture("cornel", "Assets/Textures/cornel-box.png", 0.8, 0.0);
-
 	
 	AssetManager::AddTexture("white_light", "Assets/Textures/white.png", 0.5, 0.0);
 	AssetManager::GetTexture("white_light")->SetEmissive(true);
@@ -31,7 +32,6 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("drawer", "Assets/Textures/drawerred.png", "Assets/Normals/drawer_normal.png", 0.7, 0);
 	AssetManager::AddTexture("lamp", "Assets/Textures/lamp.png", "Assets/Normals/lamp_normal.png", 0.7, 0.1);
 	AssetManager::AddTexture("arm", "Assets/Textures/Arm_COL.png", "Assets/Normals/Arm_NOR.png", 0.7, 0);
-	//Mehdi Shahsavan credits for some of these models
 	AssetManager::AddTexture("ladder", "Assets/Textures/ladder.png", "Assets/Normals/ladder_normal.png", "Assets/Roughness/ladder_roughness.png", "Assets/Metalic/ladder_metallic.png");
 	AssetManager::AddTexture("pallet", "Assets/Textures/pallet.png", "Assets/Normals/pallet_normal.png", "Assets/Roughness/pallet_roughness.png", "Assets/Metalic/pallet_metallic.png");
 	AssetManager::AddTexture("knife", "Assets/Textures/knife.png", "Assets/Normals/knife_normal.png", "Assets/Roughness/knife_roughness.png", "Assets/Metalic/knife_metallic.png");
@@ -127,7 +127,7 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("map_indirectLight", Model("Assets/Maps/lightingTest.obj", AssetManager::GetTexture("white")));
 	AssetManager::AddModel("water", Model("Assets/Objects/FBX/water_test.obj", AssetManager::GetTexture("white")));
 
-	AssetManager::AddModel("GI_map_1", Model("Assets/Maps/cornel_box.obj", AssetManager::GetTexture("cornel")));
+	AssetManager::AddModel("GI_map_1", Model("Assets/Maps/test_ity.fbx", AssetManager::GetTexture("white")));
 	
 	/*
 	Model* model = AssetManager::GetModel("map_test1");
@@ -168,6 +168,7 @@ void Scene::Load() {
 
 	AssetManager::AddGameObject("GI_map_1", AssetManager::GetModel("GI_map_1"), glm::vec3(0, 0, 0), true, 0, Concave);
 	AssetManager::GetGameObject("GI_map_1")->IncludInGI(true);
+	//AssetManager::GetGameObject("GI_map_1")->SetRotationX(-1.5708f);
 
 
 
@@ -216,7 +217,7 @@ void Scene::Load() {
 		//lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(0, 3.8, 0), glm::vec3(1, 1, 1) * 10.0f, 0.07, 0.017);
+		Light light(glm::vec3(-11, 25, -8), glm::vec3(1, 1, 1) * 2.0f, 10, 50);
 		lights.push_back(light);
 	}
 

@@ -1,5 +1,26 @@
 #include "Texture.h"
 
+
+Texture::Texture(aiTexture* aitexture, std::string name) {
+    this->name = name;
+    this->roughness = 0.5;
+    this->metalic = 0;
+
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    std::cout << "Loading Embbeded Texture \n";
+
+    // Set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    GLenum format = GL_RGBA;
+    glTexImage2D(GL_TEXTURE_2D, 0, format, aitexture->mWidth, aitexture->mHeight,
+        0, format, GL_UNSIGNED_BYTE, aitexture->pcData);
+}
+
 Texture::Texture(const char* name, const char* path, float Roughness, float Metalic) {
 	this->name = name;
     this->roughness = Roughness;

@@ -272,7 +272,7 @@ namespace AssetManager
 		}
 		std::cout << "Texture: " << name << " doesnt exsit \n";
 
-		return nullptr;
+		return &missing_texture;
 	}
 
 	size_t AddSkinnedAnimation(SkinnedAnimation skinnedanimation) {

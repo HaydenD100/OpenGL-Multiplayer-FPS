@@ -57,12 +57,12 @@ void ProbeGrid::Bake(std::vector<Light> lights) {
 	Renderer::s_probeDeffered.SetFloat("spacing", spacing);
 
 	Renderer::probeTexture.ImageBind(6);
-	//glDisable(GL_CULL_FACE);
+	glDisable(GL_CULL_FACE);
 
 	for (int i = 0; i < probes.size(); i++) {
 		probes[i].Bake();
 	}
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 
 
 	FillBuffer();
@@ -95,8 +95,7 @@ void ProbeGrid::ReLight(int probeRelightCount) {
 	for (int i = 0; i < scene->GetLightsSize(); i++) {
 		Renderer::cs_probeIrradiance.SetVec3("lights[" + std::to_string(i) + "].position", scene->GetLight(i)->position);
 		Renderer::cs_probeIrradiance.SetVec3("lights[" + std::to_string(i) + "].color", scene->GetLight(i)->colour);
-		Renderer::cs_probeIrradiance.SetFloat("lights[" + std::to_string(i) + "].linear", scene->GetLight(i)->linear);
-		Renderer::cs_probeIrradiance.SetFloat("lights[" + std::to_string(i) + "].quadratic", scene->GetLight(i)->quadratic);
+		Renderer::cs_probeIrradiance.SetFloat("lights[" + std::to_string(i) + "].strength", scene->GetLight(i)->strength);
 		Renderer::cs_probeIrradiance.SetFloat("lights[" + std::to_string(i) + "].radius", scene->GetLight(i)->radius);
 
 		glActiveTexture(GL_TEXTURE5 + i); // Activate texture unit i

@@ -2,8 +2,6 @@
 #include <iostream>
 #include <cctype>
 
-#include <glm/glm.hpp>
-
 #include "Engine/Backend.h"
 #include "Engine/Core/Common/Header.h"
 

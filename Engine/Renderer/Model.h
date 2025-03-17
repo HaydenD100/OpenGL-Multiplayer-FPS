@@ -54,7 +54,6 @@ private:
     std::vector<Mesh> meshes;
     int currentMesh = 0;
     std::string name;
-
     std::map<std::string, BoneInfo> m_BoneInfoMap; //
     int m_BoneCounter = 0;
 

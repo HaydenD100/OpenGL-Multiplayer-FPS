@@ -64,6 +64,9 @@ namespace Renderer
 	GLuint quad_vertexbuffer;
 	GLuint depthTexture;
 	GLuint cubeVBO;
+	GLuint pointVBO, pointVAO;
+	GLuint lineVAO, lineVBO;
+
 
 	//ssao
 	std::vector<glm::vec3> ssaoKernel;
@@ -108,6 +111,8 @@ namespace Renderer
 	Shader s_textShader;
 	Shader s_downScale;
 	Shader s_upScale;
+	Shader s_drawPoint;
+	Shader s_drawLine;
 
 	ComputeShader cs_probeIrradiance;
 	ComputeShader cs_Raycaster;
@@ -165,6 +170,7 @@ namespace Renderer
 		s_fxaa.Load("Assets/Shaders/fxaa/fxaa.vert", "Assets/Shaders/fxaa/fxaa.frag");
 		s_water.Load("Assets/Shaders/Water/water.vert", "Assets/Shaders/Water/water.frag");
 		s_textShader.Load("Assets/Shaders/textShader.vert", "Assets/Shaders/textShader.frag");
+		s_drawPoint.Load("Assets/Shaders/Debug/point.vert", "Assets/Shaders/Debug/point.frag");
 
 		cs_probeIrradiance.Load("Assets/Shaders/GI/irradiance.comp");
 
@@ -348,6 +354,11 @@ namespace Renderer
 		glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
 
+		glGenVertexArrays(1, &pointVAO);
+		glGenBuffers(1, &pointVBO);
+
+		glGenVertexArrays(1, &lineVAO);
+		glGenBuffers(1, &lineVBO);
 
 
 		glGenTextures(1, &noiseTexture);
@@ -361,15 +372,15 @@ namespace Renderer
 
 
 		
-		Raycaster::Init();
+		//Raycaster::Init();
 
 		//this is the projection to voxlize the scene from orgin (0,0,0) while the other one is the view of the camera
 		//voxel_orth = glm::ortho(-((float)voxelize_scene_albedo.GetWidth() / 2.0f), (float)voxelize_scene_albedo.GetWidth() / 2.0f, (float)voxelize_scene_albedo.GetWidth() / 2.0f, -((float)voxelize_scene_albedo.GetWidth() / 2.0f), -(float)voxelize_scene_albedo.GetWidth()/2.0f, (float)voxelize_scene_albedo.GetWidth()/2.0f);
-		float spacing = 0.5;
-		glm::vec3 propgationGridSize = glm::vec3(5.5, 6, 5.5);
+		float spacing = 4;
+		glm::vec3 propgationGridSize = glm::vec3(35, 26, 35);
 		//glm::vec3 propgationGridSize = glm::vec3(1, 4, 1);
-		//glm::vec3 gridPos = glm::vec3(-11.6, -1.2, -6);
-		glm::vec3 gridPos = glm::vec3(-2.5, -1, -2.5);
+		glm::vec3 gridPos = glm::vec3(-35.0f/2.0f, -1.2, -35.0f/2.0f);
+		//glm::vec3 gridPos = glm::vec3(-2.5, -1, -2.5);
 
 		probeTexture.Create(glm::ceil(propgationGridSize.x / spacing), glm::ceil(propgationGridSize.y / spacing), glm::ceil(propgationGridSize.z / spacing));
 		probeGrid.Configure(propgationGridSize.x, propgationGridSize.y, propgationGridSize.z, spacing, gridPos);
@@ -444,40 +455,15 @@ namespace Renderer
 
 
 		for (int i = 0; i < lights.size();i++) {
-			//ightPositions.push_back(light.position);
-			//lightDirection.push_back(light.direction);
-			//lightColors.push_back(light.colour);
-			//LightLinears.push_back(light.linear);
-			//LightQuadratics.push_back(light.quadratic);
-			//LightRadius.push_back(light.radius);
-			//LightCutoff.push_back(light.cutoff);
-			//LightOuterCutOff.push_back(light.outercutoff);
-
+	
 			shader->SetVec3("lights[" + std::to_string(i) + "].position",lights[i].position);
 			shader->SetVec3("lights[" + std::to_string(i) + "].color", lights[i].colour);
-			shader->SetFloat("lights[" + std::to_string(i) + "].linear", lights[i].linear);
-			shader->SetFloat("lights[" + std::to_string(i) + "].quadratic", lights[i].quadratic);
-			shader->SetFloat("lights[" + std::to_string(i) + "].radius", lights[i].quadratic);
+			shader->SetFloat("lights[" + std::to_string(i) + "].strength", lights[i].strength);
+			shader->SetFloat("lights[" + std::to_string(i) + "].radius", lights[i].radius);
 
 			glActiveTexture(GL_TEXTURE8 + i); // Activate texture unit i
 			glBindTexture(GL_TEXTURE_CUBE_MAP, lights[i].depthCubemap); // Bind the depth cubemap to the texture unit
 		}
-
-
-		//shader->SetVec3Array("LightPositions_worldspace", lightPositions);
-		//shader->SetVec3Array("Lightdirection", lightDirection);
-		//shader->SetVec3Array("LightColors", lightColors);
-		//shader->SetFloatArray("LightLinears", LightLinears);
-		//shader->SetFloatArray("LightQuadratics", LightQuadratics);
-		//shader->SetFloatArray("LightRadius", LightRadius);
-		//shader->SetFloatArray("LightCutOff", LightCutoff);
-		//shader->SetFloatArray("LightOuterCutOff", LightOuterCutOff);
-
-		// Upload depth maps (cubemap for shadow mapping)
-		//for (int i = 0; i < lights.size(); i++) {
-			//glActiveTexture(GL_TEXTURE8 + i); // Activate texture unit i
-			//glBindTexture(GL_TEXTURE_CUBE_MAP, lights[i].depthCubemap); // Bind the depth cubemap to the texture unit
-		//}
 	}
 
 	
@@ -530,23 +516,9 @@ namespace Renderer
 	}
 
 	void Renderer::RenderScene() {
-		//SoftwareRaycaster::queueRay(glm::vec3(0, 0, 1), glm::vec3(-1.97, 6.7, -0.8), 20);
-		//SHBuffer.Bind(7);
-		//probeGrid.BindCubeMapArray(5);
-		//Raycaster::Compute();
 
 		//--------------------------------------------PROBE-------------------------------------------	
 		Renderer::probeGrid.ReLight(UPDATED_PROBE_COUNT_PER_FRAME);
-
-		//Should really only do this with one probe in the grid for debugging purposes
-		//cs_Raycaster.Use();
-		//probeTexture.Bind(6);
-		//Raycaster::Bind();
-		//Raycaster::Compute();
-		//cs_Raycaster.SetVec3("gridWorldPos", probeGrid.postion);
-		//cs_Raycaster.SetVec3("volume", probeGrid.volume);
-		//cs_Raycaster.SetFloat("spacing", probeGrid.spacing);
-		//cs_Raycaster.SetInt("indicesSize", Raycaster::GetIndicesSize());
 
 		Renderer::CheckDebugState();
 
@@ -560,9 +532,6 @@ namespace Renderer
 		s_geomerty.Use();
 		s_geomerty.SetMat4("P", Camera::getProjectionMatrix());
 		s_geomerty.SetMat4("V", Camera::getViewMatrix());
-
-		//glBindTextureUnit(4, AssetManager::GetTexture("normal")->GetTextureNormal());
-
 
 		NeedRendering.clear();
 		glm::mat4 ViewMatrix = Camera::getViewMatrix();
@@ -600,6 +569,10 @@ namespace Renderer
 			gameobjectRender->RenderObject(s_geomerty.GetShaderID());
 		}
 
+
+
+
+		//This can be removed later but it just renders a cube thats glowing to show where point lights are
 		s_SolidColor.Use();
 		s_SolidColor.SetMat4("P", Camera::getProjectionMatrix());
 		s_SolidColor.SetMat4("V", Camera::getViewMatrix());
@@ -611,7 +584,7 @@ namespace Renderer
 
 		std::vector<Light> lights = SceneManager::GetCurrentScene()->getLights();
 		for (int i = 0; i < lights.size(); i++) {
-			s_SolidColor.SetVec3("color", lights[i].colour / 8.0f);
+			s_SolidColor.SetVec3("color", lights[i].colour);
 			glm::mat4 positionMatrix = glm::mat4(); // create an identity matrix;
 			positionMatrix = glm::translate(positionMatrix, lights[i].position); //position is a vec3
 			s_SolidColor.SetMat4("M", positionMatrix);
@@ -623,6 +596,8 @@ namespace Renderer
 
 		//-----------------------------------------Decal---------------------------------------
 		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		s_decal.Use();
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.Depth);
@@ -701,7 +676,7 @@ namespace Renderer
 			NeedRendering[i]->RenderObject(s_transparent.GetShaderID());
 		}
 
-
+		/*
 		s_water.Use();
 		s_water.SetMat4("P", Camera::getProjectionMatrix());
 		s_water.SetMat4("V", Camera::getViewMatrix());
@@ -731,9 +706,9 @@ namespace Renderer
 			s_water.SetMat4("M", ModelMatrix);
 			waterObjects[i]->RenderObject(s_water.GetShaderID());
 		}
-
+		*/
 		glDisable(GL_BLEND);
-
+		
 		//---------------------------------------------------Overlay-------------------------------------
 		s_geomerty.Use();
 
@@ -762,7 +737,6 @@ namespace Renderer
 
 			overlay[i]->RenderObject(s_geomerty.GetShaderID());
 		}
-
 
 		//------------------------------------------------RAYCAST DEBUG--------------------------------
 		/*
@@ -822,7 +796,6 @@ namespace Renderer
 		SHBuffer.Bind(7);
 		probeTexture.Bind(6);
 
-		
 		s_lighting.SetVec3("viewPos", Camera::GetPosition());
 		s_lighting.SetMat4("inverseV", glm::inverse(Camera::getViewMatrix()));
 		s_lighting.SetMat4("V", Camera::getViewMatrix());
@@ -830,13 +803,7 @@ namespace Renderer
 		s_lighting.SetVec3("gridWorldPos", probeGrid.postion);
 		s_lighting.SetVec3("volume", probeGrid.volume);
 		s_lighting.SetFloat("spacing", probeGrid.spacing);
-
-
-
-			
-
 		s_lighting.SetInt("lightingState", lightingState);
-
 
 		RenderPlane();
 
@@ -982,5 +949,43 @@ namespace Renderer
 				DebugState = ShowProbes | ShowProbes;
 		}
 			
+	}
+
+
+	
+	void Renderer::DrawPoint(glm::vec3 position, glm::vec3 colour) {
+		s_drawPoint.Use();
+
+		glBindVertexArray(pointVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, pointVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3), &position, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+		s_drawPoint.SetVec3("Colour", colour);
+		s_drawPoint.SetMat4("V", Camera::getViewMatrix());
+		s_drawPoint.SetMat4("P", Camera::getProjectionMatrix());
+		glEnable(GL_PROGRAM_POINT_SIZE);
+
+		glDrawArrays(GL_POINTS, 0, 1);
+		glDisableVertexAttribArray(0);
+
+	}
+	void Renderer::DrawLine(glm::vec3 position1, glm::vec3 position2, glm::vec3 colour) {
+		float lineVertices[] = {
+		position1.x, position1.y, position1.z,
+		position2.x, position2.y, position2.z
+		};
+		glBindVertexArray(lineVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, lineVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(lineVertices), lineVertices, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+		s_drawLine.Use();
+		s_drawLine.SetVec3("Colour", colour);
+		s_drawLine.SetMat4("V", Camera::getViewMatrix());
+		s_drawLine.SetMat4("P", Camera::getProjectionMatrix());
+		glBindVertexArray(lineVAO);
+		glDrawArrays(GL_LINES, 0, 2); 
+		glDisableVertexAttribArray(0);
 	}
 }

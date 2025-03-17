@@ -44,23 +44,13 @@ uniform sampler2D gFinal;
 struct Light{
     vec3 position;
     vec3 color;
-    float linear;
-    float quadratic;
+    float strength;
     float radius;
     samplerCube depthMap;
 };
 uniform Light[MAXLIGHTS] lights;
 
 
-//uniform vec3 LightColors[MAXLIGHTS];
-//uniform vec3 LightPositions_worldspace[MAXLIGHTS];
-//uniform vec3 Lightdirection[MAXLIGHTS];
-//uniform float LightLinears[MAXLIGHTS];
-//uniform float LightQuadratics[MAXLIGHTS];
-//uniform float LightRadius[MAXLIGHTS];
-//uniform float LightCutOff[MAXLIGHTS];
-//uniform float LightOuterCutOff[MAXLIGHTS];
-//uniform samplerCube depthMap[MAXLIGHTS];
 
 
 uniform vec3 viewPos;
@@ -72,7 +62,6 @@ uniform int lightingState;
 
 const float PI = 3.1415926535897932384626433832795;
 const float e = 2.71828182845904;
-const float far_plane = 25; // Constant, moved outside main
 vec3 gridSamplingDisk[20] = vec3[]
 (
    vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
@@ -106,11 +95,11 @@ float ShadowCalculation(vec3 fragPos, int index, vec3 N){
 
     int samples = 20;
     float viewDistance = length(viewPos - fragPos);
-    float diskRadius = (1.0 + (viewDistance / far_plane)) / 200;
+    float diskRadius = (1.0 + (viewDistance / lights[index].radius)) / 200;
     for(int i = 0; i < samples; ++i)
     {
         float closestDepth = texture(lights[index].depthMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
-        closestDepth *= far_plane;   // undo mapping [0;1]
+        closestDepth *= lights[index].radius;   // undo mapping [0;1]
         if(currentDepth - bias > closestDepth)
             shadow += 1.0;
     }
@@ -506,7 +495,6 @@ vec3 GetIndirectLighting(vec3 WorldPos, vec3 Normal) { // Interpolate visible pr
 
 
 
-
 void main() {
     float threshold = 0.0009; // Distance threshold
     if (length(UV - vec2(0.5, 0.5)) <= threshold) {
@@ -559,8 +547,11 @@ void main() {
         // Calculate distance between light and fragment
         vec3 L = normalize(lights[i].position - FragPos);
         float distance = length(lights[i].position - FragPos);
-        float attenuation = 1.0 / (1.0 + lights[i].linear * distance + lights[i].quadratic * (distance * distance));
-        vec3 radiance = lights[i].color * attenuation;
+        //float attenuation = 1.0 / (1.0 + lights[i].linear * distance + lights[i].quadratic * (distance * distance));
+        //vec3 radiance = lights[i].color * attenuation;
+
+        vec3 radiance = lights[i].strength * lights[i].color;// * 1.25;
+	    float attenuation = smoothstep(lights[i].radius, 0,  distance);
 
         // Cook-Torrance BRDF
         vec3 H = normalize(Vpos + L);
@@ -596,8 +587,7 @@ void main() {
 
     // HDR and gamma correction
     color = color / (color + vec3(1.0));
-    // color = albedo.xyz;
-    // color = albedo.xyz;
+
     if(isDead)
         color = color + vec3(1,-0.2,-0.2);
 

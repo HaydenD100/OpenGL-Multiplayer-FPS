@@ -231,7 +231,7 @@ namespace Player
 	
 	bool Player::OnGround() {
 		GameObject* player = AssetManager::GetGameObject("player");
-		glm::vec3 out_end = player->getPosition() + glm::vec3(0,-1.1,0);
+		glm::vec3 out_end = player->getPosition() + glm::vec3(0,-1.2,0);
 
 		btCollisionWorld::ClosestRayResultCallback RayCallback(
 			btVector3(player->getPosition().x, player->getPosition().y, player->getPosition().z),

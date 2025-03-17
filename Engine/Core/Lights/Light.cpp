@@ -1,38 +1,35 @@
 #include "Light.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Core/Scene/SceneManager.h"
-Light::Light(glm::vec3 position, glm::vec3 direction, glm::vec3 colour, float cutoff, float outercutoff, float linear, float quadratic) {
+Light::Light(glm::vec3 position, glm::vec3 direction, glm::vec3 colour, float cutoff, float outercutoff, float strength, float radius) {
 	this->lighttype = Spotlight;
 	this->position = position;
 	this->direction = direction;
 	this->cutoff = cutoff;
 	this->colour = colour;
-	this->linear = linear;
-	this->quadratic = quadratic;
+	this->strength = strength;
 	this->outercutoff = outercutoff;
 
 	this->lightMax = std::fmaxf(std::fmaxf(colour.r, colour.g), colour.b);
-	this->radius = (-linear + std::sqrtf(linear * linear - 4 * quadratic * (1 - (256.0 / 5.0) * lightMax))) / (2 * quadratic);
+	this->radius = radius;
 
 	SetUpShadows();
 	GenerateShadows();
 }
 
 
-Light::Light(glm::vec3 position, glm::vec3 colour, float linear, float quadratic) {
+Light::Light(glm::vec3 position, glm::vec3 colour, float strength, float radius) {
 	this->lighttype = PointLight;
 	this->position = position;
 	this->colour = colour;
-	this->linear = linear;
-	this->quadratic = quadratic;
+	this->strength = strength;
 	this->cutoff = 0;
 	this->outercutoff = 0;
 	this->direction = glm::vec3(0);
 
 
 	this->lightMax = std::fmaxf(std::fmaxf(colour.r, colour.g), colour.b);
-	this->radius = (-linear + std::sqrtf(linear * linear - 4 * quadratic * (1 - (256.0 / 5.0) * lightMax))) / (2 * quadratic);
-
+	this->radius = radius;
 	SetUpShadows();
 	GenerateShadows();
 }
@@ -57,10 +54,7 @@ void Light::SetUpShadows() {
 	glReadBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, SHADOW_FAR_PLANE);
-
-	
-
+	shadowProj = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, radius);
 } 
 
 
@@ -91,7 +85,7 @@ void Light::GenerateShadows() {
 		std::string pos = "shadowMatrices[" + std::to_string(i) + "]";
 		glUniformMatrix4fv(glGetUniformLocation(Renderer::GetCurrentProgramID(), pos.c_str()), 1, GL_FALSE, &shadowTransforms[i][0][0]);
 	}
-	glUniform1f(glGetUniformLocation(Renderer::GetCurrentProgramID(), "far_plane"), 25.0f);
+	glUniform1f(glGetUniformLocation(Renderer::GetCurrentProgramID(), "far_plane"), radius);
 	Renderer::s_shadow.SetVec3("lightPos", position);
 
 	Renderer::RenderAllObjects(Renderer::s_shadow);

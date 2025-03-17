@@ -1,3 +1,5 @@
+#include <filesystem>
+
 #include "Model.h"
 #include "Engine/Loaders/Loader.hpp"
 #include "Engine/Loaders/vboindexer.h"
@@ -8,6 +10,7 @@
 #include "Engine/Loaders/stb_image.h"
 #include "Engine/Core/AssetManager.h"
 
+namespace fs = std::filesystem;
 
 
 Model::Model(Mesh mesh, Texture* texture) {
@@ -215,41 +218,38 @@ void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         Mesh model_mesh = processMesh(mesh, scene);
 
+
         if (scene->mNumMaterials > 0) {
             aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
             aiString materialName;//The name of the material found in mesh file
-            aiString texturePathDiffuse;
+            aiString texturePath;
 
 
             material->Get(AI_MATKEY_NAME, materialName);//Get the material name (pass by reference)
-            material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), texturePathDiffuse);
+            if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), texturePath) == AI_SUCCESS) {
+                std::cout << "Material Name: " << materialName.C_Str() << "\n";
+                std::cout << "Texture Path: " << texturePath.C_Str() << "\n";
 
-            /*
-            if (!this->name.compare("Assets/Maps/test_ity.fbx")) {
-                std::string string_mat = materialName.C_Str();
-                if (!string_mat.empty()) {
-                    if (string_mat.substr(0, 2) == "m_")
-                        string_mat = "tex_" + string_mat.substr(2);
-                    else
-                        string_mat = "tex_" + string_mat;
-                
-                    //TODO THIS IS ALL HARD CODED ILL FIX IT LATER
-                    std::string path = "Assets/Textures/italy_textures/" + string_mat + ".jpeg";
-                    Texture* t_meshtesture = AssetManager::GetTexture(string_mat);
-                    if (t_meshtesture == nullptr) {
-                        AssetManager::AddTexture(Texture(string_mat.c_str(), path.c_str(), 0.8f, 0.0f));
-                    }
-                    t_meshtesture = AssetManager::GetTexture(string_mat);
-                    if (t_meshtesture != nullptr)
-                        meshTexture = t_meshtesture;
-                    else
-                        meshTexture = texture;
-               
+                fs::path baseDir = name; // name holds the path TODO change this
+                baseDir = baseDir.parent_path();
+                fs::path relativePath = texturePath.C_Str(); // Replace with your relative path
+
+                fs::path currentDir = fs::current_path();
+
+                fs::path absolutePath = baseDir / relativePath;
+
+                fs::path newRelativePath = fs::relative(absolutePath, currentDir);
+
+                std::cout << "Texture Path: " << newRelativePath.string() << "\n";
+                /*
+                AssetManager::AddTexture(Texture(newRelativePath.string().c_str(), newRelativePath.string().c_str(), "Assets/Textures/white.png", 0.5, 0));
+                meshTexture = AssetManager::GetTexture(newRelativePath.string());
+                if (meshTexture == AssetManager::GetMissingTexture()) {
+                    meshTexture = texture;
                 }
+                */
             }
-            */
         }
-            
             
         model_mesh.SetTexture(meshTexture);
         int name_count = 0;

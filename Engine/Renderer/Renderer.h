@@ -84,25 +84,30 @@ private:
 
 namespace Renderer
 {
-    extern Shader s_lighting;
-    extern Shader s_skybox;
-    extern Shader s_geomerty;
-    extern Shader s_ssao;
-    extern Shader s_screen;
-    extern Shader s_transparent;
-    extern Shader s_shadow;
-    extern Shader s_decal;
+    
 	extern ProbeGrid probeGrid;
-	extern Shader s_probe;
-	extern Shader s_probeDeffered;
-	extern Shader s_probeRender;
-	extern Shader s_probeirradiance;
+
 	extern StorageBuffer SHBuffer;
 	extern Texture3D probeTexture;
+
 	extern Shader s_downScale;
 	extern Shader s_upScale;
 	extern Shader s_SolidColor;
 	extern Shader s_textShader;
+	extern Shader s_drawPoint;
+	extern Shader s_drawLine;
+	extern Shader s_lighting;
+	extern Shader s_skybox;
+	extern Shader s_geomerty;
+	extern Shader s_ssao;
+	extern Shader s_screen;
+	extern Shader s_transparent;
+	extern Shader s_shadow;
+	extern Shader s_decal;
+	extern Shader s_probe;
+	extern Shader s_probeDeffered;
+	extern Shader s_probeRender;
+	extern Shader s_probeirradiance;
 
 	extern ComputeShader cs_Raycaster;
 	extern ComputeShader cs_probeIrradiance;
@@ -138,6 +143,10 @@ namespace Renderer
     void SetLights(std::vector<Light> lights, Shader* shader);
 	void SetLightsAllShaders(std::vector<Light> lights);
     void RenderScene();
+
+	void DrawPoint(glm::vec3 position, glm::vec3 colour);
+	void DrawLine(glm::vec3 position1, glm::vec3 position2, glm::vec3 colour);
+
 	void RenderCube();
     void RenderPlane();
 	void CheckDebugState();

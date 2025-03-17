@@ -17,10 +17,9 @@ struct Light
 	glm::vec3 direction = glm::vec3(0, 0, 0);
 	glm::vec3 colour = glm::vec3(1,1,1);
 
-	float linear;
-	float quadratic;
 	float lightMax;
 	float radius;
+	float strength;
 	float cutoff;
 	float outercutoff;
 
@@ -36,8 +35,8 @@ struct Light
 	float updateDistance = 15;
 
 
-	Light(glm::vec3 position, glm::vec3 direction, glm::vec3 colour, float cutoff, float outercutoff, float linear, float quadratic);
-	Light(glm::vec3 position, glm::vec3 colour, float linear, float quadratic);
+	Light(glm::vec3 position, glm::vec3 direction, glm::vec3 colour, float cutoff, float outercutoff, float strength, float radius);
+	Light(glm::vec3 position, glm::vec3 colour, float strength, float radius);
 
 	void IsDynamic(bool isDynamic);
 	void SetUpShadows();

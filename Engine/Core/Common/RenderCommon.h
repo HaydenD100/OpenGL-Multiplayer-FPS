@@ -1,4 +1,8 @@
 #pragma once
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -14,7 +18,7 @@
 #define UPDATED_PROBE_COUNT_PER_FRAME 900
 
 
-const glm::vec3 DEFAULT_SKY_COLOR(0, 0, 0);
+const glm::vec3 DEFAULT_SKY_COLOR(1, 1, 1);
 const int PROBESIZE = 64;
 const int DDGIPROBESIZE = 16;
 

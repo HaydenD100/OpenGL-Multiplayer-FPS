@@ -26,7 +26,7 @@ uniform float Metalic;
 
 uniform mat4 V;
 
-uniform bool IsEmissive;
+uniform bool IsEmissive = false;
 uniform bool HasNormalMap = true;
 
 

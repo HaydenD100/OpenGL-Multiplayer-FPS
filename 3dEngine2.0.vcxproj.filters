@@ -87,9 +87,6 @@
     <ClCompile Include="Engine\Physics\BulletPhysics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Debug\DebugDrawer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\Lights\light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -219,9 +216,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Backend.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Debug\DebugDrawer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\AssetManager.h">
@@ -381,6 +375,10 @@
     <None Include="Assets\Shaders\GI\probeGeom.vert" />
     <None Include="Assets\Shaders\GI\probeGeom.frag" />
     <None Include="Assets\Shaders\GI\irradiance.comp" />
+    <None Include="Assets\Shaders\Debug\point.frag" />
+    <None Include="Assets\Shaders\Debug\point.vert" />
+    <None Include="Assets\Shaders\Debug\line.vert" />
+    <None Include="Assets\Shaders\Debug\line.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />
