@@ -3,6 +3,7 @@
 #include "Engine/Renderer/Renderer.h"
 #include <iostream>
 #include "Engine/Core/Camera.h"
+#include "Engine/Core/UI/UI.h"
 
 
 
@@ -47,14 +48,8 @@ namespace Backend
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-		ImGui_ImplGlfw_InitForOpenGL(window, true);
-		ImGui_ImplOpenGL3_Init("#version 460");
-
+	
+		ImGuiUI::Init();
 		Renderer::init();
 		return 0;
 	}

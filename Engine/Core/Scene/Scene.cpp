@@ -296,6 +296,20 @@ Light* Scene::GetLight(int i) {
 size_t Scene::GetLightsSize() {
 	return lights.size();
 }
+void Scene::SetLight(Light light, int index) {
+	if (index > lights.size() - 1) {
+		lights.push_back(light);
+	}
+	else {
+		lights[index] = light;
+	}
+}
+void Scene::RemoveLight(int index) {
+	if (index < lights.size())
+		lights.erase(lights.begin() + index);
+}
+
+
 
 
 

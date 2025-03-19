@@ -34,7 +34,7 @@ struct Light
 	//if the player is within this distance it will update the shadows if Dynamic = true;
 	float updateDistance = 15;
 
-
+	Light() = default;
 	Light(glm::vec3 position, glm::vec3 direction, glm::vec3 colour, float cutoff, float outercutoff, float strength, float radius);
 	Light(glm::vec3 position, glm::vec3 colour, float strength, float radius);
 

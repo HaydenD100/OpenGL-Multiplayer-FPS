@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Editor\Editor.cpp" />
     <ClCompile Include="Engine\Core\Common\RenderCommon.h" />
     <ClCompile Include="Engine\Core\Debug\BulletDebug.cpp" />
     <ClCompile Include="Engine\Audio\Audio.cpp" />
@@ -162,6 +163,7 @@
     <ClCompile Include="Engine\Core\DecalInstance.cpp" />
     <ClCompile Include="Engine\Core\GameObject.cpp" />
     <ClCompile Include="Engine\Core\Input.cpp" />
+    <ClCompile Include="Engine\Core\UI\UI.cpp" />
     <ClCompile Include="Engine\Game\Game.cpp" />
     <ClCompile Include="Engine\Renderer\Bloom.cpp" />
     <ClCompile Include="Engine\Renderer\BufferLighting.cpp" />
@@ -260,6 +262,7 @@
     <Text Include="todo.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Editor\Editor.h" />
     <ClInclude Include="Engine\Core\Common\GameCommon.h" />
     <ClInclude Include="Engine\Core\Debug\BulletDebug.h" />
     <ClInclude Include="Engine\Audio\Audio.h" />

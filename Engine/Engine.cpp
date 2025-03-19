@@ -11,6 +11,8 @@
 #include "Engine/Physics/BulletPhysics.h"
 #include "Engine/Game/Game.h"
 #include "Engine/Game/Player.h"
+#include "Engine/Core/UI/UI.h"
+#include "Engine/Editor/Editor.h"
 
 //rewrite of my first 3D Engine
 //Not sure what im going to call it yet 
@@ -26,11 +28,12 @@ namespace Engine
 
 		Backend::init();
 		Input::Init();
-		Input::HideCursor();
 		Text2D::initText2D("Assets/Fonts/Holstein.DDS");
 		AudioManager::Init();
 		PhysicsManagerBullet::Init();
 		Game::Init(Game::SinglePlayer);
+		Input::HideCursor();
+
 
 		double lastTimeDT = glfwGetTime();
 		double previousTime = glfwGetTime();
@@ -54,9 +57,37 @@ namespace Engine
 				frameCount = 0;
 				previousTime = currentTime;
 			}
+			if (Input::KeyPressed(EDITORTOGGLE)) {
+				Editing = !Editing;
+				ImGuiIO& io = ImGui::GetIO();
+				
+				if (Editing) {
+					//io.MouseDrawCursor = true; // Set to false to hide the cursor
+					Input::ShowCursor();
+				}
+					
+				else {
+					//io.MouseDrawCursor = false; // Set to false to hide the cursor
+					Input::HideCursor();
+				}
+					
+			}
+				
 			// Update Managers
+			ImGuiUI::NewFrame();
+
 			Input::Update();
-			Input::CenterMouse();
+			if (!Editing) {
+				
+				Input::CenterMouse();
+			}
+				
+			else {
+				Editor::Update();
+				Editor::RenderUI();
+			}
+				
+
 			Game::Update(dt);
 			Renderer::RenderScene();
 			AudioManager::Update();
@@ -67,6 +98,7 @@ namespace Engine
 			// TDOO :: acctualy I want to make a UI class, and also change the UI shader this is really old when i was first learning
 			// OpenGL, so it needs to be updated, and maybe just replaced with myGUI
 			if ((Renderer::DebugState & NoGUi) != NoGUi) {
+
 				std::ostringstream oss;
 				oss << "FPS: " << FPS;
 				Renderer::RenderText(oss.str().c_str(), 660, 585, 15);
@@ -94,8 +126,11 @@ namespace Engine
 				oss.precision(4);
 				oss << "Enemy Kills " << Player::GetDeaths();
 				Renderer::RenderText(oss.str().c_str(), 0, 500, 15);
+				
 			}
 			
+			ImGuiUI::DrawUI();
+
 			Renderer::SwapBuffers(Backend::GetWindowPointer());
 		}
 		return 0;

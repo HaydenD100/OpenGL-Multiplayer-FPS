@@ -252,3 +252,31 @@ void checkOpenGLError() {
         std::cerr << "OpenGL Error " << gluErrorString(error) << std::endl;
     }
 }
+
+glm::vec3 ScreenPointToRayFunc(
+    float screenX, float screenY,      // Pixel coordinates
+    float screenWidth, float screenHeight,  // Screen size
+    const glm::mat4& viewMatrix,       // View matrix
+    const glm::mat4& projectionMatrix  // Projection matrix
+) {
+    // Convert screen position to normalized device coordinates (NDC)
+    float ndcX = (2.0f * screenX) / screenWidth - 1.0f;
+    float ndcY = 1.0f - (2.0f * screenY) / screenHeight; // Flip Y for OpenGL
+    float ndcZ = -1.0f; // Start the ray at near plane
+    float farZ = 1.0f;  // End the ray at far plane
+
+    // Convert NDC to world space (unproject)
+    glm::mat4 invVP = glm::inverse(projectionMatrix * viewMatrix);
+    glm::vec4 nearPoint = invVP * glm::vec4(ndcX, ndcY, ndcZ, 1.0f);
+    glm::vec4 farPoint = invVP * glm::vec4(ndcX, ndcY, farZ, 1.0f);
+
+    // Perspective divide (convert from homogeneous coordinates)
+    nearPoint /= nearPoint.w;
+    farPoint /= farPoint.w;
+
+    // Compute ray direction (normalized)
+    glm::vec3 rayOrigin = glm::vec3(nearPoint);
+    glm::vec3 rayDirection = glm::normalize(glm::vec3(farPoint) - rayOrigin);
+
+    return rayDirection;
+}

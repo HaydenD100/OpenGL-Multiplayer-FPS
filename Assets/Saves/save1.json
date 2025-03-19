@@ -1,0 +1,88 @@
+{
+    "GameObjects": [
+        {
+            "name": "GI_map_1",
+            "positionX": 0.0,
+            "positionY": 0.0,
+            "positionZ": 0.0,
+            "rotationX": 0.0,
+            "rotationY": -0.0,
+            "rotationZ": 0.0
+        },
+        {
+            "name": "knife",
+            "positionX": 5.0,
+            "positionY": 0.0,
+            "positionZ": -5.0,
+            "rotationX": 1.5708000659942627,
+            "rotationY": -0.0,
+            "rotationZ": 0.0
+        },
+        {
+            "name": "glock",
+            "positionX": 5.0,
+            "positionY": 0.0,
+            "positionZ": -5.0,
+            "rotationX": 1.5708000659942627,
+            "rotationY": -0.0,
+            "rotationZ": 0.0
+        },
+        {
+            "name": "ak47",
+            "positionX": 0.20000000298023224,
+            "positionY": -0.25,
+            "positionZ": -0.20000000298023224,
+            "rotationX": 1.5708000659942627,
+            "rotationY": -0.0,
+            "rotationZ": 0.0
+        },
+        {
+            "name": "shotgun",
+            "positionX": -3.0,
+            "positionY": 2.0,
+            "positionZ": 3.0,
+            "rotationX": 1.5708000659942627,
+            "rotationY": -0.0,
+            "rotationZ": 0.0
+        },
+        {
+            "name": "double_barrel",
+            "positionX": -3.0,
+            "positionY": 2.0,
+            "positionZ": 3.0,
+            "rotationX": 1.5708000659942627,
+            "rotationY": -0.0,
+            "rotationZ": 0.0
+        },
+        {
+            "name": "player",
+            "positionX": -10.444272994995117,
+            "positionY": 1.2285711765289307,
+            "positionZ": -6.06373405456543,
+            "rotationX": -0.015451342798769474,
+            "rotationY": -0.6698735356330872,
+            "rotationZ": 0.013586769811809063
+        },
+        {
+            "name": "player_head",
+            "positionX": -11.045112609863281,
+            "positionY": 2.2594265937805176,
+            "positionZ": -9.689995765686035,
+            "rotationX": -0.1080002710223198,
+            "rotationY": 0.6510059237480164,
+            "rotationZ": -9.366208253425157e-09
+        }
+    ],
+    "lights": [
+        {
+            "colourB": 1.0,
+            "colourG": 1.0,
+            "colourR": 1.0,
+            "positionX": -11.0,
+            "positionY": 25.0,
+            "positionZ": -8.0,
+            "radius": 50.0,
+            "strength": 10.0
+        }
+    ]
+}

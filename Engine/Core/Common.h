@@ -154,5 +154,11 @@ glm::quat GetGLMQuat(const aiQuaternion& quat);
 
 double round_up(double value, int decimal_places);
 
+glm::vec3 ScreenPointToRayFunc(
+    float screenX, float screenY,      // Pixel coordinates
+    float screenWidth, float screenHeight,  // Screen size
+    const glm::mat4& viewMatrix,       // View matrix
+    const glm::mat4& projectionMatrix  // Projection matrix
+);
 
 

@@ -49,5 +49,6 @@ enum Controls {
 	RELOADSHADERS = 'h',
 	BAKEGI= 'j',
 	PROBETOGGLE = 'y',
-	GUITOGGLE = 'u'
+	GUITOGGLE = 'u',
+	EDITORTOGGLE = 'l'
 };

@@ -286,8 +286,10 @@ namespace Player
 
 		interactingWithName = "nothing";
 
-		if (verticalAngle <= maxAngle && verticalAngle >= -maxAngle)
+		if (verticalAngle <= maxAngle && verticalAngle >= -maxAngle) 
 			verticalAngle += Input::GetSensitivity() * float(Backend::GetHeight() / 2 - Input::GetMouseY());
+		
+			
 		
 		else if (verticalAngle > maxAngle)
 			verticalAngle = maxAngle;

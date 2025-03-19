@@ -41,6 +41,9 @@ public:
 	Crate* GetCrate(std::string name);
 	std::vector<Light> getLights();
 	Light* GetLight(int i);
+	void SetLight(Light light, int index);
+	void RemoveLight(int index);
+
 	size_t GetLightsSize();
 	SkyBox GetSkyBox();
 	std::vector<GameObject*> NeedRenderingObjects();

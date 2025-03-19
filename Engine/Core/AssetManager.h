@@ -17,9 +17,10 @@ using json = nlohmann::json;
 
 namespace AssetManager
 {
+	extern const char* save_path;
 	void Init();
-	void SaveAssets(const char* path);
-	void LoadAssets(const char* path);
+	void SaveAssets(const char* path = save_path);
+	void LoadAssets(const char* path = save_path);
 
 	// returns index of object
 	size_t AddGameObject(GameObject gameobject);

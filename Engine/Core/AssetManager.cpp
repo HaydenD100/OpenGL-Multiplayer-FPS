@@ -1,5 +1,6 @@
 #include "AssetManager.h"
 #include "Engine/Core/DecalInstance.h"
+#include "Engine/Core/Scene/SceneManager.h"
 
 namespace AssetManager
 {
@@ -16,6 +17,8 @@ namespace AssetManager
 	std::map<std::string, Model> models;
 
 	Texture missing_texture;
+
+	const char* save_path = "Assets/Saves/save1.json";
 
 
 	std::string path;
@@ -38,64 +41,92 @@ namespace AssetManager
 		models.clear();
 	}
 
-	//TODO fix this
 	void AssetManager::LoadAssets(const char* loadJson) {
 		std::ifstream f(loadJson);
+		
 		json data = json::parse(f);
+		//if (data == NULL)
+			//return;
+		
+		if (data["GameObjects"] == NULL)
+			return;
 		std::cout << "loaded object count " << data["GameObjects"].size() << std::endl;
 
 		for (int gameobject = 0; gameobject < data["GameObjects"].size(); gameobject++)
 		{
-			std::string name = data["GameObjects"][gameobject][0];
-			std::string Parentname = data["GameObjects"][gameobject][1];
+			std::string name = data["GameObjects"][gameobject]["name"];
 
-			glm::vec3 position = glm::vec3(data["GameObjects"][gameobject][2], data["GameObjects"][gameobject][3], data["GameObjects"][gameobject][4]);
-			glm::vec3 rotation = glm::vec3(data["GameObjects"][gameobject][5], data["GameObjects"][gameobject][6], data["GameObjects"][gameobject][7]);
-			glm::vec3 scale = glm::vec3(data["GameObjects"][gameobject][8], data["GameObjects"][gameobject][9], data["GameObjects"][gameobject][10]);
+			glm::vec3 position = glm::vec3(data["GameObjects"][gameobject]["positionX"], data["GameObjects"][gameobject]["positionY"], data["GameObjects"][gameobject]["positionZ"]);
+			glm::vec3 rotation = glm::vec3(data["GameObjects"][gameobject]["rotationX"], data["GameObjects"][gameobject]["rotationY"], data["GameObjects"][gameobject]["rotationZ"]);
 
-			std::vector<unsigned short> indices = data["GameObjects"][gameobject][11];
-			std::vector<glm::vec3> indexed_vertices;
-			std::vector<glm::vec2> indexed_uvs;
-			std::vector<glm::vec3> indexed_normals;
-			std::vector<float> verticies = data["GameObjects"][gameobject][12];
-			std::vector<float> Uvs = data["GameObjects"][gameobject][13];
-			std::vector<float> normals = data["GameObjects"][gameobject][13];
-
-			std::string textureName = data["GameObjects"][gameobject][15];
-			//Texture* texture = GetTexture("container");
-			Texture* texture = GetTexture(textureName.c_str());
-
-			for (int vert = 0; vert < verticies.size(); vert++) {
-				indexed_vertices.push_back(glm::vec3(data["GameObjects"][gameobject][12][vert], data["GameObjects"][gameobject][12][vert + 1], data["GameObjects"][gameobject][12][vert + 2]));
-				vert = vert + 2;
+			//glm::vec3 rotation = glm::vec3(data["GameObjects"][gameobject][5], data["GameObjects"][gameobject][6], data["GameObjects"][gameobject][7]);
+			//glm::vec3 scale = glm::vec3(data["GameObjects"][gameobject][8], data["GameObjects"][gameobject][9], data["GameObjects"][gameobject][10]);
+			GameObject* p_gameobject = GetGameObject(name);
+			if (p_gameobject != nullptr) {
+				p_gameobject->setPosition(position);
 			}
-			for (int uvs = 0; uvs < Uvs.size(); uvs++) {
-				indexed_uvs.push_back(glm::vec2(data["GameObjects"][gameobject][13][uvs], data["GameObjects"][gameobject][13][uvs + 1]));
-				uvs = uvs + 1;
-			}
-			for (int normal = 0; normal < normals.size(); normal++) {
-				indexed_normals.push_back(glm::vec3(data["GameObjects"][gameobject][14][normal], data["GameObjects"][gameobject][14][normal + 1], data["GameObjects"][gameobject][14][normal + 2]));
-				normal = normal + 2;
-			}
-			bool save = data["GameObjects"][gameobject][16];
-			//GameObjects.push_back(GameObject(name.data(), Parentname.data(), texture, position, rotation, scale, indices, indexed_vertices, indexed_uvs, indexed_normals, save,0,Box));
 		}
+		
+		for (int i = 0; i < data["lights"].size(); i++) {
+			glm::vec3 position;
+			position.x = data["lights"][i]["positionX"];
+			position.y = data["lights"][i]["positionY"];
+			position.z = data["lights"][i]["positionZ"];
+
+			glm::vec3 colour;
+			colour.x = data["lights"][i]["colourR"];
+			colour.y = data["lights"][i]["colourG"];
+			colour.z = data["lights"][i]["colourB"];
+
+
+			Light light = Light(position,colour, data["lights"][i]["strength"], data["lights"][i]["radius"]);
+			SceneManager::GetCurrentScene()->SetLight(light, i);
+		}
+		
 	}
 
 	// TODO: this doesn't work yet, still needs to be updated
 	void AssetManager::SaveAssets(const char* path) {
 		json save;
 		std::vector<json> SerializedGameObjects;
+		std::vector<json> SerializedLights;
+
 		
-		// name,parentname,pos,rotation,scale,indices,indexvert,indexuv,indexnormal,texturename
+		// name,pos,rotation,scale
 		for (int i = 0; i < GameObjects.size(); i++) {
-			
-			
-			//SerializedGameObjects.push_back(gameobject);
+			GameObject* gameobject = &GameObjects[i];
+			json gameobjectJSON;
+			gameobjectJSON["name"] = gameobject->GetName();
+			glm::vec3 position = gameobject->GetPosition();
+			gameobjectJSON["positionX"] = position.x;
+			gameobjectJSON["positionY"] = position.y;
+			gameobjectJSON["positionZ"] = position.z;
+
+			glm::vec3 rotation = gameobject->getRotation();
+			gameobjectJSON["rotationX"] = rotation.x;
+			gameobjectJSON["rotationY"] = rotation.y;
+			gameobjectJSON["rotationZ"] = rotation.z;
+			SerializedGameObjects.push_back(gameobjectJSON);
+		}
+
+		for (int i = 0; i < SceneManager::GetCurrentScene()->GetLightsSize(); i++) {
+			Light* light = SceneManager::GetCurrentScene()->GetLight(i);
+			json lightJSON;
+			lightJSON["colourR"] = light->colour.r;
+			lightJSON["colourG"] = light->colour.g;
+			lightJSON["colourB"] = light->colour.b;
+
+			lightJSON["positionX"] = light->position.x;
+			lightJSON["positionY"] = light->position.y;
+			lightJSON["positionZ"] = light->position.z;
+
+			lightJSON["radius"] = light->radius;
+			lightJSON["strength"] = light->strength;
+			SerializedLights.push_back(lightJSON);
 		}
 		
 		save["GameObjects"] = SerializedGameObjects;
-
+		save["lights"] = SerializedLights;
 		// Write JSON object to file
 		std::ofstream file(path);
 		if (file.is_open()) {

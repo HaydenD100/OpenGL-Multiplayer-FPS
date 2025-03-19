@@ -8,6 +8,7 @@
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Game/Player.h"
 #include "Engine/Core/Common/GameCommon.h"
+#include "Engine.h"
 
 namespace Game {
 
@@ -42,6 +43,7 @@ namespace Game {
 		SceneManager::CreateScene(Scene());
 		SceneManager::LoadScene(0);
 		WeaponManager::Init();
+		AssetManager::LoadAssets();
 
 		Player::Init();
 		Player::setPosition(glm::vec3(0, 10, 0));
@@ -62,8 +64,12 @@ namespace Game {
 			NetworkManager::EvaulatePackets();
 
 		SceneManager::Update(dt);
-		Player::Update(dt);
-		Camera::Update(dt);
+		if (!Engine::Editing) {
+			Player::Update(dt);
+			Camera::Update(dt);
+		}
+			
+		
 		Animator::UpdateAnimation(dt);
 		AudioManager::UpdateListener(Player::getPosition(), Player::getForward(), Player::getForward());
 
