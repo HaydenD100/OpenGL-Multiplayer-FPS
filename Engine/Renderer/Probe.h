@@ -118,7 +118,7 @@ struct ProbeGrid {
 			GL_DYNAMIC_STORAGE_BIT
 		);
 
-		std::cout << "Done configure \n";
+		std::cout << "Done configure Probe Count: " << probes.size() << "\n";
 		doneConfigure = 1;
 	}
 	void FillBuffer();

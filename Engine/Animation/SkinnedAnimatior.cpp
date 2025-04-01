@@ -82,24 +82,6 @@ namespace Animator {
             CalculateBoneTransform(&node->children[i], globalTransformation, index);
     }
 
-    //FianlBoneMats are now stored in the gameobject so they can be modified for ragdolls in the future
-    /*
-    std::vector<glm::mat4> Animator::GetFinalBoneMatrices(std::string gameObjectname) {
-        for (int i = 0; i < currentAnimationInstances.size(); i++) {
-            if (currentAnimationInstances[i].GameObjectName == gameObjectname && currentAnimationInstances[i].isPlaying) {
-                return
-            }
-        }
-
-        for (int i = 0; i < currentAnimationInstances.size(); i++) {
-            if (currentAnimationInstances[i].GameObjectName == gameObjectname) {
-                return currentAnimationInstances[i].m_FinalBoneMatrices;
-            }
-        }
-        std::vector<glm::mat4> zero;
-        return zero;
-    }
-    */
     AnimationInstance* Animator::GetAnimationInsatce(int i) {
         return &currentAnimationInstances[i];
     }

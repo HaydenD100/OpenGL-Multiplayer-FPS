@@ -4,6 +4,15 @@
             "name": "GI_map_1",
             "positionX": 0.0,
             "positionY": 0.0,
+            "positionZ": -4.0,
+            "rotationX": -1.5708000659942627,
+            "rotationY": 0.0,
+            "rotationZ": 0.0
+        },
+        {
+            "name": "Cube",
+            "positionX": 0.0,
+            "positionY": 3.0,
             "positionZ": 0.0,
             "rotationX": 0.0,
             "rotationY": -0.0,
@@ -56,21 +65,21 @@
         },
         {
             "name": "player",
-            "positionX": -10.444272994995117,
-            "positionY": 1.2285711765289307,
-            "positionZ": -6.06373405456543,
-            "rotationX": -0.015451342798769474,
-            "rotationY": -0.6698735356330872,
-            "rotationZ": 0.013586769811809063
+            "positionX": 0.7360754013061523,
+            "positionY": 2.1000542640686035,
+            "positionZ": 15.752245903015137,
+            "rotationX": 0.0,
+            "rotationY": -0.0,
+            "rotationZ": 0.0
         },
         {
             "name": "player_head",
-            "positionX": -11.045112609863281,
-            "positionY": 2.2594265937805176,
-            "positionZ": -9.689995765686035,
-            "rotationX": -0.1080002710223198,
-            "rotationY": 0.6510059237480164,
-            "rotationZ": -9.366208253425157e-09
+            "positionX": 0.7360754013061523,
+            "positionY": 3.1000542640686035,
+            "positionZ": 15.752245903015137,
+            "rotationX": 2.9455912113189697,
+            "rotationY": 0.03157297521829605,
+            "rotationZ": 3.1415927410125732
         }
     ],
     "lights": [
@@ -78,11 +87,11 @@
             "colourB": 1.0,
             "colourG": 1.0,
             "colourR": 1.0,
-            "positionX": -11.0,
-            "positionY": 25.0,
-            "positionZ": -8.0,
-            "radius": 50.0,
-            "strength": 10.0
+            "positionX": -5.0,
+            "positionY": 50.0,
+            "positionZ": 0.0,
+            "radius": 300.0,
+            "strength": 190.0
         }
     ]
 }

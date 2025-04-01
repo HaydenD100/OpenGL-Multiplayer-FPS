@@ -15,6 +15,10 @@ void Scene::LoadAssets() {
 
 
 	AssetManager::AddTexture("white", "Assets/Textures/white.png", 0.5, 0.0);
+	AssetManager::AddTexture("dev_textures", "Assets/Textures/dev_textures.png", 0.5, 0.0);
+
+	AssetManager::AddTexture("metalic", "Assets/Textures/white.png", 0.0f, 1.0f);
+
 	AssetManager::AddTexture("cornel", "Assets/Textures/cornel-box.png", 0.8, 0.0);
 	
 	AssetManager::AddTexture("white_light", "Assets/Textures/white.png", 0.5, 0.0);
@@ -25,7 +29,7 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("pizza", "Assets/Textures/pizza_decal.png", 0, 0);
 	AssetManager::AddTexture("tank", "Assets/Textures/tank_decal.png", 0, 0);
 	AssetManager::AddTexture("crate", "Assets/Textures/crate.png", 0.7, 0);
-	AssetManager::AddTexture("window", "Assets/Textures/window.png", 0.7, 0);
+	//AssetManager::AddTexture("window", "Assets/Textures/window.png", 0.7, 0);
 	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png","Assets/Normals/window_normal.png", 0.5, 0);
 	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png", 0.5, 0.5);
 	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png", 0.2, 0.7);
@@ -36,11 +40,11 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("pallet", "Assets/Textures/pallet.png", "Assets/Normals/pallet_normal.png", "Assets/Roughness/pallet_roughness.png", "Assets/Metalic/pallet_metallic.png");
 	AssetManager::AddTexture("knife", "Assets/Textures/knife.png", "Assets/Normals/knife_normal.png", "Assets/Roughness/knife_roughness.png", "Assets/Metalic/knife_metallic.png");
 	AssetManager::AddTexture("shotgun", "Assets/Textures/remington.png", "Assets/Normals/remington_normal.png", "Assets/Roughness/remington_roughness.png","Assets/Metalic/remington_metallic.png");
-	AssetManager::AddTexture(Texture("shelf"));
-	AssetManager::AddTexture(Texture("vase"));
-	AssetManager::AddTexture(Texture("plant"));
-	AssetManager::AddTexture(Texture("Industrial_Light"));
-	AssetManager::AddTexture(Texture("smokespot_bench_bench"));
+	//AssetManager::AddTexture(Texture("shelf"));
+	//AssetManager::AddTexture(Texture("vase"));
+	//AssetManager::AddTexture(Texture("plant"));
+	//AssetManager::AddTexture(Texture("Industrial_Light"));
+	//AssetManager::AddTexture(Texture("smokespot_bench_bench"));
 
 
 	//Double Barel
@@ -62,39 +66,39 @@ void Scene::LoadAssets() {
 	//Loads Mode
 
 	//AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
-	AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("glass")));
+	//AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("glass")));
 
 	AssetManager::AddModel("running", Model("Assets/Objects/FBX/Running.fbx", AssetManager::GetTexture("white")));
 
 
-	AssetManager::AddModel("ladder", Model("Assets/Objects/FBX/ladder.fbx", AssetManager::GetTexture("ladder")));
-	AssetManager::AddModel("shelf", Model("Assets/Objects/FBX/shelf.fbx", AssetManager::GetTexture("shelf")));
-	AssetManager::AddModel("vase", Model("Assets/Objects/FBX/vase.fbx", AssetManager::GetTexture("vase")));
-	AssetManager::GetModel("vase")->GetMeshByName("Mesh.001")->SetTexture(AssetManager::GetTexture("plant"));
-	AssetManager::GetModel("vase")->GetMeshByName("Mesh.002")->SetTexture(AssetManager::GetTexture("plant"));
+	//AssetManager::AddModel("ladder", Model("Assets/Objects/FBX/ladder.fbx", AssetManager::GetTexture("ladder")));
+	//AssetManager::AddModel("shelf", Model("Assets/Objects/FBX/shelf.fbx", AssetManager::GetTexture("shelf")));
+	//AssetManager::AddModel("vase", Model("Assets/Objects/FBX/vase.fbx", AssetManager::GetTexture("vase")));
+	//AssetManager::GetModel("vase")->GetMeshByName("Mesh.001")->SetTexture(AssetManager::GetTexture("plant"));
+	//AssetManager::GetModel("vase")->GetMeshByName("Mesh.002")->SetTexture(AssetManager::GetTexture("plant"));
 
-	AssetManager::AddModel("Bench", Model("Assets/Objects/FBX/Bench.fbx", AssetManager::GetTexture("smokespot_bench_bench")));
+	//AssetManager::AddModel("Bench", Model("Assets/Objects/FBX/Bench.fbx", AssetManager::GetTexture("smokespot_bench_bench")));
 
 
-	AssetManager::AddModel("ceiling_light", Model("Assets/Objects/FBX/ceiling_light.fbx", AssetManager::GetTexture("Industrial_Light")));
-	AssetManager::GetModel("ceiling_light")->GetMeshByName("l1.001")->SetTexture(AssetManager::GetTexture("white_light"));
-	AssetManager::GetModel("ceiling_light")->GetMeshByName("l1")->SetTexture(AssetManager::GetTexture("white_light"));
+	//AssetManager::AddModel("ceiling_light", Model("Assets/Objects/FBX/ceiling_light.fbx", AssetManager::GetTexture("Industrial_Light")));
+	//AssetManager::GetModel("ceiling_light")->GetMeshByName("l1.001")->SetTexture(AssetManager::GetTexture("white_light"));
+	//AssetManager::GetModel("ceiling_light")->GetMeshByName("l1")->SetTexture(AssetManager::GetTexture("white_light"));
 
 
 	AssetManager::AddModel("playertwo", Model("Assets/Objects/FBX/bean_death.dae","Assets/Objects/player_mesh.obj", AssetManager::GetTexture("uvmap")));
-	AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
+	//AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 	
 
 
 
-	AssetManager::AddModel("fence1", Model("Assets/Objects/fence1.fbx", AssetManager::GetTexture("concrete")));
-	AssetManager::AddModel("fence2", Model("Assets/Objects/fence2.fbx", AssetManager::GetTexture("concrete")));
-	AssetManager::AddModel("fence3", Model("Assets/Objects/fence3.fbx", AssetManager::GetTexture("concrete")));
-	AssetManager::AddModel("floor", Model("Assets/Objects/FBX/floor.fbx", AssetManager::GetTexture("sand")));
-	AssetManager::AddModel("slope", Model("Assets/Objects/FBX/slope.fbx", AssetManager::GetTexture("sand")));
-	AssetManager::AddModel("crate", Model("Assets/Objects/FBX/crate.fbx", AssetManager::GetTexture("crate")));
-	AssetManager::AddModel("cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("red_glass")));
-	AssetManager::AddModel("cube1", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("green_glass")));
+	//AssetManager::AddModel("fence1", Model("Assets/Objects/fence1.fbx", AssetManager::GetTexture("concrete")));
+	//AssetManager::AddModel("fence2", Model("Assets/Objects/fence2.fbx", AssetManager::GetTexture("concrete")));
+	//AssetManager::AddModel("fence3", Model("Assets/Objects/fence3.fbx", AssetManager::GetTexture("concrete")));
+	//AssetManager::AddModel("floor", Model("Assets/Objects/FBX/floor.fbx", AssetManager::GetTexture("sand")));
+	//AssetManager::AddModel("slope", Model("Assets/Objects/FBX/slope.fbx", AssetManager::GetTexture("sand")));
+	//AssetManager::AddModel("crate", Model("Assets/Objects/FBX/crate.fbx", AssetManager::GetTexture("crate")));
+	//AssetManager::AddModel("cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("red_glass")));
+	//AssetManager::AddModel("cube1", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("green_glass")));
 
 	AssetManager::AddModel("glock", Model("Assets/Objects/FBX/glock17.fbx", "Assets/Objects/glock17_convex.obj", AssetManager::GetTexture("glock")));
 	AssetManager::AddModel("glockhand", Model("Assets/Objects/FBX/glock17_shoot1.dae", AssetManager::GetTexture("glock")));
@@ -121,13 +125,18 @@ void Scene::LoadAssets() {
 	AssetManager::GetModel("double_barrel_hand")->GetMeshByName("meshId10_name-mesh")->SetTexture(AssetManager::GetTexture("double_barrel_shotgun_metal_receiver"));
 	AssetManager::GetModel("double_barrel_hand")->GetMeshByName("Arms_L_R_Mesh_002-mesh")->SetTexture(AssetManager::GetTexture("arm"));
 
-	AssetManager::AddModel("map_test1", Model("Assets/Maps/dusty_1.fbx", AssetManager::GetTexture("brick")));
-	AssetManager::AddModel("map_test2", Model("Assets/Maps/other_map1.obj", AssetManager::GetTexture("white")));
-	AssetManager::AddModel("couch", Model("Assets/Objects/FBX/couch.fbx", AssetManager::GetTexture("white")));
-	AssetManager::AddModel("map_indirectLight", Model("Assets/Maps/lightingTest.obj", AssetManager::GetTexture("white")));
-	AssetManager::AddModel("water", Model("Assets/Objects/FBX/water_test.obj", AssetManager::GetTexture("white")));
+	//AssetManager::AddModel("map_test1", Model("Assets/Maps/dusty_1.fbx", AssetManager::GetTexture("brick")));
+	//AssetManager::AddModel("map_test2", Model("Assets/Maps/other_map1.obj", AssetManager::GetTexture("white")));
+	//AssetManager::AddModel("couch", Model("Assets/Objects/FBX/couch.fbx", AssetManager::GetTexture("white")));
+	//AssetManager::AddModel("map_indirectLight", Model("Assets/Maps/lightingTest.obj", AssetManager::GetTexture("white")));
+	//AssetManager::AddModel("water", Model("Assets/Objects/FBX/water_test.obj", AssetManager::GetTexture("white")));
 
-	AssetManager::AddModel("GI_map_1", Model("Assets/Maps/test_ity.fbx", AssetManager::GetTexture("white")));
+	AssetManager::AddModel("GI_map_1", Model("Assets/Maps/sand_box.fbx", AssetManager::GetTexture("dev_textures")));
+	AssetManager::GetModel("GI_map_1")->GetMeshByName("stairs_plane")->ToggleRender(false);
+	AssetManager::AddModel("Cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("metalic")));
+
+	//Super laggy
+	//AssetManager::AddModel("GI_map_1", Model("Assets/Maps/Sponza/sponza.obj", AssetManager::GetTexture("white")));
 	
 	/*
 	Model* model = AssetManager::GetModel("map_test1");
@@ -168,39 +177,18 @@ void Scene::Load() {
 
 	AssetManager::AddGameObject("GI_map_1", AssetManager::GetModel("GI_map_1"), glm::vec3(0, 0, 0), true, 0, Concave);
 	AssetManager::GetGameObject("GI_map_1")->IncludInGI(true);
-	//AssetManager::GetGameObject("GI_map_1")->SetRotationX(-1.5708f);
+	AssetManager::GetGameObject("GI_map_1")->SetRotationX(-1.5708f);
+	AssetManager::AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), true, 10.0f, Concave);
 
-
-
-	//AssetManager::AddGameObject("map_test2", AssetManager::GetModel("map_test2"), glm::vec3(0, 0, 0), true, 0, Concave);
-	//AssetManager::GetGameObject("map_test2")->IncludInRayCast();
-	//AssetManager::GetGameObject("map_test2")->IncludInGI(true);
-	// 
-	//AssetManager::AddGameObject("ladder", AssetManager::GetModel("ladder"), glm::vec3(0, 2, 0), true, 0, Convex);
-	//AssetManager::GetGameObject("ladder")->SetRotationX(-1.5708f);
-
-	//AssetManager::AddGameObject("vase", AssetManager::GetModel("vase"), glm::vec3(-2.77, 2, -2.5), true, 0, Convex);
-	//AssetManager::GetGameObject("vase")->SetRotationX(-1.5708f);
-
-
-	//AssetManager::AddGameObject("shelf", AssetManager::GetModel("shelf"), glm::vec3(4.30, 2, 2.97), true, 0, Convex);
-	//AssetManager::GetGameObject("shelf")->SetRotationX(-1.5708f);
-
-	//AssetManager::AddGameObject("ceiling_light", AssetManager::GetModel("ceiling_light"), glm::vec3(-6.12, 2, -3.5), true, 0, Convex);
-	//AssetManager::GetGameObject("ceiling_light")->SetRotationX(-1.5708f);
-
-	//AssetManager::AddGameObject("Bench", AssetManager::GetModel("Bench"), glm::vec3(-11.2, 3.55, -3.72), true, 0, Convex);
-	//AssetManager::AddGameObject("Bench", AssetManager::GetModel("Bench"), glm::vec3(-1.5, 2, 3.8), true, 0, Convex);
-	//AssetManager::GetGameObject("Bench")->setRotation(glm::vec3(-1.5708f, -1.5708f * 2.0f, 0.0f));
 
 	// Sets renderer
 	std::vector<std::string> faces{
-		"Assets/Skybox/Space/right.png",
-			"Assets/Skybox/Space/left.png",
-			"Assets/Skybox/Space/top.png",
-			"Assets/Skybox/Space/bottom.png",
-			"Assets/Skybox/Space/front.png",
-			"Assets/Skybox/Space/back.png"
+		"Assets/Skybox/daylight/right.png",
+			"Assets/Skybox/daylight/left.png",
+			"Assets/Skybox/daylight/top.png",
+			"Assets/Skybox/daylight/bottom.png",
+			"Assets/Skybox/daylight/front.png",
+			"Assets/Skybox/daylight/back.png"
 	};
 	sky = SkyBox(faces);
 
@@ -241,7 +229,7 @@ void Scene::Update(float deltaTime) {
 	//lights[1].position.y = newY;
 
 	for (int i = 0; i < lights.size(); i++) {
-		if(glm::distance(lights[i].position,Player::getPosition()) < lights[i].updateDistance && lights[i].Dynamic)
+		if(glm::distance(lights[i].position,Player::getPosition()) < lights[i].radius * 1.4f && lights[i].Dynamic)
 			lights[i].GenerateShadows();
 	}
 	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {

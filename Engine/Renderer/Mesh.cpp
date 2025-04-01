@@ -183,8 +183,13 @@ Mesh::Mesh(std::vector<glm::vec3> vertices,
 
 }
 
+void Mesh::ToggleRender(bool state) {
+    _shouldRender = state;
+}
 
 void Mesh::Render(GLuint programID) {
+    if (!_shouldRender)
+        return;
     Texture* currentTexture = texture;
     if (texture == nullptr) {
         currentTexture = AssetManager::GetMissingTexture();

@@ -61,15 +61,11 @@ namespace Engine
 				Editing = !Editing;
 				ImGuiIO& io = ImGui::GetIO();
 				
-				if (Editing) {
-					//io.MouseDrawCursor = true; // Set to false to hide the cursor
+				if (Editing) 
 					Input::ShowCursor();
-				}
-					
-				else {
-					//io.MouseDrawCursor = false; // Set to false to hide the cursor
+				else 
 					Input::HideCursor();
-				}
+				
 					
 			}
 				
@@ -77,27 +73,28 @@ namespace Engine
 			ImGuiUI::NewFrame();
 
 			Input::Update();
+			
+			
+			Renderer::RenderScene();
+			AudioManager::Update();
 			if (!Editing) {
-				
 				Input::CenterMouse();
+				PhysicsManagerBullet::Update(dt);
+				Game::Update(dt);
 			}
 				
 			else {
 				Editor::Update();
 				Editor::RenderUI();
 			}
-				
-
-			Game::Update(dt);
-			Renderer::RenderScene();
-			AudioManager::Update();
-			PhysicsManagerBullet::Update(dt);
 
 
 			//TODO :: put this in the scnene or somthing idk why its still here in ENGINE.cpp
 			// TDOO :: acctualy I want to make a UI class, and also change the UI shader this is really old when i was first learning
 			// OpenGL, so it needs to be updated, and maybe just replaced with myGUI
-			if ((Renderer::DebugState & NoGUi) != NoGUi) {
+
+			//Dont use this its not working rightnow
+			if ((Renderer::DebugState & NoGUi) != NoGUi && false) {
 
 				std::ostringstream oss;
 				oss << "FPS: " << FPS;
@@ -126,6 +123,7 @@ namespace Engine
 				oss.precision(4);
 				oss << "Enemy Kills " << Player::GetDeaths();
 				Renderer::RenderText(oss.str().c_str(), 0, 500, 15);
+
 				
 			}
 			

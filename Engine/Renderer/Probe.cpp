@@ -45,7 +45,7 @@ void ProbeGrid::FillBuffer() {
 
 
 void ProbeGrid::Bake(std::vector<Light> lights) {
-	std::cout << "starting baking lighting \n";
+	std::cout << "Starting Probe Baking \n";
 	float start = glfwGetTime();
 	glViewport(0, 0, PROBESIZE, PROBESIZE);
 
@@ -258,7 +258,7 @@ Probe::Probe(glm::vec3 postion) {
 	// Unbind framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.001f, 15.0f);
+	captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.001f, 25.0f);
 
 	//const int rays = 100;
 	//for (int i = 0; i < rays; i++ ) {

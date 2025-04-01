@@ -91,7 +91,7 @@ float ShadowCalculation(vec3 fragPos, int index, vec3 N){
     float shadow = 0.0;
     //float bias = 0.2;
     //float bias =0.1  ;
-    float bias = max(0.1 * (1.0 - dot(N, normalize(lightDir))), 0.005f);
+    float bias = max(1 * (1.0 - dot(N, normalize(lightDir))), 0.005f);
 
     int samples = 20;
     float viewDistance = length(viewPos - fragPos);
@@ -441,8 +441,6 @@ vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
         flipped = true;
     }
     
-
-
     #if (myL >= 1)
         SphericalHarmonics shRadiance;
         shRadiance[0] = L1SH_0[probeID];
@@ -482,6 +480,7 @@ vec3 GetIndirectLighting(vec3 WorldPos, vec3 Normal) { // Interpolate visible pr
 
     for (int i = 0; i < 8; i++) {
         ivec3 offset = ivec3(i, i/2, i/4) & ivec3(1);
+
         light = GetProbe(WorldPos, offset, w, Normal);
         indirectLighting += w * light;
         sumW += w;

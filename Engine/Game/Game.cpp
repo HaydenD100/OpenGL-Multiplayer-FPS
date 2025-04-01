@@ -64,10 +64,8 @@ namespace Game {
 			NetworkManager::EvaulatePackets();
 
 		SceneManager::Update(dt);
-		if (!Engine::Editing) {
-			Player::Update(dt);
-			Camera::Update(dt);
-		}
+		Player::Update(dt);
+		Camera::Update(dt);
 			
 		
 		Animator::UpdateAnimation(dt);

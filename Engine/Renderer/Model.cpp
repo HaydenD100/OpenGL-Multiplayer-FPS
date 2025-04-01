@@ -218,14 +218,17 @@ void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         Mesh model_mesh = processMesh(mesh, scene);
 
-
-        if (scene->mNumMaterials > 0) {
+        //this is really buggy right now so only load textures from model if the texture that is being assigned to this model is the missing texture
+        //TODO :: Fix this
+        if (scene->mNumMaterials > 0 && texture == AssetManager::GetMissingTexture()) {
             aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
             aiString materialName;//The name of the material found in mesh file
             aiString texturePath;
+            aiString NRMtexturePath;
 
 
             material->Get(AI_MATKEY_NAME, materialName);//Get the material name (pass by reference)
+
             if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), texturePath) == AI_SUCCESS) {
                 std::cout << "Material Name: " << materialName.C_Str() << "\n";
                 std::cout << "Texture Path: " << texturePath.C_Str() << "\n";
@@ -239,15 +242,32 @@ void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
                 fs::path absolutePath = baseDir / relativePath;
 
                 fs::path newRelativePath = fs::relative(absolutePath, currentDir);
+                fs::path newRelativePathNORMAL;
+
 
                 std::cout << "Texture Path: " << newRelativePath.string() << "\n";
-                /*
-                AssetManager::AddTexture(Texture(newRelativePath.string().c_str(), newRelativePath.string().c_str(), "Assets/Textures/white.png", 0.5, 0));
+
+                if (material->Get(AI_MATKEY_TEXTURE(aiTextureType_NORMALS, 0), NRMtexturePath) == AI_SUCCESS) {
+                    std::cout << "Material Name: " << materialName.C_Str() << "\n";
+                    std::cout << "Texture Path: " << NRMtexturePath.C_Str() << "\n";
+
+                    fs::path baseDir = name; // name holds the path TODO change this
+                    baseDir = baseDir.parent_path();
+                    fs::path relativePath = NRMtexturePath.C_Str(); // Replace with your relative path
+
+                    fs::path absolutePath = baseDir / relativePath;
+                    newRelativePathNORMAL = fs::relative(absolutePath, currentDir);
+                    AssetManager::AddTexture(Texture(newRelativePath.string().c_str(), newRelativePath.string().c_str(), newRelativePathNORMAL.string().c_str(), 0.5, 0.0f));
+                }
+                else {
+                    AssetManager::AddTexture(Texture(newRelativePath.string().c_str(), newRelativePath.string().c_str(), "Assets/Textures/white.png", 0.5, 0.0f));
+                }
+                
                 meshTexture = AssetManager::GetTexture(newRelativePath.string());
                 if (meshTexture == AssetManager::GetMissingTexture()) {
                     meshTexture = texture;
                 }
-                */
+                
             }
         }
             

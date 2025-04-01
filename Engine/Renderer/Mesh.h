@@ -37,7 +37,7 @@ public:
     //used to bind info to a raycasting buffer, returns size of data just appended to buffer
     int BindVertices(int offset, int modelMatrixIndex);
     int BindIndices(int offset);
-
+    void ToggleRender(bool state);
 
 
     std::vector<unsigned short> indices;
@@ -53,6 +53,7 @@ public:
 
 
 private:
+    bool _shouldRender = true;
     std::string name;
     Texture* texture = nullptr;
     GLuint vertexbuffer;

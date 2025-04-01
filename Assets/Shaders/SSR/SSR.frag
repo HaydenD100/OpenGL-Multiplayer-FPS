@@ -14,7 +14,7 @@ uniform mat4 P;
 uniform mat4 inverseP;
 uniform mat4 V;
 
-const float step = 0.1;
+const float step = 0.05;
 const float minRayStep = 1;
 const float maxSteps = 30;
 const int numBinarySearchSteps = 10;
