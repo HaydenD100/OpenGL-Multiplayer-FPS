@@ -379,7 +379,7 @@ namespace Renderer
 		float spacing = 2;
 		glm::vec3 propgationGridSize = glm::vec3(24, 20, 34);
 		//glm::vec3 propgationGridSize = glm::vec3(1, 4, 1);
-		glm::vec3 gridPos = glm::vec3(propgationGridSize.x/2.0f, -2, propgationGridSize.z/2.0f);
+		glm::vec3 gridPos = glm::vec3(propgationGridSize.x/-2.0f, -2, propgationGridSize.z/-2.0f);
 		//glm::vec3 gridPos = glm::vec3(-2.5, -1, -2.5);
 
 		probeTexture.Create(glm::ceil(propgationGridSize.x / spacing), glm::ceil(propgationGridSize.y / spacing), glm::ceil(propgationGridSize.z / spacing));

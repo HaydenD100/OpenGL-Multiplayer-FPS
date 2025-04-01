@@ -13,7 +13,6 @@ void ProbeGrid::ShowProbes() {
 	Renderer::SHBuffer.Bind(7);
 	Renderer::probeTexture.Bind(6);
 
-
 	for (int i = 0; i < probes.size(); i++) {
 
 		glBindTextureUnit(0, probes[i].GetCubeLighting());
