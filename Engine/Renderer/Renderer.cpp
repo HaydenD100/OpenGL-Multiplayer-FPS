@@ -162,7 +162,7 @@ namespace Renderer
 		//s_probe.Load("Assets/Shaders/GI/probe.vert", "Assets/Shaders/GI/probe.frag");
 		s_probeDeffered.Load("Assets/Shaders/GI/probeGeom.vert", "Assets/Shaders/GI/probeGeom.frag");
 		s_probeRender.Load("Assets/Shaders/GI/renderProbes.vert", "Assets/Shaders/GI/renderProbes.frag");
-		s_probeirradiance.Load("Assets/Shaders/GI/irradiance.vert", "Assets/Shaders/GI/irradiance.frag");
+		//s_probeirradiance.Load("Assets/Shaders/GI/irradiance.vert", "Assets/Shaders/GI/irradiance.frag");
 		s_lighting.Load("Assets/Shaders/Lighting/lighting.vert", "Assets/Shaders/Lighting/lighting.frag");
 		s_downScale.Load("Assets/Shaders/Bloom/bloom.vert", "Assets/Shaders/Bloom/downscale.frag");
 		s_upScale.Load("Assets/Shaders/Bloom/bloom.vert", "Assets/Shaders/Bloom/upscale.frag");
@@ -390,7 +390,7 @@ namespace Renderer
 		//voxelizedScene
 		
 		//probeGrid.AddProbe(glm::vec3(6, 1, 2));
-		SHBuffer.Configure(7500 * sizeof(glm::vec3) );
+		SHBuffer.Configure((10 * sizeof(glm::vec3)) * 10000 );
 
 
 

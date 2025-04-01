@@ -2,16 +2,16 @@
 layout (location = 0) out vec4 gLighting;
 
 layout(std430, binding = 7) buffer ShCoeffient {
-    vec3 L1SH_0[3750 * 2];
-    vec3 L1SH_1[3750 * 2];
-    vec3 L1SH_2[3750* 2];
-    vec3 L1SH_3[3750* 2];
+    vec3 L1SH_0[10000];
+    vec3 L1SH_1[10000];
+    vec3 L1SH_2[10000];
+    vec3 L1SH_3[10000];
 
-    vec3 L1SH_4[3750* 2];
-    vec3 L1SH_5[3750* 2];
-    vec3 L1SH_6[3750* 2];
-    vec3 L1SH_7[3750* 2];
-    vec3 L1SH_8[3750* 2];
+    vec3 L1SH_4[10000];
+    vec3 L1SH_5[10000];
+    vec3 L1SH_6[10000];
+    vec3 L1SH_7[10000];
+    vec3 L1SH_8[10000];
 };
 
 
