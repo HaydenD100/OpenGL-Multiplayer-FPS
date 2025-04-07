@@ -10,18 +10,11 @@ in vec4 Normal;
 in vec3 WorldPos;
 
 
-
 layout(std430, binding = 7) buffer ShCoeffient {
-    vec3 L1SH_0[10000];
-    vec3 L1SH_1[10000];
-    vec3 L1SH_2[10000];
-    vec3 L1SH_3[10000];
-
-    vec3 L1SH_4[10000];
-    vec3 L1SH_5[10000];
-    vec3 L1SH_6[10000];
-    vec3 L1SH_7[10000];
-    vec3 L1SH_8[10000];
+    vec3 L1SH_0[3750 * 2];
+    vec3 L1SH_1[3750 * 2];
+    vec3 L1SH_2[3750* 2];
+    vec3 L1SH_3[3750* 2];
 };
 
 
@@ -32,7 +25,7 @@ uniform int probeID;
 //Credits to https://www.shadertoy.com/view/wtt3W2
 
 #define myT vec3
-#define myL 3
+#define myL 1
 #define SphericalHarmonicsTL(T, L) T[(L + 1)*(L + 1)]
 #define SphericalHarmonics SphericalHarmonicsTL(myT, myL)
 #define shSize(L) ((L + 1)*(L + 1))

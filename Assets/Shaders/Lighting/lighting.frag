@@ -6,15 +6,7 @@ layout(std430, binding = 7) buffer ShCoeffient {
     vec3 L1SH_1[10000];
     vec3 L1SH_2[10000];
     vec3 L1SH_3[10000];
-
-    vec3 L1SH_4[10000];
-    vec3 L1SH_5[10000];
-    vec3 L1SH_6[10000];
-    vec3 L1SH_7[10000];
-    vec3 L1SH_8[10000];
 };
-
-
 
 layout(binding = 6) uniform sampler3D probeGrid;
 
@@ -266,9 +258,6 @@ SphericalHarmonics shEvaluate(vec3 p)
 
 
 #define ENV_SMPL_NUM 256
-
-
-
 #define NORM2SNORM(value) (value * 2.0 - 1.0)
 #define SNORM2NORM(value) (value * 0.5 + 0.5)
 
@@ -364,27 +353,7 @@ vec3 GetIrradianceFromSH(SphericalHarmonics shRadiance, vec3 direction) {
 
 }
 
-int clampToNearestDirectionINT(vec3 position) {
-    float maxDot = -1.0; // Initialize to the smallest possible value
-    int bestMatchIndex = 0;
-    int secondMatchIndex = 0;
-    int thirdMatchIndex = 0;
 
-
-    // Iterate through all predefined directions
-    for (int i = 0; i < 16; ++i) {
-        float dotProduct = dot(position, directions[i]);
-
-        // Find the direction with the largest dot product (smallest angle)
-        if (dotProduct > maxDot) {
-            maxDot = dotProduct;
-            bestMatchIndex = i;
-        }
-    }
-
-    // Return the closest direction
-    return bestMatchIndex;
-}
 
 vec3 NormalizePoint(vec3 point, vec3 minPoint, vec3 maxPoint) {
     return (point - minPoint) / (maxPoint - minPoint);

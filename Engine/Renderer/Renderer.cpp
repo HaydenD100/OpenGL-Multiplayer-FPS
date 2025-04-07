@@ -377,7 +377,7 @@ namespace Renderer
 		//this is the projection to voxlize the scene from orgin (0,0,0) while the other one is the view of the camera
 		//voxel_orth = glm::ortho(-((float)voxelize_scene_albedo.GetWidth() / 2.0f), (float)voxelize_scene_albedo.GetWidth() / 2.0f, (float)voxelize_scene_albedo.GetWidth() / 2.0f, -((float)voxelize_scene_albedo.GetWidth() / 2.0f), -(float)voxelize_scene_albedo.GetWidth()/2.0f, (float)voxelize_scene_albedo.GetWidth()/2.0f);
 		float spacing = 2;
-		glm::vec3 propgationGridSize = glm::vec3(24, 20, 34);
+		glm::vec3 propgationGridSize = glm::vec3(24, 20, 38);
 		//glm::vec3 propgationGridSize = glm::vec3(1, 4, 1);
 		glm::vec3 gridPos = glm::vec3(propgationGridSize.x/-2.0f, -2, propgationGridSize.z/-2.0f);
 		//glm::vec3 gridPos = glm::vec3(-2.5, -1, -2.5);

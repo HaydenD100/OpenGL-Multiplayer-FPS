@@ -2,9 +2,9 @@
     "GameObjects": [
         {
             "name": "GI_map_1",
-            "positionX": 0.0,
+            "positionX": -0.10000000149011612,
             "positionY": 0.0,
-            "positionZ": -4.0,
+            "positionZ": -4.099999904632568,
             "rotationX": -1.5708000659942627,
             "rotationY": 0.0,
             "rotationZ": 0.0
@@ -65,20 +65,20 @@
         },
         {
             "name": "player",
-            "positionX": 0.7360754013061523,
-            "positionY": 2.1000542640686035,
-            "positionZ": 15.752245903015137,
+            "positionX": 0.20887383818626404,
+            "positionY": 2.0950875282287598,
+            "positionZ": 8.036070823669434,
             "rotationX": 0.0,
             "rotationY": -0.0,
             "rotationZ": 0.0
         },
         {
             "name": "player_head",
-            "positionX": 0.7360754013061523,
-            "positionY": 3.1000542640686035,
-            "positionZ": 15.752245903015137,
-            "rotationX": 2.9455912113189697,
-            "rotationY": 0.03157297521829605,
+            "positionX": 0.20887383818626404,
+            "positionY": 3.0950875282287598,
+            "positionZ": 8.036070823669434,
+            "rotationX": 3.0495924949645996,
+            "rotationY": -0.008407680317759514,
             "rotationZ": 3.1415927410125732
         }
     ],

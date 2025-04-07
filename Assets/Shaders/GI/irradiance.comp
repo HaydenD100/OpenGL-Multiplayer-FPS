@@ -23,12 +23,6 @@ layout(std430, binding = 7) buffer ShCoeffient {
     vec3 L1SH_1[3750 * 2];
     vec3 L1SH_2[3750* 2];
     vec3 L1SH_3[3750* 2];
-
-    vec3 L1SH_4[3750* 2];
-    vec3 L1SH_5[3750* 2];
-    vec3 L1SH_6[3750* 2];
-    vec3 L1SH_7[3750* 2];
-    vec3 L1SH_8[3750* 2];
 };
 
 
@@ -547,7 +541,7 @@ void main()
     vec3 probe_world_pos = probe_pos + gridWorldPos;
 
     ivec3 texturePosition = ivec3(probe_pos);
-	//imageStore(probeGrid, texturePosition, vec4(probeID));
+	imageStore(probeGrid, texturePosition, vec4(probeID));
     //imageStore(probeGrid, texturePosition, vec4(1));
 
      
