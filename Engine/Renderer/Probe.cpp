@@ -53,7 +53,7 @@ void ProbeGrid::Bake(std::vector<Light> lights) {
 	Renderer::s_probeDeffered.Use();
 	Renderer::s_probeDeffered.SetVec3("gridWorldPos", postion);
 	Renderer::s_probeDeffered.SetVec3("volume", volume);
-	Renderer::s_probeDeffered.SetFloat("spacing", spacing);
+	Renderer::s_probeDeffered.SetVec3("spacing", spacing);
 
 	Renderer::probeTexture.ImageBind(6);
 	glDisable(GL_CULL_FACE);
@@ -80,7 +80,7 @@ void ProbeGrid::ReLight(int probeRelightCount) {
 	Renderer::cs_probeIrradiance.Use();
 	Renderer::cs_probeIrradiance.SetVec3("gridWorldPos", postion);
 	Renderer::cs_probeIrradiance.SetVec3("volume", volume);
-	Renderer::cs_probeIrradiance.SetFloat("spacing", spacing);
+	Renderer::cs_probeIrradiance.SetVec3("spacing", spacing);
 	Renderer::cs_probeIrradiance.SetInt("start_index", updatedIndex);
 	Renderer::cs_probeIrradiance.SetVec3("Sky_Color", DEFAULT_SKY_COLOR);
 

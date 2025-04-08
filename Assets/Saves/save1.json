@@ -4,15 +4,6 @@
             "name": "GI_map_1",
             "positionX": 0.0,
             "positionY": 0.0,
-            "positionZ": -4.0,
-            "rotationX": -1.5708000659942627,
-            "rotationY": 0.0,
-            "rotationZ": 0.0
-        },
-        {
-            "name": "Cube",
-            "positionX": 0.0,
-            "positionY": 3.0,
             "positionZ": 0.0,
             "rotationX": 0.0,
             "rotationY": -0.0,
@@ -65,21 +56,21 @@
         },
         {
             "name": "player",
-            "positionX": -1.8901711702346802,
-            "positionY": 7.099968910217285,
-            "positionZ": -12.84642505645752,
+            "positionX": -0.47579509019851685,
+            "positionY": 1.0861659049987793,
+            "positionZ": 6.036730766296387,
             "rotationX": 0.0,
             "rotationY": -0.0,
             "rotationZ": 0.0
         },
         {
             "name": "player_head",
-            "positionX": -1.8901711702346802,
-            "positionY": 8.099968910217285,
-            "positionZ": -12.84642505645752,
-            "rotationX": 0.1740000694990158,
-            "rotationY": 0.24118547141551971,
-            "rotationZ": -3.8363308085820336e-09
+            "positionX": -0.47579509019851685,
+            "positionY": 2.0861659049987793,
+            "positionZ": 6.036730766296387,
+            "rotationX": -3.133592367172241,
+            "rotationY": -0.0405665785074234,
+            "rotationZ": 3.1415927410125732
         }
     ],
     "lights": [
@@ -87,11 +78,11 @@
             "colourB": 1.0,
             "colourG": 1.0,
             "colourR": 1.0,
-            "positionX": -5.0,
-            "positionY": 50.0,
+            "positionX": 0.0,
+            "positionY": 3.9000000953674316,
             "positionZ": 0.0,
-            "radius": 300.0,
-            "strength": 100.0
+            "radius": 40.0,
+            "strength": 20.0
         }
     ]
 }

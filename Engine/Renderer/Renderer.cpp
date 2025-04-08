@@ -374,22 +374,13 @@ namespace Renderer
 		
 		//Raycaster::Init();
 
-		//this is the projection to voxlize the scene from orgin (0,0,0) while the other one is the view of the camera
-		//voxel_orth = glm::ortho(-((float)voxelize_scene_albedo.GetWidth() / 2.0f), (float)voxelize_scene_albedo.GetWidth() / 2.0f, (float)voxelize_scene_albedo.GetWidth() / 2.0f, -((float)voxelize_scene_albedo.GetWidth() / 2.0f), -(float)voxelize_scene_albedo.GetWidth()/2.0f, (float)voxelize_scene_albedo.GetWidth()/2.0f);
-		float spacing = 2;
-		glm::vec3 propgationGridSize = glm::vec3(24, 20, 38);
-		//glm::vec3 propgationGridSize = glm::vec3(1, 4, 1);
+		glm::vec3 spacing = glm::vec3(0.8,1,0.8);
+		glm::vec3 propgationGridSize = glm::vec3(10, 10, 10);
 		glm::vec3 gridPos = glm::vec3(propgationGridSize.x/-2.0f, -2, propgationGridSize.z/-2.0f);
-		//glm::vec3 gridPos = glm::vec3(-2.5, -1, -2.5);
 
-		probeTexture.Create(glm::ceil(propgationGridSize.x / spacing), glm::ceil(propgationGridSize.y / spacing), glm::ceil(propgationGridSize.z / spacing));
+		probeTexture.Create(glm::ceil(propgationGridSize.x / spacing.x), glm::ceil(propgationGridSize.y / spacing.y), glm::ceil(propgationGridSize.z / spacing.z));
 		probeGrid.Configure(propgationGridSize.x, propgationGridSize.y, propgationGridSize.z, spacing, gridPos);
 
-
-		//voxel stuff
-		//voxelizedScene
-		
-		//probeGrid.AddProbe(glm::vec3(6, 1, 2));
 		SHBuffer.Configure((10 * sizeof(glm::vec3)) * 10000 );
 
 
@@ -802,7 +793,7 @@ namespace Renderer
 		s_lighting.SetBool("isDead", Player::IsDead());
 		s_lighting.SetVec3("gridWorldPos", probeGrid.postion);
 		s_lighting.SetVec3("volume", probeGrid.volume);
-		s_lighting.SetFloat("spacing", probeGrid.spacing);
+		s_lighting.SetVec3("spacing", probeGrid.spacing);
 		s_lighting.SetInt("lightingState", lightingState);
 
 		RenderPlane();

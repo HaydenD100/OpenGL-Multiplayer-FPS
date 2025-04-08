@@ -69,14 +69,14 @@ struct ProbeGrid {
 	//Generate all the probes on another thread while the assets are loading
 
 
-	void Configure(float Width, float Height, float Depth, float spacing, glm::vec3 start) {
+	void Configure(float Width, float Height, float Depth, glm::vec3 spacing, glm::vec3 start) {
 		// Pre-calculate inverse spacing to avoid repeated division
-		const float invSpacing = 1.0f / spacing;
+		const glm::vec3 invSpacing = 1.0f / spacing;
 
 		// Convert dimensions to integer counts using proper rounding
-		const int width = static_cast<int>(std::round(Width * invSpacing));
-		const int height = static_cast<int>(std::round(Height * invSpacing));
-		const int depth = static_cast<int>(std::round(Depth * invSpacing));
+		const int width = static_cast<int>(std::round(Width * invSpacing.x));
+		const int height = static_cast<int>(std::round(Height * invSpacing.y));
+		const int depth = static_cast<int>(std::round(Depth * invSpacing.z));
 
 		volume = glm::vec3(width, height, depth) * spacing;
 		postion = start;
@@ -142,7 +142,7 @@ struct ProbeGrid {
 
 	glm::vec3 postion;
 	glm::vec3 volume;
-	float spacing;
+	glm::vec3 spacing;
 
 	std::vector<glm::uvec2> probeTextureHandles;
 	std::vector< glm::uvec2> probeDepthHandles;

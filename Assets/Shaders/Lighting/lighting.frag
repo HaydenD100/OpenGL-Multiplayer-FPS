@@ -14,7 +14,7 @@ layout(binding = 6) uniform sampler3D probeGrid;
 
 uniform vec3 gridWorldPos;
 uniform vec3 volume;
-uniform float spacing;
+uniform vec3 spacing;
 
 
 in vec2 UV;

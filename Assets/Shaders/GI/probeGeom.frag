@@ -19,7 +19,7 @@ uniform vec3 color;
 uniform vec3 position;
 uniform vec3 gridWorldPos;
 uniform vec3 volume;
-uniform float spacing;
+uniform vec3 spacing;
 uniform int probeID;
 
 in vec2 UV;

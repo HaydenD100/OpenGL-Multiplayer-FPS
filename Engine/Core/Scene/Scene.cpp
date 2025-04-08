@@ -44,7 +44,7 @@ void Scene::LoadAssets() {
 	//AssetManager::AddTexture(Texture("vase"));
 	//AssetManager::AddTexture(Texture("plant"));
 	//AssetManager::AddTexture(Texture("Industrial_Light"));
-	//AssetManager::AddTexture(Texture("smokespot_bench_bench"));
+	AssetManager::AddTexture(Texture("smokespot_bench_bench"));
 
 
 	//Double Barel
@@ -71,13 +71,13 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("running", Model("Assets/Objects/FBX/Running.fbx", AssetManager::GetTexture("white")));
 
 
-	//AssetManager::AddModel("ladder", Model("Assets/Objects/FBX/ladder.fbx", AssetManager::GetTexture("ladder")));
+	AssetManager::AddModel("ladder", Model("Assets/Objects/FBX/ladder.fbx", AssetManager::GetTexture("ladder")));
 	//AssetManager::AddModel("shelf", Model("Assets/Objects/FBX/shelf.fbx", AssetManager::GetTexture("shelf")));
 	//AssetManager::AddModel("vase", Model("Assets/Objects/FBX/vase.fbx", AssetManager::GetTexture("vase")));
 	//AssetManager::GetModel("vase")->GetMeshByName("Mesh.001")->SetTexture(AssetManager::GetTexture("plant"));
 	//AssetManager::GetModel("vase")->GetMeshByName("Mesh.002")->SetTexture(AssetManager::GetTexture("plant"));
 
-	//AssetManager::AddModel("Bench", Model("Assets/Objects/FBX/Bench.fbx", AssetManager::GetTexture("smokespot_bench_bench")));
+	AssetManager::AddModel("Bench", Model("Assets/Objects/FBX/Bench.fbx", AssetManager::GetTexture("smokespot_bench_bench")));
 
 
 	//AssetManager::AddModel("ceiling_light", Model("Assets/Objects/FBX/ceiling_light.fbx", AssetManager::GetTexture("Industrial_Light")));
@@ -131,8 +131,10 @@ void Scene::LoadAssets() {
 	//AssetManager::AddModel("map_indirectLight", Model("Assets/Maps/lightingTest.obj", AssetManager::GetTexture("white")));
 	//AssetManager::AddModel("water", Model("Assets/Objects/FBX/water_test.obj", AssetManager::GetTexture("white")));
 
-	AssetManager::AddModel("GI_map_1", Model("Assets/Maps/sand_box.fbx", AssetManager::GetTexture("dev_textures")));
-	AssetManager::GetModel("GI_map_1")->GetMeshByName("stairs_plane")->ToggleRender(false);
+	AssetManager::AddModel("GI_map_1", Model("Assets/Maps/cornel_box.obj", AssetManager::GetTexture("cornel")));
+	//AssetManager::AddModel("GI_map_1", Model("Assets/Maps/sand_box.fbx", AssetManager::GetTexture("dev_textures")));
+
+	//AssetManager::GetModel("GI_map_1")->GetMeshByName("stairs_plane")->ToggleRender(false);
 	AssetManager::AddModel("Cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("metalic")));
 
 	//Super laggy
@@ -177,18 +179,23 @@ void Scene::Load() {
 
 	AssetManager::AddGameObject("GI_map_1", AssetManager::GetModel("GI_map_1"), glm::vec3(0, 0, 0), true, 0, Concave);
 	AssetManager::GetGameObject("GI_map_1")->IncludInGI(true);
-	AssetManager::GetGameObject("GI_map_1")->SetRotationX(-1.5708f);
-	AssetManager::AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), true, 10.0f, Concave);
+	//AssetManager::GetGameObject("GI_map_1")->SetRotationX(-1.5708f);
+	//AssetManager::AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), true, 10.0f, Concave);
 
+	//AssetManager::AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
+	//AssetManager::GetGameObject("ladder_object")->SetRotationX(-1.5708f);
+
+	//AssetManager::AddGameObject("Bench_object", AssetManager::GetModel("Bench"), glm::vec3(0, 0, 0), true, 0, Concave);
+	//AssetManager::GetGameObject("Bench_object")->SetRotationX(-1.5708f);
 
 	// Sets renderer
 	std::vector<std::string> faces{
-		"Assets/Skybox/daylight/right.png",
-			"Assets/Skybox/daylight/left.png",
-			"Assets/Skybox/daylight/top.png",
-			"Assets/Skybox/daylight/bottom.png",
-			"Assets/Skybox/daylight/front.png",
-			"Assets/Skybox/daylight/back.png"
+		"Assets/Skybox/Space/right.png",
+			"Assets/Skybox/Space/left.png",
+			"Assets/Skybox/Space/top.png",
+			"Assets/Skybox/Space/bottom.png",
+			"Assets/Skybox/Space/front.png",
+			"Assets/Skybox/Space/back.png"
 	};
 	sky = SkyBox(faces);
 

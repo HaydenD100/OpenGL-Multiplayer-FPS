@@ -6,7 +6,7 @@ layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 uniform vec3 gridWorldPos;
 uniform vec3 volume;
-uniform float spacing;
+uniform vec3 spacing;
 uniform int start_index;
 uniform vec3 Sky_Color;
 
