@@ -386,7 +386,7 @@ vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
     vec3 a = gridCoords - base;
     int probeID = int(texelFetch(probeGrid, base + offset,0).r);
     vec3 probe_worldPos = (base + offset) + gridWorldPos * spacing;
-    vec3 dir =   probe_worldPos - fragWorldPos;
+    vec3 dir = probe_worldPos - fragWorldPos;
 
     vec3 v = normalize(dir); // TODO: no need to normalize if only checking sign
     float vdotn = dot(v, Normal);

@@ -21,8 +21,8 @@ layout(binding = 9, std430) readonly buffer ssbo4 {
 layout(std430, binding = 7) buffer ShCoeffient {
     vec3 L1SH_0[3750 * 2];
     vec3 L1SH_1[3750 * 2];
-    vec3 L1SH_2[3750 * 2];
-    vec3 L1SH_3[3750 * 2];
+    vec3 L1SH_2[3750* 2];
+    vec3 L1SH_3[3750* 2];
 };
 
 
@@ -94,7 +94,7 @@ float ShadowCalculation(vec3 fragPos, int index, vec3 probe_world_pos)
 
     int samples = 20;
     float viewDistance = length(probe_world_pos - fragPos);
-    float diskRadius = (1.0 + (viewDistance / lights[index].radius)) / 25.0;
+    float diskRadius = (1.0 + (viewDistance / lights[index].radius)) / 30.0;
     for(int i = 0; i < samples; ++i)
     {
         float closestDepth = texture(lights[index].depthMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
