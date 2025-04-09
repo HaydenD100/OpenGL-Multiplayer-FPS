@@ -68,9 +68,11 @@ void main()
         gAlbedo = MaterialDiffuseColor;
     }
     gl_FragDepth =  LinearizeDepth(gl_FragCoord.z);
-
     vec3 pos = (position - gridWorldPos) / spacing;
 	ivec3 texturePosition = ivec3(floor(pos));
+    if(!gl_FrontFacing)
+        gAlbedo = vec3(0,0,0);
+
 	imageStore(probeGrid, texturePosition, vec4(probeID));
 
 

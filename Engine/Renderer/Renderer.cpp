@@ -374,8 +374,8 @@ namespace Renderer
 		
 		//Raycaster::Init();
 
-		glm::vec3 spacing = glm::vec3(0.8,1,0.8);
-		glm::vec3 propgationGridSize = glm::vec3(10, 10, 10);
+		glm::vec3 spacing = glm::vec3(0.6,1,0.6);
+		glm::vec3 propgationGridSize = glm::vec3(8, 10, 8);
 		glm::vec3 gridPos = glm::vec3(propgationGridSize.x/-2.0f, -2, propgationGridSize.z/-2.0f);
 
 		probeTexture.Create(glm::ceil(propgationGridSize.x / spacing.x), glm::ceil(propgationGridSize.y / spacing.y), glm::ceil(propgationGridSize.z / spacing.z));

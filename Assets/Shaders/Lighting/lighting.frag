@@ -384,8 +384,8 @@ vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
     vec3 gridCoords = (fragWorldPos - gridWorldPos) / spacing;
     ivec3 base = ivec3(floor(gridCoords));
     vec3 a = gridCoords - base;
-    int probeID = int(texelFetch(probeGrid, base + offset,0).r);
-    vec3 probe_worldPos = (base + offset) + gridWorldPos * spacing;
+    int probeID = int(texelFetch(probeGrid, base + offset, 0).r);
+    vec3 probe_worldPos = gridWorldPos + (base + offset)  * spacing;
     vec3 dir = probe_worldPos - fragWorldPos;
 
     vec3 v = normalize(dir); // TODO: no need to normalize if only checking sign
@@ -394,21 +394,7 @@ vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
 
     //There was an issue where it will always sample pos offset, but if the normal is facing in the negative dir then the weight will spit out 0 becuase of the vdotn > -0.0.
     //I fixed this by checking if the normal is in the negative and then sampling negative offset. theres still a few artifacts where it switches from pos to neg but its alot better then beofre
- 
-    bool flipped = false;
-    if(vdotn < -0.0) {
-        // Use flipped offset (-offset) and adjust blend factor
-        probeID = int(texelFetch(probeGrid, base - offset, 0).r);
-        probe_worldPos = gridWorldPos + vec3(base - offset) * spacing; // Correct position
 
-        dir = probe_worldPos - fragWorldPos;
-        v = normalize(dir);
-        vdotn = dot(v, Normal);
-
-        // Invert blend factor for flipped direction
-        weights = mix(1.0 - a, a, 1.0 - vec3(offset)); 
-        flipped = true;
-    }
     
     #if (myL >= 1)
         SphericalHarmonics shRadiance;
@@ -431,10 +417,9 @@ vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
 
 
 
-    if(vdotn > -0.0 && probe_color != vec3(0) && !flipped)
+    if(vdotn > -0.0 && probe_color != vec3(0))
         weight = weights.x * weights.y * weights.z;
-    else if(probe_color != vec3(0) && flipped)
-        weight = weights.x * weights.y * weights.z;
+
     else
         weight = 0.0;        
     return probe_color;
@@ -449,6 +434,7 @@ vec3 GetIndirectLighting(vec3 WorldPos, vec3 Normal) { // Interpolate visible pr
 
     for (int i = 0; i < 8; i++) {
         ivec3 offset = ivec3(i, i/2, i/4) & ivec3(1);
+        //offset = ivec3(1,0,0);
 
         light = GetProbe(WorldPos, offset, w, Normal);
         indirectLighting += w * light;
