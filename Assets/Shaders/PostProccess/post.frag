@@ -38,7 +38,7 @@ void main() {
     vec2 texSize  = textureSize(gSSR, 0).xy;
     vec4 emissive = vec4(texture(gEmissive, UV).rgb,1); 
 
-
+    /*
     vec2 texOffset = 1.0 / textureSize(gSSR, 0); // Texture offset
     bool horizontal = false;
     int kernelSize = 5; // Kernel size (e.g., 5x5)
@@ -46,9 +46,9 @@ void main() {
     vec4 blurredSSR = ssr;
     //if(ssr.a > 0.001f && ssr.r > 0.001f && ssr.g > 0.001f && ssr.b > 0.001f)
         //blurredSSR = boxBlur2D(gSSR, UV, texOffset, kernelSize);
+    */
 
-
-    
-    gFinal = lighting + blurredSSR + emissive ;
+    //+ blurredSSR
+    gFinal = lighting  + emissive ;
 
 }

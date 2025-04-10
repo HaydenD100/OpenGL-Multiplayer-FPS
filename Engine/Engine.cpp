@@ -79,8 +79,8 @@ namespace Engine
 			AudioManager::Update();
 			if (!Editing) {
 				Input::CenterMouse();
-				PhysicsManagerBullet::Update(dt);
 				Game::Update(dt);
+				PhysicsManagerBullet::Update(dt);
 			}
 				
 			else {

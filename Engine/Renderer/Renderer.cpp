@@ -374,8 +374,8 @@ namespace Renderer
 		
 		//Raycaster::Init();
 
-		glm::vec3 spacing = glm::vec3(0.6,1,0.6);
-		glm::vec3 propgationGridSize = glm::vec3(8, 10, 8);
+		glm::vec3 spacing = glm::vec3(2,2,2);
+		glm::vec3 propgationGridSize = glm::vec3(28, 20, 38);
 		glm::vec3 gridPos = glm::vec3(propgationGridSize.x/-2.0f, -2, propgationGridSize.z/-2.0f);
 
 		probeTexture.Create(glm::ceil(propgationGridSize.x / spacing.x), glm::ceil(propgationGridSize.y / spacing.y), glm::ceil(propgationGridSize.z / spacing.z));
@@ -799,6 +799,8 @@ namespace Renderer
 		RenderPlane();
 
 		//-------------------------------------------------SSR-------------------------
+		//I have to optimze this or somthing becuase it tanks fps
+		/*
 		ssrBuffer.Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		s_SSR.Use();
@@ -818,7 +820,7 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gRMA);
 		RenderPlane();
 
-
+		*/
 		//-------------------------------------------------EMISSIVE-----------------------------------
 		emmisiveRenderer.RenderBloomTexture(gbuffer.gEmission, 0.005f);
 
