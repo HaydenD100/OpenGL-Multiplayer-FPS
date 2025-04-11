@@ -465,7 +465,7 @@ void main() {
 
 
 
-    vec3 albedo = texture(gAlbeido, UV).rgb;
+    vec3 albedo = pow(texture(gAlbeido, UV).rgb,vec3(2.2));
 
     float skybox = texture(gPBR, UV).z;
     vec3 emisive = texture(gEmssive, UV).rgb;
@@ -539,9 +539,9 @@ void main() {
     vec3 color = ao * Lo + adjustedIndirectLighting;
     
 
-    // HDR and gamma correction
+    // HDR
     color = color / (color + vec3(1.0));
-
+    color = pow(color, vec3(1.0/2.2));
     if(isDead)
         color = color + vec3(1,-0.2,-0.2);
 
