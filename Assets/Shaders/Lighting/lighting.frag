@@ -545,7 +545,7 @@ void main() {
     adjustedIndirectLighting *= albedo * 1;
 
     vec3 ambientColor = albedo * envLighting;
-    vec3 ambientLighting = ambientColor * vec3(0.2f);
+    vec3 ambientLighting = ambientColor * vec3(0.1f);
 
     // Ambient hack
 	float amfactor = min(1, 1 - metallic * 1.0);
@@ -559,7 +559,7 @@ void main() {
 
     // HDR
 
-    color = color / (color + vec3(1.0));
+
     color = mix(color, Tonemap_ACES(color), 1.0);   
 
     color = pow(color, vec3(1.0/2.2));
@@ -570,7 +570,7 @@ void main() {
     if(lightingState == 0)
         gLighting = vec4(color, spec);// + vec4(albedo * 0.2,1);
     if(lightingState == 1){
-        vec3 color = directlight / ( directlight + vec3(1.0));
+        vec3 color = directlight;
         color = mix(color, Tonemap_ACES(color), 1.0);   
         color = pow(color, vec3(1.0/2.2));
         gLighting = vec4(color, 1);// + vec4(albedo * 0.2,1);
