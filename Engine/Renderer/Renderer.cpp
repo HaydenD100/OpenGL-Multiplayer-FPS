@@ -376,7 +376,7 @@ namespace Renderer
 
 		glm::vec3 spacing = glm::vec3(2,2,2);
 		glm::vec3 propgationGridSize = glm::vec3(28, 20, 38);
-		glm::vec3 gridPos = glm::vec3(propgationGridSize.x/-2.0f, -2, propgationGridSize.z/-2.0f);
+		glm::vec3 gridPos = glm::vec3(propgationGridSize.x/-2, -2, propgationGridSize.z/-2);
 
 		probeTexture.Create(glm::ceil(propgationGridSize.x / spacing.x), glm::ceil(propgationGridSize.y / spacing.y), glm::ceil(propgationGridSize.z / spacing.z));
 		probeGrid.Configure(propgationGridSize.x, propgationGridSize.y, propgationGridSize.z, spacing, gridPos);
@@ -518,7 +518,7 @@ namespace Renderer
 		glEnable(GL_DEPTH_TEST);
 		gbuffer.Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetSkyBox());
+		RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetEnviromentLighting().sky);
 
 		s_geomerty.Use();
 		s_geomerty.SetMat4("P", Camera::getProjectionMatrix());
@@ -618,6 +618,7 @@ namespace Renderer
 		}
 		
 		//-----------------------------------------Transaprent stuff---------------------------------------
+		
 		s_transparent.Use();
 		s_transparent.SetMat4("P", Camera::getProjectionMatrix());
 		s_transparent.SetMat4("V", Camera::getViewMatrix());
@@ -627,7 +628,7 @@ namespace Renderer
 
 
 		//TODO :: CHANGE THIS TO OIT this gets slow if theres too many transparent objects
-	
+		
 		std::sort(NeedRendering.begin(), NeedRendering.end(),
 			[&cameraPosition](const GameObject* a, const GameObject* b) {
 				float distanceA = glm::length(a->GetPosition() - cameraPosition);
@@ -666,7 +667,7 @@ namespace Renderer
 			s_transparent.SetMat4("M", ModelMatrix);
 			NeedRendering[i]->RenderObject(s_transparent.GetShaderID());
 		}
-
+		
 		/*
 		s_water.Use();
 		s_water.SetMat4("P", Camera::getProjectionMatrix());
@@ -795,6 +796,11 @@ namespace Renderer
 		s_lighting.SetVec3("volume", probeGrid.volume);
 		s_lighting.SetVec3("spacing", probeGrid.spacing);
 		s_lighting.SetInt("lightingState", lightingState);
+
+		s_lighting.SetVec3("envLighting", SceneManager::GetCurrentScene()->GetEnviromentLighting().indirectLight);
+
+
+		
 
 		RenderPlane();
 

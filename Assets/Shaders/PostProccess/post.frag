@@ -49,6 +49,6 @@ void main() {
     */
 
     //+ blurredSSR
-    gFinal = lighting  + emissive ;
+    gFinal = lighting + emissive ;
 
 }

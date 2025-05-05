@@ -135,7 +135,10 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("GI_map_1", Model("Assets/Maps/sand_box.fbx", AssetManager::GetTexture("dev_textures")));
 	AssetManager::GetModel("GI_map_1")->GetMeshByName("stairs_plane")->ToggleRender(false);
 
-	//AssetManager::GetModel("GI_map_1")->GetMeshByName("stairs_plane")->ToggleRender(false);
+	AssetManager::AddModel("GI_map_1", Model("Assets/Maps/sand_box.fbx", AssetManager::GetTexture("dev_textures")));
+
+
+	AssetManager::GetModel("GI_map_1")->GetMeshByName("stairs_plane")->ToggleRender(false);
 	AssetManager::AddModel("Cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("metalic")));
 
 	//Super laggy
@@ -198,7 +201,12 @@ void Scene::Load() {
 			"Assets/Skybox/Space/front.png",
 			"Assets/Skybox/Space/back.png"
 	};
-	sky = SkyBox(faces);
+
+	envLight.sky = SkyBox(faces);
+	//Average light of skybox
+	envLight.indirectLight = glm::vec3(0.188, 0.278, 0.4);
+
+
 
 	{
 		Light light(glm::vec3(6.13, 4.5, 5.3), glm::vec3(1, 0.11, 0) * 6.0f, 0.22, 0.20);
@@ -210,17 +218,13 @@ void Scene::Load() {
 	}
 	{
 		Light light(glm::vec3(0, 6, -2.4), glm::vec3(1, 0.922, 0.678) * 7.5f, 0.07, 0.017);
-		//lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(-11, 25, -8), glm::vec3(1, 1, 1) * 2.0f, 10, 50);
 		lights.push_back(light);
 	}
+
 
 	// TODO: not currently working
 	//AssetManager::SaveAssets("Assets/Saves/mainScene.json");
 	
-	glBindVertexArray(sky.GetSkyBoxVAO());
 }
 
 void Scene::Update(float deltaTime) {
@@ -272,8 +276,8 @@ std::vector<Light> Scene::getLights() {
 	return lights;
 }
 
-SkyBox Scene::GetSkyBox() {
-	return sky;
+EnviromentLighting Scene::GetEnviromentLighting() {
+	return envLight;
 }
 std::vector<GameObject*> Scene::NeedRenderingObjects() {
 	return NeedRendering;
@@ -304,9 +308,3 @@ void Scene::RemoveLight(int index) {
 	if (index < lights.size())
 		lights.erase(lights.begin() + index);
 }
-
-
-
-
-
-

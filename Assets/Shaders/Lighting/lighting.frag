@@ -41,6 +41,7 @@ struct Light{
     samplerCube depthMap;
 };
 uniform Light[MAXLIGHTS] lights;
+uniform vec3 envLighting;
 
 
 
@@ -83,7 +84,7 @@ float ShadowCalculation(vec3 fragPos, int index, vec3 N){
     float shadow = 0.0;
     //float bias = 0.2;
     //float bias =0.1  ;
-    float bias = max(1 * (1.0 - dot(N, normalize(lightDir))), 0.005f);
+    float bias = max(0.1 * (1.0 - dot(N, normalize(lightDir))), 0.005f);
 
     int samples = 20;
     float viewDistance = length(viewPos - fragPos);
@@ -419,7 +420,6 @@ vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
 
     if(vdotn > -0.0 && probe_color != vec3(0))
         weight = weights.x * weights.y * weights.z;
-
     else
         weight = 0.0;        
     return probe_color;
@@ -446,6 +446,14 @@ vec3 GetIndirectLighting(vec3 WorldPos, vec3 Normal) { // Interpolate visible pr
 }
 
 
+vec3 Tonemap_ACES(const vec3 x) { // Narkowicz 2015, "ACES Filmic Tone Mapping Curve"
+    const float a = 2.51;
+    const float b = 0.03;
+    const float c = 2.43;
+    const float d = 0.59;
+    const float e = 0.14;
+    return (x * (a * x + b)) / (x * (c * x + d) + e);
+}
 
 
 
@@ -522,7 +530,7 @@ void main() {
         float NdotL = max(dot(N, L), 0.0);
         float shadow = ShadowCalculation(FragPos , i, N);
         //the 1.3 makes it a little brighter
-        Lo += ((kD * albedo) * (shadow) / PI + specular) * radiance * NdotL * (shadow);
+        Lo += ((kD * albedo * envLighting) * (shadow) / PI + specular) * radiance * NdotL * (shadow);
         spec += specular * radiance * NdotL * (shadow);
     }
     
@@ -530,17 +538,30 @@ void main() {
     vec3 indirectLighting = GetIndirectLighting(FragPos,trueNormal);
 
     vec3 adjustedIndirectLighting = indirectLighting;
+    indirectLighting = pow(indirectLighting,vec3(2.2f));
     float factor = min(1, roughness * 1.5);
     adjustedIndirectLighting *= (0.8) * vec3(factor);
     adjustedIndirectLighting = max(adjustedIndirectLighting, vec3(0));
-    adjustedIndirectLighting *= albedo * 2;
+    adjustedIndirectLighting *= albedo * 1;
 
-    vec3 directlight = ao * Lo;
-    vec3 color = ao * Lo + adjustedIndirectLighting;
+    vec3 ambientColor = albedo * envLighting;
+    vec3 ambientLighting = ambientColor * vec3(0.2f);
+
+    // Ambient hack
+	float amfactor = min(1, 1 - metallic * 1.0);
+	ambientLighting *= (1.0) * vec3(amfactor);
+
+    vec3 directlight = ao * Lo + ambientLighting;
+    vec3 color = directlight + adjustedIndirectLighting;
+
+
     
 
     // HDR
+
     color = color / (color + vec3(1.0));
+    color = mix(color, Tonemap_ACES(color), 1.0);   
+
     color = pow(color, vec3(1.0/2.2));
     if(isDead)
         color = color + vec3(1,-0.2,-0.2);
@@ -548,8 +569,13 @@ void main() {
 
     if(lightingState == 0)
         gLighting = vec4(color, spec);// + vec4(albedo * 0.2,1);
-    if(lightingState == 1)
-        gLighting = vec4(directlight / ( directlight + vec3(1.0)),1);
+    if(lightingState == 1){
+        vec3 color = directlight / ( directlight + vec3(1.0));
+        color = mix(color, Tonemap_ACES(color), 1.0);   
+        color = pow(color, vec3(1.0/2.2));
+        gLighting = vec4(color, 1);// + vec4(albedo * 0.2,1);
+
+    }
     if(lightingState == 2)
         gLighting = vec4(adjustedIndirectLighting,1);
     if(lightingState == 3)

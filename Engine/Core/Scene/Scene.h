@@ -23,6 +23,12 @@
 #include "Engine/Animation/SkinnedAnimatior.h"
 #include "Engine/Pathfinding/Pathfinding.h"
 
+
+
+struct EnviromentLighting {
+	SkyBox sky = SkyBox();
+	glm::vec3 indirectLight = glm::vec3(0, 0, 0);
+};
  
 class Scene
 {
@@ -45,12 +51,12 @@ public:
 	void RemoveLight(int index);
 
 	size_t GetLightsSize();
-	SkyBox GetSkyBox();
+	EnviromentLighting GetEnviromentLighting();
 	std::vector<GameObject*> NeedRenderingObjects();
 
 private:
 	std::vector<GameObject*> NeedRendering;
-	SkyBox sky = SkyBox();
+	EnviromentLighting envLight;
 
 	// Objects
 	std::vector<Door> doors;

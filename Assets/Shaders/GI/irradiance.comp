@@ -85,16 +85,19 @@ vec3 gridSamplingDisk[20] = vec3[]
    vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
 );
 
-float ShadowCalculation(vec3 fragPos, int index, vec3 probe_world_pos)
+float ShadowCalculation(vec3 fragPos, int index, vec3 probe_world_pos, vec3 N)
 {
     vec3 fragToLight = fragPos - lights[index].position;
+     vec3 lightDir = lights[index].position - fragPos;
     float currentDepth = length(fragToLight);
     float shadow = 0.0;
-    float bias = 0.2;
+    //float bias = 0.2;
+    //float bias =0.1  ;
+    float bias = max(0.1 * (1.0 - dot(N, normalize(lightDir))), 0.005f);
 
     int samples = 20;
     float viewDistance = length(probe_world_pos - fragPos);
-    float diskRadius = (1.0 + (viewDistance / lights[index].radius)) / 25.0;
+    float diskRadius = (1.0 + (viewDistance / lights[index].radius)) / 200;
     for(int i = 0; i < samples; ++i)
     {
         float closestDepth = texture(lights[index].depthMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
@@ -106,6 +109,8 @@ float ShadowCalculation(vec3 fragPos, int index, vec3 probe_world_pos)
     
     return shadow;
 }
+
+
 
 // ----------------------------------------------------------------------------
 float DistributionGGX(vec3 N, vec3 H, float roughness) {
@@ -142,7 +147,6 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 vec3 DirectLighting(vec3 p, float b, int probeID, vec3 probe_world_pos){
     vec3 diffuse = textureLod(textures[probeID * 3], p, b).rgb;
     vec3 FragPos = textureLod(textures[probeID * 3 + 2], p, b).rgb;
-
     if(FragPos == vec3(0)){
         return vec3(Sky_Color);
     }
@@ -182,7 +186,7 @@ vec3 DirectLighting(vec3 p, float b, int probeID, vec3 probe_world_pos){
         vec3 kS = F;
         vec3 kD = (1.0 - kS) * (1.0 - metallic);
         float NdotL = max(dot(N, L), 0.0);
-        float shadow = ShadowCalculation(FragPos , i,probe_world_pos);
+        float shadow = ShadowCalculation(FragPos , i,probe_world_pos, N);
         //the 1.3 makes it a little brighter
         Lo += ((kD * diffuse) * (1.0f - shadow) / PI + specular) * radiance * NdotL * (1.0f - shadow);
         spec += specular * radiance * NdotL * (1.0 - shadow);
@@ -537,13 +541,7 @@ void main()
     uint workInvocationID = gl_LocalInvocationID.x;
     int probeID = start_index + int(workGroupID);
 
-    vec3 probe_pos = positions[probeID];
-    vec3 probe_world_pos = probe_pos + gridWorldPos;
-
-    ivec3 texturePosition = ivec3(probe_pos);
-	imageStore(probeGrid, texturePosition, vec4(probeID));
-    //imageStore(probeGrid, texturePosition, vec4(1));
-
+    vec3 probe_world_pos = positions[probeID];
      
 	SphericalHarmonics shRadiance = CubeMapToRadianceSH(probeID,probe_world_pos);
 	//SphericalHarmonics shDepth = DepthMapToRadianceSH();

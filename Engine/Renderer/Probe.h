@@ -104,7 +104,7 @@ struct ProbeGrid {
 
 					// Create position vector once and reuse
 					const glm::vec3 pos(xPos, yPos, zPos);
-
+					//std::cout << "Pos: " << (pos * spacing).x << " " << (pos * spacing).y <<  " " << (pos * spacing).z << "\n";
 					probes.emplace_back(pos * spacing);
 					positions.push_back(pos * spacing);
 				}
