@@ -168,6 +168,9 @@
     <ClCompile Include="Engine\Editor\Editor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Renderer\Ocean.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Scene\Scene.h">
@@ -332,13 +335,15 @@
     <ClInclude Include="Engine\Editor\Editor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Renderer\Ocean.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\SkyBoxShader.vert" />
     <None Include="Assets\Shaders\SkyBoxShader.frag" />
     <None Include="Assets\Shaders\SSAO\ssao.vert" />
     <None Include="Assets\Shaders\Lighting\lighting.vert" />
-    <None Include="Assets\Shaders\Lighting\lighting.frag" />
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.vert" />
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.frag" />
     <None Include="Assets\Shaders\Editor\Editor.frag" />
@@ -388,6 +393,15 @@
     <None Include="Assets\Shaders\Debug\point.vert" />
     <None Include="Assets\Shaders\Debug\line.vert" />
     <None Include="Assets\Shaders\Debug\line.frag" />
+    <None Include="Assets\Shaders\Lighting\lighting.comp" />
+    <None Include="Assets\Shaders\SSAO\ssao.comp" />
+    <None Include="Assets\Shaders\PostProccess\post.comp" />
+    <None Include="Assets\Shaders\fxaa\fxaa.comp" />
+    <None Include="Assets\Shaders\Water\water.tesc" />
+    <None Include="Assets\Shaders\Water\water.tese" />
+    <None Include="Assets\Shaders\Water\wave_vec.comp" />
+    <None Include="Assets\Shaders\Water\water_height_row.comp" />
+    <None Include="Assets\Shaders\Water\water_height_col.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

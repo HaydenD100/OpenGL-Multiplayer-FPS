@@ -21,12 +21,33 @@ Model::Model(Mesh mesh, Texture* texture) {
 
 }
 
+Model::Model(const char* path, Texture* texture, int triangulate) {
+    this->name = path;
+    Assimp::Importer import;
+    const aiScene* scene;
+    if(triangulate)
+        scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    else
+        scene = import.ReadFile(path, aiProcess_FlipUVs);
+
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    {
+        std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+        return;
+    }
+    std::cout << "Assimp: Loading Model " << path << std::endl;
+    processNode(scene->mRootNode, scene, texture);
+
+    aabb = generateAABB();
+}
+
 //Right now this can only load files that support tanget and bit tanget fbx is the most common
 Model::Model(const char* path, Texture* texture) {
     this->name = path;
     Assimp::Importer import;
+    const aiScene* scene;
+    scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
-    const aiScene * scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {

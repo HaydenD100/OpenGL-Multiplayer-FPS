@@ -4,6 +4,7 @@
 #include "Engine/Loaders/stb_image.h"
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Core/Camera.h"
+#include "Engine/Core/Common/Header.h"
 
 
 #include <random>
@@ -279,4 +280,130 @@ glm::vec3 ScreenPointToRayFunc(
     glm::vec3 rayDirection = glm::normalize(glm::vec3(farPoint) - rayOrigin);
 
     return rayDirection;
+}
+
+
+std::vector<GLfloat> generateGaussianNoise(int width, int height) {
+    std::vector<GLfloat> pixels(width * height * 4); // Now 4 channels (RGBA)
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<GLfloat> dist(0.0f, 1.0f);
+
+    for (int i = 0; i < width * height; ++i) {
+        // Generate two pairs of (u, v) for two Box-Muller transforms
+        float u1 = 1.0f - dist(gen); // Avoid log(0)
+        float v1 = 1.0f - dist(gen);
+        float u2 = 1.0f - dist(gen);
+        float v2 = 1.0f - dist(gen);
+
+        // First Box-Muller transform (Red/Green channels)
+        float radius1 = std::sqrt(-2.0f * std::log(u1));
+        float angle1 = 2.0f * ENGINE_PI * v1;
+        float z0 = radius1 * std::cos(angle1);
+        float z1 = radius1 * std::sin(angle1);
+
+        // Second Box-Muller transform (Blue/Alpha channels)
+        float radius2 = std::sqrt(-2.0f * std::log(u2));
+        float angle2 = 2.0f * ENGINE_PI * v2;
+        float z2 = radius2 * std::cos(angle2);
+        float z3 = radius2 * std::sin(angle2);
+
+        // Assign to all four channels
+        pixels[i * 4 + 0] = z0; // Red
+        pixels[i * 4 + 1] = z1; // Green
+        pixels[i * 4 + 2] = z2; // Blue
+        pixels[i * 4 + 3] = z3; // Alpha
+    }
+
+    return pixels;
+}
+
+
+std::vector<GLfloat> generatePhillipsDistribution(int Nx, int Nz, glm::vec2 size, float amplitude,
+    float max_l, float L, glm::vec2 wind_dir) {
+    std::vector<GLfloat> pixels(Nx * Nz * 4); // RGBA channels
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<GLfloat> dist(0.0f, 1.0f);
+
+    glm::vec2 mod = glm::vec2(2.0f * ENGINE_PI) / size;
+
+    for (int z = 0; z < Nz; ++z) {
+        for (int x = 0; x < Nx; ++x) {
+            // Calculate aliased wave vector
+            glm::vec2 k = mod * glm::vec2(alias(x, Nx), alias(z, Nz));
+
+            // Compute Phillips spectrum
+            float phillips_val = phillips(k, max_l, L, wind_dir);
+            float scale = amplitude * sqrt(0.5f * phillips_val);
+
+            // Generate Gaussian pairs using Box-Muller
+            float u1 = 1.0f - dist(gen);
+            float v1 = dist(gen);
+            float radius1 = sqrt(-2.0f * log(u1));
+            float angle1 = 2.0f * ENGINE_PI * v1;
+            float z0 = radius1 * cos(angle1) * scale;
+            float z1 = radius1 * sin(angle1) * scale;
+
+            float u2 = 1.0f - dist(gen);
+            float v2 = dist(gen);
+            float radius2 = sqrt(-2.0f * log(u2));
+            float angle2 = 2.0f * ENGINE_PI * v2;
+            float z2 = radius2 * cos(angle2) * scale;
+            float z3 = radius2 * sin(angle2) * scale;
+
+            // Store in RGBA channels
+            int idx = (z * Nx + x) * 4;
+            pixels[idx + 0] = z0; // Red
+            pixels[idx + 1] = z1; // Green
+            pixels[idx + 2] = z2; // Blue
+            pixels[idx + 3] = z3; // Alpha
+        }
+    }
+
+    return pixels;
+}
+
+// Helper function for aliasing indices
+int alias(int index, int N) {
+    return index < N / 2 ? index : index - N;
+}
+
+// Phillips spectrum implementation
+float phillips(glm::vec2 k, float max_l, float L, glm::vec2 wind_dir) {
+    float k_len = glm::length(k);
+    if (k_len == 0.0f) return 0.0f;
+
+    float kL = k_len * L;
+    glm::vec2 k_dir = glm::normalize(k);
+    float kw = glm::dot(k_dir, wind_dir);
+
+    return pow(fabs(kw), 1.0f) *
+        exp(-k_len * k_len * max_l * max_l) *
+        exp(-1.0f / (kL * kL)) *
+        pow(k_len, -4.0f);
+}
+std::vector<glm::vec3> generate_random_directions(int count) {
+    assert(count > 0 && "Direction count must be positive");
+    std::vector<glm::vec3> directions;
+    directions.reserve(count);
+
+    // Random number setup
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::normal_distribution<float> dist(0.0f, 1.0f);
+
+    for (int i = 0; i < count; ++i) {
+        // Generate random components
+        float x = dist(gen);
+        float y = dist(gen);
+        float z = dist(gen);
+
+        // Normalize and store
+        directions.emplace_back(glm::normalize(glm::vec3(x, y, z)));
+    }
+
+    return directions;
 }

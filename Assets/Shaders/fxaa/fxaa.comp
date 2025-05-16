@@ -1,0 +1,88 @@
+#version 460
+layout (local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
+
+layout (rgba32f, binding = 7) uniform writeonly image2D FragColor;
+
+// Input texture and texture coordinates
+layout (binding = 0) uniform sampler2D inputTexture;
+
+
+
+uniform float viewportWidth;
+uniform float viewportHeight;
+
+//TokyoSplif code
+
+
+
+
+// FXAA implementation
+vec3 Fxaa(sampler2D tex) {
+
+    ivec2 coords = ivec2(gl_GlobalInvocationID.xy);
+    vec2 UV = (vec2(gl_GlobalInvocationID.xy) + 0.5) / vec2(viewportWidth,viewportHeight);
+
+    	// Compute Fxaa texture offsets here, rather than fragment shader
+	vec2 texCoordOffset = 1.0f / vec2(float(viewportWidth), float(viewportHeight));
+	//texCoordOffset *= 0.75;
+	vec2 offsetTL = UV  + vec2(-1.0, -1.0) * texCoordOffset;
+	vec2 offsetTR = UV  + (vec2(1.0, -1.0) * texCoordOffset);
+	vec2 offsetBL = UV  + vec2(-1.0,  1.0) * texCoordOffset;
+	vec2 offsetBR = UV  + vec2( 1.0,  1.0) * texCoordOffset;
+    // Constants for FXAA
+    float fxaaSpanMax = 8.0;
+    float fxaaReduceMin = 1.0 / 128.0;
+    float fxaaReduceMul = 1.0 / 4.0;
+
+    // Luma weights for RGB channels
+    vec3 lumaWeights = vec3(0.299, 0.587, 0.114);
+
+    // Sample luma values from the texture
+    float lumaTL = dot(lumaWeights, texture(tex, offsetTL).rgb);
+    float lumaTR = dot(lumaWeights, texture(tex, offsetTR).rgb);
+    float lumaBL = dot(lumaWeights, texture(tex, offsetBL).rgb);
+    float lumaBR = dot(lumaWeights, texture(tex, offsetBR).rgb);
+    float lumaM = dot(lumaWeights, texture(tex, TexCoords).rgb);
+
+    // Calculate the direction of the edge
+    vec2 dir;
+    dir.x = -((lumaTL + lumaTR) - (lumaBL + lumaBR));
+    dir.y = ((lumaTL + lumaBL) - (lumaTR + lumaBR));
+
+    // Reduce the direction's influence
+    float dirReduce = max((lumaTL + lumaTR + lumaBL + lumaBR) * (fxaaReduceMul * 0.25), fxaaReduceMin);
+    float inverseDirAdjustment = 1.0 / (min(abs(dir.x), abs(dir.y)) + dirReduce);
+
+    dir = clamp(dir * inverseDirAdjustment, vec2(-fxaaSpanMax), vec2(fxaaSpanMax)) * texCoordOffset;
+
+    // Sample along the calculated direction
+    vec3 result1 = 0.5 * (
+        texture(tex, TexCoords + dir * (1.0 / 3.0 - 0.5)).rgb +
+        texture(tex, TexCoords + dir * (2.0 / 3.0 - 0.5)).rgb
+    );
+
+    vec3 result2 = 0.5 * result1 + 0.25 * (
+        texture(tex, TexCoords + dir * (0.0 / 3.0 - 0.5)).rgb +
+        texture(tex, TexCoords + dir * (3.0 / 3.0 - 0.5)).rgb
+    );
+
+    // Compute min and max luma for clamping
+    float lumaMin = min(lumaM, min(min(lumaTL, lumaTR), min(lumaBL, lumaBR)));
+    float lumaMax = max(lumaM, max(max(lumaTL, lumaTR), max(lumaBL, lumaBR)));
+
+    // Select the final result
+    float lumaResult2 = dot(lumaWeights, result2);
+    if (lumaResult2 < lumaMin || lumaResult2 > lumaMax)
+        return result1;
+    else
+        return result2;
+}
+
+void main() {
+    vec3 result = Fxaa(inputTexture);
+    //result = texture(inputTexture, TexCoords).xyz;
+    // Output the final color
+    ivec2 coords = ivec2(gl_GlobalInvocationID.xy);
+    imageStore(gFinal, coords,vec4(result, 1.0));
+
+}

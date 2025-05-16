@@ -7,9 +7,9 @@
 #include "Engine/Core/Input.h"
 #include "Engine/Core/UI/Text2D.h" 
 #include "Loaders/stb_image.h"
+
 #include <random>
-
-
+#include <memory>
 
 
 
@@ -67,6 +67,13 @@ namespace Renderer
 	GLuint pointVBO, pointVAO;
 	GLuint lineVAO, lineVBO;
 
+	//Water
+	Texture GaussianNoise;
+	Texture waterVecOut;
+	Texture waterHeightMap;
+	std::vector<glm::vec3> _randomdir;
+	const int waveCount = 32;
+
 
 	//ssao
 	std::vector<glm::vec3> ssaoKernel;
@@ -88,7 +95,6 @@ namespace Renderer
 	GLuint bloomTexture;
 
 	//Shaders
-	Shader s_lighting;
 	Shader s_skybox;
 	Shader s_geomerty;
 	Shader s_ssao;
@@ -98,7 +104,6 @@ namespace Renderer
 	Shader s_decal;
 	Shader s_final;
 	Shader s_SSR;
-	Shader s_Post;
 	Shader s_voxel;
 	Shader s_voxel_display;
 	Shader s_probe;
@@ -113,6 +118,16 @@ namespace Renderer
 	Shader s_upScale;
 	Shader s_drawPoint;
 	Shader s_drawLine;
+
+	//ComputeShaders
+	ComputeShader cs_lighting;
+	ComputeShader cs_post;
+	ComputeShader cs_ssao;
+	ComputeShader cs_water_vec;
+	ComputeShader cs_water_height_fft_col;
+	ComputeShader cs_water_height_fft_row;
+
+
 
 	ComputeShader cs_probeIrradiance;
 	ComputeShader cs_Raycaster;
@@ -143,8 +158,10 @@ namespace Renderer
 
 	//state stuff for enabling/disabling indirect lighting for showcase
 	int lightingState = 0;
-
 	int DebugState = 0;
+	int WaterWireFrame = 1;
+
+
 
 	void Renderer::LoadAllShaders() {
 		
@@ -158,30 +175,29 @@ namespace Renderer
 		s_decal.Load("Assets/Shaders/Decal/decal.vert", "Assets/Shaders/Decal/decal.frag");
 		s_final.Load("Assets/Shaders/Final/final.vert", "Assets/Shaders/Final/final.frag");
 		s_SSR.Load("Assets/Shaders/SSR/SSR.vert", "Assets/Shaders/SSR/SSR.frag");
-		s_Post.Load("Assets/Shaders/PostProccess/post.vert", "Assets/Shaders/PostProccess/post.frag");
-		//s_probe.Load("Assets/Shaders/GI/probe.vert", "Assets/Shaders/GI/probe.frag");
 		s_probeDeffered.Load("Assets/Shaders/GI/probeGeom.vert", "Assets/Shaders/GI/probeGeom.frag");
 		s_probeRender.Load("Assets/Shaders/GI/renderProbes.vert", "Assets/Shaders/GI/renderProbes.frag");
-		//s_probeirradiance.Load("Assets/Shaders/GI/irradiance.vert", "Assets/Shaders/GI/irradiance.frag");
-		s_lighting.Load("Assets/Shaders/Lighting/lighting.vert", "Assets/Shaders/Lighting/lighting.frag");
 		s_downScale.Load("Assets/Shaders/Bloom/bloom.vert", "Assets/Shaders/Bloom/downscale.frag");
 		s_upScale.Load("Assets/Shaders/Bloom/bloom.vert", "Assets/Shaders/Bloom/upscale.frag");
 		s_SolidColor.Load("Assets/Shaders/SolidColour/solidColour.vert", "Assets/Shaders/SolidColour/solidColour.frag");
 		s_fxaa.Load("Assets/Shaders/fxaa/fxaa.vert", "Assets/Shaders/fxaa/fxaa.frag");
-		s_water.Load("Assets/Shaders/Water/water.vert", "Assets/Shaders/Water/water.frag");
+		s_water.Load("Assets/Shaders/Water/water.vert", "Assets/Shaders/Water/water.frag","Assets/Shaders/Water/water.tese","Assets/Shaders/Water/water.tesc");
 		s_textShader.Load("Assets/Shaders/textShader.vert", "Assets/Shaders/textShader.frag");
 		s_drawPoint.Load("Assets/Shaders/Debug/point.vert", "Assets/Shaders/Debug/point.frag");
 
 		cs_probeIrradiance.Load("Assets/Shaders/GI/irradiance.comp");
-
 		cs_Raycaster.Load("Assets/Shaders/GI/triangleIntersection.comp");
-
+		cs_lighting.Load("Assets/Shaders/Lighting/lighting.comp");
+		cs_post.Load("Assets/Shaders/PostProccess/post.comp");
+		cs_ssao.Load("Assets/Shaders/SSAO/ssao.comp");
+		cs_water_vec.Load("Assets/Shaders/Water/wave_vec.comp");
+		cs_water_height_fft_col.Load("Assets/Shaders/Water/water_height_col.comp");
 
 		//TODO :: change this so the texture bindings are defined in the GLSL shader
 		
-		s_lighting.Use();
+		cs_lighting.Use();
 		for (int i = 0; i < 26; i++) {
-			s_lighting.SetInt("lights[" + std::to_string(i) + "].depthMap", 8 + i);
+			cs_lighting.SetInt("lights[" + std::to_string(i) + "].depthMap", 8 + i);
 		}
 
 		s_water.Use();
@@ -217,21 +233,21 @@ namespace Renderer
 		s_SolidColor.SetInt("DefaultNormal", 4);
 
 
-		s_ssao.Use();
+		cs_ssao.Use();
 		for (size_t i = 0; i < ssaoKernel.size(); i++) {
-			s_ssao.SetVec3("samples[" + std::to_string(i) + "]", ssaoKernel[i]);
+			cs_ssao.SetVec3("samples[" + std::to_string(i) + "]", ssaoKernel[i]);
 		}
-		s_ssao.SetInt("gPosition", 0);
-		s_ssao.SetInt("gNormal", 1);
-		s_ssao.SetInt("texNoise", 2);
+		cs_ssao.SetInt("gPosition", 0);
+		cs_ssao.SetInt("gNormal", 1);
+		cs_ssao.SetInt("texNoise", 2);
 
 		s_decal.Use();
 		s_decal.SetInt("decalTexture", 1);
 		s_decal.SetInt("gDepth", 3);
 
-		s_Post.Use();
-		s_Post.SetInt("gLighting", 0);
-		s_Post.SetInt("gSSR", 1);
+		cs_post.Use();
+		cs_post.SetInt("gLighting", 0);
+		cs_post.SetInt("gSSR", 1);
 
 		s_final.Use();
 		s_final.SetInt("gFinal", 0);
@@ -369,9 +385,11 @@ namespace Renderer
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-
-
 		
+		GaussianNoise = Texture(generateGaussianNoise(512, 512), 512, 512);
+		waterVecOut = Texture(generateGaussianNoise(512, 512), 512, 512);
+		waterHeightMap = Texture(generateGaussianNoise(512, 512), 512, 512);
+
 		//Raycaster::Init();
 
 		glm::vec3 spacing = glm::vec3(2,2,2);
@@ -383,7 +401,7 @@ namespace Renderer
 
 		SHBuffer.Configure((10 * sizeof(glm::vec3)) * 10000 );
 
-
+		_randomdir = generate_random_directions(waveCount);
 
 		return 0;
 	}
@@ -395,6 +413,7 @@ namespace Renderer
 		lightingBuffer.Configure();
 		postBuffer.Configure();
 		fxaaBuffer.Configure(Backend::GetWidth(), Backend::GetHeight());
+
 		emmisiveRenderer.Init(Backend::GetWidth(), Backend::GetHeight());
 
 
@@ -448,6 +467,31 @@ namespace Renderer
 		for (int i = 0; i < lights.size();i++) {
 	
 			shader->SetVec3("lights[" + std::to_string(i) + "].position",lights[i].position);
+			shader->SetVec3("lights[" + std::to_string(i) + "].color", lights[i].colour);
+			shader->SetFloat("lights[" + std::to_string(i) + "].strength", lights[i].strength);
+			shader->SetFloat("lights[" + std::to_string(i) + "].radius", lights[i].radius);
+
+			glActiveTexture(GL_TEXTURE8 + i); // Activate texture unit i
+			glBindTexture(GL_TEXTURE_CUBE_MAP, lights[i].depthCubemap); // Bind the depth cubemap to the texture unit
+		}
+	}
+
+	void Renderer::SetLights(std::vector<Light> lights, ComputeShader* shader) {
+		// Upload lights data to the GPU
+		std::vector<glm::vec3> lightPositions;
+		std::vector<glm::vec3> lightDirection;
+
+		std::vector<glm::vec3> lightColors;
+		std::vector<float> LightLinears;
+		std::vector<float> LightQuadratics;
+		std::vector<float> LightRadius;
+		std::vector<float> LightCutoff;
+		std::vector<float> LightOuterCutOff;
+
+
+		for (int i = 0; i < lights.size(); i++) {
+
+			shader->SetVec3("lights[" + std::to_string(i) + "].position", lights[i].position);
 			shader->SetVec3("lights[" + std::to_string(i) + "].color", lights[i].colour);
 			shader->SetFloat("lights[" + std::to_string(i) + "].strength", lights[i].strength);
 			shader->SetFloat("lights[" + std::to_string(i) + "].radius", lights[i].radius);
@@ -513,12 +557,44 @@ namespace Renderer
 
 		Renderer::CheckDebugState();
 
+		cs_water_vec.Use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, GaussianNoise.GetTexture());
+		glBindImageTexture(1, waterVecOut.GetTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+		cs_water_vec.SetFloat("time", glfwGetTime());
+
+		glDispatchCompute(512 / 32, 512 / 32, 1);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
+		cs_water_height_fft_col.Use();
+
+		cs_water_height_fft_col.SetBool("uHorizontalPass", true);
+
+		glBindImageTexture(0, waterVecOut.GetTexture(), 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA32F);
+		glBindImageTexture(1, waterHeightMap.GetTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+
+		glDispatchCompute(512 / 32, 512 / 32, 1); // 32 workgroups for 512 columns
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
+		//cs_water_height_fft_col.SetBool("uHorizontalPass", false);
+
+		//glDispatchCompute(512 / 32, 512 / 32, 1); // 32 workgroups for 512 columns
+		//glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
+		//cs_water_height_fft_row	.Use();
+
+		//glBindImageTexture(0, waterVecOut.GetTexture(), 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA32F);
+		//glBindImageTexture(1, waterHeightMap.GetTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+
+		//glDispatchCompute(512 / 32, 1, 1); // 32 workgroups for 512 rows
+		//glMemoryBarrier(GL_ALL_BARRIER_BITS);
 		//-------------------------------------------GBUFFER-----------------------------------------
 
 		glEnable(GL_DEPTH_TEST);
 		gbuffer.Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetEnviromentLighting().sky);
+		waterObjects.clear();
 
 		s_geomerty.Use();
 		s_geomerty.SetMat4("P", Camera::getProjectionMatrix());
@@ -560,6 +636,7 @@ namespace Renderer
 			gameobjectRender->RenderObject(s_geomerty.GetShaderID());
 		}
 
+		RenderWater();
 
 
 
@@ -616,14 +693,16 @@ namespace Renderer
 			s_decal.SetVec3("size", size);
 			decal.RenderDecal(s_decal.GetShaderID());
 		}
-		
+
+
+
 		//-----------------------------------------Transaprent stuff---------------------------------------
 		
 		s_transparent.Use();
 		s_transparent.SetMat4("P", Camera::getProjectionMatrix());
 		s_transparent.SetMat4("V", Camera::getViewMatrix());
 		s_transparent.SetVec3("viewPos", Camera::GetPosition());
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glm::vec3 cameraPosition = Camera::GetPosition(); // Camera position
 
 
@@ -644,10 +723,7 @@ namespace Renderer
 				overlay.push_back(NeedRendering[i]);
 				continue;
 			}
-			if (NeedRendering[i]->GetShaderType() == "water") {
-				waterObjects.push_back(NeedRendering[i]);
-				continue;
-			}
+			
 			auto transforms = NeedRendering[i]->GetFinalBoneMatricies();
 			if (transforms[0] != glm::mat4(1)) {
 				s_transparent.SetBool("animated", true);
@@ -668,6 +744,7 @@ namespace Renderer
 			NeedRendering[i]->RenderObject(s_transparent.GetShaderID());
 		}
 		
+
 		/*
 		s_water.Use();
 		s_water.SetMat4("P", Camera::getProjectionMatrix());
@@ -745,30 +822,36 @@ namespace Renderer
 
 
 		//---------------------------------------------------SSAO-------------------------------------
-		ssaoBuffer.Bind();
-		glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//ssaoBuffer.Bind();
+		//glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		s_ssao.Use();
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+		cs_ssao.Use();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gNormal);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, noiseTexture);
-		s_ssao.SetMat4("projection", Camera::getProjectionMatrix());		
-		s_ssao.SetFloat("ScreenWidth", Backend::GetWidth());
-		s_ssao.SetFloat("ScreenHeight", Backend::GetHeight());
+		cs_ssao.SetMat4("projection", Camera::getProjectionMatrix());		
+		cs_ssao.SetFloat("ScreenWidth", Backend::GetWidth());
+		cs_ssao.SetFloat("ScreenHeight", Backend::GetHeight());
 
+		glBindImageTexture(7, ssaoBuffer.gSSAO, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R16F);
 
-		RenderPlane();
+		glDispatchCompute(Backend::GetWidth() / 32, Backend::GetHeight() / 32, 1);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
+		//RenderPlane();
 		//---------------------------------------------------LIGHTING-------------------------------------
 
-		lightingBuffer.Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		s_lighting.Use();
-		SetLights(lights,&s_lighting);
+		cs_lighting.Use();
+		SetLights(lights,&cs_lighting);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
@@ -782,27 +865,33 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, ssaoBuffer.gSSAO);
 		glActiveTexture(GL_TEXTURE5);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gTrueNormal);
-		glBindTextureUnit(8, gbuffer.gEmission);
+
+
+		glBindImageTexture(7, lightingBuffer.gLighting, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+
+		glDispatchCompute(Backend::GetWidth() / 32, Backend::GetHeight() / 32, 1);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 
 		SHBuffer.Bind(7);
 		probeTexture.Bind(6);
 
-		s_lighting.SetVec3("viewPos", Camera::GetPosition());
-		s_lighting.SetMat4("inverseV", glm::inverse(Camera::getViewMatrix()));
-		s_lighting.SetMat4("V", Camera::getViewMatrix());
-		s_lighting.SetBool("isDead", Player::IsDead());
-		s_lighting.SetVec3("gridWorldPos", probeGrid.postion);
-		s_lighting.SetVec3("volume", probeGrid.volume);
-		s_lighting.SetVec3("spacing", probeGrid.spacing);
-		s_lighting.SetInt("lightingState", lightingState);
+		cs_lighting.SetVec3("viewPos", Camera::GetPosition());
+		cs_lighting.SetMat4("inverseV", glm::inverse(Camera::getViewMatrix()));
+		cs_lighting.SetMat4("V", Camera::getViewMatrix());
+		cs_lighting.SetBool("isDead", Player::IsDead());
+		cs_lighting.SetVec3("gridWorldPos", probeGrid.postion);
+		cs_lighting.SetVec3("volume", probeGrid.volume);
+		cs_lighting.SetVec3("spacing", probeGrid.spacing);
+		cs_lighting.SetInt("lightingState", lightingState);
+		cs_lighting.SetVec2("screen", glm::vec2(Backend::GetWidth(), Backend::GetHeight()));
+		cs_lighting.SetVec3("envLighting", SceneManager::GetCurrentScene()->GetEnviromentLighting().indirectLight);
 
-		s_lighting.SetVec3("envLighting", SceneManager::GetCurrentScene()->GetEnviromentLighting().indirectLight);
-
-
+		glDispatchCompute(Backend::GetWidth()/32, Backend::GetHeight()/32, 1);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 		
 
-		RenderPlane();
+		//RenderPlane();
 
 		//-------------------------------------------------SSR-------------------------
 		//I have to optimze this or somthing becuase it tanks fps
@@ -835,20 +924,24 @@ namespace Renderer
 
 
 
-		postBuffer.Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		s_Post.Use();
+		cs_post.Use();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, lightingBuffer.gLighting);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, ssrBuffer.gSSR);
+		glBindTexture(GL_TEXTURE_2D, waterHeightMap.GetTexture());
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, emmisiveRenderer.BloomTexture());
 
-		probeGrid.Bind(15);
+		glBindImageTexture(7, postBuffer.gLighting, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
-		RenderPlane();
+		cs_post.SetVec2("screen", glm::vec2(Backend::GetWidth(), Backend::GetHeight()));
+
+		probeGrid.Bind(15);
+		//2.23ms with plane and 0.17 with compute
+		glDispatchCompute(Backend::GetWidth() / 32, Backend::GetHeight() / 32, 1);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
@@ -861,16 +954,51 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, postBuffer.gLighting); //FinalFrameTexture);
 		s_fxaa.SetFloat("viewportWidth", Backend::GetWidth());
 		s_fxaa.SetFloat("viewportHeight", Backend::GetHeight());
-
+		//2.79
 		RenderPlane();
 
 		glDisable(GL_DEPTH_TEST);
 	}
 
 
+	void Renderer::RenderWater() {
+
+		if(Input::KeyDown('m'))
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+		s_water.Use();
+		glPatchParameteri(GL_PATCH_VERTICES, 4);
+		GameObject* water = AssetManager::GetGameObject("water");
+		//Upload the water plane data
+		glm::mat4 ModelMatrix = water->GetModelMatrix();
+
+		s_water.SetVec3("viewpos", Camera::GetPosition());
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, SceneManager::GetCurrentScene()->GetEnviromentLighting().sky.GetTextureID());
+		s_water.SetMat4("P", Camera::getProjectionMatrix());
+		s_water.SetMat4("V", Camera::getViewMatrix());
+		s_water.SetMat4("M", water->GetModelMatrix());
+		s_water.SetFloat("time", glfwGetTime());
+		s_water.SetVec3Array("randomDir", _randomdir);
+
+		s_water.SetVec3("cameraPosition", Camera::GetPosition());
+		water->GetModel()->GetMesh(0)->UploadData();
+
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+
+		glDrawElements(
+			GL_PATCHES,      // mode
+			(GLsizei)water->GetModel()->GetMesh(0)->indices.size(),    // count
+			GL_UNSIGNED_SHORT,   // type
+			(void*)0           // element array buffer offset
+		);
+
+		if (Input::KeyDown('m'))
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	}
 	
 	void Renderer::RendererSkyBox(glm::mat4 view, glm::mat4 projection, SkyBox skybox) {
-		
 		glDepthMask(GL_FALSE);
 		s_skybox.Use();
 		glm::mat4 viewWithoutTranslation = glm::mat4(glm::mat3(view));

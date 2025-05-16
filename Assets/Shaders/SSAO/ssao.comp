@@ -1,8 +1,7 @@
 #version 430 core
-layout (location = 0) out vec3 color;
+layout (local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 
-
-in vec2 UV;
+layout (r16f, binding = 7) uniform writeonly image2D color;
 
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
@@ -28,6 +27,9 @@ uniform mat4 projection;
 void main()
 {
 
+
+    ivec2 coords = ivec2(gl_GlobalInvocationID.xy);
+    vec2 UV = (vec2(gl_GlobalInvocationID.xy) + 0.5) / vec2(ScreenWidth,ScreenHeight);
     // get input for SSAO algorithm
     vec3 fragPos = texture(gPosition, UV).xyz;
     vec3 normal = normalize(texture(gNormal, UV).rgb);
@@ -59,5 +61,6 @@ void main()
     }
     occlusion = 1.0 - (occlusion / kernelSize);
     
-    color = vec3(pow(occlusion,1));
+    imageStore(color, coords,vec4(pow(occlusion,1)));
+
 }

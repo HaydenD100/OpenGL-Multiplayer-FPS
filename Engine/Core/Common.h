@@ -161,4 +161,9 @@ glm::vec3 ScreenPointToRayFunc(
     const glm::mat4& projectionMatrix  // Projection matrix
 );
 
-
+std::vector<GLfloat> generateGaussianNoise(int width, int height);
+std::vector<GLfloat> generatePhillipsDistribution(int Nx, int Nz, glm::vec2 size, float amplitude,
+    float max_l, float L, glm::vec2 wind_dir);
+int alias(int index, int N);
+float phillips(glm::vec2 k, float max_l, float L, glm::vec2 wind_dir);
+std::vector<glm::vec3> generate_random_directions(int count);

@@ -30,7 +30,7 @@
 
 
 enum ControlFlag : uint8_t {
-	CONNECTED= 1,
+	CONNECTED = 1,
 	DISCONNECTED = 2
 };
 
@@ -98,7 +98,7 @@ struct Packet {
 		float hitpointNormal_x;
 		float hitpointNormal_y;
 		float hitpointNormal_z;
-		
+
 		int32_t Damage;
 
 		float force_x;
@@ -187,4 +187,3 @@ namespace NetworkManager
 	void EvaulatePackets();
 
 };
-

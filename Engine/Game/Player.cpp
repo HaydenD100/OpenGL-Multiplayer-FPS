@@ -11,6 +11,7 @@
 #include "Engine/Core/Input.h"
 #include "Engine/Core/Common/GameCommon.h"
 
+
 namespace Player
 {
 	glm::vec3 forward;
@@ -222,7 +223,11 @@ namespace Player
 				glm::mat4 rotation_matrix = glm::mat4_cast(glm::quat(gameobject->getRotation()));
 				normal = glm::vec3(glm::inverse(rotation_matrix) * glm::vec4(normal, 0));
 
-				AssetManager::AddDecalInstance(vec3local, normal, AssetManager::GetDecal(decal_inv[decal_index]), gameobject);
+				//Stops z fighting by offesting the decal by a random amount
+				std::srand(std::time(0));
+				double randNum = 0.2 + static_cast<double>(std::rand()) / RAND_MAX * (0.2 - 0.01);
+
+				AssetManager::AddDecalInstance(vec3local + normal * glm::vec3(randNum), normal, AssetManager::GetDecal(decal_inv[decal_index]), gameobject);
 				AudioManager::PlaySound("spray_paint");
 
 			}

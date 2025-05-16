@@ -24,6 +24,7 @@ public:
     std::vector<glm::vec4> weights);
 
     void Render(GLuint programID);
+    void UploadData();
     glm::vec3 GetVertices(int index);
     std::string  GetTextureName();
     std::string GetName();

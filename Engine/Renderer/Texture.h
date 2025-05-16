@@ -14,6 +14,7 @@ class Texture
 public:
     //static int CurrentTextureNumber;
     Texture() = default;
+    Texture(std::vector<GLfloat> data, int width, int height);
     Texture(aiTexture* aitexture, std::string name);
     Texture(const char* name, const char* path, float roughness, float metalic);
     Texture(std::string name);

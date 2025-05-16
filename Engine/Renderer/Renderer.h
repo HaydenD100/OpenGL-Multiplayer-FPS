@@ -96,7 +96,6 @@ namespace Renderer
 	extern Shader s_textShader;
 	extern Shader s_drawPoint;
 	extern Shader s_drawLine;
-	extern Shader s_lighting;
 	extern Shader s_skybox;
 	extern Shader s_geomerty;
 	extern Shader s_ssao;
@@ -129,18 +128,16 @@ namespace Renderer
 
     // Text Rendering
     void RenderText(const char* text, int x, int y, int size);
-
     void RendererSkyBox(glm::mat4 view, glm::mat4 projection, SkyBox skybox);
-
     void RenderAllObjects(Shader& shader);
-
+	void RenderWater();
 	//anything that needs to be ran before the gameLoop;
 	void BeforeRender();
 
 
-
     // Shader
     void SetLights(std::vector<Light> lights, Shader* shader);
+	void SetLights(std::vector<Light> lights, ComputeShader* shader);
 	void SetLightsAllShaders(std::vector<Light> lights);
     void RenderScene();
 

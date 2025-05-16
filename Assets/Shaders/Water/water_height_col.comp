@@ -1,0 +1,30 @@
+#version 460 
+layout (local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
+
+// Input frequency domain data
+layout(rgba32f, binding = 0) uniform readonly image2D gFrequency;
+// Output spatial domain data
+layout(rgba32f, binding = 1) uniform writeonly image2D gSpatial;
+
+uniform bool uHorizontalPass; // Determines if processing rows or columns
+
+const float PI = 3.141592653589793;
+const uint N = 512;
+
+vec2 cmul(vec2 a, vec2 b) {
+    return vec2(a.x*b.x - a.y*b.y, a.x*b.y + a.y*b.x);
+}
+
+vec2 ifft_twiddle(uint k, uint m) {
+    float angle = 2.0 * PI * float(k) / float(m);
+    return vec2(cos(angle), sin(angle));
+}
+
+shared vec2 shared_data[N];
+
+
+void main() {
+    ivec2 coord = ivec2(gl_GlobalInvocationID.xy);
+
+    imageStore(gSpatial, coord, vec4(imageLoad(gFrequency,coord).xy, 0.0, 1.0));
+}

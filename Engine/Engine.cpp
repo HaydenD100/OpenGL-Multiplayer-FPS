@@ -35,6 +35,7 @@ namespace Engine
 		Input::HideCursor();
 
 
+
 		double lastTimeDT = glfwGetTime();
 		double previousTime = glfwGetTime();
 		int frameCount = 0;

@@ -87,6 +87,65 @@ void Shader::Load(std::string vertexPath, std::string fragmentPath) {
 
 }
 
+void Shader::Load(std::string vertexPath, std::string fragmentPath, std::string teselationEvalPath, std::string tesselationControlPath) {
+    std::string vertexSource = readTextFromFile(vertexPath);
+    std::string fragmentSource = readTextFromFile(fragmentPath);
+    std::string testEvalSource = readTextFromFile(teselationEvalPath);
+    std::string testControlSource = readTextFromFile(tesselationControlPath);
+
+
+    const char* vShaderCode = vertexSource.c_str();
+    const char* fShaderCode = fragmentSource.c_str();
+    const char* tEvalShaderCode = testEvalSource.c_str();
+    const char* tControlShaderCode = testControlSource.c_str();
+
+
+    unsigned int vertex = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex, 1, &vShaderCode, NULL);
+    glCompileShader(vertex);
+    checkCompileErrors(vertex, "VERTEX");
+
+    unsigned int fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment, 1, &fShaderCode, NULL);
+    glCompileShader(fragment);
+    checkCompileErrors(fragment, "FRAGMENT");
+
+    unsigned int tesselationEval = glCreateShader(GL_TESS_EVALUATION_SHADER);
+    glShaderSource(tesselationEval, 1, &tEvalShaderCode, NULL);
+    glCompileShader(tesselationEval);
+    checkCompileErrors(tesselationEval, "TESS_EVALUATION");
+
+    unsigned int tesselationControl = glCreateShader(GL_TESS_CONTROL_SHADER);
+    glShaderSource(tesselationControl, 1, &tControlShaderCode, NULL);
+    glCompileShader(tesselationControl);
+    checkCompileErrors(tesselationControl, "TESS_CONTROL");
+
+    int tempID = glCreateProgram();
+    glAttachShader(tempID, vertex);
+    glAttachShader(tempID, fragment);
+    glAttachShader(tempID, tesselationEval);
+    glAttachShader(tempID, tesselationControl);
+
+    glLinkProgram(tempID);
+
+    if (checkCompileErrors(tempID, "PROGRAM")) {
+        if (m_ID != -1) {
+            glDeleteProgram(m_ID);
+        }
+        m_uniformsLocations.clear();
+        m_ID = tempID;
+    }
+    else {
+        std::cout << "shader failed to compile " << vertexPath << " " << fragmentPath << "\n";
+    }
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
+    glDeleteShader(tesselationEval);
+    glDeleteShader(tesselationControl);
+
+}
+
+
 
 void Shader::Load(std::string vertexPath, std::string fragmentPath, std::string geomPath) {
     std::string vertexSource = readTextFromFile(vertexPath);

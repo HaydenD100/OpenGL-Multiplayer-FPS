@@ -201,6 +201,7 @@
     <ClCompile Include="Engine\Renderer\Texture3D.cpp" />
     <ClCompile Include="Engine\Renderer\Probe.cpp" />
     <ClCompile Include="Engine\Renderer\Raycaster.cpp" />
+    <ClCompile Include="Engine\Renderer\Ocean.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\Bloom\downscale.frag" />
@@ -220,6 +221,7 @@
     <None Include="Assets\Shaders\Editor\Editor.vert" />
     <None Include="Assets\Shaders\Final\final.frag" />
     <None Include="Assets\Shaders\Final\final.vert" />
+    <None Include="Assets\Shaders\fxaa\fxaa.comp" />
     <None Include="Assets\Shaders\fxaa\fxaa.frag" />
     <None Include="Assets\Shaders\fxaa\fxaa.vert" />
     <None Include="Assets\Shaders\GI\ddgiProbes.comp" />
@@ -234,8 +236,9 @@
     <None Include="Assets\Shaders\GI\renderProbes.frag" />
     <None Include="Assets\Shaders\GI\renderProbes.vert" />
     <None Include="Assets\Shaders\GI\triangleIntersection.comp" />
-    <None Include="Assets\Shaders\Lighting\lighting.frag" />
+    <None Include="Assets\Shaders\Lighting\lighting.comp" />
     <None Include="Assets\Shaders\Lighting\lighting.vert" />
+    <None Include="Assets\Shaders\PostProccess\post.comp" />
     <None Include="Assets\Shaders\PostProccess\post.frag" />
     <None Include="Assets\Shaders\PostProccess\post.vert" />
     <None Include="Assets\Shaders\Shadow\depth.frag" />
@@ -247,6 +250,7 @@
     <None Include="Assets\Shaders\SolidColour\solidColour.vert" />
     <None Include="Assets\Shaders\SSAO\blur.frag" />
     <None Include="Assets\Shaders\SSAO\blur.vert" />
+    <None Include="Assets\Shaders\SSAO\ssao.comp" />
     <None Include="Assets\Shaders\SSAO\ssao.frag" />
     <None Include="Assets\Shaders\SSAO\ssao.vert" />
     <None Include="Assets\Shaders\SSR\SSR.frag" />
@@ -257,6 +261,11 @@
     <None Include="Assets\Shaders\Transparent\transparent.vert" />
     <None Include="Assets\Shaders\Water\water.frag" />
     <None Include="Assets\Shaders\Water\water.vert" />
+    <None Include="Assets\Shaders\Water\water.tesc" />
+    <None Include="Assets\Shaders\Water\water.tese" />
+    <None Include="Assets\Shaders\Water\water_height_col.comp" />
+    <None Include="Assets\Shaders\Water\water_height_row.comp" />
+    <None Include="Assets\Shaders\Water\wave_vec.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />
@@ -316,6 +325,7 @@
     <ClInclude Include="Engine\Renderer\Texture3D.h" />
     <ClInclude Include="Engine\Renderer\Probe.h" />
     <ClInclude Include="Engine\Renderer\Raycaster.h" />
+    <ClInclude Include="Engine\Renderer\Ocean.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="github\screenshots\3DEngine.png" />

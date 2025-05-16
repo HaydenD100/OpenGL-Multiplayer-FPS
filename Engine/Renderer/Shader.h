@@ -13,6 +13,7 @@
 struct Shader {
 public:
     void Load(std::string vertexPath, std::string fragmentPath);
+    void Load(std::string vertexPath, std::string fragmentPath, std::string teselationEvalPath, std::string tesselationControlPath);
     void Load(std::string vertexPath, std::string fragmentPath, std::string geomPath);
     void Use();
     void SetBool(const std::string& name, bool value);

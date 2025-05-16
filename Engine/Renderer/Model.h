@@ -20,6 +20,8 @@ public:
 
     Model(Mesh mesh, Texture* texture);
     Model(const char* path, Texture* texture);
+    Model(const char* path, Texture* texture, int triangulate);
+
     Model(const char* path, const char* collisonShapePath, Texture* texture);
     void AddMesh(Mesh mesh);
     void SetMesh(int mesh);

@@ -129,7 +129,8 @@ void Scene::LoadAssets() {
 	//AssetManager::AddModel("map_test2", Model("Assets/Maps/other_map1.obj", AssetManager::GetTexture("white")));
 	//AssetManager::AddModel("couch", Model("Assets/Objects/FBX/couch.fbx", AssetManager::GetTexture("white")));
 	//AssetManager::AddModel("map_indirectLight", Model("Assets/Maps/lightingTest.obj", AssetManager::GetTexture("white")));
-	//AssetManager::AddModel("water", Model("Assets/Objects/FBX/water_test.obj", AssetManager::GetTexture("white")));
+	AssetManager::AddModel("water", Model("Assets/Objects/FBX/water_test.obj", AssetManager::GetTexture("white"),0));
+	AssetManager::AddModel("water_COL", Model("Assets/Objects/FBX/water_test.obj", AssetManager::GetTexture("white")));
 
 	//AssetManager::AddModel("GI_map_1", Model("Assets/Maps/cornel_box.obj", AssetManager::GetTexture("cornel")));
 	AssetManager::AddModel("GI_map_1", Model("Assets/Maps/sand_box.fbx", AssetManager::GetTexture("dev_textures")));
@@ -185,6 +186,11 @@ void Scene::Load() {
 	AssetManager::GetGameObject("GI_map_1")->IncludInGI(true);
 	AssetManager::GetGameObject("GI_map_1")->SetRotationX(-1.5708f);
 	AssetManager::AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), false, 10.0f, Box);
+
+	
+	AssetManager::AddGameObject("water", AssetManager::GetModel("water"), glm::vec3(0, 2, 0), true, 0, Box);
+	AssetManager::GetGameObject("water")->SetShaderType("water");
+
 
 	//AssetManager::AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
 	//AssetManager::GetGameObject("ladder_object")->SetRotationX(-1.5708f);

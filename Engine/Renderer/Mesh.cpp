@@ -311,6 +311,96 @@ void Mesh::Render(GLuint programID) {
     );
 
 }
+void Mesh::UploadData() {
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+    glVertexAttribPointer(
+        0,                  // attribute
+        3,                  // size
+        GL_FLOAT,           // type
+        GL_FALSE,           // normalized?
+        0,                  // stride
+        (void*)0            // array buffer offset
+    );
+
+    // 2nd attribute buffer : UVs
+    glEnableVertexAttribArray(1);
+    glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+    glVertexAttribPointer(
+        1,                                // attribute
+        2,                                // size
+        GL_FLOAT,                         // type
+        GL_FALSE,                         // normalized?
+        0,                                // stride
+        (void*)0                          // array buffer offset
+    );
+
+    // 3rd attribute buffer : normals
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+    glVertexAttribPointer(
+        2,                                // attribute
+        3,                                // size
+        GL_FLOAT,                         // type
+        GL_FALSE,                         // normalized?
+        0,                                // stride
+        (void*)0                          // array buffer offset
+    );
+
+    // 4th attribute buffer : tangents
+    glEnableVertexAttribArray(3);
+    glBindBuffer(GL_ARRAY_BUFFER, tangentbuffer);
+    glVertexAttribPointer(
+        3,                                // attribute
+        3,                                // size
+        GL_FLOAT,                         // type
+        GL_FALSE,                         // normalized?
+        0,                                // stride
+        (void*)0                          // array buffer offset
+    );
+
+    // 5th attribute buffer : bitangents
+    glEnableVertexAttribArray(4);
+    glBindBuffer(GL_ARRAY_BUFFER, bitangentbuffer);
+    glVertexAttribPointer(
+        4,                                // attribute
+        3,                                // size
+        GL_FLOAT,                         // type
+        GL_FALSE,                         // normalized?
+        0,                                // stride
+        (void*)0                          // array buffer offset
+    );
+
+
+    // 5th attribute buffer : boneid
+    glEnableVertexAttribArray(5);
+    glBindBuffer(GL_ARRAY_BUFFER, jointIdbuffer);
+    glVertexAttribPointer(
+        5,                                // attribute
+        4,                                // size
+        GL_FLOAT,                         // type
+        GL_FALSE,                         // normalized?
+        0,                                // stride
+        (void*)0                          // array buffer offset
+    );
+
+    // 7th attribute buffer : weights
+    glEnableVertexAttribArray(6);
+    glBindBuffer(GL_ARRAY_BUFFER, Weightbuffer);
+    glVertexAttribPointer(
+        6,                                // attribute
+        4,                                // size
+        GL_FLOAT,                         // type
+        GL_FALSE,                         // normalized?
+        0,                                // stride
+        (void*)0                          // array buffer offset
+    );
+
+
+    // Index buffer
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+}
+
 glm::vec3 Mesh::GetVertices(int index) {
     return indexed_vertices[index];
 }

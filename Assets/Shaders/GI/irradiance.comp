@@ -188,7 +188,7 @@ vec3 DirectLighting(vec3 p, float b, int probeID, vec3 probe_world_pos){
         float NdotL = max(dot(N, L), 0.0);
         float shadow = ShadowCalculation(FragPos , i,probe_world_pos, N);
         //the 1.3 makes it a little brighter
-        Lo += ((kD * diffuse) * (1.0f - shadow) / PI + specular) * radiance * NdotL * (1.0f - shadow);
+        Lo += ((kD * diffuse) * (1.0f - shadow) * 1.0 / PI + specular) * radiance * NdotL * (1.0f - shadow);
         spec += specular * radiance * NdotL * (1.0 - shadow);
 
 

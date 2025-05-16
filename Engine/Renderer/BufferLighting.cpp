@@ -16,7 +16,7 @@ void BufferLighting::Configure() {
 
 	glGenTextures(1, &gLighting);
 	glBindTexture(GL_TEXTURE_2D, gLighting);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Backend::GetWidth(), Backend::GetHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, Backend::GetWidth(), Backend::GetHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	

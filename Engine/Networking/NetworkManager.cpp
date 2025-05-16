@@ -31,7 +31,7 @@ namespace NetworkManager
 
 	void LoadedIn() {
 		loadedIn = 1;
-		if(!isServer)
+		if (!isServer)
 			SendControl(CONNECTED);
 	}
 
@@ -76,7 +76,7 @@ namespace NetworkManager
 
 		// Receive until the peer shuts down the connection
 		do {
-			if(!clientConnected)
+			if (!clientConnected)
 				WaitForClient();
 
 			memset(recvbuf, 0, sizeof(recvbuf));
@@ -142,7 +142,7 @@ namespace NetworkManager
 			printf("Listen failed with error: %ld\n", WSAGetLastError());
 			closesocket(ListenSocket);
 			WSACleanup();
-			return 1; 
+			return 1;
 		}
 
 		for (struct addrinfo* ptr = result; ptr != NULL; ptr = ptr->ai_next) {
@@ -154,7 +154,7 @@ namespace NetworkManager
 		}
 
 
-		
+
 
 		netowrking_thread = std::thread(RunServer);
 	}
@@ -228,7 +228,7 @@ namespace NetworkManager
 				return 1;
 			}
 		}
-		
+
 		std::string hostname_str = std::string(hostname);
 
 		std::cout << "\n=================== TRYING TO CONNECT TO " << hostname_str << "========= \n";
@@ -346,7 +346,7 @@ namespace NetworkManager
 		iResult = send(ConnectSocket, buffer, recvbuflen, 0);
 
 		if (iResult == SOCKET_ERROR) {
-			
+
 		}
 		return iResult;
 	}
@@ -360,10 +360,10 @@ namespace NetworkManager
 		if (isServer && !clientConnected)
 			return 1;
 
-		while(out.size() > 0){
+		while (out.size() > 0) {
 			Packet packet = out.front();
 			out.pop();
-			char sendbuf[DEFAULT_BUFLEN] = {0};
+			char sendbuf[DEFAULT_BUFLEN] = { 0 };
 			std::memcpy(sendbuf, &packet.type, sizeof(packet.type));
 			std::memcpy(sendbuf + sizeof(packet.type), &packet.size, sizeof(packet.size));
 
@@ -371,7 +371,7 @@ namespace NetworkManager
 			switch (packet.type)
 			{
 			case MESSAGE:
-				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size),packet.payload.message.message, packet.size);
+				std::memcpy(sendbuf + sizeof(packet.type) + sizeof(packet.size), packet.payload.message.message, packet.size);
 
 				break;
 			case PlAYERDATA:
@@ -538,17 +538,17 @@ namespace NetworkManager
 		Packet packet;
 		packet.type = 255;
 		size_t offset = 0;
-		
+
 
 		switch (recvbuf[0])
 		{
 		case MESSAGE:
 			packet.type = MESSAGE;
 			std::memcpy(&packet.size, recvbuf + sizeof(packet.type), 2);
-			std::memcpy(&packet.payload.message.message, recvbuf + sizeof(packet.type) + sizeof(packet.size), packet.size);\
+			std::memcpy(&packet.payload.message.message, recvbuf + sizeof(packet.type) + sizeof(packet.size), packet.size); \
 
 
-			in.push(packet);
+				in.push(packet);
 			/*
 			std::cout << "-------------MESSAGE FROM SERVER--------------- \n";
 			std::cout << (int)packet.type << "\n";
@@ -589,7 +589,7 @@ namespace NetworkManager
 			std::cout << packet.payload.player.interactingWith << "\n";
 			*/
 			break;
-			
+
 		case ANIMATION:
 			packet.type = ANIMATION;
 			offset = sizeof(packet.type);
@@ -743,7 +743,7 @@ namespace NetworkManager
 			std::memcpy(&packet.payload.dynamicObjectData.velocity_z, recvbuf + offset, sizeof(float));
 
 
-			
+
 			/*
 			std::cout << "-------------Received Packet Info---------------\n";
 			std::cout << "Object Name Size: " << static_cast<int>(packet.payload.dynamicObjectData.ObjectNameSize) << "\n";
@@ -797,7 +797,7 @@ namespace NetworkManager
 			offset += sizeof(float);
 			std::memcpy(&packet.payload.sound.z, recvbuf + offset, sizeof(float));
 
-	
+
 
 			break;
 
@@ -817,7 +817,7 @@ namespace NetworkManager
 			cv.notify_one();
 		}
 
-	}        
+	}
 
 	void SendPlayerDied() {
 		Packet packet;
@@ -962,7 +962,7 @@ namespace NetworkManager
 
 		temp.payload.player.interactingWithSize = sizeof(interactingWith);
 		temp.payload.player.currentGunSize = sizeof(currentGun);
-		
+
 		strcpy(temp.payload.player.interactingWith, interactingWith.c_str());
 		strcpy(temp.payload.player.currentGun, currentGun.c_str());
 
@@ -1024,7 +1024,7 @@ namespace NetworkManager
 				Animator::PlayAnimation(animation, packet.payload.animation.ObjectName, false);
 				break;
 			}
-				
+
 
 			case GUNSHOT:
 
@@ -1038,7 +1038,7 @@ namespace NetworkManager
 					if (gameobject == nullptr)
 						break;
 					btRigidBody* body = gameobject->GetRigidBody();
-					if(body != nullptr)
+					if (body != nullptr)
 						body->applyImpulse(btVector3(packet.payload.gunshotdata.force_x, packet.payload.gunshotdata.force_y, packet.payload.gunshotdata.force_z), btVector3(packet.payload.gunshotdata.hitpointLocal_x, packet.payload.gunshotdata.hitpointLocal_y, packet.payload.gunshotdata.hitpointLocal_z));
 					AssetManager::AddDecalInstance(glm::vec3(packet.payload.gunshotdata.worldhitpoint_x, packet.payload.gunshotdata.worldhitpoint_y, packet.payload.gunshotdata.worldhitpoint_z), glm::vec3(packet.payload.gunshotdata.hitpointNormal_x, packet.payload.gunshotdata.hitpointNormal_y, packet.payload.gunshotdata.hitpointNormal_z), AssetManager::GetDecal("bullet_hole"), gameobject);
 				}
@@ -1065,7 +1065,7 @@ namespace NetworkManager
 					otherPlayer->GetRigidBody()->setActivationState(ACTIVE_TAG);
 					otherPlayer->GetRigidBody()->activate(true);
 				}
-					
+
 				else if (packet.payload.control.flag == DISCONNECTED) {
 					GameObject* otherPlayer = AssetManager::GetGameObject("PlayerTwo");
 					if (otherPlayer == nullptr)
@@ -1073,25 +1073,25 @@ namespace NetworkManager
 					otherPlayer->SetRender(false);
 					otherPlayer->GetRigidBody()->setActivationState(DISABLE_SIMULATION);
 					clientConnected = 0;
-					if(isServer)
+					if (isServer)
 						std::cout << "\n===================== Client Disconnected =====================\n";
 
 				}
-					
+
 
 				break;
 			case SOUND:
 			{
 				std::string soundName = std::string(packet.payload.sound.SoundName, packet.payload.sound.SoundNameSize);
 				AudioManager::PlaySound(soundName, glm::vec3(packet.payload.sound.x, packet.payload.sound.y, packet.payload.sound.z));
-				
+
 			}
-				break;
+			break;
 			case PLAYERDIED:
 				Player::AddToKill();
 
 				break;
-				
+
 
 			default:
 				break;
