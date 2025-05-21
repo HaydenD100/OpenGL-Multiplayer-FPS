@@ -66,8 +66,6 @@ namespace Engine
 					Input::ShowCursor();
 				else 
 					Input::HideCursor();
-				
-					
 			}
 				
 			// Update Managers

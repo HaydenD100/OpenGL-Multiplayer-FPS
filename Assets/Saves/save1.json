@@ -12,17 +12,17 @@
         {
             "name": "Cube",
             "positionX": 0.9232215285301208,
-            "positionY": -11.229427337646484,
+            "positionY": -7380.83251953125,
             "positionZ": -3.990361452102661,
-            "rotationX": -0.0016869837418198586,
-            "rotationY": -4.91286555188708e-05,
-            "rotationZ": -0.0031760819256305695
+            "rotationX": 0.0,
+            "rotationY": -0.0,
+            "rotationZ": 0.0
         },
         {
             "name": "water",
             "positionX": 0.0,
             "positionY": 2.0,
-            "positionZ": 40.0,
+            "positionZ": 60.0,
             "rotationX": 0.0,
             "rotationY": -0.0,
             "rotationZ": 0.0
@@ -74,21 +74,21 @@
         },
         {
             "name": "player",
-            "positionX": -0.5726732015609741,
-            "positionY": 3.1000044345855713,
-            "positionZ": 14.332353591918945,
-            "rotationX": 7.638691386091523e-07,
-            "rotationY": -4.2544916564355925e-14,
-            "rotationZ": 1.0990026311219481e-07
+            "positionX": -4.156366348266602,
+            "positionY": 7.032723903656006,
+            "positionZ": 17.46031951904297,
+            "rotationX": -0.0013266969472169876,
+            "rotationY": 1.99365274511365e-07,
+            "rotationZ": -0.0007592933252453804
         },
         {
             "name": "player_head",
-            "positionX": -0.5726732015609741,
-            "positionY": 4.100004196166992,
-            "positionZ": 14.332353591918945,
-            "rotationX": -1.7395927906036377,
-            "rotationY": -1.1590490341186523,
-            "rotationZ": -3.141592502593994
+            "positionX": -4.15636682510376,
+            "positionY": 8.032723426818848,
+            "positionZ": 17.46031951904297,
+            "rotationX": -2.765592575073242,
+            "rotationY": -0.4205586016178131,
+            "rotationZ": 3.1415927410125732
         }
     ],
     "lights": [

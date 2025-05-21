@@ -977,7 +977,7 @@ namespace Renderer
 
 		s_water.Use();
 		glPatchParameteri(GL_PATCH_VERTICES, 4);
-		GameObject* water = AssetManager::GetGameObject("water");
+		GameObject* water = &SceneManager::GetCurrentScene()->g_water[0];
 		//Upload the water plane data
 		glm::mat4 ModelMatrix = water->GetModelMatrix();
 

@@ -188,8 +188,7 @@ void Scene::Load() {
 	AssetManager::AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), false, 10.0f, Box);
 
 	
-	AssetManager::AddGameObject("water", AssetManager::GetModel("water"), glm::vec3(0, 2, 0), true, 0, Box);
-	AssetManager::GetGameObject("water")->SetShaderType("water");
+	g_water.push_back(GameObject("water", AssetManager::GetModel("water"), glm::vec3(0, 2, 90), true, 0, Box));
 
 
 	//AssetManager::AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);

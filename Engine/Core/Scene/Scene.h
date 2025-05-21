@@ -54,6 +54,8 @@ public:
 	EnviromentLighting GetEnviromentLighting();
 	std::vector<GameObject*> NeedRenderingObjects();
 
+	std::vector<GameObject> g_water;
+
 private:
 	std::vector<GameObject*> NeedRendering;
 	EnviromentLighting envLight;
