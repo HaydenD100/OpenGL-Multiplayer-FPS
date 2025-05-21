@@ -1,8 +1,13 @@
 #include "SkinnedAnimatior.h"
-#include <iostream>
-#include <glm/gtc/matrix_transform.hpp>
+
 #include <cmath>
+#include <iostream>
+
+#include <glm/gtc/matrix_transform.hpp>
 #include "Engine/Core/AssetManager.h"
+#include "Engine/Core/Scene/SceneManager.h"
+
+
 
 
 namespace Animator {
@@ -72,7 +77,7 @@ namespace Animator {
         glm::mat4 globalTransformation = parentTransform * nodeTransform;
 
         auto boneInfoMap = currentAnimationInstances[index].Animation->GetBoneIDMap();
-        GameObject* gameobject = AssetManager::GetGameObject(currentAnimationInstances[index].GameObjectName);
+        GameObject* gameobject = SceneManager::GetCurrentScene()->GetGameObject(currentAnimationInstances[index].GameObjectName);
         if (boneInfoMap.find(nodeName) != boneInfoMap.end()) {
             int indexBone = boneInfoMap[nodeName].id;
             gameobject->SetFinalBoneMatricies(indexBone, globalTransformation * boneInfoMap[nodeName].offset);

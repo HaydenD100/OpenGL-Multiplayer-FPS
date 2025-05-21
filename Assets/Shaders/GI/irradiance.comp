@@ -541,6 +541,7 @@ void main()
     uint workInvocationID = gl_LocalInvocationID.x;
     int probeID = start_index + int(workGroupID);
 
+
     vec3 probe_world_pos = positions[probeID];
      
 	SphericalHarmonics shRadiance = CubeMapToRadianceSH(probeID,probe_world_pos);

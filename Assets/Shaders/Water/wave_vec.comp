@@ -7,79 +7,113 @@ layout(binding = 0) uniform sampler2D gRandom;
 
 uniform float time;
 
+float u_gravity = 9.81;         // Acceleration due to gravity (m/s^2)
+float u_windSpeed = 10.0;       // Wind speed at 10m above sea level (m/s) - Moderate breeze
+float u_fetch = 10000.0;      // Fetch length (m) - 100 km, representing a limited but significant fetch
+float u_depth = 100;
+const float PI = 3.14159265358979323846264338327950288;
 
-vec2 alias(vec2 idx, vec2 N) {
-    // Shift indices above Nyquist to negative frequencies
-    return mix(idx, idx - N, greaterThan(idx, N / 2));
+
+float scale = 0;
+float angle = 90 / 180 * PI;
+float spreadBlend;
+float swell = 0.5;
+float alpha = 0.076f * pow(u_gravity * u_fetch / u_windSpeed / u_windSpeed, -0.22f);
+float peakOmega = 22 * pow(u_windSpeed * u_fetch / u_gravity / u_gravity, -0.33f);;
+float gamma = 1;
+float shortWavesFade = 1;
+float _N = 512;
+float _LowCutoff = 0.01;
+float _HighCutoff = 10000000;
+
+
+
+float TMACorrection(float omega) {
+	float omegaH = omega * sqrt(u_depth / u_gravity);
+	if (omegaH <= 1.0f)
+		return 0.5f * omegaH * omegaH;
+	if (omegaH < 2.0f)
+		return 1.0f - 0.5f * (2.0f - omegaH) * (2.0f - omegaH);
+
+	return 1.0f;
 }
 
-vec2 cmul(vec2 a, vec2 b)
-{
-    vec2 r3 = a.yx;
-    vec2 r1 = b.xx;
-    vec2 R0 = a * r1;
-    vec2 r2 = b.yy;
-    vec2 R1 = r2 * r3;
-    return R0 + vec2(-R1.x, R1.y);
-}
-  
-const float G = 9.81;
-const float PI = 3.14159265358979323846;
+float JONSWAP(float omega) {
+	float sigma = (omega <= peakOmega) ? 0.07f : 0.09f;
 
-float Frequency(float k, float g, float depth)
-{
-	return sqrt(g * k * tanh(min(k * depth, 20)));
-}
+	float r = exp(-(omega - peakOmega) * (omega - peakOmega) / 2.0f / sigma / sigma / peakOmega / peakOmega);
+	imageStore(gFinal, ivec2(gl_GlobalInvocationID.xy),vec4(-(omega - peakOmega) * (omega - peakOmega) / 2.0f / sigma / sigma / peakOmega / peakOmega,sigma,omega,peakOmega));
 
+	float oneOverOmega = 1.0f / omega;
+	float peakOmegaOverOmega = peakOmega / omega;
+	return scale * TMACorrection(omega) * alpha * u_gravity * u_gravity
+		* oneOverOmega * oneOverOmega * oneOverOmega * oneOverOmega * oneOverOmega
+		* exp(-1.25f * peakOmegaOverOmega * peakOmegaOverOmega * peakOmegaOverOmega * peakOmegaOverOmega)
+		* pow(abs(gamma), r);
+}
+float SpreadPower(float omega, float peakOmega) {
+	if (omega > peakOmega)
+		return 9.77f * pow(abs(omega / peakOmega), -2.5f);
+	else
+		return 6.97f * pow(abs(omega / peakOmega), 5.0f);
+}
+float NormalizationFactor(float s) {
+    float s2 = s * s;
+    float s3 = s2 * s;
+    float s4 = s3 * s;
+    if (s < 5) return -0.000564f * s4 + 0.00776f * s3 - 0.044f * s2 + 0.192f * s + 0.163f;
+    else return -4.80e-08f * s4 + 1.07e-05f * s3 - 9.53e-04f * s2 + 5.90e-02f * s + 3.93e-01f;
+}
+float Cosine2s(float theta, float s) {
+	return NormalizationFactor(s) * pow(abs(cos(0.5f * theta)), 2.0f * s);
+}
+float DirectionSpectrum(float theta, float omega) {
+	float s = SpreadPower(omega, peakOmega) + 16 * tanh(min(omega / peakOmega, 20)) * swell * swell;
+	return mix(2.0f / 3.1415f * cos(theta) * cos(theta), Cosine2s(theta - angle, s), spreadBlend);
+}
+float ShortWavesFade(float kLength) {
+	return exp(-shortWavesFade * shortWavesFade * kLength * kLength);
+}
+float Dispersion(float kMag) {
+    return sqrt(u_gravity * kMag * tanh(min(kMag * u_depth, 20)));
+}
+float DispersionDerivative(float kMag) {
+    float th = tanh(min(kMag * u_depth, 20));
+    float ch = cosh(kMag * u_depth);
+    return u_gravity * (u_depth * kMag / ch / ch + th) / Dispersion(kMag) / 2.0f;
+}
 
 void main() {
     
-    ivec2 coords = ivec2(gl_GlobalInvocationID.xy);
-    vec2 UV = coords / vec2(512);
 
-    float deltaK = 2 * PI / 10;
-	int nx = coords.x - 512 / 2;
-	int nz = coords.y - 512 / 2;
-    vec2 k = vec2(nx, nz) * deltaK;
-	float kLength = length(k);
+    ivec2 id = ivec2(gl_GlobalInvocationID.xy);
+    vec2 UV = id / vec2(512);
 
-    if (kLength <= 10000 && kLength >= 0.001)
-	{
-		float kAngle = atan(k.y, k.x);
-		float omega = Frequency(kLength, -9.81, 100);
-		imageStore(gFinal,coords, vec4(k.x, 1 / kLength, k.y, omega));
-		//float dOmegadk = FrequencyDerivative(kLength, GravityAcceleration, Depth);
+    float halfN = _N / 2.0f;
 
-		//float spectrum = JONSWAP(omega, GravityAcceleration, Depth, Spectrums[0])
-			//* DirectionSpectrum(kAngle, omega, Spectrums[0]) * ShortWavesFade(kLength, Spectrums[0]);
-		//if (Spectrums[1].scale > 0)
-			//spectrum += JONSWAP(omega, GravityAcceleration, Depth, Spectrums[1])
-			//* DirectionSpectrum(kAngle, omega, Spectrums[1]) * ShortWavesFade(kLength, Spectrums[1]);
-	//	H0K[id.xy] = float2(Noise[id.xy].x, Noise[id.xy].y)
-		//	* sqrt(2 * spectrum * abs(dOmegadk) / kLength * deltaK * deltaK);
-	}
+    float deltaK = 2.0f * PI / 1;
+    vec2 K = (id.xy - halfN) * deltaK;
+    float kLength = length(K);
 
-    // Pick out positive and negative travelling waves.
-    //vec2 a = texture(gRandom, UV).xy;
-   // vec2 b = texture(gRandom, wi).xy;
-   // vec2 k = uMod * alias(vec2(coords), vec2(N));
-    //float k_len = length(k);
+ 
+    vec4 gauss = texture(gRandom,UV);
 
-    /*
-    // If this sample runs for hours on end, the cosines of very large numbers will eventually become unstable.
-    // It is fairly easy to fix this by wrapping uTime,
-    // and quantizing w such that wrapping uTime does not change the result.
-    // See Tessendorf's paper for how to do it.
-    // The sqrt(G * k_len) factor represents how fast ocean waves at different frequencies propagate.
-    float w = sqrt(G * k_len) * time;
-    float cw1 = cos(w);
-    float sw = sin(w);
-    // Complex multiply to rotate our frequency samples.
 
-    a = cmul(a, vec2(cw1, sw));
-    b = cmul(b, vec2(cw1, sw));
-    b = vec2(b.x, -b.y); // Complex conjugate since we picked a frequency with the opposite direction.
-    vec2 res = a + b; // Sum up forward and backwards travelling waves.
-    */
-    //imageStore(gFinal, coords,vec4(k,0 ,0));
+    if (_LowCutoff <= kLength && kLength <= _HighCutoff) {
+        float kAngle = atan(K.y, K.x);
+        float omega = Dispersion(kLength);
+
+        float dOmegadk = DispersionDerivative(kLength);
+
+        float spectrum = JONSWAP(omega) * DirectionSpectrum(kAngle, omega) * ShortWavesFade(kLength);
+            
+        if (scale > 0)
+            spectrum += JONSWAP(omega) * DirectionSpectrum(kAngle, omega) * ShortWavesFade(kLength);
+            
+         //imageStore(gFinal, id, vec4(vec2(gauss.x, gauss.y) * sqrt(2 * spectrum * abs(dOmegadk) / kLength * deltaK * deltaK), 0.0f, 0.0f));
+    } else {
+        imageStore(gFinal, id, vec4(1,1,1,1));
+
+    }
+
 }

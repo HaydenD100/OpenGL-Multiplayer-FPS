@@ -6,19 +6,18 @@ layout (location = 3) out vec4 gRMA;  // Stores both albedo and specular in one 
 layout (location = 4) out vec4 gTrueNormal;  // Stores both albedo and specular in one vector
 layout (location = 5) out vec4 gEmission;  // Stores both albedo and specular in one vector
 
-
 in vec2 UV;
 in vec3 FragPos;
 in vec3 N;
 
 layout(binding = 0) uniform samplerCube sky;    // View-space position
 
-
 uniform vec3 viewpos;
 uniform mat4 MVP;
 uniform mat4 V;
 uniform mat4 M;
 uniform mat4 P;
+
 
 void main()
 {    
@@ -33,12 +32,13 @@ void main()
     fresnel = clamp(fresnel, 0.0, 1.0);
     //fresnel = clamp(fresnel, 0.0, 1.0);
 
-    gRMA = vec4(0.0,0.0,0,0);
     gNormal = V * vec4(N, 0);
-    vec3 color = mix(waterColor , envColor , fresnel);
+    //vec3 directLighting = DirectLighting();
+    vec3 color = mix(waterColor, envColor , fresnel);
 
     //color = waterColor;
-    gRMA = vec4(0.1,0.0,0,2.0);
+    // w = ambient strenght
+    gRMA = vec4(0.04,0.0,0,10);
     gAlbedo =  vec4(color,1);
     gTrueNormal = V * vec4(N,0);  // Use transpose of TBN to inverse the transformation
 }

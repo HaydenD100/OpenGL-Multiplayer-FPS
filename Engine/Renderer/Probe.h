@@ -16,11 +16,7 @@ public:
 	GLuint GetCubeAlbedo();
 	GLuint GetCubeNormal();
 	GLuint GetCubePosition();
-	GLuint GetCubeLighting();
-
-
 	GLuint GetDepthCubeMap();
-	GLuint GetIrradianceCubeMap();
 
 	unsigned int ProbeID();
 
@@ -32,16 +28,13 @@ public:
 
 private:
 	Transform transform;
-	GLuint probeLighting = 0;
+
 	GLuint probeAlbedo = 0;
 	GLuint probeNormal = 0;
 	GLuint probePosition = 0;
-
-	GLuint probeIrradianceCubemap = 0;
-	GLuint probeFBO = 0;
-	GLuint gbufferFBO = 0;
 	GLuint Depth = 0;
-	GLuint m_depth = 0;
+
+	GLuint gbufferFBO = 0;
 
 	GLuint probeTextureBuffer = 0;
 
@@ -110,7 +103,7 @@ struct ProbeGrid {
 				}
 			}
 		}
-
+		glCreateBuffers(1, &b_probePosition);
 		glNamedBufferStorage(
 			b_probePosition,
 			sizeof(glm::vec3) * positions.size(),

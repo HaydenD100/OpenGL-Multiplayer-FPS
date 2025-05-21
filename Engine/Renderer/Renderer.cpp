@@ -90,7 +90,6 @@ namespace Renderer
 	GLuint testDepth;
 	GLenum DrawBuffersTest[1] = { GL_COLOR_ATTACHMENT0 };
 
-
 	GLuint bloomFBO = 0;
 	GLuint bloomTexture;
 
@@ -199,12 +198,6 @@ namespace Renderer
 		for (int i = 0; i < 26; i++) {
 			cs_lighting.SetInt("lights[" + std::to_string(i) + "].depthMap", 8 + i);
 		}
-
-		s_water.Use();
-		for (int i = 0; i < 26; i++) {
-			s_water.SetInt("depthMap[" + std::to_string(i) + "]", 8 + i);
-		}
-
 
 		s_skybox.Use();
 		s_skybox.SetInt("skybox", 0);
@@ -386,9 +379,10 @@ namespace Renderer
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		
-		GaussianNoise = Texture(generateGaussianNoise(512, 512), 512, 512);
-		waterVecOut = Texture(generateGaussianNoise(512, 512), 512, 512);
-		waterHeightMap = Texture(generateGaussianNoise(512, 512), 512, 512);
+		//GaussianNoise = Texture(generateGaussianNoise(512, 512), 512, 512);
+		//waterVecOut = Texture(generateGaussianNoise(512, 512), 512, 512);
+		//waterHeightMap = Texture(generateGaussianNoise(512, 512), 512, 512);
+
 
 		//Raycaster::Init();
 
@@ -397,9 +391,11 @@ namespace Renderer
 		glm::vec3 gridPos = glm::vec3(propgationGridSize.x/-2, -2, propgationGridSize.z/-2);
 
 		probeTexture.Create(glm::ceil(propgationGridSize.x / spacing.x), glm::ceil(propgationGridSize.y / spacing.y), glm::ceil(propgationGridSize.z / spacing.z));
+
+
 		probeGrid.Configure(propgationGridSize.x, propgationGridSize.y, propgationGridSize.z, spacing, gridPos);
 
-		SHBuffer.Configure((10 * sizeof(glm::vec3)) * 10000 );
+		SHBuffer.Configure((10 * sizeof(glm::vec3)) * 50000 );
 
 		_randomdir = generate_random_directions(waveCount);
 
@@ -407,13 +403,19 @@ namespace Renderer
 	}
 	void ConfigureFrameBuffers() {
 		std::cout << "Config buffers \n";
+		//gbuffer.Destroy();
+		//ssaoBuffer.Destroy();
+		//ssrBuffer.Destroy();
+		//lightingBuffer.Destroy();
+		//postBuffer.Destroy();
+		//fxaaBuffer.Destroy();
+
 		gbuffer.Configure();
 		ssaoBuffer.Configure();
 		ssrBuffer.Configure(Backend::GetWidth(), Backend::GetHeight());
 		lightingBuffer.Configure();
 		postBuffer.Configure();
 		fxaaBuffer.Configure(Backend::GetWidth(), Backend::GetHeight());
-
 		emmisiveRenderer.Init(Backend::GetWidth(), Backend::GetHeight());
 
 
@@ -430,13 +432,13 @@ namespace Renderer
 		GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
 		glDrawBuffers(1, DrawBuffers);
 
-
 	}
 
 
 	void Renderer::BeforeRender() {
 
-		Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->getLights());
+		std::vector<Light> lights = SceneManager::GetCurrentScene()->g_lights;
+		Renderer::probeGrid.Bake(lights);
 		//Raycaster::FillBuffers();
 		int gridX = 10;
 		int gridY = 10;
@@ -447,6 +449,7 @@ namespace Renderer
 		//SHBuffer.Bind(7);
 		//Raycaster::Bind();
 		//Raycaster::Compute();
+
 	}
 
 
@@ -513,8 +516,8 @@ namespace Renderer
 		overlay.clear();
 		waterObjects.clear();
 		glm::mat4 ViewMatrix = Camera::getViewMatrix();
-		for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
-			GameObject* gameobjectRender = AssetManager::GetGameObject(i);
+		for (int i = 0; i < SceneManager::GetCurrentScene()->GetGameObjectsSize(); i++) {
+			GameObject* gameobjectRender = SceneManager::GetCurrentScene()->GetGameObject(i);
 
 			if (!gameobjectRender->ShouldRender())
 				continue;
@@ -557,37 +560,6 @@ namespace Renderer
 
 		Renderer::CheckDebugState();
 
-		cs_water_vec.Use();
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, GaussianNoise.GetTexture());
-		glBindImageTexture(1, waterVecOut.GetTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
-		cs_water_vec.SetFloat("time", glfwGetTime());
-
-		glDispatchCompute(512 / 32, 512 / 32, 1);
-		glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
-		cs_water_height_fft_col.Use();
-
-		cs_water_height_fft_col.SetBool("uHorizontalPass", true);
-
-		glBindImageTexture(0, waterVecOut.GetTexture(), 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA32F);
-		glBindImageTexture(1, waterHeightMap.GetTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
-
-		glDispatchCompute(512 / 32, 512 / 32, 1); // 32 workgroups for 512 columns
-		glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
-		//cs_water_height_fft_col.SetBool("uHorizontalPass", false);
-
-		//glDispatchCompute(512 / 32, 512 / 32, 1); // 32 workgroups for 512 columns
-		//glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
-		//cs_water_height_fft_row	.Use();
-
-		//glBindImageTexture(0, waterVecOut.GetTexture(), 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA32F);
-		//glBindImageTexture(1, waterHeightMap.GetTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
-
-		//glDispatchCompute(512 / 32, 1, 1); // 32 workgroups for 512 rows
-		//glMemoryBarrier(GL_ALL_BARRIER_BITS);
 		//-------------------------------------------GBUFFER-----------------------------------------
 
 		glEnable(GL_DEPTH_TEST);
@@ -602,16 +574,11 @@ namespace Renderer
 
 		NeedRendering.clear();
 		glm::mat4 ViewMatrix = Camera::getViewMatrix();
-		for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
-			GameObject* gameobjectRender = AssetManager::GetGameObject(i);
+		for (int i = 0; i < SceneManager::GetCurrentScene()->GetGameObjectsSize(); i++) {
+			GameObject* gameobjectRender = SceneManager::GetCurrentScene()->GetGameObject(i);
 
-			if (!gameobjectRender->ShouldRender())
+			if (!gameobjectRender->ShouldRender() && gameobjectRender->GetShaderType() != "Default")
 				continue;
-			if (gameobjectRender->GetShaderType() != "Default") {
-				//make guns render on top;
-				NeedRendering.push_back(gameobjectRender);
-				continue;
-			}
 			if (!gameobjectRender->GetModel()->GetAABB()->isOnFrustum(Camera::GetFrustum(), gameobjectRender->getTransform()) && !gameobjectRender->DontCull())
 				continue;
 
@@ -626,7 +593,6 @@ namespace Renderer
 			else
 				s_geomerty.SetBool("animated", false);
 
-
 			glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
 			glm::mat4 modelViewMatrix = ViewMatrix * ModelMatrix;
 			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
@@ -636,7 +602,7 @@ namespace Renderer
 			gameobjectRender->RenderObject(s_geomerty.GetShaderID());
 		}
 
-		RenderWater();
+		//RenderWater();
 
 
 
@@ -650,11 +616,10 @@ namespace Renderer
 		s_SolidColor.SetFloat("Metalic", 0);
 
 
-		std::vector<Light> lights = SceneManager::GetCurrentScene()->getLights();
-		for (int i = 0; i < lights.size(); i++) {
-			s_SolidColor.SetVec3("color", lights[i].colour);
+		for (int i = 0; i < SceneManager::GetCurrentScene()->g_lights.size(); i++) {
+			s_SolidColor.SetVec3("color", SceneManager::GetCurrentScene()->g_lights[i].colour);
 			glm::mat4 positionMatrix = glm::mat4(); // create an identity matrix;
-			positionMatrix = glm::translate(positionMatrix, lights[i].position); //position is a vec3
+			positionMatrix = glm::translate(positionMatrix, SceneManager::GetCurrentScene()->g_lights[i].position); //position is a vec3
 			s_SolidColor.SetMat4("M", positionMatrix);
 			AssetManager::GetModel("light_cube")->RenderModel(s_SolidColor.GetShaderID());
 		}
@@ -702,29 +667,15 @@ namespace Renderer
 		s_transparent.SetMat4("P", Camera::getProjectionMatrix());
 		s_transparent.SetMat4("V", Camera::getViewMatrix());
 		s_transparent.SetVec3("viewPos", Camera::GetPosition());
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glm::vec3 cameraPosition = Camera::GetPosition(); // Camera position
 
 
 		//TODO :: CHANGE THIS TO OIT this gets slow if theres too many transparent objects
-		
-		std::sort(NeedRendering.begin(), NeedRendering.end(),
-			[&cameraPosition](const GameObject* a, const GameObject* b) {
-				float distanceA = glm::length(a->GetPosition() - cameraPosition);
-				float distanceB = glm::length(b->GetPosition() - cameraPosition);
-
-				return distanceA > distanceB; // Sort by descending distance (farthest first)
-			});
 
 
-
-		for (int i = 0; i < NeedRendering.size(); i++) {
-			if (NeedRendering[i]->GetShaderType() == "Overlay") {
-				overlay.push_back(NeedRendering[i]);
-				continue;
-			}
+		for (int i = 0; i < SceneManager::GetCurrentScene()->g_transparent.size(); i++) {
 			
-			auto transforms = NeedRendering[i]->GetFinalBoneMatricies();
+			GameObject object = SceneManager::GetCurrentScene()->g_transparent[i];
+			auto transforms = object.GetFinalBoneMatricies();
 			if (transforms[0] != glm::mat4(1)) {
 				s_transparent.SetBool("animated", true);
 				for (int i = 0; i < transforms.size(); ++i) {
@@ -735,52 +686,21 @@ namespace Renderer
 			else {
 				s_transparent.SetBool("animated", false);
 			}
-			glm::mat4 ModelMatrix = NeedRendering[i]->GetModelMatrix();
+			glm::mat4 ModelMatrix = object .GetModelMatrix();
 			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;
 			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
 
 			s_transparent.SetMat3("normalMatrix3", normalMatrix);
 			s_transparent.SetMat4("M", ModelMatrix);
-			NeedRendering[i]->RenderObject(s_transparent.GetShaderID());
+			object .RenderObject(s_transparent.GetShaderID());
 		}
 		
-
-		/*
-		s_water.Use();
-		s_water.SetMat4("P", Camera::getProjectionMatrix());
-		s_water.SetMat4("V", Camera::getViewMatrix());
-		s_water.SetVec3("viewPos", Camera::GetPosition());
-		s_water.SetFloat("time", glfwGetTime());
-		s_water.SetVec3("viewPos", Camera::GetPosition());
-
-		SetLights(lights, &s_water);
-
-		for (int i = 0; i < waterObjects.size(); i++) {
-			auto transforms = waterObjects[i]->GetFinalBoneMatricies();
-			if (transforms[0] != glm::mat4(1)) {
-				s_water.SetBool("animated", true);
-				for (int i = 0; i < transforms.size(); ++i) {
-					std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
-					s_water.SetMat4(pos.c_str(), transforms[i]);
-				}
-			}
-			else {
-				s_water.SetBool("animated", false);
-			}
-			glm::mat4 ModelMatrix = waterObjects[i]->GetModelMatrix();
-			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;
-			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
-
-			s_water.SetMat3("normalMatrix3", normalMatrix);
-			s_water.SetMat4("M", ModelMatrix);
-			waterObjects[i]->RenderObject(s_water.GetShaderID());
-		}
-		*/
 		glDisable(GL_BLEND);
 		
 		//---------------------------------------------------Overlay-------------------------------------
+		/*
 		s_geomerty.Use();
-
+		
 		glClear(GL_DEPTH_BUFFER_BIT);
 		for (int i = 0; i < overlay.size(); i++) {
 			glm::mat4 ModelMatrix = overlay[i]->GetModelMatrix();
@@ -806,6 +726,7 @@ namespace Renderer
 
 			overlay[i]->RenderObject(s_geomerty.GetShaderID());
 		}
+		*/
 
 		//------------------------------------------------RAYCAST DEBUG--------------------------------
 		/*
@@ -851,7 +772,7 @@ namespace Renderer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		cs_lighting.Use();
-		SetLights(lights,&cs_lighting);
+		SetLights(SceneManager::GetCurrentScene()->g_lights,&cs_lighting);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
@@ -917,7 +838,7 @@ namespace Renderer
 
 		*/
 		//-------------------------------------------------EMISSIVE-----------------------------------
-		emmisiveRenderer.RenderBloomTexture(gbuffer.gEmission, 0.005f);
+		//emmisiveRenderer.RenderBloomTexture(gbuffer.gEmission, 0.005f);
 
 
 		//---------------------------------------------------Post-------------------------------------
@@ -930,7 +851,7 @@ namespace Renderer
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, lightingBuffer.gLighting);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, waterHeightMap.GetTexture());
+		glBindTexture(GL_TEXTURE_2D, waterVecOut.GetTexture());
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, emmisiveRenderer.BloomTexture());
 
@@ -960,7 +881,6 @@ namespace Renderer
 		glDisable(GL_DEPTH_TEST);
 	}
 
-
 	void Renderer::RenderWater() {
 
 		if(Input::KeyDown('m'))
@@ -968,29 +888,28 @@ namespace Renderer
 
 		s_water.Use();
 		glPatchParameteri(GL_PATCH_VERTICES, 4);
-		GameObject* water = AssetManager::GetGameObject("water");
-		//Upload the water plane data
+		GameObject* water = &SceneManager::GetCurrentScene()->g_water[0];
 		glm::mat4 ModelMatrix = water->GetModelMatrix();
 
-		s_water.SetVec3("viewpos", Camera::GetPosition());
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, SceneManager::GetCurrentScene()->GetEnviromentLighting().sky.GetTextureID());
 		s_water.SetMat4("P", Camera::getProjectionMatrix());
 		s_water.SetMat4("V", Camera::getViewMatrix());
 		s_water.SetMat4("M", water->GetModelMatrix());
 		s_water.SetFloat("time", glfwGetTime());
+		s_water.SetVec3("viewpos", Camera::GetPosition());
+		s_water.SetVec3("viewdir", Camera::GetDirection());
+
 		s_water.SetVec3Array("randomDir", _randomdir);
 
 		s_water.SetVec3("cameraPosition", Camera::GetPosition());
 		water->GetModel()->GetMesh(0)->UploadData();
 
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-
 		glDrawElements(
-			GL_PATCHES,      // mode
-			(GLsizei)water->GetModel()->GetMesh(0)->indices.size(),    // count
-			GL_UNSIGNED_SHORT,   // type
-			(void*)0           // element array buffer offset
+			GL_PATCHES,     
+			(GLsizei)water->GetModel()->GetMesh(0)->indices.size(), 
+			GL_UNSIGNED_SHORT,
+			(void*)0 
 		);
 
 		if (Input::KeyDown('m'))
@@ -1012,6 +931,7 @@ namespace Renderer
 	}
 
 	void Renderer::SwapBuffers(GLFWwindow* window) {
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}

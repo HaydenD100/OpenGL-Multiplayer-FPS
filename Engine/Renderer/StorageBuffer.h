@@ -9,9 +9,6 @@ struct StorageBuffer {
 
 	GLuint GetID();
 
-
-
-
 private:
 	GLuint ID;
 

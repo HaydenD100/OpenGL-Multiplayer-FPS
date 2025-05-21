@@ -3,7 +3,7 @@
         {
             "name": "GI_map_1",
             "positionX": -1.5,
-            "positionY": -3.700000047683716,
+            "positionY": -0.0,
             "positionZ": -4.0,
             "rotationX": -1.5708000659942627,
             "rotationY": 0.0,
@@ -11,21 +11,12 @@
         },
         {
             "name": "Cube",
-            "positionX": 0.9203879833221436,
-            "positionY": -1.700000286102295,
-            "positionZ": -3.982480764389038,
-            "rotationX": -3.918135007552337e-06,
-            "rotationY": 0.0009613872971385717,
-            "rotationZ": 3.3784812103476725e-07
-        },
-        {
-            "name": "water",
-            "positionX": 0.0,
-            "positionY": 2.0,
-            "positionZ": 0.0,
-            "rotationX": 0.0,
-            "rotationY": -0.0,
-            "rotationZ": 0.0
+            "positionX": 0.9295189380645752,
+            "positionY": -1.7000000476837158,
+            "positionZ": -3.9666686058044434,
+            "rotationX": -3.7162556054681772e-06,
+            "rotationY": 0.00010487214603926986,
+            "rotationZ": 5.151613891030138e-07
         },
         {
             "name": "knife",
@@ -74,21 +65,21 @@
         },
         {
             "name": "player",
-            "positionX": -1.2002671957015991,
-            "positionY": 3.0999996662139893,
-            "positionZ": 4.992770195007324,
-            "rotationX": 5.881161779797139e-09,
-            "rotationY": -1.7294032157129885e-17,
-            "rotationZ": 5.881161779797139e-09
+            "positionX": -23.639039993286133,
+            "positionY": 3.099994421005249,
+            "positionZ": -6.088785648345947,
+            "rotationX": -8.547952347726095e-06,
+            "rotationY": -1.6172426245408822e-11,
+            "rotationZ": -3.411701982258819e-06
         },
         {
             "name": "player_head",
-            "positionX": -1.2002671957015991,
-            "positionY": 4.09999942779541,
-            "positionZ": 4.992770195007324,
-            "rotationX": 0.021996349096298218,
-            "rotationY": 0.08392391353845596,
-            "rotationZ": 0.0
+            "positionX": -23.639039993286133,
+            "positionY": 4.099994659423828,
+            "positionZ": -6.088785648345947,
+            "rotationX": 0.15000015497207642,
+            "rotationY": 0.7743709683418274,
+            "rotationZ": 1.042241759563467e-08
         }
     ],
     "lights": [
@@ -97,9 +88,9 @@
             "colourG": 0.9730392098426819,
             "colourR": 1.0,
             "positionX": 0.0,
-            "positionY": 50.0,
-            "positionZ": 100.0,
-            "radius": 400.0,
+            "positionY": 40.0,
+            "positionZ": 200.0,
+            "radius": 500.0,
             "strength": 100.0
         }
     ]

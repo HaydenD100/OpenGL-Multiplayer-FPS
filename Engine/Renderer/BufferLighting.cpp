@@ -43,6 +43,7 @@ void BufferLighting::Bind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, ID);
 }
 void BufferLighting::Destroy() {
+	glDeleteFramebuffers(1, &ID);
 
 }
 unsigned int BufferLighting::GetID() {

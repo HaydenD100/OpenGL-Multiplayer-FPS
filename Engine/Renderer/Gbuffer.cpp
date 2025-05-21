@@ -83,6 +83,7 @@ void GBuffer::Bind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, ID);
 }
 void GBuffer::Destroy() {
+	glDeleteFramebuffers(1, &ID);
 
 }
 unsigned int GBuffer::GetID() {

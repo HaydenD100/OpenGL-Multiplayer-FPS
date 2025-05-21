@@ -1,5 +1,4 @@
-﻿#include "Probe.h"
-#include "Engine/Core/AssetManager.h"
+﻿#include "Engine/Core/AssetManager.h"
 #include "Engine/Core/Scene/SceneManager.h"
 #include "Engine/Renderer/Raycaster.h"
 
@@ -14,23 +13,22 @@ void ProbeGrid::ShowProbes() {
 	Renderer::probeTexture.Bind(6);
 
 	for (int i = 0; i < probes.size(); i++) {
-
-		glBindTextureUnit(0, probes[i].GetCubeLighting());
-		glBindTextureUnit(1, probes[i].GetIrradianceCubeMap());
 		Renderer::s_probeRender.SetInt("probeID", probes[i].ProbeID());
-
-
 		Renderer::s_probeRender.SetMat4("M", probes[i].GetTransform().to_mat4());
 		AssetManager::GetModel("probe")->RenderModel(Renderer::s_probeRender.GetShaderID());
 	}
 }
 void ProbeGrid::FillBuffer() {
-	for (auto probe : probes) {
-		probe.CreateBindless();
-		handels.push_back(probe.h_gAlbedo);
-		handels.push_back(probe.h_gNormal);
-		handels.push_back(probe.h_gPosition);
+
+	/*
+	for (int i = 0; i < probes.size(); i++) {
+		probes[i].CreateBindless();
+		handels.push_back(probes[i].h_gAlbedo);
+		handels.push_back(probes[i].h_gNormal);
+		handels.push_back(probes[i].h_gPosition);
 	}
+	*/
+
 	glCreateBuffers(1, &b_handles);
 
 	glNamedBufferStorage(
@@ -44,6 +42,7 @@ void ProbeGrid::FillBuffer() {
 
 
 void ProbeGrid::Bake(std::vector<Light> lights) {
+
 	std::cout << "Starting Probe Baking \n";
 	float start = glfwGetTime();
 	glViewport(0, 0, PROBESIZE, PROBESIZE);
@@ -60,6 +59,11 @@ void ProbeGrid::Bake(std::vector<Light> lights) {
 
 	for (int i = 0; i < probes.size(); i++) {
 		probes[i].Bake();
+
+		probes[i].CreateBindless();
+		handels.push_back(probes[i].h_gAlbedo);
+		handels.push_back(probes[i].h_gNormal);
+		handels.push_back(probes[i].h_gPosition);
 	}
 	glEnable(GL_CULL_FACE);
 
@@ -70,7 +74,7 @@ void ProbeGrid::Bake(std::vector<Light> lights) {
 
 	glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
 	glClearColor(0, 0, 0, 1);
-	std::cout << "Done Baking " << glfwGetTime() - start <<  "s \n";
+	std::cout << "Done Baking " << glfwGetTime() - start << "s \n";
 }
 
 void ProbeGrid::ReLight(int probeRelightCount) {
@@ -101,8 +105,6 @@ void ProbeGrid::ReLight(int probeRelightCount) {
 		glBindTexture(GL_TEXTURE_CUBE_MAP, scene->GetLight(i)->depthCubemap); // Bind the depth cubemap to the texture unit
 	}
 
-
-
 	Renderer::probeTexture.ImageBind(6);
 	Renderer::SHBuffer.Bind(7);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, b_handles);
@@ -121,6 +123,13 @@ void Probe::CreateBindless() {
 	glMakeTextureHandleResidentARB(h_gNormal);
 	h_gPosition = glGetTextureHandleARB(probePosition);
 	glMakeTextureHandleResidentARB(h_gPosition);
+
+
+	glDeleteTextures(1,&probeAlbedo);
+	glDeleteTextures(1,&probeNormal);
+	glDeleteTextures(1, &probePosition);
+	glDeleteFramebuffers(1, &gbufferFBO);
+
 }
 
 
@@ -131,8 +140,23 @@ Probe::Probe(glm::vec3 postion) {
 	probeCount++;
 
 	// Create the cubemap texture for the probe
-	
 
+	//const int rays = 100;
+	//for (int i = 0; i < rays; i++ ) {
+		//Raycaster::queueRay(postion, glm::vec3(0,0,0), 25, glm::vec4(1, probeID, 0, 0));
+	//}
+}
+
+void Probe::Irradiance() {
+
+
+}
+
+void Probe::ReLight() {
+	
+}
+
+void Probe::Bake() {
 	glGenTextures(1, &probeAlbedo);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, probeAlbedo);
 	for (unsigned int i = 0; i < 6; ++i) {
@@ -166,28 +190,6 @@ Probe::Probe(glm::vec3 postion) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	glGenTextures(1, &probeLighting);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, probeLighting);
-	for (unsigned int i = 0; i < 6; ++i) {
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, PROBESIZE, PROBESIZE, 0, GL_RGB, GL_FLOAT, NULL);
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-	glGenTextures(1, &probeIrradianceCubemap);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, probeIrradianceCubemap);
-	for (unsigned int i = 0; i < 6; ++i) {
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, PROBESIZE, PROBESIZE, 0, GL_RGB, GL_FLOAT, NULL);
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
 
 	// Create and configure the depth texture
 
@@ -202,17 +204,6 @@ Probe::Probe(glm::vec3 postion) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	
-	glGenTextures(1, &m_depth);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, m_depth);
-	for (unsigned int i = 0; i < 6; ++i)
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, PROBESIZE, PROBESIZE, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 	// Configure framebuffer for probe
 	glGenFramebuffers(1, &gbufferFBO);
@@ -227,7 +218,7 @@ Probe::Probe(glm::vec3 postion) {
 	}
 
 	// Set draw buffers (single output for simplicity here)
-	GLenum DrawBuffers[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
+	GLenum DrawBuffers[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
 	glDrawBuffers(3, DrawBuffers);
 
 	// Check framebuffer completeness
@@ -236,90 +227,12 @@ Probe::Probe(glm::vec3 postion) {
 		std::cout << "Framebuffer incomplete: " << status << std::endl;
 	}
 
-	
-	glGenFramebuffers(1, &probeFBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, probeFBO);
-	// Attach cubemap face for color output
-	for (int face = 0; face < 6; ++face) {
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, probeLighting, 0);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, probeIrradianceCubemap, 0);
-	}
-	GLenum DrawBuffers1[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
-	glDrawBuffers(2, DrawBuffers1);
-
-	// Check framebuffer completeness
-	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status != GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "Framebuffer incomplete: " << status << std::endl;
-	}
-	
-
 	// Unbind framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.001f, 25.0f);
 
-	//const int rays = 100;
-	//for (int i = 0; i < rays; i++ ) {
-		//Raycaster::queueRay(postion, glm::vec3(0,0,0), 25, glm::vec4(1, probeID, 0, 0));
-	//}
-}
 
-void Probe::Irradiance() {
-	glBindFramebuffer(GL_FRAMEBUFFER, this->probeFBO);
-	glBindTextureUnit(0, probeAlbedo);
-	glBindTextureUnit(1, probeNormal);
-	glBindTextureUnit(2, probePosition);
-	glBindTextureUnit(3, GetDepthCubeMap());
-
-	Renderer::s_probeirradiance.SetMat4("P", captureProjection);
-	Renderer::s_probeirradiance.SetInt("probeID", probeID);
-	Renderer::s_probeirradiance.SetVec3("probe_world_Pos", transform.position);
-
-	Renderer::probeTexture.ImageBind(6);
-
-	for (unsigned int i = 0; i < 6; ++i)
-	{
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, probeIrradianceCubemap, 0);
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		Renderer::s_probeirradiance.SetMat4("V", captureViews[i]);
-		Renderer::RenderCube();
-	}
-
-}
-
-void Probe::ReLight() {
-	//glBindFramebuffer(GL_FRAMEBUFFER, this->probeFBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, this->probeFBO);
-
-	glBindTextureUnit(0, probeAlbedo);
-	glBindTextureUnit(1, probeNormal);
-	glBindTextureUnit(2, probePosition);
-	Renderer::s_probe.SetMat4("P", captureProjection);
-	Renderer::s_probe.SetVec3("viewPos", transform.position);
-
-	captureViews[0] = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-	captureViews[1] = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-	captureViews[2] = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	captureViews[3] = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f));
-	captureViews[4] = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-	captureViews[5] = glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f));
-
-	for (unsigned int i = 0; i < 6; ++i)
-	{
-		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, probeLighting, 0);
-		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, m_depth, 0);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, probeLighting, 0);
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		Renderer::s_probe.SetMat4("V", captureViews[i]);
-		//Renderer::s_probe.SetMat4("M", captureViews[i]);
-		Renderer::RenderCube();
-	}
-}
-
-void Probe::Bake() {
 	glViewport(0, 0, PROBESIZE, PROBESIZE);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->gbufferFBO);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -349,8 +262,8 @@ void Probe::Bake() {
 
 		Renderer::s_probeDeffered.SetMat4("V", captureViews[i]);
 
-		for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
-			GameObject* gameobjectRender = AssetManager::GetGameObject(i);
+		for (int i = 0; i < SceneManager::GetCurrentScene()->GetGameObjectsSize(); i++) {
+			GameObject* gameobjectRender = SceneManager::GetCurrentScene()->GetGameObject(i);
 
 			if (gameobjectRender->GetShaderType() != "Default" || !gameobjectRender->ShouldRender() || !gameobjectRender->IncludedInGI()) {
 				continue;
@@ -363,7 +276,7 @@ void Probe::Bake() {
 			Renderer::s_probeDeffered.SetMat3("normalMatrix3", normalMatrix);
 			Renderer::s_probeDeffered.SetMat4("M", ModelMatrix);
 			gameobjectRender->RenderObject(Renderer::s_probeDeffered.GetShaderID());
-		}		
+		}
 	}
 
 }
@@ -381,12 +294,6 @@ GLuint Probe::GetCubeNormal() {
 GLuint Probe::GetCubePosition() {
 	return probePosition;
 }
-GLuint Probe::GetIrradianceCubeMap() {
-	return probeIrradianceCubemap;
-}
-GLuint Probe::GetCubeLighting() {
-	return probeLighting;
-}
 
 unsigned int Probe::ProbeID() {
 	return probeID;
@@ -398,5 +305,3 @@ GLuint Probe::GetDepthCubeMap() {
 
 
 unsigned int Probe::probeCount = 0;
-
-

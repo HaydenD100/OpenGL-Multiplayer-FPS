@@ -27,6 +27,15 @@ namespace Engine
 	int Engine::Run() {
 
 		Backend::init();
+
+		const GLubyte* renderer = glGetString(GL_RENDERER); // Graphics card
+		const GLubyte* version = glGetString(GL_VERSION);   // OpenGL version
+		const GLubyte* vendor = glGetString(GL_VENDOR);   // Vendor
+
+		std::cout << "Graphics Card (Renderer): " << renderer << std::endl;
+		std::cout << "OpenGL Version: " << version << std::endl;
+		std::cout << "Vendor: " << vendor << std::endl;
+
 		Input::Init();
 		Text2D::initText2D("Assets/Fonts/Holstein.DDS");
 		AudioManager::Init();
@@ -47,6 +56,7 @@ namespace Engine
 		Renderer::BeforeRender();
 
 		while (Backend::IsWindowOpen()) {
+			std::cout << "test\n";
 			// Delta time stuff
 			double currentTime = glfwGetTime();
 			double dt = currentTime - lastTimeDT;
@@ -69,10 +79,9 @@ namespace Engine
 				
 					
 			}
-				
+
 			// Update Managers
 			ImGuiUI::NewFrame();
-
 			Input::Update();
 			
 			
@@ -124,11 +133,11 @@ namespace Engine
 				oss.precision(4);
 				oss << "Enemy Kills " << Player::GetDeaths();
 				Renderer::RenderText(oss.str().c_str(), 0, 500, 15);
-
-				
 			}
 			
-			ImGuiUI::DrawUI();
+			//ImGuiUI::DrawUI();
+
+			checkOpenGLError();
 
 			Renderer::SwapBuffers(Backend::GetWindowPointer());
 		}

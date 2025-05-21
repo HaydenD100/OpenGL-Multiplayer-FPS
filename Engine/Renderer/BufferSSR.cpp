@@ -48,7 +48,7 @@ void BufferSSR::Bind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, ID);
 }
 void BufferSSR::Destroy() {
-
+	glDeleteFramebuffers(1, &ID);
 }
 unsigned int BufferSSR::GetID() {
 	return ID;

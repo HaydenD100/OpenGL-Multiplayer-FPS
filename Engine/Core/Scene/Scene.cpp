@@ -176,36 +176,37 @@ void Scene::LoadAssets() {
 	//these are diffrent animations from skinnedanimation
 	AnimationManager::AddAnimation(Animation("Assets/Animations/door_open.fbx", "door_open"));
 	AnimationManager::AddAnimation(Animation("Assets/Animations/door_close.fbx", "door_close"));	
+
+	//AudioManager::AddSound("Assets/Audio/ocean_waves.wav", "ocean", glm::vec3(0,0,0), 5, 1.0f);
+
 }
 
 
 void Scene::Load() { 
 	LoadAssets();
 
-	AssetManager::AddGameObject("GI_map_1", AssetManager::GetModel("GI_map_1"), glm::vec3(0, 0, 0), true, 0, Concave);
-	AssetManager::GetGameObject("GI_map_1")->IncludInGI(true);
-	AssetManager::GetGameObject("GI_map_1")->SetRotationX(-1.5708f);
-	AssetManager::AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), false, 10.0f, Box);
+	AddGameObject("GI_map_1", AssetManager::GetModel("GI_map_1"), glm::vec3(0, 0, 0), true, 0, Concave);
+	GetGameObject("GI_map_1")->IncludInGI(true);
+	GetGameObject("GI_map_1")->SetRotationX(-1.5708f);
+	AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), false, 10.0f, Box);
 
-	
-	AssetManager::AddGameObject("water", AssetManager::GetModel("water"), glm::vec3(0, 2, 0), true, 0, Box);
-	AssetManager::GetGameObject("water")->SetShaderType("water");
+	g_water.push_back(GameObject("water", AssetManager::GetModel("water"), glm::vec3(0, 2, 40), true, 0, Box));
 
 
-	//AssetManager::AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
-	//AssetManager::GetGameObject("ladder_object")->SetRotationX(-1.5708f);
+	//SceneManager::GetCurrentScene()->AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
+	//SceneManager::GetCurrentScene()->GetGameObject("ladder_object")->SetRotationX(-1.5708f);
 
-	//AssetManager::AddGameObject("Bench_object", AssetManager::GetModel("Bench"), glm::vec3(0, 0, 0), true, 0, Concave);
-	//AssetManager::GetGameObject("Bench_object")->SetRotationX(-1.5708f);
+	//SceneManager::GetCurrentScene()->AddGameObject("Bench_object", AssetManager::GetModel("Bench"), glm::vec3(0, 0, 0), true, 0, Concave);
+	//SceneManager::GetCurrentScene()->GetGameObject("Bench_object")->SetRotationX(-1.5708f);
 
 	// Sets renderer
 	std::vector<std::string> faces{
-		"Assets/Skybox/Space/right.png",
-			"Assets/Skybox/Space/left.png",
-			"Assets/Skybox/Space/top.png",
-			"Assets/Skybox/Space/bottom.png",
-			"Assets/Skybox/Space/front.png",
-			"Assets/Skybox/Space/back.png"
+		"Assets/Skybox/daylight/right.png",
+			"Assets/Skybox/daylight/left.png",
+			"Assets/Skybox/daylight/top.png",
+			"Assets/Skybox/daylight/bottom.png",
+			"Assets/Skybox/daylight/front.png",
+			"Assets/Skybox/daylight/back.png"
 	};
 
 	envLight.sky = SkyBox(faces);
@@ -224,7 +225,7 @@ void Scene::Load() {
 	}
 	{
 		Light light(glm::vec3(0, 6, -2.4), glm::vec3(1, 0.922, 0.678) * 7.5f, 0.07, 0.017);
-		lights.push_back(light);
+		g_lights.push_back(light);
 	}
 
 
@@ -245,72 +246,93 @@ void Scene::Update(float deltaTime) {
 	float newY = 9 + amplitude * glm::sin(time * speed);
 	// Update light position
 	//lights[1].position.y = newY;
-
-	for (int i = 0; i < lights.size(); i++) {
-		if(glm::distance(lights[i].position,Player::getPosition()) < lights[i].radius * 1.4f && lights[i].Dynamic)
-			lights[i].GenerateShadows();
+	
+	for (int i = 0; i < g_lights.size(); i++) {
+		if(glm::distance(g_lights[i].position,Player::getPosition()) < g_lights[i].radius * 1.4f && g_lights[i].Dynamic)
+			g_lights[i].GenerateShadows();
 	}
-	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
-		AssetManager::GetGameObject(i)->Update();
-	}
-	for (int door = 0; door < doors.size(); door++) {
-		doors[door].Interact();
-		doors[door].Update(deltaTime);
+	
+	for (int i = 0; i < GetGameObjectsSize(); i++) {
+		GetGameObject(i)->Update();
 	}
 }
 
 
-
-void Scene::AddGunPickUp(GunPickUp gunpickup) {
-	gunPickUps.push_back(gunpickup);
-}
-
-//had to change back to int instead of size_t as it was giving me errors with string sizes
-int Scene::GetGunPickUpSize() {
-	return gunPickUps.size();
-}
-
-Crate* Scene::GetCrate(std::string name) {
-	for (int i = 0; i < crates.size(); i++) {
-		if (crates[i].GetName() == name)
-			return &crates[i];
-	}
-	return nullptr;
-}
 
 std::vector<Light> Scene::getLights() {
-	return lights;
+	return g_lights;
 }
 
 EnviromentLighting Scene::GetEnviromentLighting() {
 	return envLight;
 }
-std::vector<GameObject*> Scene::NeedRenderingObjects() {
-	return NeedRendering;
-}
-int Scene::DoesGunPickUpExsit(std::string name) {
-	for (int i = 0; i < gunPickUps.size(); i++) {
-		if (gunPickUps[i].GetName() == name)
-			return 1;
-	}
-	return 0;
-}
+
 
 Light* Scene::GetLight(int i) {
-	return &lights[i];
+	return &g_lights[i];
 }
 size_t Scene::GetLightsSize() {
-	return lights.size();
+	return g_lights.size();
 }
 void Scene::SetLight(Light light, int index) {
-	if (index > lights.size() - 1) {
-		lights.push_back(light);
+	if (index > g_lights.size() - 1) {
+		g_lights.push_back(light);
 	}
 	else {
-		lights[index] = light;
+		g_lights[index] = light;
 	}
 }
 void Scene::RemoveLight(int index) {
-	if (index < lights.size())
-		lights.erase(lights.begin() + index);
+	if (index < g_lights.size())
+		g_lights.erase(g_lights.begin() + index);
+}
+
+
+
+size_t Scene::AddGameObject(GameObject gameobject) {
+	gameObjects.push_back(gameobject);
+	gameObjects[gameObjects.size() - 1].GetRigidBody()->setUserPointer((void*)(gameObjects.size() - 1));
+	return gameObjects.size() - 1;
+}
+
+size_t Scene::AddGameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape) {
+	gameObjects.push_back(GameObject(name, model, position, save, mass, shape));
+	gameObjects[gameObjects.size() - 1].GetRigidBody()->setUserIndex((int)gameObjects.size() - 1);
+	return gameObjects.size() - 1;
+}
+
+void Scene::RemoveGameObject(std::string name) {
+	for (int i = 0; i < gameObjects.size(); i++) {
+		if (gameObjects[i].GetName() == name) {
+			PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(gameObjects[i].GetRigidBody());
+			gameObjects.erase(gameObjects.begin() + i);
+		}
+	}
+}
+
+void Scene::RemoveGameObject(int index) {
+	gameObjects.erase(gameObjects.begin() + index);
+}
+
+GameObject* Scene::GetGameObject(std::string name) {
+	for (int i = 0; i < gameObjects.size(); i++) {
+		if (gameObjects[i].GetName() == name)
+			return &gameObjects[i];
+	}
+	std::cout << "Object: " << name << " doesnt exsit \n";
+	return nullptr;
+}
+
+GameObject* Scene::GetGameObject(int index) {
+	if (index >= gameObjects.size() || index < 0)
+		return nullptr;
+	return &gameObjects[index];
+}
+
+std::vector<GameObject> Scene::GetAllGameObjects() {
+	return gameObjects;
+}
+
+size_t Scene::GetGameObjectsSize() {
+	return gameObjects.size();
 }

@@ -75,8 +75,8 @@ namespace Game {
 			NetworkManager::SendPlayerData(Player::getPosition(), glm::vec3(-Camera::GetVerticalAngle(), Camera::GetHorizontalAngle(), 0), Player::getCurrentGun(), Player::GetInteractingWithName());
 		//Host keeps track of all the physics objects 
 		if (NetworkManager::IsServer && m_multiPlayerMode == MultiPlayer) {
-			for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
-				GameObject* gameobject = AssetManager::GetGameObject(i);
+			for (int i = 0; i < SceneManager::GetCurrentScene()->GetGameObjectsSize(); i++) {
+				GameObject* gameobject = SceneManager::GetCurrentScene()->GetGameObject(i);
 				if (!gameobject->IsDynamic() || gameobject->GetName() == "PlayerTwo" || gameobject->GetName() == "player")
 					continue;
 

@@ -15,7 +15,8 @@ uniform mat3 normalMatrix3;
 uniform float time;
 uniform vec3 randomDir[32];
 
-vec2 windDir = normalize(vec2(0.5,0.5));
+vec2 windDir = normalize(vec2(0.5,0.4));
+float windSpeed = 1.0;
 
 float random (in vec2 st) {
     return fract(sin(dot(st.xy,
@@ -31,10 +32,12 @@ vec3 BrownianMotion(vec3 pos) {
     float amplitudeSum = 0;
     float h = 0.0;
     vec2 derivatives = vec2(0.0); // Stores (dh/dx, dh/dz)
-    float maxPeak = 1.9;
-    
+    float maxPeak = 1.5;
+    //h += 0.5 * sin(dot(pos.xz,windDir) + time * windSpeed);
+
+
     for (int i = 0; i < 64; i++) {
-        vec2 dir = normalize(vec2(cos(seed), sin(seed))); // Wave direction
+        vec2 dir = normalize(mix(vec2(cos(seed), sin(seed)),windDir,0.3)); // Wave direction
         float x = dot(dir, p.xz) * f + time * speed; // Scaled position + time
         float wave = a * exp(maxPeak * sin(x) - 1.0); // Wave height
         float dwave_dx = f * wave * cos(x); // Derivative INCLUDES frequency (f)
@@ -48,21 +51,21 @@ vec3 BrownianMotion(vec3 pos) {
 
         f *= 1.18; // Lacunarity
         a *= 0.79; // Gain
-        speed *= 1.07;
+        speed *= 1.08;
         seed += 1253.2131;
     }
-    
+
 
     // Normalize height and derivatives
-    h /= amplitudeSum * 1;
+    h /= amplitudeSum * 1.0;
     derivatives /= amplitudeSum;
 
-    // Compute tangent basis
-    vec3 T = normalize(vec3(1.0, derivatives.x, 0.0)); // Tangent (x-axis)
-    vec3 B = normalize(vec3(0.0, derivatives.y, 1.0)); // Bitangent (z-axis)
-    N = normalize(cross(B, T)); // Final normal (order matters!)
+     vec3 T = normalize(vec3(1.0, derivatives.x, 0.0)); // Tangent (x-axis)
+     vec3 B = normalize(vec3(0.0, derivatives.y, 1.0)); // Bitangent (z-axis)
+     N = normalize(cross(B, T)); // Final normal (order matters!)
 
-    return vec3(0, h, 0); // Return height (or modify as needed)
+    // Incorporate derivatives for horizontal displacement
+    return vec3(derivatives.x * 0.1, h, derivatives.y * 0.1); // Scale the displacement as needed
 }
 
 /*

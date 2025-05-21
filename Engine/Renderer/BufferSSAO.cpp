@@ -9,7 +9,6 @@ BufferSSAO::BufferSSAO() {
 BufferSSAO::~BufferSSAO() {
 
 }
-
 void BufferSSAO::Configure() {
 	// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
 	glGenFramebuffers(1, &ID);
@@ -44,6 +43,7 @@ void BufferSSAO::Bind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, ID);
 }
 void BufferSSAO::Destroy() {
+	glDeleteFramebuffers(1, &ID);
 
 }
 unsigned int BufferSSAO::GetID() {

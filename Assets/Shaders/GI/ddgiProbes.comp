@@ -20,8 +20,6 @@ layout(std430, binding = 7) buffer ShCoeffient {
     vec3 L1SH_8[10000];
 };
 
-
-
 layout(std430, binding = 9) readonly buffer VertexBuffer {
     vec4 vertices[]; 
 };

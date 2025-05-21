@@ -343,7 +343,6 @@
     <None Include="Assets\Shaders\SkyBoxShader.vert" />
     <None Include="Assets\Shaders\SkyBoxShader.frag" />
     <None Include="Assets\Shaders\SSAO\ssao.vert" />
-    <None Include="Assets\Shaders\Lighting\lighting.vert" />
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.vert" />
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.frag" />
     <None Include="Assets\Shaders\Editor\Editor.frag" />
@@ -368,8 +367,6 @@
     <None Include="Assets\Shaders\Final\final.frag" />
     <None Include="Assets\Shaders\SSR\SSR.frag" />
     <None Include="Assets\Shaders\SSR\SSR.vert" />
-    <None Include="Assets\Shaders\PostProccess\post.frag" />
-    <None Include="Assets\Shaders\PostProccess\post.vert" />
     <None Include="Assets\Shaders\GI\probe.vert" />
     <None Include="Assets\Shaders\GI\probe.frag" />
     <None Include="Assets\Shaders\GI\irradiance.vert" />
