@@ -367,8 +367,6 @@
     <None Include="Assets\Shaders\Final\final.frag" />
     <None Include="Assets\Shaders\SSR\SSR.frag" />
     <None Include="Assets\Shaders\SSR\SSR.vert" />
-    <None Include="Assets\Shaders\PostProccess\post.frag" />
-    <None Include="Assets\Shaders\PostProccess\post.vert" />
     <None Include="Assets\Shaders\GI\probe.vert" />
     <None Include="Assets\Shaders\GI\probe.frag" />
     <None Include="Assets\Shaders\GI\irradiance.vert" />

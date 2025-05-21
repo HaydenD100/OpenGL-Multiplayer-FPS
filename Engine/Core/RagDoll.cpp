@@ -34,7 +34,7 @@ void RagDoll::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 paren
     glm::mat4 globalTransformation = parentTransform * nodeTransform;
 
     auto boneInfoMap = currentAnimationInstances[index].Animation->GetBoneIDMap();
-    GameObject* gameobject = AssetManager::GetGameObject(currentAnimationInstances[index].GameObjectName);
+    GameObject* gameobject = SceneManager::GetCurrentScene()->GetGameObject(currentAnimationInstances[index].GameObjectName);
     if (boneInfoMap.find(nodeName) != boneInfoMap.end()) {
         int indexBone = boneInfoMap[nodeName].id;
         gameobject->SetFinalBoneMatricies(indexBone, globalTransformation * boneInfoMap[nodeName].offset);

@@ -3,6 +3,8 @@
 #include "Engine/Physics/BulletPhysics.h"
 #include "Engine/Networking/NetworkManager.h"
 
+#include "Engine/Core/Scene/SceneManager.h"
+
 #undef max
 
 GameObject::GameObject() = default;
@@ -328,12 +330,6 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 		m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
 }
 
-
-
-
-
-
-
 Model* GameObject::GetModel() {
 	return model;
 }
@@ -349,7 +345,7 @@ glm::mat4 GameObject::GetModelMatrix() {
 	//Btransform.getOpenGLMatrix(glm::value_ptr(matrix));
 
 	if (!parentName.empty()) {
-		GameObject* parent = AssetManager::GetGameObject(parentName);
+		GameObject* parent = SceneManager::GetCurrentScene()->GetGameObject(parentName);
 		if (parent != nullptr) {
 			matrix = parent->GetModelMatrix() * transform.to_mat4();
 		}

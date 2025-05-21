@@ -86,7 +86,6 @@ namespace Renderer
 {
     
 	extern ProbeGrid probeGrid;
-
 	extern StorageBuffer SHBuffer;
 	extern Texture3D probeTexture;
 
@@ -139,7 +138,6 @@ namespace Renderer
     // Shader
     void SetLights(std::vector<Light> lights, Shader* shader);
 	void SetLights(std::vector<Light> lights, ComputeShader* shader);
-	void SetLightsAllShaders(std::vector<Light> lights);
     void RenderScene();
 
 	void DrawPoint(glm::vec3 position, glm::vec3 colour);

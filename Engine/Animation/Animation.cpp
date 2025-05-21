@@ -5,6 +5,8 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
+#include "Engine/Core/Scene/SceneManager.h"
 KeyFrame::KeyFrame(glm::vec3 Position, glm::quat Rotation, glm::vec3 Scale, float Duration) {
 	position = Position;
 	rotation = Rotation;
@@ -166,7 +168,7 @@ namespace AnimationManager
 
 	
 	void AnimationManager::Play(std::string Name,std::string ObjectName) {
-		GameObject* gameobject = AssetManager::GetGameObject(ObjectName);
+		GameObject* gameobject = SceneManager::GetCurrentScene()->GetGameObject(ObjectName);
 		Animation* animation = GetAnimation(Name);
 		if (gameobject != nullptr && animation != nullptr) {
 			animation->SetGameObject(gameobject);

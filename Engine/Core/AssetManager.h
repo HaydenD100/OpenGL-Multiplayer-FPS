@@ -22,15 +22,10 @@ namespace AssetManager
 	void SaveAssets(const char* path = save_path);
 	void LoadAssets(const char* path = save_path);
 
-	// returns index of object
-	size_t AddGameObject(GameObject gameobject);
-	unsigned long long AddGameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape);
-
 	unsigned long long AddDecal(std::string name, Texture* texture, glm::vec3 size);
 	Decal* GetDecal(std::string name);
 	Decal* GetDecal(int index);
 	size_t DecalSize();
-
 
 	std::vector<Decal>* GetAllDecals();
 	void ClearAllDecalInstances();
@@ -53,19 +48,12 @@ namespace AssetManager
 	size_t AddSkinnedAnimation(SkinnedAnimation skinnedanimation);
 	SkinnedAnimation* GetSkinnedAnimation(std::string name);
 
-
-	void RemoveGameObject(std::string name);
-	void RemoveGameObject(int index);
 	void ClearAssets();
 
 	Texture* GetMissingTexture();
 
 	void CleanUp();
 
-	GameObject* GetGameObject(std::string name);
-	GameObject* GetGameObject(int index);
-	std::vector<GameObject> GetAllGameObjects();
-	size_t GetGameObjectsSize();
 	size_t GetDecalsSize();
 
 	Texture* GetTexture(std::string name);
