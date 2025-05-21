@@ -200,12 +200,12 @@ void Scene::Load() {
 
 	// Sets renderer
 	std::vector<std::string> faces{
-		"Assets/Skybox/Space/right.png",
-			"Assets/Skybox/Space/left.png",
-			"Assets/Skybox/Space/top.png",
-			"Assets/Skybox/Space/bottom.png",
-			"Assets/Skybox/Space/front.png",
-			"Assets/Skybox/Space/back.png"
+		"Assets/Skybox/daylight/right.png",
+			"Assets/Skybox/daylight/left.png",
+			"Assets/Skybox/daylight/top.png",
+			"Assets/Skybox/daylight/bottom.png",
+			"Assets/Skybox/daylight/front.png",
+			"Assets/Skybox/daylight/back.png"
 	};
 
 	envLight.sky = SkyBox(faces);

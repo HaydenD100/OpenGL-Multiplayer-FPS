@@ -44,7 +44,9 @@ void BufferSSAO::Bind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, ID);
 }
 void BufferSSAO::Destroy() {
-
+	glDeleteTextures(1, &gSSAO);
+	glDeleteTextures(1, &Depth);
+	glDeleteFramebuffers(1, &ID);
 }
 unsigned int BufferSSAO::GetID() {
 	return ID;

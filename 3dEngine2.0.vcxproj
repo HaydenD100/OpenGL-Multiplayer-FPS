@@ -201,7 +201,7 @@
     <ClCompile Include="Engine\Renderer\Texture3D.cpp" />
     <ClCompile Include="Engine\Renderer\Probe.cpp" />
     <ClCompile Include="Engine\Renderer\Raycaster.cpp" />
-    <ClCompile Include="Engine\Renderer\Ocean.cpp" />
+    <ClCompile Include="Engine\Game\Ocean.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\Bloom\downscale.frag" />
@@ -237,7 +237,6 @@
     <None Include="Assets\Shaders\GI\renderProbes.vert" />
     <None Include="Assets\Shaders\GI\triangleIntersection.comp" />
     <None Include="Assets\Shaders\Lighting\lighting.comp" />
-    <None Include="Assets\Shaders\Lighting\lighting.vert" />
     <None Include="Assets\Shaders\PostProccess\post.comp" />
     <None Include="Assets\Shaders\PostProccess\post.frag" />
     <None Include="Assets\Shaders\PostProccess\post.vert" />
@@ -325,7 +324,7 @@
     <ClInclude Include="Engine\Renderer\Texture3D.h" />
     <ClInclude Include="Engine\Renderer\Probe.h" />
     <ClInclude Include="Engine\Renderer\Raycaster.h" />
-    <ClInclude Include="Engine\Renderer\Ocean.h" />
+    <ClInclude Include="Engine\Game\Ocean.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="github\screenshots\3DEngine.png" />

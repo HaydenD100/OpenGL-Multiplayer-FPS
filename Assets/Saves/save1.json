@@ -3,7 +3,7 @@
         {
             "name": "GI_map_1",
             "positionX": -1.5,
-            "positionY": -3.700000047683716,
+            "positionY": 0.0,
             "positionZ": -4.0,
             "rotationX": -1.5708000659942627,
             "rotationY": 0.0,
@@ -11,18 +11,18 @@
         },
         {
             "name": "Cube",
-            "positionX": 0.9203879833221436,
-            "positionY": -1.700000286102295,
-            "positionZ": -3.982480764389038,
-            "rotationX": -3.918135007552337e-06,
-            "rotationY": 0.0009613872971385717,
-            "rotationZ": 3.3784812103476725e-07
+            "positionX": 0.9232215285301208,
+            "positionY": -11.229427337646484,
+            "positionZ": -3.990361452102661,
+            "rotationX": -0.0016869837418198586,
+            "rotationY": -4.91286555188708e-05,
+            "rotationZ": -0.0031760819256305695
         },
         {
             "name": "water",
             "positionX": 0.0,
             "positionY": 2.0,
-            "positionZ": 0.0,
+            "positionZ": 40.0,
             "rotationX": 0.0,
             "rotationY": -0.0,
             "rotationZ": 0.0
@@ -74,21 +74,21 @@
         },
         {
             "name": "player",
-            "positionX": -1.2002671957015991,
-            "positionY": 3.0999996662139893,
-            "positionZ": 4.992770195007324,
-            "rotationX": 5.881161779797139e-09,
-            "rotationY": -1.7294032157129885e-17,
-            "rotationZ": 5.881161779797139e-09
+            "positionX": -0.5726732015609741,
+            "positionY": 3.1000044345855713,
+            "positionZ": 14.332353591918945,
+            "rotationX": 7.638691386091523e-07,
+            "rotationY": -4.2544916564355925e-14,
+            "rotationZ": 1.0990026311219481e-07
         },
         {
             "name": "player_head",
-            "positionX": -1.2002671957015991,
-            "positionY": 4.09999942779541,
-            "positionZ": 4.992770195007324,
-            "rotationX": 0.021996349096298218,
-            "rotationY": 0.08392391353845596,
-            "rotationZ": 0.0
+            "positionX": -0.5726732015609741,
+            "positionY": 4.100004196166992,
+            "positionZ": 14.332353591918945,
+            "rotationX": -1.7395927906036377,
+            "rotationY": -1.1590490341186523,
+            "rotationZ": -3.141592502593994
         }
     ],
     "lights": [

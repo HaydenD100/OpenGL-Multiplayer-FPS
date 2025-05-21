@@ -13,14 +13,11 @@ public:
 	void ReLight();
 	void CreateBindless();
 	Transform GetTransform();
+
 	GLuint GetCubeAlbedo();
 	GLuint GetCubeNormal();
 	GLuint GetCubePosition();
-	GLuint GetCubeLighting();
 
-
-	GLuint GetDepthCubeMap();
-	GLuint GetIrradianceCubeMap();
 
 	unsigned int ProbeID();
 
@@ -28,20 +25,15 @@ public:
 	GLuint64 h_gAlbedo = 0;
 	GLuint64 h_gNormal = 0;
 	GLuint64 h_gPosition = 0;
-	GLuint64 h_gdepth = 0;
 
 private:
 	Transform transform;
-	GLuint probeLighting = 0;
 	GLuint probeAlbedo = 0;
 	GLuint probeNormal = 0;
 	GLuint probePosition = 0;
 
-	GLuint probeIrradianceCubemap = 0;
-	GLuint probeFBO = 0;
 	GLuint gbufferFBO = 0;
 	GLuint Depth = 0;
-	GLuint m_depth = 0;
 
 	GLuint probeTextureBuffer = 0;
 

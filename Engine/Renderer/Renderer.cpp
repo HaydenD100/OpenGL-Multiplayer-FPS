@@ -386,9 +386,9 @@ namespace Renderer
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 		
-		GaussianNoise = Texture(generateGaussianNoise(512, 512), 512, 512);
-		waterVecOut = Texture(generateGaussianNoise(512, 512), 512, 512);
-		waterHeightMap = Texture(generateGaussianNoise(512, 512), 512, 512);
+		//GaussianNoise = Texture(generateGaussianNoise(512, 512), 512, 512);
+		//waterVecOut = Texture(generateGaussianNoise(512, 512), 512, 512);
+		//waterHeightMap = Texture(generateGaussianNoise(512, 512), 512, 512);
 
 		//Raycaster::Init();
 
@@ -413,7 +413,6 @@ namespace Renderer
 		lightingBuffer.Configure();
 		postBuffer.Configure();
 		fxaaBuffer.Configure(Backend::GetWidth(), Backend::GetHeight());
-
 		emmisiveRenderer.Init(Backend::GetWidth(), Backend::GetHeight());
 
 
@@ -432,6 +431,16 @@ namespace Renderer
 
 
 	}
+	void DeleteFrameBuffers() {
+		gbuffer.Destroy();
+		ssaoBuffer.Destroy();
+		ssrBuffer.Destroy();
+		lightingBuffer.Destroy();
+		postBuffer.Destroy();
+		fxaaBuffer.Destroy();
+		//emmisiveRenderer.Destroy();
+	}
+
 
 
 	void Renderer::BeforeRender() {

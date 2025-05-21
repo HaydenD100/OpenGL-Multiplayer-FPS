@@ -83,7 +83,14 @@ void GBuffer::Bind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, ID);
 }
 void GBuffer::Destroy() {
-
+	glDeleteTextures(1, &gPosition);
+	glDeleteTextures(1, &gNormal);
+	glDeleteTextures(1, &gAlbedo);
+	glDeleteTextures(1, &gRMA);
+	glDeleteTextures(1, &gTrueNormal);
+	glDeleteTextures(1, &gEmission);
+	glDeleteTextures(1, &Depth);
+	glDeleteFramebuffers(1, &ID);
 }
 unsigned int GBuffer::GetID() {
 	return ID;

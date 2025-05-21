@@ -81,6 +81,7 @@ namespace Backend
 		height = m_height;
 		width = m_width;
 		glViewport(0, 0, width, height);
+		Renderer::DeleteFrameBuffers();
 		Renderer::ConfigureFrameBuffers();
 		Camera::RecalcuteProjectionMatrix();
 	}

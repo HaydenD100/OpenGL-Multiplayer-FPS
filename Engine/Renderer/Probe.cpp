@@ -15,8 +15,6 @@ void ProbeGrid::ShowProbes() {
 
 	for (int i = 0; i < probes.size(); i++) {
 
-		glBindTextureUnit(0, probes[i].GetCubeLighting());
-		glBindTextureUnit(1, probes[i].GetIrradianceCubeMap());
 		Renderer::s_probeRender.SetInt("probeID", probes[i].ProbeID());
 
 
@@ -101,8 +99,6 @@ void ProbeGrid::ReLight(int probeRelightCount) {
 		glBindTexture(GL_TEXTURE_CUBE_MAP, scene->GetLight(i)->depthCubemap); // Bind the depth cubemap to the texture unit
 	}
 
-
-
 	Renderer::probeTexture.ImageBind(6);
 	Renderer::SHBuffer.Bind(7);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, b_handles);
@@ -121,6 +117,13 @@ void Probe::CreateBindless() {
 	glMakeTextureHandleResidentARB(h_gNormal);
 	h_gPosition = glGetTextureHandleARB(probePosition);
 	glMakeTextureHandleResidentARB(h_gPosition);
+
+
+	//glDeleteTextures(1, &probeAlbedo);
+	//glDeleteTextures(1, &probeNormal);
+	//glDeleteTextures(1, &probePosition);
+	glDeleteFramebuffers(1, &gbufferFBO);
+
 }
 
 
@@ -166,29 +169,6 @@ Probe::Probe(glm::vec3 postion) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-	glGenTextures(1, &probeLighting);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, probeLighting);
-	for (unsigned int i = 0; i < 6; ++i) {
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, PROBESIZE, PROBESIZE, 0, GL_RGB, GL_FLOAT, NULL);
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-	glGenTextures(1, &probeIrradianceCubemap);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, probeIrradianceCubemap);
-	for (unsigned int i = 0; i < 6; ++i) {
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, PROBESIZE, PROBESIZE, 0, GL_RGB, GL_FLOAT, NULL);
-	}
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-
 	// Create and configure the depth texture
 
 	glGenTextures(1, &Depth);
@@ -201,19 +181,6 @@ Probe::Probe(glm::vec3 postion) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-	
-	glGenTextures(1, &m_depth);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, m_depth);
-	for (unsigned int i = 0; i < 6; ++i)
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, PROBESIZE, PROBESIZE, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
 	// Configure framebuffer for probe
 	glGenFramebuffers(1, &gbufferFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, gbufferFBO);
@@ -236,24 +203,6 @@ Probe::Probe(glm::vec3 postion) {
 		std::cout << "Framebuffer incomplete: " << status << std::endl;
 	}
 
-	
-	glGenFramebuffers(1, &probeFBO);
-	glBindFramebuffer(GL_FRAMEBUFFER, probeFBO);
-	// Attach cubemap face for color output
-	for (int face = 0; face < 6; ++face) {
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, probeLighting, 0);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, probeIrradianceCubemap, 0);
-	}
-	GLenum DrawBuffers1[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
-	glDrawBuffers(2, DrawBuffers1);
-
-	// Check framebuffer completeness
-	status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status != GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "Framebuffer incomplete: " << status << std::endl;
-	}
-	
-
 	// Unbind framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -266,6 +215,7 @@ Probe::Probe(glm::vec3 postion) {
 }
 
 void Probe::Irradiance() {
+	/*
 	glBindFramebuffer(GL_FRAMEBUFFER, this->probeFBO);
 	glBindTextureUnit(0, probeAlbedo);
 	glBindTextureUnit(1, probeNormal);
@@ -285,10 +235,12 @@ void Probe::Irradiance() {
 		Renderer::s_probeirradiance.SetMat4("V", captureViews[i]);
 		Renderer::RenderCube();
 	}
+	*/
 
 }
 
 void Probe::ReLight() {
+	/*
 	//glBindFramebuffer(GL_FRAMEBUFFER, this->probeFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, this->probeFBO);
 
@@ -317,6 +269,7 @@ void Probe::ReLight() {
 		//Renderer::s_probe.SetMat4("M", captureViews[i]);
 		Renderer::RenderCube();
 	}
+	*/
 }
 
 void Probe::Bake() {
@@ -381,21 +334,10 @@ GLuint Probe::GetCubeNormal() {
 GLuint Probe::GetCubePosition() {
 	return probePosition;
 }
-GLuint Probe::GetIrradianceCubeMap() {
-	return probeIrradianceCubemap;
-}
-GLuint Probe::GetCubeLighting() {
-	return probeLighting;
-}
 
 unsigned int Probe::ProbeID() {
 	return probeID;
 }
-GLuint Probe::GetDepthCubeMap() {
-	return Depth;
-}
-
-
 
 unsigned int Probe::probeCount = 0;
 

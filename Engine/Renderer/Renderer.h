@@ -121,6 +121,7 @@ namespace Renderer
     int init();
     void LoadAllShaders();
 	void ConfigureFrameBuffers();
+	void DeleteFrameBuffers();
     void ClearScreen();
     void SwapBuffers(GLFWwindow* window);
 

@@ -168,7 +168,7 @@
     <ClCompile Include="Engine\Editor\Editor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Renderer\Ocean.cpp">
+    <ClCompile Include="Engine\Game\Ocean.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -335,7 +335,7 @@
     <ClInclude Include="Engine\Editor\Editor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Renderer\Ocean.h">
+    <ClInclude Include="Engine\Game\Ocean.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -343,7 +343,6 @@
     <None Include="Assets\Shaders\SkyBoxShader.vert" />
     <None Include="Assets\Shaders\SkyBoxShader.frag" />
     <None Include="Assets\Shaders\SSAO\ssao.vert" />
-    <None Include="Assets\Shaders\Lighting\lighting.vert" />
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.vert" />
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.frag" />
     <None Include="Assets\Shaders\Editor\Editor.frag" />
