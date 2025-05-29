@@ -171,6 +171,9 @@
     <ClCompile Include="Engine\Game\Ocean.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Renderer\Particle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Scene\Scene.h">
@@ -338,6 +341,9 @@
     <ClInclude Include="Engine\Game\Ocean.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Renderer\Particle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\SkyBoxShader.vert" />
@@ -401,6 +407,9 @@
     <None Include="Assets\Shaders\Water\wave_vec.comp" />
     <None Include="Assets\Shaders\Water\water_height_row.comp" />
     <None Include="Assets\Shaders\Water\water_height_col.comp" />
+    <None Include="Assets\Shaders\Particles\simParticle.comp" />
+    <None Include="Assets\Shaders\Particles\particle.vert" />
+    <None Include="Assets\Shaders\Particles\particle.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

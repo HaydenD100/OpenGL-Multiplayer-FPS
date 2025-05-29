@@ -10,29 +10,32 @@ namespace Editor
 	std::vector<GameObject*> objects;
 	void RenderUI() {
 		ImGui::Begin("Lights");
-		size_t s_light = SceneManager::GetCurrentScene()->GetLightsSize();
+		size_t s_light = SceneManager::GetCurrentScene()->g_lights.size();
 		for (int i = 0; i < s_light; i++) {
-			ImGui::Text("Light " + i);
-			if (ImGui::Button("Remove Light")) {
+			std::string label = "Light " + std::to_string(i);
+			ImGui::Text("%s", label.c_str());
+
+			std::string removeButtonLabel = "Remove Light##" + std::to_string(i);
+			if (ImGui::Button(removeButtonLabel.c_str())) {
 				SceneManager::GetCurrentScene()->RemoveLight(i);
+				// Important: Break out because lights list is now invalid
+				break;
 			}
-			Light* light = SceneManager::GetCurrentScene()->GetLight(i);
-			ImGui::ColorEdit3("Colour", glm::value_ptr(light->colour));
-			ImGui::InputFloat3("Position", glm::value_ptr(light->position));
-			ImGui::InputFloat("Radius", &light->radius);
-			ImGui::InputFloat("Strength", &light->strength);
+
+			Light* light = &SceneManager::GetCurrentScene()->g_lights[i];
+
+			ImGui::ColorEdit3(("Colour##" + std::to_string(i)).c_str(), glm::value_ptr(light->colour));
+			ImGui::InputFloat3(("Position##" + std::to_string(i)).c_str(), glm::value_ptr(light->position));
+			ImGui::InputFloat(("Radius##" + std::to_string(i)).c_str(), &light->radius);
+			ImGui::InputFloat(("Strength##" + std::to_string(i)).c_str(), &light->strength);
 		}
-		//if (ImGui::Button("Add Light")) {
-			//if the index of setlight is greater then the scene lights it will just push_back
-			//SceneManager::GetCurrentScene()->SetLight(Light(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), 5, 20), 99999);
-		//s}
 		ImGui::End();
+
 		ImGui::Begin("Editor");
 		if (ImGui::Button("Save Assets")) {
 			AssetManager::SaveAssets();
 		}
 		ImGui::End();
-
 	}
 	void Update() {
 		if (!ImGui::GetIO().WantCaptureMouse && Input::LeftMousePressed()) {
@@ -48,7 +51,7 @@ namespace Editor
 			RayCallback.m_collisionFilterMask = GROUP_STATIC | GROUP_DYNAMIC;
 			PhysicsManagerBullet::GetDynamicWorld()->rayTest(btVector3(cameraPosition.x, cameraPosition.y, cameraPosition.z), btVector3(out_end.x, out_end.y, out_end.z), RayCallback);
 			if (RayCallback.m_collisionObject != NULL) {
-				GameObject* gameobject = AssetManager::GetGameObject(RayCallback.m_collisionObject->getUserIndex());
+				GameObject* gameobject = &SceneManager::GetCurrentScene()->g_objects[RayCallback.m_collisionObject->getUserIndex()];
 				bool alreadyIncluded = false;
 				for (GameObject* object : objects) {
 					if (gameobject == object)

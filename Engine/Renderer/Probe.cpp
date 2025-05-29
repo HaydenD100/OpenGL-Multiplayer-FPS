@@ -89,7 +89,7 @@ void ProbeGrid::ReLight(int probeRelightCount) {
 	}
 
 
-	for (int i = 0; i < scene->GetLightsSize(); i++) {
+	for (int i = 0; i <  scene->g_lights.size(); i++) {
 		Renderer::cs_probeIrradiance.SetVec3("lights[" + std::to_string(i) + "].position", scene->GetLight(i)->position);
 		Renderer::cs_probeIrradiance.SetVec3("lights[" + std::to_string(i) + "].color", scene->GetLight(i)->colour);
 		Renderer::cs_probeIrradiance.SetFloat("lights[" + std::to_string(i) + "].strength", scene->GetLight(i)->strength);
@@ -302,8 +302,8 @@ void Probe::Bake() {
 
 		Renderer::s_probeDeffered.SetMat4("V", captureViews[i]);
 
-		for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
-			GameObject* gameobjectRender = AssetManager::GetGameObject(i);
+		for (int i = 0; i < SceneManager::GetCurrentScene()->g_objects.size(); i++) {
+			GameObject* gameobjectRender = &SceneManager::GetCurrentScene()->g_objects[i];
 
 			if (gameobjectRender->GetShaderType() != "Default" || !gameobjectRender->ShouldRender() || !gameobjectRender->IncludedInGI()) {
 				continue;

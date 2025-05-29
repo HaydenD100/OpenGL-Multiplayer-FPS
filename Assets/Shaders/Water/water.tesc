@@ -6,8 +6,8 @@ out vec2 uvsCoord[];
 
 uniform vec3 cameraPosition;
 
-const float MIN_TES = 4.0;
-const float MAX_TES = 32.0; 
+const float MIN_TES = 16.0;
+const float MAX_TES = 128.0; 
 const float MIN_DIST = 20.0;
 const float MAX_DIST = 50.0;
 

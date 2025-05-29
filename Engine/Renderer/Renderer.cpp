@@ -3,15 +3,17 @@
 #include "Engine/Core/Common.h"
 #include "Engine/Core/DecalInstance.h"
 #include "Engine/Renderer/Bloom.h"
+#include "Engine/Renderer/Particle.h"
 #include "Engine/Renderer/Raycaster.h"
 #include "Engine/Core/Input.h"
 #include "Engine/Core/UI/Text2D.h" 
 #include "Loaders/stb_image.h"
+#include "Engine/Pathfinding/Pathfinding.h"
 
 #include <random>
 #include <memory>
 
-
+#include "glm/gtx/norm.hpp"
 
 SkyBox::SkyBox() = default;
 
@@ -74,7 +76,6 @@ namespace Renderer
 	std::vector<glm::vec3> _randomdir;
 	const int waveCount = 32;
 
-
 	//ssao
 	std::vector<glm::vec3> ssaoKernel;
 	std::vector<glm::vec3> ssaoNoise;
@@ -118,6 +119,7 @@ namespace Renderer
 	Shader s_upScale;
 	Shader s_drawPoint;
 	Shader s_drawLine;
+	Shader s_particle;
 
 	//ComputeShaders
 	ComputeShader cs_lighting;
@@ -126,6 +128,7 @@ namespace Renderer
 	ComputeShader cs_water_vec;
 	ComputeShader cs_water_height_fft_col;
 	ComputeShader cs_water_height_fft_row;
+	ComputeShader cs_sim_particle;
 
 
 
@@ -184,6 +187,7 @@ namespace Renderer
 		s_water.Load("Assets/Shaders/Water/water.vert", "Assets/Shaders/Water/water.frag","Assets/Shaders/Water/water.tese","Assets/Shaders/Water/water.tesc");
 		s_textShader.Load("Assets/Shaders/textShader.vert", "Assets/Shaders/textShader.frag");
 		s_drawPoint.Load("Assets/Shaders/Debug/point.vert", "Assets/Shaders/Debug/point.frag");
+		s_particle.Load("Assets/Shaders/Particles/particle.vert", "Assets/Shaders/Particles/particle.frag");
 
 		cs_probeIrradiance.Load("Assets/Shaders/GI/irradiance.comp");
 		cs_Raycaster.Load("Assets/Shaders/GI/triangleIntersection.comp");
@@ -192,7 +196,7 @@ namespace Renderer
 		cs_ssao.Load("Assets/Shaders/SSAO/ssao.comp");
 		cs_water_vec.Load("Assets/Shaders/Water/wave_vec.comp");
 		cs_water_height_fft_col.Load("Assets/Shaders/Water/water_height_col.comp");
-
+		cs_sim_particle.Load("Assets/Shaders/Particles/simParticle.comp");
 		//TODO :: change this so the texture bindings are defined in the GLSL shader
 		
 		cs_lighting.Use();
@@ -215,9 +219,8 @@ namespace Renderer
 		s_transparent.SetInt("RoughnessTextureSampler", 2);
 		s_transparent.SetInt("MetalicTextureSampler", 3);
 		for (int i = 0; i < 26; i++) {
-			s_transparent.SetInt("depthMap[" + std::to_string(i) + "]", 5 + i);
+			s_transparent.SetInt("lights[" + std::to_string(i) + "].depthMap", 8 + i);
 		}
-
 		s_geomerty.Use();
 		s_geomerty.SetInt("DiffuseTextureSampler", 0);
 		s_geomerty.SetInt("NormalTextureSampler", 1);
@@ -244,10 +247,6 @@ namespace Renderer
 		s_decal.Use();
 		s_decal.SetInt("decalTexture", 1);
 		s_decal.SetInt("gDepth", 3);
-
-		cs_post.Use();
-		cs_post.SetInt("gLighting", 0);
-		cs_post.SetInt("gSSR", 1);
 
 		s_final.Use();
 		s_final.SetInt("gFinal", 0);
@@ -445,7 +444,8 @@ namespace Renderer
 
 	void Renderer::BeforeRender() {
 
-		Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->getLights());
+		Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->g_lights);
+		ParticleSystem::init();
 		//Raycaster::FillBuffers();
 		int gridX = 10;
 		int gridY = 10;
@@ -519,11 +519,9 @@ namespace Renderer
 
 	void Renderer::RenderAllObjects(Shader& shader) {
 		NeedRendering.clear();
-		overlay.clear();
-		waterObjects.clear();
 		glm::mat4 ViewMatrix = Camera::getViewMatrix();
-		for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
-			GameObject* gameobjectRender = AssetManager::GetGameObject(i);
+		for (int i = 0; i < SceneManager::GetCurrentScene()->g_lights.size(); i++) {
+			GameObject* gameobjectRender = &SceneManager::GetCurrentScene()->g_objects[i];
 
 			if (!gameobjectRender->ShouldRender())
 				continue;
@@ -559,31 +557,13 @@ namespace Renderer
 		Text2D::printText2D(text, x, y, size);
 	}
 
-	void Renderer::RenderScene() {
+	void Renderer::RenderScene(float dt) {
 
 		//--------------------------------------------PROBE-------------------------------------------	
 		Renderer::probeGrid.ReLight(UPDATED_PROBE_COUNT_PER_FRAME);
-
 		Renderer::CheckDebugState();
-
-		cs_water_vec.Use();
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, GaussianNoise.GetTexture());
-		glBindImageTexture(1, waterVecOut.GetTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
-		cs_water_vec.SetFloat("time", glfwGetTime());
-
-		glDispatchCompute(512 / 32, 512 / 32, 1);
-		glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
-		cs_water_height_fft_col.Use();
-
-		cs_water_height_fft_col.SetBool("uHorizontalPass", true);
-
-		glBindImageTexture(0, waterVecOut.GetTexture(), 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA32F);
-		glBindImageTexture(1, waterHeightMap.GetTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
-
-		glDispatchCompute(512 / 32, 512 / 32, 1); // 32 workgroups for 512 columns
-		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+		//ParticleSystem::Simulate(dt);
+		
 
 		//cs_water_height_fft_col.SetBool("uHorizontalPass", false);
 
@@ -611,16 +591,11 @@ namespace Renderer
 
 		NeedRendering.clear();
 		glm::mat4 ViewMatrix = Camera::getViewMatrix();
-		for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
-			GameObject* gameobjectRender = AssetManager::GetGameObject(i);
+		for (int i = 0; i < SceneManager::GetCurrentScene()->g_objects.size(); i++) {
+			GameObject* gameobjectRender = &SceneManager::GetCurrentScene()->g_objects[i];
 
 			if (!gameobjectRender->ShouldRender())
 				continue;
-			if (gameobjectRender->GetShaderType() != "Default") {
-				//make guns render on top;
-				NeedRendering.push_back(gameobjectRender);
-				continue;
-			}
 			if (!gameobjectRender->GetModel()->GetAABB()->isOnFrustum(Camera::GetFrustum(), gameobjectRender->getTransform()) && !gameobjectRender->DontCull())
 				continue;
 
@@ -647,7 +622,7 @@ namespace Renderer
 
 		RenderWater();
 
-
+		//ParticleSystem::RenderParticles();
 
 		//This can be removed later but it just renders a cube thats glowing to show where point lights are
 		s_SolidColor.Use();
@@ -659,7 +634,7 @@ namespace Renderer
 		s_SolidColor.SetFloat("Metalic", 0);
 
 
-		std::vector<Light> lights = SceneManager::GetCurrentScene()->getLights();
+		std::vector<Light> lights = SceneManager::GetCurrentScene()->g_lights;
 		for (int i = 0; i < lights.size(); i++) {
 			s_SolidColor.SetVec3("color", lights[i].colour);
 			glm::mat4 positionMatrix = glm::mat4(); // create an identity matrix;
@@ -711,46 +686,29 @@ namespace Renderer
 		s_transparent.SetMat4("P", Camera::getProjectionMatrix());
 		s_transparent.SetMat4("V", Camera::getViewMatrix());
 		s_transparent.SetVec3("viewPos", Camera::GetPosition());
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		SetLights(SceneManager::GetCurrentScene()->g_lights, &s_transparent);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glm::vec3 cameraPosition = Camera::GetPosition(); // Camera position
-
-
 		//TODO :: CHANGE THIS TO OIT this gets slow if theres too many transparent objects
 		
-		std::sort(NeedRendering.begin(), NeedRendering.end(),
-			[&cameraPosition](const GameObject* a, const GameObject* b) {
-				float distanceA = glm::length(a->GetPosition() - cameraPosition);
-				float distanceB = glm::length(b->GetPosition() - cameraPosition);
+		auto& glassObjects = SceneManager::GetCurrentScene()->g_glass;
 
-				return distanceA > distanceB; // Sort by descending distance (farthest first)
+		std::sort(glassObjects.begin(), glassObjects.end(),
+			[&cameraPosition](const GameObject& a, const GameObject& b) {
+				float distA = glm::length2(a.GetPosition() - cameraPosition);
+				float distB = glm::length2(b.GetPosition() - cameraPosition);
+				return distA > distB;
 			});
 
-
-
-		for (int i = 0; i < NeedRendering.size(); i++) {
-			if (NeedRendering[i]->GetShaderType() == "Overlay") {
-				overlay.push_back(NeedRendering[i]);
-				continue;
-			}
+		for (int i = 0; i < glassObjects.size(); i++) {
 			
-			auto transforms = NeedRendering[i]->GetFinalBoneMatricies();
-			if (transforms[0] != glm::mat4(1)) {
-				s_transparent.SetBool("animated", true);
-				for (int i = 0; i < transforms.size(); ++i) {
-					std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
-					s_transparent.SetMat4(pos.c_str(), transforms[i]);
-				}
-			}
-			else {
-				s_transparent.SetBool("animated", false);
-			}
-			glm::mat4 ModelMatrix = NeedRendering[i]->GetModelMatrix();
-			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;
-			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
+			glm::mat4 ModelMatrix = glassObjects[i].GetModelMatrix();
+			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(ModelMatrix)));
 
 			s_transparent.SetMat3("normalMatrix3", normalMatrix);
 			s_transparent.SetMat4("M", ModelMatrix);
-			NeedRendering[i]->RenderObject(s_transparent.GetShaderID());
+			glassObjects[i].RenderObject(s_transparent.GetShaderID());
+
 		}
 		
 
@@ -788,16 +746,16 @@ namespace Renderer
 		glDisable(GL_BLEND);
 		
 		//---------------------------------------------------Overlay-------------------------------------
+		/*
 		s_geomerty.Use();
-
 		glClear(GL_DEPTH_BUFFER_BIT);
-		for (int i = 0; i < overlay.size(); i++) {
-			glm::mat4 ModelMatrix = overlay[i]->GetModelMatrix();
+		for (int i = 0; i < SceneManager::GetCurrentScene()->g_overlay.size(); i++) {
+			glm::mat4 ModelMatrix = SceneManager::GetCurrentScene()->g_overlay[i].GetModelMatrix();
 			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;
 			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
 
 			//auto transforms = SceneManager::GetCurrentScene()->GetAnimator()->GetFinalBoneMatrices(overlay[i]->GetName());
-			auto transforms = overlay[i]->GetFinalBoneMatricies();
+			auto transforms = SceneManager::GetCurrentScene()->g_overlay[i].GetFinalBoneMatricies();
 
 			if (transforms[0] != glm::mat4(1)) {
 				s_geomerty.SetBool("animated", true);
@@ -813,9 +771,9 @@ namespace Renderer
 			s_geomerty.SetMat3("normalMatrix3", normalMatrix);
 			s_geomerty.SetMat4("M", ModelMatrix);
 
-			overlay[i]->RenderObject(s_geomerty.GetShaderID());
+			SceneManager::GetCurrentScene()->g_overlay[i].RenderObject(s_geomerty.GetShaderID());
 		}
-
+		*/
 		//------------------------------------------------RAYCAST DEBUG--------------------------------
 		/*
 		s_SolidColor.Use();
@@ -942,6 +900,8 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, waterHeightMap.GetTexture());
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, emmisiveRenderer.BloomTexture());
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gtransparent);
 
 		glBindImageTexture(7, postBuffer.gLighting, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 

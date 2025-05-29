@@ -1,7 +1,7 @@
 #include "Raycaster.h"
 #include "Engine/Core/AssetManager.h"
 #include "glm/gtx/intersect.hpp"
-
+#include "Engine/Core/Scene/SceneManager.h"
 
 
 namespace Raycaster
@@ -56,11 +56,11 @@ namespace Raycaster
 
 	}
 	void FillBuffers() {
-		size_t objectListSize = AssetManager::GetGameObjectsSize();	
+		size_t objectListSize = SceneManager::GetCurrentScene()->g_objects.size();	
 		verticies.clear();
 
 		for (int i = 0; i < objectListSize; i++) {
-			GameObject* object = AssetManager::GetGameObject(i);
+			GameObject* object = &SceneManager::GetCurrentScene()->g_objects[i];
 			//for now just keep tbis the map as it only has a few verticies
 			if (!object->IncludedInRayCast())
 				continue;
@@ -176,9 +176,8 @@ namespace SoftwareRaycaster
 	}
 	void FillBuffers() {
 		verticies.clear();
-		size_t objectListSize = AssetManager::GetGameObjectsSize();
-		for (int i = 0; i < objectListSize; i++) {
-			GameObject* object = AssetManager::GetGameObject(i);
+		for (int i = 0; i < SceneManager::GetCurrentScene()->g_objects.size(); i++) {
+			GameObject* object = &SceneManager::GetCurrentScene()->g_objects[i];
 			//for now just keep tbis the map as it only has a few verticies
 			if (!object->IncludedInRayCast())
 				continue;
@@ -215,7 +214,7 @@ namespace SoftwareRaycaster
 			if (closestHit != maxLength) {
 				glm::vec3 cartesian = raysOrigin[ray] + raysDirection[ray] * closestHit;
 				std::cout << "x " << cartesian.x << " y " << cartesian.y << " z " << cartesian.z << " \n";
-				//AssetManager::GetGameObject("raytest")->setPosition(cartesian);
+				//SceneManager::GetCurrentScene()->GetGameObject("raytest")->setPosition(cartesian);
 			}
 			else {
 				std::cout << "No Hit \n";

@@ -1,6 +1,7 @@
 #include "Animation.h"
 #include "Engine/Core/GameObject.h"
 #include "Engine/Core/AssetManager.h"
+#include "Engine/Core/Scene/SceneManager.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -166,7 +167,7 @@ namespace AnimationManager
 
 	
 	void AnimationManager::Play(std::string Name,std::string ObjectName) {
-		GameObject* gameobject = AssetManager::GetGameObject(ObjectName);
+		GameObject* gameobject = SceneManager::GetCurrentScene()->GetGameObject(ObjectName);
 		Animation* animation = GetAnimation(Name);
 		if (gameobject != nullptr && animation != nullptr) {
 			animation->SetGameObject(gameobject);

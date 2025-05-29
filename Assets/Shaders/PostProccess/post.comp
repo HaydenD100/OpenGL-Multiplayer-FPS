@@ -3,14 +3,16 @@ layout (local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 
 layout (rgba32f, binding = 7) uniform writeonly image2D gFinal;
 
-uniform sampler2D gLighting; 
-uniform sampler2D gSSR; 
-uniform vec2 screen;
+layout(binding = 0)uniform sampler2D gLighting; 
 layout(binding = 2) uniform sampler2D gEmissive; 
+layout(binding = 1) uniform sampler2D gSSR; 
+layout(binding = 3 )uniform sampler2D gTransparent; 
+
+uniform vec2 screen;
 
 
 vec4 center;
-vec4 boxBlur2D(sampler2D image, vec2 texCoords, vec2 texOffset, int kernelSize)
+vec4 boxBlur2D(vec2 texCoords, vec2 texOffset, int kernelSize)
 {
     vec4 result = vec4(0.0);
     int kernelRadius = kernelSize / 2; // Radius of the kernel
@@ -22,7 +24,7 @@ vec4 boxBlur2D(sampler2D image, vec2 texCoords, vec2 texOffset, int kernelSize)
         for (int y = -kernelRadius; y <= kernelRadius; ++y)
         {
             // Sample the texture at the offset position
-            result += texture(image, texCoords + vec2(texOffset.x * x, texOffset.y * y));
+            result += texture(gLighting, texCoords + vec2(texOffset.x * x, texOffset.y * y)) + texture(gEmissive, texCoords + vec2((texOffset.x + 0.005) * x, (texOffset.y + 0.005) * y));
         }
     }
 
@@ -32,12 +34,22 @@ vec4 boxBlur2D(sampler2D image, vec2 texCoords, vec2 texOffset, int kernelSize)
     return result;
 }
 
+vec4 blendSrcOver(vec4 foreground, vec4 background) {
+    float alpha = foreground.a;
+    return vec4(
+        foreground.rgb * alpha + background.rgb * (alpha),
+      1.0  // output is fully opaque
+    );
+}
+
 void main() {
     ivec2 coords = ivec2(gl_GlobalInvocationID.xy);
     vec2 UV = (vec2(gl_GlobalInvocationID.xy) + 0.5) / screen;
 
     // Retrieve data from G-buffer
+    vec4 transparent = texture(gTransparent, UV).rgba;
     vec4 lighting = vec4(texture(gLighting, UV).rgb, 1.0);
+
     vec4 ssr = vec4(texture(gSSR, UV).rg,0,0);
     vec2 texSize  = textureSize(gSSR, 0).xy;
     vec4 emissive = vec4(texture(gEmissive, UV).rgb,1); 
@@ -50,8 +62,19 @@ void main() {
     //else{
         
     //}
+    vec4 albedo = lighting + emissive;
 
-    imageStore(gFinal, coords,vec4(lighting + emissive));
+    if(transparent.rgb != vec3(0)){
+        vec4 result = boxBlur2D(UV,vec2(0.0015),5);
+        result += transparent;
+        imageStore(gFinal, coords,vec4(result.xyz,1));
+    }else{
+        imageStore(gFinal, coords,vec4(albedo.xyz,1));
+    }
+
+    //imageStore(gFinal, coords,vec4(resultColor,1));
+
+    //imageStore(gFinal, coords,vec4(lighting + emissive));
     /*
     vec2 texOffset = 1.0 / textureSize(gSSR, 0); // Texture offset
     bool horizontal = false;

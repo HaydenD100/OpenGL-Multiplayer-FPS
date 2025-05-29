@@ -68,10 +68,10 @@ namespace Player
 	void Player::Init() {
 		timeSinceDeath = glfwGetTime();
 		srand((unsigned int)time(nullptr));
-		AssetManager::AddGameObject(GameObject("player", AssetManager::GetModel("player") , glm::vec3(0, 10, 5), false, 1, Capsule, 0.5, 2.2, 0.5));
-		AssetManager::AddGameObject(GameObject("player_head", AssetManager::GetModel("player"), glm::vec3(0, 10, 5), false, 0, Sphere, 0, 0, 0));
-		GameObject* player_head = AssetManager::GetGameObject("player_head");
-		GameObject* player_body = AssetManager::GetGameObject("player");
+		SceneManager::GetCurrentScene()->g_objects.push_back(GameObject("player", AssetManager::GetModel("player") , glm::vec3(0, 10, 5), false, 1, Capsule, 0.5, 2.2, 0.5));
+		SceneManager::GetCurrentScene()->g_objects.push_back(GameObject("player_head", AssetManager::GetModel("player"), glm::vec3(0, 10, 5), false, 0, Sphere, 0, 0, 0));
+		GameObject* player_head = SceneManager::GetCurrentScene()->GetGameObject("player_head");
+		GameObject* player_body = SceneManager::GetCurrentScene()->GetGameObject("player");
 
 		player_head->SetRender(false);
 		btBroadphaseProxy*  proxy = player_head->GetRigidBody()->getBroadphaseHandle();
@@ -93,8 +93,8 @@ namespace Player
 		btRigidBody* playerHeadRigidBody = player_head->GetRigidBody(); // Assuming GetRigidBody() returns btRigidBody*
 		playerHeadRigidBody->setActivationState(DISABLE_SIMULATION);
 
-		btRigidBody* body = AssetManager::GetGameObject("player")->GetRigidBody();
-		AssetManager::GetGameObject("player")->SetRender(false);
+		btRigidBody* body = SceneManager::GetCurrentScene()->GetGameObject("player")->GetRigidBody();
+		SceneManager::GetCurrentScene()->GetGameObject("player")->SetRender(false);
 		body->setFriction(0.0f);
 		body->setRestitution(0.0f);
 		body->setCcdMotionThreshold(0.05f);
@@ -126,7 +126,7 @@ namespace Player
 			WeaponManager::GetGunByName(gunName)->Shoot();
 			btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit(0);
 			if (hit.m_collisionObject != nullptr) {
-				GameObject* gameobject = AssetManager::GetGameObject(hit.m_collisionObject->getUserIndex());
+				GameObject* gameobject = &SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()];
 				if (gameobject != nullptr)
 				{
 					btVector3 start = hit.m_rayFromWorld; // Ray origin
@@ -169,7 +169,7 @@ namespace Player
 				float maxSpread = WeaponManager::GetGunByName(gunName)->spread;
 				btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit(maxSpread);
 				if (hit.m_collisionObject != nullptr) {
-					GameObject* gameobject = AssetManager::GetGameObject(hit.m_collisionObject->getUserIndex());
+					GameObject* gameobject = &SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()];
 					if (gameobject != nullptr)
 					{
 						btRigidBody* body = gameobject->GetRigidBody();
@@ -207,7 +207,7 @@ namespace Player
 	void Player::Graffite() {
 		btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit();
 		if (hit.m_collisionObject != nullptr) {
-			GameObject* gameobject = AssetManager::GetGameObject(hit.m_collisionObject->getUserIndex());
+			GameObject* gameobject = &SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()];
 			if (gameobject != nullptr)
 			{
 				btVector3 start = hit.m_rayFromWorld; // Ray origin
@@ -235,7 +235,7 @@ namespace Player
 	}
 	
 	bool Player::OnGround() {
-		GameObject* player = AssetManager::GetGameObject("player");
+		GameObject* player = SceneManager::GetCurrentScene()->GetGameObject("player");
 		glm::vec3 out_end = player->getPosition() + glm::vec3(0,-1.2,0);
 
 		btCollisionWorld::ClosestRayResultCallback RayCallback(
@@ -267,8 +267,8 @@ namespace Player
 
 			
 
-		GameObject* player =  AssetManager::GetGameObject("player");
-		GameObject* head = AssetManager::GetGameObject("player_head");
+		GameObject* player =  SceneManager::GetCurrentScene()->GetGameObject("player");
+		GameObject* head = SceneManager::GetCurrentScene()->GetGameObject("player_head");
 		player->setRotation(glm::vec3(horizontalAngle,0, 0));
 		head->setRotation(glm::vec3(-verticalAngle, horizontalAngle, 0));
 		head->setPosition(player->getPosition() + glm::vec3(0, 1, 0));
@@ -364,7 +364,7 @@ namespace Player
 		if (Input::KeyPressed(INTERACT)) {
 			btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit();
 			if (hit.m_collisionObject != nullptr) {
-				GameObject* gameobject = AssetManager::GetGameObject(hit.m_collisionObject->getUserIndex());
+				GameObject* gameobject = &SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()];
 				if (gameobject != nullptr && glm::distance(gameobject->getPosition(), getPosition()) <= interactDistance)
 					interactingWithName = gameobject->GetName();
 			}
@@ -384,6 +384,12 @@ namespace Player
 			reloadingTime = glfwGetTime();
 			WeaponManager::GetGunByName(gunName)->Reload();
 
+		}
+		if (Input::KeyPressed(DROPWEAPON) && gunName != "nothing" && WeaponManager::GetGunByName(getCurrentGun())->type != Melee) {
+			Gun* gun = WeaponManager::GetGunByName(gunName);
+			Model* gunModel = AssetManager::GetModel(gun->gunModel);
+			GunPickUp temp_pickup = GunPickUp(gunName,gunModel,Camera::GetPosition() + Camera::GetDirection() * 1.5f);
+			SceneManager::GetCurrentScene()->m_gunPickups.push_back(temp_pickup);
 		}
 
 		if (Input::RightMouseDown() && !reloading && WeaponManager::GetGunByName(gunName)->type != Melee && gunName != "nothing") {
@@ -433,9 +439,6 @@ namespace Player
 			footstepTime = glfwGetTime();
 		}
 
-		if(GetInteractingWithName() != "nothing")
-			std::cout << GetInteractingWithName() << "\n";
-
 		//AudioManager::UpdateListener(player->getPosition(), Camera::GetDirection(), btToGlmVector3(player->GetRigidBody()->getLinearVelocity()));
 
 		//sometimes you fall through floor
@@ -457,7 +460,7 @@ namespace Player
 	}
 	
 	glm::vec3 Player::getPosition() {
-		return AssetManager::GetGameObject("player")->getPosition();
+		return SceneManager::GetCurrentScene()->GetGameObject("player")->getPosition();
 	}
 	
 	glm::vec3 Player::getForward() {
@@ -465,8 +468,8 @@ namespace Player
 	}
 	
 	void Player::setPosition(glm::vec3 pos) {
-		AssetManager::GetGameObject("player")->setPosition(pos);
-		Camera::SetPosition(AssetManager::GetGameObject("player")->getPosition());
+		SceneManager::GetCurrentScene()->GetGameObject("player")->setPosition(pos);
+		Camera::SetPosition(SceneManager::GetCurrentScene()->GetGameObject("player")->getPosition());
 	}
 	
 	std::string Player::GetInteractingWithName() {
@@ -481,16 +484,16 @@ namespace Player
 		if (reloading || weaponName == gunName)
 			return false;
 		if (gunName != "nothing")
-			AssetManager::GetGameObject(WeaponManager::GetGunByName(gunName)->name)->SetRender(false);
+			SceneManager::GetCurrentScene()->GetGameObject(WeaponManager::GetGunByName(gunName)->name)->SetRender(false);
 		gunName = weaponName;
-		AssetManager::GetGameObject(WeaponManager::GetGunByName(gunName)->name)->SetRender(true);
+		SceneManager::GetCurrentScene()->GetGameObject(WeaponManager::GetGunByName(gunName)->name)->SetRender(true);
 		AudioManager::PlaySound("item_pickup", getPosition());
 		WeaponManager::GetGunByName(weaponName)->Equip();
 		return true;
 	}
 	
 	void Player::SwitchWeapons(int index) {
-		AssetManager::GetGameObject(inv[index])->SetRender(false);
+		SceneManager::GetCurrentScene()->GetGameObject(inv[index])->SetRender(false);
 		gunName = inv[index];
 	}
 
@@ -513,7 +516,7 @@ namespace Player
 			timeSinceDeath = glfwGetTime();
 			NetworkManager::SendAnimation("bean_death", "PlayerTwo");
 			if(gunName != "nothing")
-				AssetManager::GetGameObject(gunName)->SetRender(false);
+				SceneManager::GetCurrentScene()->GetGameObject(gunName)->SetRender(false);
 			gunName = "nothing";
 
 			NetworkManager::SendPlayerDied();
@@ -536,7 +539,7 @@ namespace Player
 
 		Health = 100;
 		if(gunName != "nothing")
-			AssetManager::GetGameObject(gunName)->SetRender(false);
+			SceneManager::GetCurrentScene()->GetGameObject(gunName)->SetRender(false);
 		gunName = "nothing";
 		setPosition(spawnpoints[spawnpointindex]);
 		isDead = 0;
@@ -573,9 +576,9 @@ namespace PlayerTwo
 	}
 
 	void PlayerTwo::Init() {
-		AssetManager::AddGameObject("PlayerTwo", AssetManager::GetModel("playertwo"), glm::vec3(0, -10, 0), false, 0, Convex);
+		SceneManager::GetCurrentScene()->AddGameObject("PlayerTwo", AssetManager::GetModel("playertwo"), glm::vec3(0, -10, 0), false, 0, Convex);
 		if (NetworkManager::IsServer()) {
-			GameObject* otherPlayer = AssetManager::GetGameObject("PlayerTwo");
+			GameObject* otherPlayer = SceneManager::GetCurrentScene()->GetGameObject("PlayerTwo");
 			if (otherPlayer != nullptr) {
 				otherPlayer->SetRender(false);
 				otherPlayer->GetRigidBody()->setActivationState(DISABLE_SIMULATION);
@@ -583,35 +586,35 @@ namespace PlayerTwo
 		}
 		
 
-		AssetManager::AddGameObject(GameObject("glock_PlayerTwo", AssetManager::GetModel("glockhand"), glm::vec3(-0.3, 0.25f, 0.9), false, 0, Convex));
-		AssetManager::GetGameObject("glock_PlayerTwo")->SetRender(false);
-		AssetManager::GetGameObject("glock_PlayerTwo")->SetParentName("PlayerTwo");
-		AssetManager::GetGameObject("glock_PlayerTwo")->SetScale(0.3);
-		AssetManager::GetGameObject("glock_PlayerTwo")->SetDontCull(true);
+		SceneManager::GetCurrentScene()->AddGameObject(GameObject("glock_PlayerTwo", AssetManager::GetModel("glockhand"), glm::vec3(-0.3, 0.25f, 0.9), false, 0, Convex));
+		SceneManager::GetCurrentScene()->GetGameObject("glock_PlayerTwo")->SetRender(false);
+		SceneManager::GetCurrentScene()->GetGameObject("glock_PlayerTwo")->SetParentName("PlayerTwo");
+		SceneManager::GetCurrentScene()->GetGameObject("glock_PlayerTwo")->SetScale(0.3);
+		SceneManager::GetCurrentScene()->GetGameObject("glock_PlayerTwo")->SetDontCull(true);
 
-		AssetManager::AddGameObject(GameObject("ak47_PlayerTwo", AssetManager::GetModel("ak47hand"), glm::vec3(-0.3, 0.25, 0.9), false, 0, Convex));
-		AssetManager::GetGameObject("ak47_PlayerTwo")->SetRender(false);
-		AssetManager::GetGameObject("ak47_PlayerTwo")->SetParentName("PlayerTwo");
-		AssetManager::GetGameObject("ak47_PlayerTwo")->SetScale(0.3);
-		AssetManager::GetGameObject("ak47_PlayerTwo")->SetDontCull(true);
+		SceneManager::GetCurrentScene()->AddGameObject(GameObject("ak47_PlayerTwo", AssetManager::GetModel("ak47hand"), glm::vec3(-0.3, 0.25, 0.9), false, 0, Convex));
+		SceneManager::GetCurrentScene()->GetGameObject("ak47_PlayerTwo")->SetRender(false);
+		SceneManager::GetCurrentScene()->GetGameObject("ak47_PlayerTwo")->SetParentName("PlayerTwo");
+		SceneManager::GetCurrentScene()->GetGameObject("ak47_PlayerTwo")->SetScale(0.3);
+		SceneManager::GetCurrentScene()->GetGameObject("ak47_PlayerTwo")->SetDontCull(true);
 
-		AssetManager::AddGameObject("shotgun_PlayerTwo", AssetManager::GetModel("shotgun"), glm::vec3(-0.3, 0.25, 0.9), false, 0, Convex);
-		AssetManager::GetGameObject("shotgun_PlayerTwo")->SetRender(false);
-		AssetManager::GetGameObject("shotgun_PlayerTwo")->SetParentName("PlayerTwo");
-		AssetManager::GetGameObject("shotgun_PlayerTwo")->SetScale(0.3);
-		AssetManager::GetGameObject("shotgun_PlayerTwo")->SetDontCull(true);
+		SceneManager::GetCurrentScene()->AddGameObject("shotgun_PlayerTwo", AssetManager::GetModel("shotgun"), glm::vec3(-0.3, 0.25, 0.9), false, 0, Convex);
+		SceneManager::GetCurrentScene()->GetGameObject("shotgun_PlayerTwo")->SetRender(false);
+		SceneManager::GetCurrentScene()->GetGameObject("shotgun_PlayerTwo")->SetParentName("PlayerTwo");
+		SceneManager::GetCurrentScene()->GetGameObject("shotgun_PlayerTwo")->SetScale(0.3);
+		SceneManager::GetCurrentScene()->GetGameObject("shotgun_PlayerTwo")->SetDontCull(true);
 
-		AssetManager::AddGameObject("double_barrel_PlayerTwo", AssetManager::GetModel("double_barrel_hand"), glm::vec3(-0.3, 0.25f, 0.9), false, 0, Convex);
-		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetRender(false);
-		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetParentName("PlayerTwo");
-		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetScale(0.3);
-		AssetManager::GetGameObject("double_barrel_PlayerTwo")->SetDontCull(true);
+		SceneManager::GetCurrentScene()->AddGameObject("double_barrel_PlayerTwo", AssetManager::GetModel("double_barrel_hand"), glm::vec3(-0.3, 0.25f, 0.9), false, 0, Convex);
+		SceneManager::GetCurrentScene()->GetGameObject("double_barrel_PlayerTwo")->SetRender(false);
+		SceneManager::GetCurrentScene()->GetGameObject("double_barrel_PlayerTwo")->SetParentName("PlayerTwo");
+		SceneManager::GetCurrentScene()->GetGameObject("double_barrel_PlayerTwo")->SetScale(0.3);
+		SceneManager::GetCurrentScene()->GetGameObject("double_barrel_PlayerTwo")->SetDontCull(true);
 
-		AssetManager::AddGameObject("knife_PlayerTwo", AssetManager::GetModel("knifehand"), glm::vec3(-0.3, 0.25f, 0.9), false, 0, Convex);
-		AssetManager::GetGameObject("knife_PlayerTwo")->SetRender(false);
-		AssetManager::GetGameObject("knife_PlayerTwo")->SetParentName("PlayerTwo");
-		AssetManager::GetGameObject("knife_PlayerTwo")->SetScale(0.3);
-		AssetManager::GetGameObject("knife_PlayerTwo")->SetDontCull(true);
+		SceneManager::GetCurrentScene()->AddGameObject("knife_PlayerTwo", AssetManager::GetModel("knifehand"), glm::vec3(-0.3, 0.25f, 0.9), false, 0, Convex);
+		SceneManager::GetCurrentScene()->GetGameObject("knife_PlayerTwo")->SetRender(false);
+		SceneManager::GetCurrentScene()->GetGameObject("knife_PlayerTwo")->SetParentName("PlayerTwo");
+		SceneManager::GetCurrentScene()->GetGameObject("knife_PlayerTwo")->SetScale(0.3);
+		SceneManager::GetCurrentScene()->GetGameObject("knife_PlayerTwo")->SetDontCull(true);
 
 
 		AssetManager::AddSkinnedAnimation(SkinnedAnimation("Assets/Objects/FBX/glock17_shoot1.dae", AssetManager::GetModel("glockhand"), 0, "glock17_shoot"));
@@ -640,18 +643,18 @@ namespace PlayerTwo
 		interactingWithName = interact;
 		if (gunname != currentGun) {
 			if(currentGun != "nothing")
-				AssetManager::GetGameObject(currentGun + "_PlayerTwo")->SetRender(false);
+				SceneManager::GetCurrentScene()->GetGameObject(currentGun + "_PlayerTwo")->SetRender(false);
 			currentGun = gunname;
 			if (currentGun != "nothing")
-				AssetManager::GetGameObject(currentGun + "_PlayerTwo")->SetRender(true);
+				SceneManager::GetCurrentScene()->GetGameObject(currentGun + "_PlayerTwo")->SetRender(true);
 
 			std::cout << "Player_two changed weapon to: " << currentGun << "\n";
 
 		}
 			
 
-		AssetManager::GetGameObject("PlayerTwo")->setPosition(position);
-		AssetManager::GetGameObject("PlayerTwo")->setRotation(rotation);
+		SceneManager::GetCurrentScene()->GetGameObject("PlayerTwo")->setPosition(position);
+		SceneManager::GetCurrentScene()->GetGameObject("PlayerTwo")->setRotation(rotation);
 
 	}
 	void PlayerTwo::Update() {

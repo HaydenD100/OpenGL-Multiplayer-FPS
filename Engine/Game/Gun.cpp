@@ -11,9 +11,10 @@
 
 
 void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
-	GameObject* gun = AssetManager::GetGameObject(name);
-	gun->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
-	gun->GetRigidBody()->setLinearVelocity(btVector3(0, 0, 0));
+	//GameObject* gun = SceneManager::GetCurrentScene()->GetGameObject(name);
+	//gun->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
+	//gun->GetRigidBody()->setLinearVelocity(btVector3(0, 0, 0));
+	/*
 	if (! hasAnimations) {
 		kickbackOffset *= 0.96f;
 		if (kickbackOffset < 0.01)
@@ -59,6 +60,7 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 		//swayPosition.y = finlerpTo(swayPosition.y, ySwayTarget, 1/60, speed);
 		//gun->addPosition(swayPosition);
 	}
+	*/
 	for (int i = 1; i <= firesounds; i++) {
 		AudioManager::GetSound(gunsShotName + std::to_string(i))->SetPosition(Player::getPosition());
 	}
@@ -106,55 +108,55 @@ namespace WeaponManager
 	std::vector<Gun> guns;
 
 	void WeaponManager::Init() {
-		AssetManager::AddGameObject(GameObject("knife", AssetManager::GetModel("knifehand"), glm::vec3(5, 0, -5), false, 0, Convex));
-		AssetManager::GetGameObject("knife")->SetRender(false);
-		AssetManager::GetGameObject("knife")->SetParentName("player_head");
-		AssetManager::GetGameObject("knife")->SetShaderType("Overlay");
-		AssetManager::GetGameObject("knife")->SetRotationX(1.5708f);
+		SceneManager::GetCurrentScene()->g_objects.push_back(GameObject("knife", AssetManager::GetModel("knifehand"), glm::vec3(5, 0, -5), false, 0, Convex));
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetParentName("player_head");
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() -1].SetRotationX(-1.5708f);
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetRender(false);
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetDontCull(true);
 
 
-		AssetManager::AddGameObject(GameObject("glock", AssetManager::GetModel("glockhand"), glm::vec3(5, 0, -5), false, 0, Convex));
-		AssetManager::GetGameObject("glock")->SetRender(false);
-		AssetManager::GetGameObject("glock")->SetParentName("player_head");
-		AssetManager::GetGameObject("glock")->SetShaderType("Overlay");
-		AssetManager::GetGameObject("glock")->SetRotationX(1.5708f);
+		SceneManager::GetCurrentScene()->g_objects.push_back(GameObject("glock", AssetManager::GetModel("glockhand"), glm::vec3(5, 0, -5), false, 0, Convex));
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetParentName("player_head");
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetRotationX(-1.5708f);
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetRender(false);
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetDontCull(true);
 
-		AssetManager::AddGameObject(GameObject("ak47", AssetManager::GetModel("ak47hand"), glm::vec3(0.2, -0.25, -0.2), false, 0, Convex));
-		AssetManager::GetGameObject("ak47")->SetRender(false);
-		AssetManager::GetGameObject("ak47")->SetParentName("player_head");
-		AssetManager::GetGameObject("ak47")->SetShaderType("Overlay"); 
-		AssetManager::GetGameObject("ak47")->SetRotationX(1.5708f);
 
-		AssetManager::AddGameObject("shotgun", AssetManager::GetModel("shotgun"), glm::vec3(-3, 2, 3), false, 0, Convex);
-		AssetManager::GetGameObject("shotgun")->SetRender(false);
-		AssetManager::GetGameObject("shotgun")->SetParentName("player_head");
-		AssetManager::GetGameObject("shotgun")->SetShaderType("Overlay");
-		AssetManager::GetGameObject("shotgun")->SetRotationX(1.5708f);
+		SceneManager::GetCurrentScene()->g_objects.push_back(GameObject("ak47", AssetManager::GetModel("ak47hand"), glm::vec3(0.2, -0.25, -0.2), false, 0, Convex));
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetParentName("player_head");
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetRotationX(-1.5708f);
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetRender(false);
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetDontCull(true);
 
-		AssetManager::AddGameObject("double_barrel", AssetManager::GetModel("double_barrel_hand"), glm::vec3(-3, 2, 3), false, 0, Convex);
-		AssetManager::GetGameObject("double_barrel")->SetRender(false);
-		AssetManager::GetGameObject("double_barrel")->SetParentName("player_head");
-		AssetManager::GetGameObject("double_barrel")->SetShaderType("Overlay");
-		AssetManager::GetGameObject("double_barrel")->SetRotationX(1.5708f);
+
+		SceneManager::GetCurrentScene()->g_objects.push_back(GameObject("shotgun", AssetManager::GetModel("shotgun"), glm::vec3(-3, 2, 3), false, 0, Convex));
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetParentName("player_head");
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetRotationX(-1.5708f);
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetRender(false);
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetDontCull(true);
+
+
+		SceneManager::GetCurrentScene()->g_objects.push_back(GameObject("double_barrel", AssetManager::GetModel("double_barrel_hand"), glm::vec3(-3, 2, 3), false, 0, Convex));
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetParentName("player_head");
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetRotationX(-1.5708f);
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetRender(false);
+		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1].SetDontCull(true);
 
 		
-		AudioManager::AddSound("Assets/Audio/shotgun_fire.wav", "shotgun_fire1", AssetManager::GetGameObject("shotgun")->getPosition(), 1, 0.4f);
-		AudioManager::AddSound("Assets/Audio/ak47_fire1.wav", "ak47_fire1", AssetManager::GetGameObject("ak47")->getPosition(), 10,0.5f);
-		AudioManager::AddSound("Assets/Audio/ak47_fire2.wav", "ak47_fire2", AssetManager::GetGameObject("ak47")->getPosition(), 10, 0.5f);
-		AudioManager::AddSound("Assets/Audio/ak47_fire3.wav", "ak47_fire3", AssetManager::GetGameObject("ak47")->getPosition(), 10, 0.5f);
-		AudioManager::AddSound("Assets/Audio/ak47_fire4.wav", "ak47_fire4", AssetManager::GetGameObject("ak47")->getPosition(), 10, 0.5f);
-		AudioManager::AddSound("Assets/Audio/glock_fire1.wav", "glock_fire1", AssetManager::GetGameObject("glock")->getPosition(), 10, 0.5f);
-		AudioManager::AddSound("Assets/Audio/glock_fire2.wav", "glock_fire2", AssetManager::GetGameObject("glock")->getPosition(), 10, 0.5f);
-		AudioManager::AddSound("Assets/Audio/glock_fire3.wav", "glock_fire3", AssetManager::GetGameObject("glock")->getPosition(), 10, 0.5f);
-		AudioManager::AddSound("Assets/Audio/glock_fire4.wav", "glock_fire4", AssetManager::GetGameObject("glock")->getPosition(), 10, 0.5f);
-		AudioManager::AddSound("Assets/Audio/dry_fire.wav", "dry_fire", AssetManager::GetGameObject("glock")->getPosition(), 5, 0.2f);
-		AudioManager::AddSound("Assets/Audio/knife.wav", "knife_swing1", AssetManager::GetGameObject("knife")->getPosition(), 5, 1.0f);
-		AudioManager::AddSound("Assets/Audio/knife.wav", "knife_swing2", AssetManager::GetGameObject("knife")->getPosition(), 5, 1.0f);
-		AudioManager::AddSound("Assets/Audio/knife.wav", "knife_swing3", AssetManager::GetGameObject("knife")->getPosition(), 5, 1.0f);
-		AudioManager::AddSound("Assets/Audio/knife.wav", "knife_swing4", AssetManager::GetGameObject("knife")->getPosition(), 5, 1.0f);
-
-
-
+		AudioManager::AddSound("Assets/Audio/shotgun_fire.wav", "shotgun_fire1", Camera::GetPosition(), 1, 0.4f);
+		AudioManager::AddSound("Assets/Audio/ak47_fire1.wav", "ak47_fire1", Camera::GetPosition(), 10,0.5f);
+		AudioManager::AddSound("Assets/Audio/ak47_fire2.wav", "ak47_fire2", Camera::GetPosition(), 10, 0.5f);
+		AudioManager::AddSound("Assets/Audio/ak47_fire3.wav", "ak47_fire3", Camera::GetPosition(), 10, 0.5f);
+		AudioManager::AddSound("Assets/Audio/ak47_fire4.wav", "ak47_fire4", Camera::GetPosition(), 10, 0.5f);
+		AudioManager::AddSound("Assets/Audio/glock_fire1.wav", "glock_fire1", Camera::GetPosition(), 10, 0.5f);
+		AudioManager::AddSound("Assets/Audio/glock_fire2.wav", "glock_fire2", Camera::GetPosition(), 10, 0.5f);
+		AudioManager::AddSound("Assets/Audio/glock_fire3.wav", "glock_fire3", Camera::GetPosition(), 10, 0.5f);
+		AudioManager::AddSound("Assets/Audio/glock_fire4.wav", "glock_fire4", Camera::GetPosition(), 10, 0.5f);
+		AudioManager::AddSound("Assets/Audio/dry_fire.wav", "dry_fire", Camera::GetPosition(), 5, 0.2f);
+		AudioManager::AddSound("Assets/Audio/knife.wav", "knife_swing1", Camera::GetPosition(), 5, 1.0f);
+		AudioManager::AddSound("Assets/Audio/knife.wav", "knife_swing2", Camera::GetPosition(), 5, 1.0f);
+		AudioManager::AddSound("Assets/Audio/knife.wav", "knife_swing3", Camera::GetPosition(), 5, 1.0f);
+		AudioManager::AddSound("Assets/Audio/knife.wav", "knife_swing4", Camera::GetPosition(), 5, 1.0f);
 	
 		Gun glock;
 		glock.name = "glock";
@@ -277,45 +279,27 @@ namespace WeaponManager
 	}
 }
 
-GunPickUp::GunPickUp(std::string GunName, std::string ObjectName, Model* model, glm::vec3 position) {
+
+GunPickUp::GunPickUp(std::string GunName, Model* model, glm::vec3 position) {
 	gunName = GunName;
-	objectName = ObjectName;
-	AssetManager::AddGameObject(objectName, model, position, false,1,Convex);
+	objectName = "pickup" + generateRandomString(10);
+	SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->AddGameObject(objectName.c_str(), model, position, false, 1, Convex)].GetRigidBody()->applyCentralImpulse(glmToBtVector3(Camera::GetDirection()) * 10.0f);
 	GunPickUpCount++;
 }
 
-GunPickUp::GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force) {
-
-	//STILL GIVING ERROR STING TO LONG ERROR NOT SURE WHY NOT SURE HOW TO FIX
-	objectName.reserve(100);
-
-	std::stringstream ss;
-	ss << Player::getPosition().x;
-	ss << Camera::GetDirection().y;
-	ss << GunName;
-	objectName = ss.str();
-	gunName = GunName;
-	AssetManager::AddGameObject(objectName, AssetManager::GetModel(GunName), position, false, 1, Convex);
-	GunPickUpCount++;
-	AssetManager::GetGameObject(objectName)->GetRigidBody()->applyCentralImpulse(glmToBtVector3(force));
-}
 
 glm::vec3 Gun::swayPosition = glm::vec3(0);
 
 void GunPickUp::Update() {
 	
 }
-std::string GunPickUp::GetName() {
-	return objectName;
-}
-
 
 bool GunPickUp::Interact() {
 	if (PlayerTwo::GetInteractingWithName() == objectName && PlayerTwo::GetCurrentWeapon() != gunName) {
-		GameObject* object = AssetManager::GetGameObject(objectName);
+		GameObject* object = SceneManager::GetCurrentScene()->GetGameObject(objectName);
 		PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(object->GetRigidBody());
 		object->SetRender(false);
-		AssetManager::RemoveGameObject(objectName);
+		SceneManager::GetCurrentScene()->RemoveGameObject(objectName);
 
 		AudioManager::PlaySound("item_pickup", Player::getPosition());
 		return true;
@@ -323,7 +307,7 @@ bool GunPickUp::Interact() {
 	if (Player::GetInteractingWithName() != objectName || !Player::SelectWeapon(gunName))
 		return false;
 	
-	GameObject* object = AssetManager::GetGameObject(objectName);
+	GameObject* object = SceneManager::GetCurrentScene()->GetGameObject(objectName);
 	PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(object->GetRigidBody());
 	object->SetRender(false);
 		
@@ -332,25 +316,6 @@ bool GunPickUp::Interact() {
 	return true;
 
 
-}
-GunSpawner::GunSpawner(std::string GunType, std::string spawnerName, glm::vec3 postion) {
-	gunType = GunType;
-	this->spawnerName = spawnerName;
-	this->postion = postion;
-}
-
-void GunSpawner::CheckForSpawn() {
-	if (needsSpawning && timeSincePickUp < glfwGetTime() - spawnTime) {
-		std::cout << "Spawning Gun \n";
-		SceneManager::GetCurrentScene()->AddGunPickUp(GunPickUp(gunType, spawnerName, AssetManager::GetModel(gunType), postion));
-		needsSpawning = 0;
-	}
-	else if(needsSpawning == 0) {
-		needsSpawning = !SceneManager::GetCurrentScene()->DoesGunPickUpExsit(spawnerName);
-		if (needsSpawning)
-			timeSincePickUp = glfwGetTime();
-		std::cout << "needs spawning: " << needsSpawning << "\n";
-	}
 }
 
 int GunPickUp::GunPickUpCount = 0;

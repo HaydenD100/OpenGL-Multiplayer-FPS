@@ -2,7 +2,7 @@
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Physics/BulletPhysics.h"
 #include "Engine/Networking/NetworkManager.h"
-
+#include "Engine/Core/Scene/SceneManager.h"
 #undef max
 
 GameObject::GameObject() = default;
@@ -349,7 +349,7 @@ glm::mat4 GameObject::GetModelMatrix() {
 	//Btransform.getOpenGLMatrix(glm::value_ptr(matrix));
 
 	if (!parentName.empty()) {
-		GameObject* parent = AssetManager::GetGameObject(parentName);
+		GameObject* parent = SceneManager::GetCurrentScene()->GetGameObject(parentName);
 		if (parent != nullptr) {
 			matrix = parent->GetModelMatrix() * transform.to_mat4();
 		}

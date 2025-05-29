@@ -107,10 +107,13 @@ namespace Renderer
 	extern Shader s_probeDeffered;
 	extern Shader s_probeRender;
 	extern Shader s_probeirradiance;
+	extern Shader s_particle;
 
 	extern ComputeShader cs_Raycaster;
 	extern ComputeShader cs_probeIrradiance;
+	extern ComputeShader cs_sim_particle;
 
+	extern GLuint quad_vertexbuffer;
 
 	extern StorageBuffer SHBuffer;
 
@@ -140,7 +143,7 @@ namespace Renderer
     void SetLights(std::vector<Light> lights, Shader* shader);
 	void SetLights(std::vector<Light> lights, ComputeShader* shader);
 	void SetLightsAllShaders(std::vector<Light> lights);
-    void RenderScene();
+    void RenderScene(float dt);
 
 	void DrawPoint(glm::vec3 position, glm::vec3 colour);
 	void DrawLine(glm::vec3 position1, glm::vec3 position2, glm::vec3 colour);

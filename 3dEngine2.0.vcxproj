@@ -170,6 +170,7 @@
     <ClCompile Include="Engine\Renderer\BufferSSAO.cpp" />
     <ClCompile Include="Engine\Renderer\BufferSSR.cpp" />
     <ClCompile Include="Engine\Renderer\Gbuffer.cpp" />
+    <ClCompile Include="Engine\Renderer\Particle.cpp" />
     <ClCompile Include="Engine\Renderer\Renderer.cpp" />
     <ClCompile Include="Engine\Core\Scene\Scene.cpp" />
     <ClCompile Include="Engine\Core\Scene\SceneManager.cpp" />
@@ -237,6 +238,9 @@
     <None Include="Assets\Shaders\GI\renderProbes.vert" />
     <None Include="Assets\Shaders\GI\triangleIntersection.comp" />
     <None Include="Assets\Shaders\Lighting\lighting.comp" />
+    <None Include="Assets\Shaders\Particles\particle.frag" />
+    <None Include="Assets\Shaders\Particles\particle.vert" />
+    <None Include="Assets\Shaders\Particles\simParticle.comp" />
     <None Include="Assets\Shaders\PostProccess\post.comp" />
     <None Include="Assets\Shaders\PostProccess\post.frag" />
     <None Include="Assets\Shaders\PostProccess\post.vert" />
@@ -292,6 +296,7 @@
     <ClInclude Include="Engine\Renderer\BufferSSR.h" />
     <ClInclude Include="Engine\Renderer\Gbuffer.h" />
     <ClInclude Include="Engine\Renderer\Model.h" />
+    <ClInclude Include="Engine\Renderer\Particle.h" />
     <ClInclude Include="Engine\Renderer\Renderer.h" />
     <ClInclude Include="Engine\Core\Scene\Scene.h" />
     <ClInclude Include="Engine\Core\Scene\SceneManager.h" />

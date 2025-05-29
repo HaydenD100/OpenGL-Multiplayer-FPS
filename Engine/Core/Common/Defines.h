@@ -40,6 +40,7 @@ enum Controls {
 	LEFT = 'a',
 	RIGHT = 'd',
 	BACKWARD = 's',
+	DROPWEAPON = 'q',
 	JUMP = ' ',
 	CROUCH = 'c',
 	RELOAD = 'r',

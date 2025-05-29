@@ -5,6 +5,7 @@
 #include "Backend.h"
 #include "Engine/Renderer/Raycaster.h"
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Renderer/Particle.h"
 #include "Engine/Audio/Audio.h"
 #include "Engine/Core/UI/Text2D.h"
 #include "Engine/Core/Input.h"
@@ -73,13 +74,12 @@ namespace Engine
 
 			Input::Update();
 			
-			
-			Renderer::RenderScene();
+			Renderer::RenderScene(dt);
 			AudioManager::Update();
 			if (!Editing) {
 				Input::CenterMouse();
-				Game::Update(dt);
 				PhysicsManagerBullet::Update(dt);
+				Game::Update(dt);
 			}
 				
 			else {

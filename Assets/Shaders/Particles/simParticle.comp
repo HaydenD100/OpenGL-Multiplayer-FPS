@@ -1,0 +1,40 @@
+#version 430
+layout(local_size_x = 256) in;
+
+struct Particle {
+    vec3 position;
+    vec3 velocity;
+    float lifetime;
+};
+
+layout(std430, binding = 0) readonly buffer InputParticles {
+    Particle particlesIn[];
+};
+
+layout(std430, binding = 1) writeonly buffer OutputParticles {
+    Particle particlesOut[];
+};
+
+uniform float dt;
+
+float rand(in vec2 co) {
+    return fract(sin(dot(co.xy ,vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+void main() {
+    uint i = gl_GlobalInvocationID.x;
+    Particle p = particlesIn[i];
+
+    p.lifetime -= dt;
+    if (p.lifetime <= 0.0) {
+        // Respawn
+        p.position = vec3(0.0);
+        p.velocity = vec3(rand(vec2(i, dt)), rand(vec2(i, dt)), rand(vec2(i, dt))); // Implement `rand()`
+        p.lifetime = 5.0;
+    }
+
+    p.velocity += vec3(0.0, -9.81, 0.0) * dt; // gravity
+    p.position += p.velocity * dt;
+
+    particlesOut[i] = p;
+}

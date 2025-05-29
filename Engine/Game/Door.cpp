@@ -3,13 +3,14 @@
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Game/Player.h"
 #include "Engine/Audio/Audio.h"
+#include "Engine/Core/Scene/SceneManager.h"
 
 Door::Door(std::string Name, Model* door, Model* frame, glm::vec3 position, glm::vec3 GameObjectRotation, bool inWards) {
 	name = Name;
-	int doorFrameIndex = AssetManager::AddGameObject(GameObject(name + "_frame", frame, position, false, 0, Concave)) ;
-	int doorIndex = AssetManager::AddGameObject(name + "_door", door, position, false, 0, Concave);
-	GameObject* gameobject = AssetManager::GetGameObject(name + "_door");
-	GameObject* gameobjectFrame = AssetManager::GetGameObject(name + "_frame");
+	int doorFrameIndex = SceneManager::GetCurrentScene()->AddGameObject(GameObject(name + "_frame", frame, position, false, 0, Concave)) ;
+	int doorIndex = SceneManager::GetCurrentScene()->AddGameObject(name + "_door", door, position, false, 0, Concave);
+	GameObject* gameobject = SceneManager::GetCurrentScene()->GetGameObject(name + "_door");
+	GameObject* gameobjectFrame = SceneManager::GetCurrentScene()->GetGameObject(name + "_frame");
 
 	gameobject->setRotation(GameObjectRotation);
 	gameobjectFrame->setRotation(GameObjectRotation);
@@ -68,16 +69,16 @@ void Door::Update(float deltaTime) {
 	if (rotation >= maxRotation) {
 		opening = false;
 		opened = true;
-		AssetManager::GetGameObject(name + "_door")->setRotation(door_rotation + direction * glm::vec3(0, maxRotation, 0));
+		SceneManager::GetCurrentScene()->GetGameObject(name + "_door")->setRotation(door_rotation + direction * glm::vec3(0, maxRotation, 0));
 		rotation = maxRotation;
 		return;
 	}
 	if (rotation <= 0) {
 		opening = false;
 		opened = false;
-		AssetManager::GetGameObject(name + "_door")->setRotation(door_rotation);
+		SceneManager::GetCurrentScene()->GetGameObject(name + "_door")->setRotation(door_rotation);
 		rotation = 0;
 		return;
 	}
-	AssetManager::GetGameObject(name + "_door")->setRotation(door_rotation + direction * glm::vec3(0,rotation,0));
+	SceneManager::GetCurrentScene()->GetGameObject(name + "_door")->setRotation(door_rotation + direction * glm::vec3(0,rotation,0));
 }

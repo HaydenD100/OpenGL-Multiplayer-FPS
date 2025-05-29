@@ -407,3 +407,23 @@ std::vector<glm::vec3> generate_random_directions(int count) {
 
     return directions;
 }
+
+std::string generateRandomString(size_t length) {
+    const std::string chars =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+
+    std::random_device rd;                      // Seed
+    std::mt19937 generator(rd());               // Mersenne Twister engine
+    std::uniform_int_distribution<> dist(0, chars.size() - 1);
+
+    std::string result;
+    result.reserve(length);
+
+    for (size_t i = 0; i < length; ++i) {
+        result += chars[dist(generator)];
+    }
+
+    return result;
+}

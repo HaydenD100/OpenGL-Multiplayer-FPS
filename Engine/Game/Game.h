@@ -1,8 +1,7 @@
 #pragma once
 #include "Engine/core/Common/GameCommon.h"
-
+#include "Engine/Pathfinding/Pathfinding.h"
 namespace Game {
-
 	enum GameNetworkingMode {
 		SinglePlayer, 
 		MultiPlayer

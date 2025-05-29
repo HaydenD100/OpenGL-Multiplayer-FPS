@@ -8,7 +8,6 @@ namespace AssetManager
 	//setting this number to anything hire then 0 will reserve the first n spots for decals that wont be replaced
 	int nextDecalSpot = 0;
 
-	std::vector<GameObject> GameObjects;
 	std::vector<Texture> Textures;
 	std::vector<Decal> Decals;
 	std::vector<DecalInstance> DecalInstances;
@@ -25,7 +24,6 @@ namespace AssetManager
 
 	void AssetManager::Init() {
 		Textures.clear();
-		GameObjects.clear();
 		Decals.clear();
 		DecalInstances.clear();
 
@@ -61,7 +59,7 @@ namespace AssetManager
 
 			//glm::vec3 rotation = glm::vec3(data["GameObjects"][gameobject][5], data["GameObjects"][gameobject][6], data["GameObjects"][gameobject][7]);
 			//glm::vec3 scale = glm::vec3(data["GameObjects"][gameobject][8], data["GameObjects"][gameobject][9], data["GameObjects"][gameobject][10]);
-			GameObject* p_gameobject = GetGameObject(name);
+			GameObject* p_gameobject = SceneManager::GetCurrentScene()->GetGameObject(name);
 			if (p_gameobject != nullptr) {
 				p_gameobject->setPosition(position);
 			}
@@ -93,8 +91,8 @@ namespace AssetManager
 
 		
 		// name,pos,rotation,scale
-		for (int i = 0; i < GameObjects.size(); i++) {
-			GameObject* gameobject = &GameObjects[i];
+		for (int i = 0; i < SceneManager::GetCurrentScene()->g_objects.size(); i++) {
+			GameObject* gameobject = &SceneManager::GetCurrentScene()->g_objects[i];
 			json gameobjectJSON;
 			gameobjectJSON["name"] = gameobject->GetName();
 			glm::vec3 position = gameobject->GetPosition();
@@ -109,8 +107,8 @@ namespace AssetManager
 			SerializedGameObjects.push_back(gameobjectJSON);
 		}
 
-		for (int i = 0; i < SceneManager::GetCurrentScene()->GetLightsSize(); i++) {
-			Light* light = SceneManager::GetCurrentScene()->GetLight(i);
+		for (int i = 0; i < SceneManager::GetCurrentScene()->g_lights.size(); i++) {
+			Light* light = &SceneManager::GetCurrentScene()->g_lights[i];
 			json lightJSON;
 			lightJSON["colourR"] = light->colour.r;
 			lightJSON["colourG"] = light->colour.g;
@@ -140,17 +138,6 @@ namespace AssetManager
 	}
 
 	// Returns index of object
-	size_t AssetManager::AddGameObject(GameObject gameobject) {
-		GameObjects.push_back(gameobject);
-		GameObjects[GameObjects.size() - 1].GetRigidBody()->setUserPointer((void*)(GameObjects.size() - 1));
-		return GameObjects.size() - 1;
-	}
-
-	size_t AssetManager::AddGameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape) {
-		GameObjects.push_back(GameObject(name, model, position,save, mass, shape));
-		GameObjects[GameObjects.size() - 1].GetRigidBody()->setUserIndex((int)GameObjects.size() - 1);
-		return GameObjects.size() - 1;
-	}
 
 	size_t AddDecal(std::string name, Texture* texture, glm::vec3 size) {
 		Decals.push_back(Decal(name, texture,size));
@@ -246,56 +233,12 @@ namespace AssetManager
 	Texture* GetMissingTexture() {
 		return &missing_texture;
 	}
-
-
-
-	void AssetManager::RemoveGameObject(std::string name) {
-		for (int i = 0; i < GameObjects.size(); i++) {
-			if (GameObjects[i].GetName() == name) {
-				PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(GameObjects[i].GetRigidBody());
-				GameObjects.erase(GameObjects.begin() + i);
-			}
-		}
-	}
-	
-	void AssetManager::RemoveGameObject(int index) {
-		GameObjects.erase(GameObjects.begin() + index);
-	}
-	
 	void AssetManager::CleanUp() {
-		for (int i = 0; i < GameObjects.size(); i++) {
-			if (GameObjects[i].ShouldDlete())
-				GameObjects.erase(GameObjects.begin() + i);
-		}
-	}
-	
-	GameObject* AssetManager::GetGameObject(std::string name) {
-		for (int i = 0; i < GameObjects.size(); i++) {
-			if (GameObjects[i].GetName() == name)
-				return &GameObjects[i];
-		}
-		std::cout << "Object: " << name << " doesnt exsit \n";
-		return nullptr;
-	}
-	
-	GameObject* AssetManager::GetGameObject(int index) {
-		if (index >= GameObjects.size() || index < 0)
-			return nullptr;
-		return &GameObjects[index];
-	}
-	
-	std::vector<GameObject> AssetManager::GetAllGameObjects() {
-		return GameObjects;
-	}
 
-	size_t AssetManager::GetGameObjectsSize() {
-		return GameObjects.size();
 	}
-
 	size_t AssetManager::GetDecalsSize() {
 		return Decals.size();
 	}
-	
 	Texture* AssetManager::GetTexture(std::string name) {
 		for (int i = 0; i < Textures.size(); i++) {
 			if (Textures[i].GetName() == name)

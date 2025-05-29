@@ -13,7 +13,6 @@ enum GunType
 
 struct Gun
 {
-
 	static glm::vec3 swayPosition;
 
 	std::string name;
@@ -62,32 +61,14 @@ namespace WeaponManager
 	Gun* GetGunByName(std::string name);
 }
 
-class GunSpawner {
-public:
-	GunSpawner(std::string GunType, std::string spawnerName, glm::vec3 postion);
-	void CheckForSpawn();
-
-private:
-	std::string gunType;
-	std::string spawnerName;
-	glm::vec3 postion;
-
-	float timeSincePickUp = 0;
-	float spawnTime = 5;
-	bool needsSpawning = 1;
-};
-
 class GunPickUp
 {
 public:
 	static int GunPickUpCount;
-	GunPickUp(std::string GunName, std::string ObjectName, Model* model, glm::vec3 position);
-	GunPickUp(std::string GunName, glm::vec3 position, glm::vec3 force);
+	GunPickUp(std::string GunName, Model* model, glm::vec3 position);
 	void Update();
 	bool Interact();
-	std::string GetName();
 private:
-	std::string gunName = "";
-	std::string objectName = "Unkown";
-
+	std::string objectName = "";
+	std::string gunName;
 };

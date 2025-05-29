@@ -4,6 +4,8 @@
 #include "Engine/Game/Player.h"
 #include "Engine/Audio/Audio.h"
 #include "Engine/Backend.h"
+#include "Engine/Core/Scene/SceneManager.h"
+
 //BUGS
 //physics objects were glitchy
 //weird gun glitch where u cant switch weapons
@@ -1034,7 +1036,7 @@ namespace NetworkManager
 				else {
 
 					objectName = std::string(packet.payload.gunshotdata.ObjectName, packet.payload.gunshotdata.ObjectNameSize);
-					GameObject* gameobject = AssetManager::GetGameObject(objectName);
+					GameObject* gameobject = SceneManager::GetCurrentScene()->GetGameObject(objectName);
 					if (gameobject == nullptr)
 						break;
 					btRigidBody* body = gameobject->GetRigidBody();
@@ -1045,7 +1047,7 @@ namespace NetworkManager
 				break;
 			case DYNAMICOBJECT: {
 				objectName = std::string(packet.payload.dynamicObjectData.ObjectName, packet.payload.dynamicObjectData.ObjectNameSize);
-				GameObject* dynamicObject = AssetManager::GetGameObject(objectName);
+				GameObject* dynamicObject = SceneManager::GetCurrentScene()->GetGameObject(objectName);
 				if (dynamicObject == nullptr)
 					break;
 
@@ -1058,7 +1060,7 @@ namespace NetworkManager
 			case CONTROL:
 
 				if (packet.payload.control.flag == CONNECTED) {
-					GameObject* otherPlayer = AssetManager::GetGameObject("PlayerTwo");
+					GameObject* otherPlayer = SceneManager::GetCurrentScene()->GetGameObject("PlayerTwo");
 					if (otherPlayer == nullptr)
 						break;
 					otherPlayer->SetRender(true);
@@ -1067,7 +1069,7 @@ namespace NetworkManager
 				}
 
 				else if (packet.payload.control.flag == DISCONNECTED) {
-					GameObject* otherPlayer = AssetManager::GetGameObject("PlayerTwo");
+					GameObject* otherPlayer = SceneManager::GetCurrentScene()->GetGameObject("PlayerTwo");
 					if (otherPlayer == nullptr)
 						break;
 					otherPlayer->SetRender(false);

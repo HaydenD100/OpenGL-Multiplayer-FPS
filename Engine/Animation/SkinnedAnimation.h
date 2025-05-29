@@ -28,12 +28,13 @@ public:
             std::cout << "ERROR " << animationPath << "\n";
         }
         assert(scene && scene->mRootNode);
-        std::cout << "Aniamtions: " << scene->mNumAnimations << " For" << animationPath << "\n";
+        std::cout << "Aniamtions: " << scene->mNumAnimations << " For " << animationPath << "\n";
         if (scene->mNumAnimations) {
             auto animation = scene->mAnimations[index];
             m_Duration = animation->mDuration;
             m_TicksPerSecond = animation->mTicksPerSecond;
             m_GlobalInversetransform = glm::inverse(ConvertMatrixToGLMFormat(scene->mRootNode->mTransformation));
+
             ReadHeirarchyData(m_RootNode, scene->mRootNode);
             ReadMissingBones(animation, *model);
 

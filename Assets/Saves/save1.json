@@ -12,17 +12,8 @@
         {
             "name": "Cube",
             "positionX": 0.9232215285301208,
-            "positionY": -7380.83251953125,
+            "positionY": -7938.2236328125,
             "positionZ": -3.990361452102661,
-            "rotationX": 0.0,
-            "rotationY": -0.0,
-            "rotationZ": 0.0
-        },
-        {
-            "name": "water",
-            "positionX": 0.0,
-            "positionY": 2.0,
-            "positionZ": 60.0,
             "rotationX": 0.0,
             "rotationY": -0.0,
             "rotationZ": 0.0
@@ -74,33 +65,33 @@
         },
         {
             "name": "player",
-            "positionX": -4.156366348266602,
-            "positionY": 7.032723903656006,
-            "positionZ": 17.46031951904297,
-            "rotationX": -0.0013266969472169876,
-            "rotationY": 1.99365274511365e-07,
-            "rotationZ": -0.0007592933252453804
+            "positionX": -3.1809027194976807,
+            "positionY": 7.099203586578369,
+            "positionZ": -12.74682903289795,
+            "rotationX": -0.0008264795760624111,
+            "rotationY": -7.655904141756764e-07,
+            "rotationZ": -0.0014576062094420195
         },
         {
             "name": "player_head",
-            "positionX": -4.15636682510376,
-            "positionY": 8.032723426818848,
-            "positionZ": 17.46031951904297,
-            "rotationX": -2.765592575073242,
-            "rotationY": -0.4205586016178131,
-            "rotationZ": 3.1415927410125732
+            "positionX": -3.1809027194976807,
+            "positionY": 8.099189758300781,
+            "positionZ": -12.74682903289795,
+            "rotationX": 0.13800011575222015,
+            "rotationY": 0.8245726823806763,
+            "rotationZ": 0.0
         }
     ],
     "lights": [
         {
-            "colourB": 0.9166666865348816,
-            "colourG": 0.9730392098426819,
+            "colourB": 0.75,
+            "colourG": 0.9191176295280457,
             "colourR": 1.0,
             "positionX": 0.0,
-            "positionY": 50.0,
-            "positionZ": 100.0,
-            "radius": 400.0,
-            "strength": 100.0
+            "positionY": 8.0,
+            "positionZ": 0.0,
+            "radius": 30.0,
+            "strength": 5.0
         }
     ]
 }

@@ -3,6 +3,16 @@
 #include "Physics/Physics.h"
 #include "Engine/Core/Input.h"
 
+#include "Engine/Animation/SkinnedAnimatior.h"
+
+
+//TODO LIST
+//rework guns
+//add transparency
+//
+
+
+
 Scene::Scene() {
 
 }
@@ -53,17 +63,20 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("double_barrel_shotgun_wooden_grip_large", "Assets/Objects/FBX/DoubleBarrel/Wooden Grip Large_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Wooden Grip Large_normal.png", "Assets/Objects/FBX/DoubleBarrel/Wooden Grip Large_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Wooden Grip Large_metallic.jpg");
 	AssetManager::AddTexture("double_barrel_shotgun_metal_receiver", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_normal.png", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_metallic.jpg");
 
-	AssetManager::AddTexture("transparent", "Assets/Textures/glass.png", 0, 0);
+	AssetManager::AddTexture("transparent", "Assets/Textures/dusty1.png","Assets/Normals/dirty_glass.png", 0.1f, 0.0f);
 
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
 	AssetManager::AddModel("probe", Model("Assets/Objects/FBX/probe_cube.fbx", AssetManager::GetTexture("uvmap")));
 	AssetManager::AddModel("cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("uvmap")));
 	AssetManager::AddModel("light_cube", Model("Assets/Objects/FBX/light_cube.fbx", AssetManager::GetTexture("uvmap")));
 	AssetManager::GetTexture("uvmap")->SetEmissive(true);
+	AssetManager::AddModel("glasscube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("transparent")));
 
 	// TODO: not currently working
 	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
 	//Loads Mode
+
+	
 
 	//AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 	//AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("glass")));
@@ -159,6 +172,8 @@ void Scene::LoadAssets() {
 	model->GetMeshByName("pallet4")->SetTexture(AssetManager::GetTexture("pallet"));
 	model->GetMeshByName("pallet3.001")->SetTexture(AssetManager::GetTexture("pallet"));
 	*/
+	AssetManager::AddModel("cat", Model("Assets/Objects/FBX/run_fast.fbx", AssetManager::GetTexture("white")));
+
 	AssetManager::AddModel("ak47", Model("Assets/Objects/FBX/ak47.fbx", "Assets/Objects/ak47_convex.obj", AssetManager::GetTexture("ak47")));
 	AssetManager::AddModel("door", Model(Mesh("Assets/Objects/door.obj"), AssetManager::GetTexture("door")));
 	AssetManager::AddModel("door_frame", Model(Mesh("Assets/Objects/door_frame.obj"), AssetManager::GetTexture("door")));
@@ -176,26 +191,32 @@ void Scene::LoadAssets() {
 	//these are diffrent animations from skinnedanimation
 	AnimationManager::AddAnimation(Animation("Assets/Animations/door_open.fbx", "door_open"));
 	AnimationManager::AddAnimation(Animation("Assets/Animations/door_close.fbx", "door_close"));	
+
+	cute_cat = SkinnedAnimation("Assets/Objects/FBX/run_fast.fbx", AssetManager::GetModel("cat"), 0, "cute_cat");
 }
+
 
 
 void Scene::Load() { 
 	LoadAssets();
 
-	AssetManager::AddGameObject("GI_map_1", AssetManager::GetModel("GI_map_1"), glm::vec3(0, 0, 0), true, 0, Concave);
-	AssetManager::GetGameObject("GI_map_1")->IncludInGI(true);
-	AssetManager::GetGameObject("GI_map_1")->SetRotationX(-1.5708f);
-	AssetManager::AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), false, 10.0f, Box);
-
+	AddGameObject("GI_map_1", AssetManager::GetModel("GI_map_1"), glm::vec3(0, 0, 0), true, 0, Concave);
+	GetGameObject("GI_map_1")->IncludInGI(true);
+	GetGameObject("GI_map_1")->SetRotationX(-1.5708f);
+	AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), false, 10.0f, Box);
 	
-	g_water.push_back(GameObject("water", AssetManager::GetModel("water"), glm::vec3(0, 2, 90), true, 0, Box));
+	//AddGameObject("cat", AssetManager::GetModel("cat"), glm::vec3(0, 4, 0), true, 0, None);
+	//GetGameObject("cat")->SetScale(0.02);
+	//Animator::PlayAnimation(&cute_cat, "cat", true);
+	g_water.push_back(GameObject("water", AssetManager::GetModel("water"), glm::vec3(0, -2, 90), true, 0, Box));
+	g_glass.push_back(GameObject("Cube", AssetManager::GetModel("glasscube"), glm::vec3(0, 6, 0), false, 0, Box));
 
 
-	//AssetManager::AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
-	//AssetManager::GetGameObject("ladder_object")->SetRotationX(-1.5708f);
+	//SceneManager::GetCurrentScene()->AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
+	//SceneManager::GetCurrentScene()->GetGameObject("ladder_object")->SetRotationX(-1.5708f);
 
-	//AssetManager::AddGameObject("Bench_object", AssetManager::GetModel("Bench"), glm::vec3(0, 0, 0), true, 0, Concave);
-	//AssetManager::GetGameObject("Bench_object")->SetRotationX(-1.5708f);
+	//SceneManager::GetCurrentScene()->AddGameObject("Bench_object", AssetManager::GetModel("Bench"), glm::vec3(0, 0, 0), true, 0, Concave);
+	//SceneManager::GetCurrentScene()->GetGameObject("Bench_object")->SetRotationX(-1.5708f);
 
 	// Sets renderer
 	std::vector<std::string> faces{
@@ -218,18 +239,17 @@ void Scene::Load() {
 		//lights.push_back(light);
 	}
 	{
-		Light light(glm::vec3(-4.44, 2, 0), glm::vec3(0, 0.573, 1) * 6.0f, 0.22, 0.20);
-		//lights.push_back(light);
+		Light light(glm::vec3(0, 10, 0), glm::vec3(1, 0.996, 0.82),10,50);
+		g_lights.push_back(light);
 	}
 	{
 		Light light(glm::vec3(0, 6, -2.4), glm::vec3(1, 0.922, 0.678) * 7.5f, 0.07, 0.017);
-		lights.push_back(light);
+		g_lights.push_back(light);
 	}
 
 
 	// TODO: not currently working
 	//AssetManager::SaveAssets("Assets/Saves/mainScene.json");
-	
 }
 
 void Scene::Update(float deltaTime) {
@@ -245,41 +265,24 @@ void Scene::Update(float deltaTime) {
 	// Update light position
 	//lights[1].position.y = newY;
 
-	for (int i = 0; i < lights.size(); i++) {
-		if(glm::distance(lights[i].position,Player::getPosition()) < lights[i].radius * 1.4f && lights[i].Dynamic)
-			lights[i].GenerateShadows();
+	for (int i = 0; i < g_lights.size(); i++) {
+		if(glm::distance(g_lights[i].position,Player::getPosition()) < g_lights[i].radius * 1.4f && g_lights[i].Dynamic)
+			g_lights[i].GenerateShadows();
 	}
-	for (int i = 0; i < AssetManager::GetGameObjectsSize(); i++) {
-		AssetManager::GetGameObject(i)->Update();
+	for (int i = 0; i < g_objects.size(); i++) {
+		g_objects[i].Update();
 	}
-	for (int door = 0; door < doors.size(); door++) {
-		doors[door].Interact();
-		doors[door].Update(deltaTime);
+
+	for (int i = 0; i <  m_gunPickups.size(); i++)
+	{
+		int results = m_gunPickups[i].Interact();
+		if (results) {
+			m_gunPickups.erase(m_gunPickups.begin() + i);
+			continue;
+		}
 	}
 }
 
-
-
-void Scene::AddGunPickUp(GunPickUp gunpickup) {
-	gunPickUps.push_back(gunpickup);
-}
-
-//had to change back to int instead of size_t as it was giving me errors with string sizes
-int Scene::GetGunPickUpSize() {
-	return gunPickUps.size();
-}
-
-Crate* Scene::GetCrate(std::string name) {
-	for (int i = 0; i < crates.size(); i++) {
-		if (crates[i].GetName() == name)
-			return &crates[i];
-	}
-	return nullptr;
-}
-
-std::vector<Light> Scene::getLights() {
-	return lights;
-}
 
 EnviromentLighting Scene::GetEnviromentLighting() {
 	return envLight;
@@ -287,29 +290,53 @@ EnviromentLighting Scene::GetEnviromentLighting() {
 std::vector<GameObject*> Scene::NeedRenderingObjects() {
 	return NeedRendering;
 }
-int Scene::DoesGunPickUpExsit(std::string name) {
-	for (int i = 0; i < gunPickUps.size(); i++) {
-		if (gunPickUps[i].GetName() == name)
-			return 1;
-	}
-	return 0;
-}
 
 Light* Scene::GetLight(int i) {
-	return &lights[i];
+	return &g_lights[i];
 }
-size_t Scene::GetLightsSize() {
-	return lights.size();
-}
+
 void Scene::SetLight(Light light, int index) {
-	if (index > lights.size() - 1) {
-		lights.push_back(light);
+	if (index > g_lights.size() - 1) {
+		g_lights.push_back(light);
 	}
 	else {
-		lights[index] = light;
+		g_lights[index] = light;
 	}
 }
 void Scene::RemoveLight(int index) {
-	if (index < lights.size())
-		lights.erase(lights.begin() + index);
+	if (index < g_lights.size())
+		g_lights.erase(g_lights.begin() + index);
 }
+
+size_t Scene::AddGameObject(GameObject gameobject) {
+	g_objects.push_back(gameobject);
+	g_objects[g_objects.size() - 1].GetRigidBody()->setUserPointer((void*)(g_objects.size() - 1));
+	return g_objects.size() - 1;
+}
+
+size_t Scene::AddGameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape) {
+	g_objects.push_back(GameObject(name, model, position, save, mass, shape));
+	g_objects[g_objects.size() - 1].GetRigidBody()->setUserIndex((int)g_objects.size() - 1);
+	return g_objects.size() - 1;
+}
+
+GameObject* Scene::GetGameObject(std::string name) {
+	for (int i = 0; i < g_objects.size(); i++) {
+		if (g_objects[i].GetName() == name)
+			return &g_objects[i];
+	}
+	std::cout << "Object: " << name << " doesnt exsit \n";
+	return nullptr;
+}
+
+
+void Scene::RemoveGameObject(std::string name) {
+	for (int i = 0; i < g_objects.size(); i++) {
+		if (g_objects[i].GetName() == name) {
+			PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(g_objects[i].GetRigidBody());
+			g_objects.erase(g_objects.begin() + i);
+		}
+	}
+}
+
+

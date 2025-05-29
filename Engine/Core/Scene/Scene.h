@@ -42,35 +42,37 @@ public:
 
 	void LoadAssets();
  
-	int GetGunPickUpSize();
-	int DoesGunPickUpExsit(std::string name);
-	Crate* GetCrate(std::string name);
-	std::vector<Light> getLights();
 	Light* GetLight(int i);
 	void SetLight(Light light, int index);
 	void RemoveLight(int index);
 
-	size_t GetLightsSize();
 	EnviromentLighting GetEnviromentLighting();
 	std::vector<GameObject*> NeedRenderingObjects();
 
+	unsigned long long AddGameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape);
+	size_t AddGameObject(GameObject gameobject);
+	GameObject* GetGameObject(std::string name);
+
+	void RemoveGameObject(std::string name);
+
 	std::vector<GameObject> g_water;
+	std::vector<GameObject> g_objects;
+	std::vector<GameObject> g_glass;
+	std::vector<GunPickUp> m_gunPickups;
+
+	std::vector<Light> g_lights;
+
+
+
 
 private:
 	std::vector<GameObject*> NeedRendering;
 	EnviromentLighting envLight;
 
-	// Objects
-	std::vector<Door> doors;
-	std::vector<Crate> crates;
-	std::vector<GunPickUp> gunPickUps;
-	std::vector<Light> lights;
-	std::vector<GunSpawner> gunSpawners;
-
-
 	//holds the model shader ID for Gemoetry
 	GLuint ModelMatrixId;
 
 	SkinnedAnimation m_running;
+	SkinnedAnimation cute_cat;
 
 };

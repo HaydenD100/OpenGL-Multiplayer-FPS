@@ -12,6 +12,7 @@
 
 
 #define MAX_LIGHTS 100
+#define MAX_PARTICLES 1000
 
 #define DEFAULT_WIDTH 1280
 #define DEFAULT_HEIGHT 720
@@ -19,7 +20,7 @@
 
 
 const glm::vec3 DEFAULT_SKY_COLOR(0.1, 0.1, 0.1);
-const int PROBESIZE = 32;
+const int PROBESIZE = 64;
 const int DDGIPROBESIZE = 16;
 
 enum LightType

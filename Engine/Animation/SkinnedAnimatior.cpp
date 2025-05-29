@@ -3,7 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <cmath>
 #include "Engine/Core/AssetManager.h"
-
+#include "Engine/Core/Scene/SceneManager.h"
 
 namespace Animator {
     std::vector<AnimationInstance> currentAnimationInstances;
@@ -32,7 +32,7 @@ namespace Animator {
                     continue;
                 }
                 currentAnimationInstances[i].m_CurrentTime = fmod(currentAnimationInstances[i].m_CurrentTime, currentAnimationInstances[i].Animation->GetDuration());
-                CalculateBoneTransform(&currentAnimationInstances[i].Animation->GetRootNode(), currentAnimationInstances[i].Animation->GetRootNode().transformation, i);
+                CalculateBoneTransform(&currentAnimationInstances[i].Animation->GetRootNode(), glm::mat4(1), i);
                 
             }
         }
@@ -60,7 +60,7 @@ namespace Animator {
 
     void Animator::CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform, int index) {
         std::string nodeName = node->name;
-        glm::mat4 nodeTransform = node->transformation;
+        glm::mat4 nodeTransform = node->transformation; //node->transformation;
 
         Bone* Bone = currentAnimationInstances[index].Animation->FindBone(nodeName);
 
@@ -72,10 +72,10 @@ namespace Animator {
         glm::mat4 globalTransformation = parentTransform * nodeTransform;
 
         auto boneInfoMap = currentAnimationInstances[index].Animation->GetBoneIDMap();
-        GameObject* gameobject = AssetManager::GetGameObject(currentAnimationInstances[index].GameObjectName);
+        GameObject* gameobject = SceneManager::GetCurrentScene()->GetGameObject(currentAnimationInstances[index].GameObjectName);
         if (boneInfoMap.find(nodeName) != boneInfoMap.end()) {
             int indexBone = boneInfoMap[nodeName].id;
-            gameobject->SetFinalBoneMatricies(indexBone, globalTransformation * boneInfoMap[nodeName].offset);
+            gameobject->SetFinalBoneMatricies(indexBone, currentAnimationInstances[index].Animation->GetInverseGlobal() * globalTransformation * boneInfoMap[nodeName].offset);
         }
 
         for (int i = 0; i < node->childrenCount; i++)
