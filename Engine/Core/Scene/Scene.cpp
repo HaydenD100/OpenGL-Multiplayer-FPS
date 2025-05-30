@@ -29,7 +29,7 @@ void Scene::LoadAssets() {
 
 	AssetManager::AddTexture("metalic", "Assets/Textures/white.png", 0.0f, 1.0f);
 
-	AssetManager::AddTexture("cornel", "Assets/Textures/cornel-box.png", 0.8, 0.0);
+	//AssetManager::AddTexture("cornel", "Assets/Textures/cornel-box.png", 0.8, 0.0);
 	
 	AssetManager::AddTexture("white_light", "Assets/Textures/white.png", 0.5, 0.0);
 	AssetManager::GetTexture("white_light")->SetEmissive(true);
@@ -38,23 +38,23 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("freaky", "Assets/Textures/freaky_decal.png", 0, 0);
 	AssetManager::AddTexture("pizza", "Assets/Textures/pizza_decal.png", 0, 0);
 	AssetManager::AddTexture("tank", "Assets/Textures/tank_decal.png", 0, 0);
-	AssetManager::AddTexture("crate", "Assets/Textures/crate.png", 0.7, 0);
+	//AssetManager::AddTexture("crate", "Assets/Textures/crate.png", 0.7, 0);
 	//AssetManager::AddTexture("window", "Assets/Textures/window.png", 0.7, 0);
 	AssetManager::AddTexture("bullet_hole", "Assets/Textures/bullet_hole.png","Assets/Normals/window_normal.png", 0.5, 0);
 	AssetManager::AddTexture("glock", "Assets/Textures/glock_17.png", "Assets/Normals/glock_17_normal.png", 0.5, 0.5);
 	AssetManager::AddTexture("ak47", "Assets/Textures/ak47.png", "Assets/Normals/ak47_normal.png", 0.2, 0.7);
 	AssetManager::AddTexture("drawer", "Assets/Textures/drawerred.png", "Assets/Normals/drawer_normal.png", 0.7, 0);
-	AssetManager::AddTexture("lamp", "Assets/Textures/lamp.png", "Assets/Normals/lamp_normal.png", 0.7, 0.1);
+	//AssetManager::AddTexture("lamp", "Assets/Textures/lamp.png", "Assets/Normals/lamp_normal.png", 0.7, 0.1);
 	AssetManager::AddTexture("arm", "Assets/Textures/Arm_COL.png", "Assets/Normals/Arm_NOR.png", 0.7, 0);
-	AssetManager::AddTexture("ladder", "Assets/Textures/ladder.png", "Assets/Normals/ladder_normal.png", "Assets/Roughness/ladder_roughness.png", "Assets/Metalic/ladder_metallic.png");
-	AssetManager::AddTexture("pallet", "Assets/Textures/pallet.png", "Assets/Normals/pallet_normal.png", "Assets/Roughness/pallet_roughness.png", "Assets/Metalic/pallet_metallic.png");
+	//AssetManager::AddTexture("ladder", "Assets/Textures/ladder.png", "Assets/Normals/ladder_normal.png", "Assets/Roughness/ladder_roughness.png", "Assets/Metalic/ladder_metallic.png");
+	//AssetManager::AddTexture("pallet", "Assets/Textures/pallet.png", "Assets/Normals/pallet_normal.png", "Assets/Roughness/pallet_roughness.png", "Assets/Metalic/pallet_metallic.png");
 	AssetManager::AddTexture("knife", "Assets/Textures/knife.png", "Assets/Normals/knife_normal.png", "Assets/Roughness/knife_roughness.png", "Assets/Metalic/knife_metallic.png");
 	AssetManager::AddTexture("shotgun", "Assets/Textures/remington.png", "Assets/Normals/remington_normal.png", "Assets/Roughness/remington_roughness.png","Assets/Metalic/remington_metallic.png");
 	//AssetManager::AddTexture(Texture("shelf"));
 	//AssetManager::AddTexture(Texture("vase"));
 	//AssetManager::AddTexture(Texture("plant"));
-	//AssetManager::AddTexture(Texture("Industrial_Light"));
-	AssetManager::AddTexture(Texture("smokespot_bench_bench"));
+	AssetManager::AddTexture(Texture("angled-tiled-floor"));
+	AssetManager::AddTexture("angled-tiled-floor", "Assets/Textures/angled-tiled-floor.png",0.0f,0.0f);
 
 
 	//Double Barel
@@ -63,14 +63,16 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("double_barrel_shotgun_wooden_grip_large", "Assets/Objects/FBX/DoubleBarrel/Wooden Grip Large_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Wooden Grip Large_normal.png", "Assets/Objects/FBX/DoubleBarrel/Wooden Grip Large_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Wooden Grip Large_metallic.jpg");
 	AssetManager::AddTexture("double_barrel_shotgun_metal_receiver", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_normal.png", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_metallic.jpg");
 
-	AssetManager::AddTexture("transparent", "Assets/Textures/dusty1.png","Assets/Normals/dirty_glass.png", 0.1f, 0.0f);
+	AssetManager::AddTexture("transparent", "Assets/Textures/dusty1.png","Assets/Normals/dirty_glass.png", 0.1f,0.0f);
 
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
 	AssetManager::AddModel("probe", Model("Assets/Objects/FBX/probe_cube.fbx", AssetManager::GetTexture("uvmap")));
 	AssetManager::AddModel("cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("uvmap")));
 	AssetManager::AddModel("light_cube", Model("Assets/Objects/FBX/light_cube.fbx", AssetManager::GetTexture("uvmap")));
 	AssetManager::GetTexture("uvmap")->SetEmissive(true);
-	AssetManager::AddModel("glasscube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("transparent")));
+	AssetManager::AddModel("shaderBall", Model("Assets/Objects/shaderBall.obj", AssetManager::GetTexture("transparent")));
+	AssetManager::AddModel("cubeGlass", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("transparent")));
+
 
 	// TODO: not currently working
 	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
@@ -81,17 +83,18 @@ void Scene::LoadAssets() {
 	//AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 	//AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("glass")));
 
-	AssetManager::AddModel("running", Model("Assets/Objects/FBX/Running.fbx", AssetManager::GetTexture("white")));
+	//AssetManager::AddModel("running", Model("Assets/Objects/FBX/Running.fbx", AssetManager::GetTexture("white")));
 
 
-	AssetManager::AddModel("ladder", Model("Assets/Objects/FBX/ladder.fbx", AssetManager::GetTexture("ladder")));
+	//AssetManager::AddModel("ladder", Model("Assets/Objects/FBX/ladder.fbx", AssetManager::GetTexture("ladder")));
 	//AssetManager::AddModel("shelf", Model("Assets/Objects/FBX/shelf.fbx", AssetManager::GetTexture("shelf")));
 	//AssetManager::AddModel("vase", Model("Assets/Objects/FBX/vase.fbx", AssetManager::GetTexture("vase")));
 	//AssetManager::GetModel("vase")->GetMeshByName("Mesh.001")->SetTexture(AssetManager::GetTexture("plant"));
 	//AssetManager::GetModel("vase")->GetMeshByName("Mesh.002")->SetTexture(AssetManager::GetTexture("plant"));
 
-	AssetManager::AddModel("Bench", Model("Assets/Objects/FBX/Bench.fbx", AssetManager::GetTexture("smokespot_bench_bench")));
+	//AssetManager::AddModel("Bench", Model("Assets/Objects/FBX/Bench.fbx", AssetManager::GetTexture("angled-tiled-floor")));
 
+	AssetManager::AddModel("Tiltedfloor", Model("Assets/Objects/floor.obj", AssetManager::GetTexture("angled-tiled-floor")));
 
 	//AssetManager::AddModel("ceiling_light", Model("Assets/Objects/FBX/ceiling_light.fbx", AssetManager::GetTexture("Industrial_Light")));
 	//AssetManager::GetModel("ceiling_light")->GetMeshByName("l1.001")->SetTexture(AssetManager::GetTexture("white_light"));
@@ -151,7 +154,6 @@ void Scene::LoadAssets() {
 
 	AssetManager::AddModel("GI_map_1", Model("Assets/Maps/sand_box.fbx", AssetManager::GetTexture("dev_textures")));
 
-
 	AssetManager::GetModel("GI_map_1")->GetMeshByName("stairs_plane")->ToggleRender(false);
 	AssetManager::AddModel("Cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("metalic")));
 
@@ -172,7 +174,7 @@ void Scene::LoadAssets() {
 	model->GetMeshByName("pallet4")->SetTexture(AssetManager::GetTexture("pallet"));
 	model->GetMeshByName("pallet3.001")->SetTexture(AssetManager::GetTexture("pallet"));
 	*/
-	AssetManager::AddModel("cat", Model("Assets/Objects/FBX/run_fast.fbx", AssetManager::GetTexture("white")));
+	//AssetManager::AddModel("cat", Model("Assets/Objects/FBX/run_fast.fbx", AssetManager::GetTexture("white")));
 
 	AssetManager::AddModel("ak47", Model("Assets/Objects/FBX/ak47.fbx", "Assets/Objects/ak47_convex.obj", AssetManager::GetTexture("ak47")));
 	AssetManager::AddModel("door", Model(Mesh("Assets/Objects/door.obj"), AssetManager::GetTexture("door")));
@@ -192,7 +194,6 @@ void Scene::LoadAssets() {
 	AnimationManager::AddAnimation(Animation("Assets/Animations/door_open.fbx", "door_open"));
 	AnimationManager::AddAnimation(Animation("Assets/Animations/door_close.fbx", "door_close"));	
 
-	cute_cat = SkinnedAnimation("Assets/Objects/FBX/run_fast.fbx", AssetManager::GetModel("cat"), 0, "cute_cat");
 }
 
 
@@ -200,6 +201,8 @@ void Scene::LoadAssets() {
 void Scene::Load() { 
 	LoadAssets();
 
+	AddGameObject("Tiltedfloor", AssetManager::GetModel("Tiltedfloor"), glm::vec3(0, 0.1, 0), true, 0, Box);
+	GetGameObject("Tiltedfloor")->IncludInGI(true);
 	AddGameObject("GI_map_1", AssetManager::GetModel("GI_map_1"), glm::vec3(0, 0, 0), true, 0, Concave);
 	GetGameObject("GI_map_1")->IncludInGI(true);
 	GetGameObject("GI_map_1")->SetRotationX(-1.5708f);
@@ -209,8 +212,10 @@ void Scene::Load() {
 	//GetGameObject("cat")->SetScale(0.02);
 	//Animator::PlayAnimation(&cute_cat, "cat", true);
 	g_water.push_back(GameObject("water", AssetManager::GetModel("water"), glm::vec3(0, -2, 90), true, 0, Box));
-	g_glass.push_back(GameObject("Cube", AssetManager::GetModel("glasscube"), glm::vec3(0, 6, 0), false, 0, Box));
+	g_glass.push_back(GameObject("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(0, 1, 0), false, 0, Box));
+	g_glass.push_back(GameObject("cubeGlass", AssetManager::GetModel("cubeGlass"), glm::vec3(-3, 2, 0), false, 0, Box));
 
+	
 
 	//SceneManager::GetCurrentScene()->AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
 	//SceneManager::GetCurrentScene()->GetGameObject("ladder_object")->SetRotationX(-1.5708f);

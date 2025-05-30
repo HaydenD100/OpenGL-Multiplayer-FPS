@@ -218,6 +218,8 @@ namespace Renderer
 		s_transparent.SetInt("NormalTextureSampler", 1);
 		s_transparent.SetInt("RoughnessTextureSampler", 2);
 		s_transparent.SetInt("MetalicTextureSampler", 3);
+		s_transparent.SetInt("envMap", 4);
+
 		for (int i = 0; i < 26; i++) {
 			s_transparent.SetInt("lights[" + std::to_string(i) + "].depthMap", 8 + i);
 		}
@@ -560,7 +562,6 @@ namespace Renderer
 	void Renderer::RenderScene(float dt) {
 
 		//--------------------------------------------PROBE-------------------------------------------	
-		Renderer::probeGrid.ReLight(UPDATED_PROBE_COUNT_PER_FRAME);
 		Renderer::CheckDebugState();
 		//ParticleSystem::Simulate(dt);
 		
@@ -686,8 +687,10 @@ namespace Renderer
 		s_transparent.SetMat4("P", Camera::getProjectionMatrix());
 		s_transparent.SetMat4("V", Camera::getViewMatrix());
 		s_transparent.SetVec3("viewPos", Camera::GetPosition());
+
 		SetLights(SceneManager::GetCurrentScene()->g_lights, &s_transparent);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, SceneManager::GetCurrentScene()->GetEnviromentLighting().sky.GetTextureID());
 		glm::vec3 cameraPosition = Camera::GetPosition(); // Camera position
 		//TODO :: CHANGE THIS TO OIT this gets slow if theres too many transparent objects
 		
@@ -711,38 +714,6 @@ namespace Renderer
 
 		}
 		
-
-		/*
-		s_water.Use();
-		s_water.SetMat4("P", Camera::getProjectionMatrix());
-		s_water.SetMat4("V", Camera::getViewMatrix());
-		s_water.SetVec3("viewPos", Camera::GetPosition());
-		s_water.SetFloat("time", glfwGetTime());
-		s_water.SetVec3("viewPos", Camera::GetPosition());
-
-		SetLights(lights, &s_water);
-
-		for (int i = 0; i < waterObjects.size(); i++) {
-			auto transforms = waterObjects[i]->GetFinalBoneMatricies();
-			if (transforms[0] != glm::mat4(1)) {
-				s_water.SetBool("animated", true);
-				for (int i = 0; i < transforms.size(); ++i) {
-					std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
-					s_water.SetMat4(pos.c_str(), transforms[i]);
-				}
-			}
-			else {
-				s_water.SetBool("animated", false);
-			}
-			glm::mat4 ModelMatrix = waterObjects[i]->GetModelMatrix();
-			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;
-			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
-
-			s_water.SetMat3("normalMatrix3", normalMatrix);
-			s_water.SetMat4("M", ModelMatrix);
-			waterObjects[i]->RenderObject(s_water.GetShaderID());
-		}
-		*/
 		glDisable(GL_BLEND);
 		
 		//---------------------------------------------------Overlay-------------------------------------
@@ -814,6 +785,9 @@ namespace Renderer
 
 		//RenderPlane();
 		//---------------------------------------------------LIGHTING-------------------------------------
+
+		Renderer::probeGrid.ReLight(UPDATED_PROBE_COUNT_PER_FRAME);
+
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

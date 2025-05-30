@@ -205,7 +205,6 @@ void Mesh::Render(GLuint programID) {
             glBindTextureUnit(1, currentTexture->GetTextureNormal());
             glUniform1i(glGetUniformLocation(programID, "HasNormalMap"), true);
         }
-           
         glBindTextureUnit(2, currentTexture->GetTextureRoughness());
         glBindTextureUnit(3, currentTexture->GetTextureMetalic());
         glUniform1f(glGetUniformLocation(programID, "Roughness"), currentTexture->GetRoughness());

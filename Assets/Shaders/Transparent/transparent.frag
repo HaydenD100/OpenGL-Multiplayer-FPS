@@ -1,6 +1,7 @@
 #version 430 core
 
 layout (location = 6) out vec4 gTransparent;  // Stores both albedo and specular in one vector
+layout (location = 7) out vec4 gTransparentUV;  // Stores both albedo and specular in one vector
 
 #define MAXLIGHTS 26
 
@@ -19,6 +20,7 @@ uniform sampler2D DiffuseTextureSampler;
 uniform sampler2D NormalTextureSampler;
 uniform sampler2D RoughnessTextureSampler;
 uniform sampler2D MetalicTextureSampler;
+layout(binding = 4) uniform samplerCube envMap;
 
 uniform float Roughness;
 uniform float Metalic;
@@ -113,7 +115,6 @@ vec3 Tonemap_ACES(const vec3 x) { // Narkowicz 2015, "ACES Filmic Tone Mapping C
     return (x * (a * x + b)) / (x * (c * x + d) + e);
 }
 
-
 void main() {
 
 
@@ -123,9 +124,6 @@ void main() {
     float roughness = Roughness;
     //if(roughness == -1)
         //roughness = texture(RoughnessTextureSampler, UV).r;
-
-
-
     float metallic = Metalic;
     //if(metallic == -1)
        // metallic =texture(MetalicTextureSampler, UV).r;
@@ -137,7 +135,6 @@ void main() {
 
     // Reflectance at normal incidence
     vec3 F0 = mix(vec3(0.04), albedo, metallic);
-    
 
     vec3 Lo = vec3(0.0);
     for (int i = 0; i < MAXLIGHTS; ++i) {
@@ -172,16 +169,26 @@ void main() {
     }
     
     
-    vec3 color = Lo + 0.01;
+    vec3 color = Lo;
+    float intensity = dot(color, vec3(0.2126, 0.7152, 0.0722)); 
+    float Changedalpha = 0.1 * intensity ; 
 
-     float intensity = dot(color, vec3(0.2126, 0.7152, 0.0722)); 
-     float Changedalpha =  alpha * intensity ; 
-
-    // HDR to ldexp 
-    color = pow(color, vec3(1.0/2.2));
-
-    color = mix(color, Tonemap_ACES(color), 1.0);   
+    // Tone mapping and gamma correction FIRST
 
 
-    gTransparent = vec4(color, 0.1);
+
+    // Calculate refraction direction (simplified)
+    vec3 viewDir = normalize(-FragPos.xyz);
+    vec3 refractDir = refract(viewDir, FragN, 1.0 / 1.5);
+
+    // Apply distortion to UVs
+    vec2 distortedUV =  (refractDir.xy * 0.15);
+
+    // Sample the background scene with distortion
+
+    // Optional: Add fresnel effect for more realism
+    //float edgeScale = 1.0 - smoothstep(0.4, 0.45, length(UV - 0.5));
+    //distortedUV *= mix(1.0, 1.0 + 2.0 * 0.2, 0.3);
+
+    gTransparent = vec4(distortedUV,color.x * 10,0.2);
 }

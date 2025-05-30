@@ -7,6 +7,7 @@ layout(binding = 0)uniform sampler2D gLighting;
 layout(binding = 2) uniform sampler2D gEmissive; 
 layout(binding = 1) uniform sampler2D gSSR; 
 layout(binding = 3 )uniform sampler2D gTransparent; 
+layout(binding = 4 )uniform sampler2D gTransparentUV; 
 
 uniform vec2 screen;
 
@@ -34,12 +35,51 @@ vec4 boxBlur2D(vec2 texCoords, vec2 texOffset, int kernelSize)
     return result;
 }
 
-vec4 blendSrcOver(vec4 foreground, vec4 background) {
-    float alpha = foreground.a;
-    return vec4(
-        foreground.rgb * alpha + background.rgb * (alpha),
-      1.0  // output is fully opaque
+// Simplex Noise 2D by Ian McEwan (Ashima Arts)
+vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+
+float snoise(vec2 v) {
+    const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+    vec2 i  = floor(v + dot(v, C.yy));
+    vec2 x0 = v - i + dot(i, C.xx);
+    vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+    vec4 x12 = x0.xyxy + C.xxzz;
+    x12.xy -= i1;
+    i = mod289(i);
+    vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+    m = m*m;
+    m = m*m;
+    vec3 x = 2.0 * fract(p * C.www) - 1.0;
+    vec3 h = abs(x) - 0.5;
+    vec3 ox = floor(x + 0.5);
+    vec3 a0 = x - ox;
+    m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+    vec3 g;
+    g.x  = a0.x  * x0.x  + h.x  * x0.y;
+    g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+    return 130.0 * dot(m, g);
+}
+vec2 glassDistortion(vec2 uv, float time, float strength, float edgeDistortion) {
+    // Base noise pattern
+    vec2 distort = vec2(
+        snoise(uv * 1.5 + vec2(time * 0.3, time * 0.1)),
+        snoise(uv * 1.5 + vec2(time * 0.2, time * 0.3))
     );
+    
+    // Add swirling motion
+    vec2 center = uv - 0.5;
+    float angle = length(center) * 10.0 - time * 2.0;
+    distort += 0.25 * vec2(cos(angle), sin(angle)) * smoothstep(0.3, 0.5, length(center));
+    
+    // Edge distortion effect (stronger near edges)
+    float edgeFactor = pow(length(center) * 1.5, 4.0);
+    distort *= mix(1.0, edgeFactor * 2.5, edgeDistortion);
+    
+    // Scale by strength parameter
+    return distort * strength * 0.015;
 }
 
 void main() {
@@ -54,38 +94,20 @@ void main() {
     vec2 texSize  = textureSize(gSSR, 0).xy;
     vec4 emissive = vec4(texture(gEmissive, UV).rgb,1); 
 
-    //if(gl_GlobalInvocationID.x < 512 && gl_GlobalInvocationID.y < 512){
-        //imageStore(gFinal, coords,vec4(ssr));
-
-        
-    //}
-    //else{
-        
-    //}
     vec4 albedo = lighting + emissive;
 
     if(transparent.rgb != vec3(0)){
-        vec4 result = boxBlur2D(UV,vec2(0.0015),5);
-        result += transparent;
-        imageStore(gFinal, coords,vec4(result.xyz,1));
+        //vec4 blurredImage = boxBlur2D(UV, vec2(0.0015), 5);
+
+        vec4 backgroundSample = texture(gLighting, clamp(UV + transparent.xy,0.0,1.0));
+        backgroundSample += texture(gEmissive, clamp(UV + transparent.xy,0.0,1.0));
+
+        vec4 blended = backgroundSample + vec4(transparent.z);
+
+        imageStore(gFinal, coords, blended);
     }else{
         imageStore(gFinal, coords,vec4(albedo.xyz,1));
     }
-
-    //imageStore(gFinal, coords,vec4(resultColor,1));
-
-    //imageStore(gFinal, coords,vec4(lighting + emissive));
-    /*
-    vec2 texOffset = 1.0 / textureSize(gSSR, 0); // Texture offset
-    bool horizontal = false;
-    int kernelSize = 5; // Kernel size (e.g., 5x5)
-
-    vec4 blurredSSR = ssr;
-    //if(ssr.a > 0.001f && ssr.r > 0.001f && ssr.g > 0.001f && ssr.b > 0.001f)
-        //blurredSSR = boxBlur2D(gSSR, UV, texOffset, kernelSize);
-    */
-
-    //+ blurredSSR
 
 
 }

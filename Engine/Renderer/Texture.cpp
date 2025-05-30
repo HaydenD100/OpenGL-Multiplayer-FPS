@@ -225,7 +225,7 @@ Texture::Texture(const char* name, const char* path, const char* normalPath, flo
 
 }
 
-Texture::Texture(const char* name, const char* path, const char* normalPath, const char* roughnessPath, const char* metalicPath) {
+Texture::Texture(const char* name, const char* path, const char* normalPath, std::string roughnessPath, std::string metalicPath) {
     this->name = name;
     
     std::cout << "Loading Texture " << path << std::endl;
@@ -287,7 +287,7 @@ Texture::Texture(const char* name, const char* path, const char* normalPath, con
     // Load and generate the texture
     int width2, height2;
 
-    unsigned char* data2 = stbi_load(roughnessPath, &width2, &height2, 0, STBI_rgb_alpha);
+    unsigned char* data2 = stbi_load(roughnessPath.c_str(), &width2, &height2, 0, STBI_rgb_alpha);
     if (data2) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width2, height2, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -310,7 +310,7 @@ Texture::Texture(const char* name, const char* path, const char* normalPath, con
     // Load and generate the texture
     int width3, height3;
 
-    unsigned char* data3 = stbi_load(roughnessPath, &width3, &height3, 0, STBI_rgb_alpha);
+    unsigned char* data3 = stbi_load(roughnessPath.c_str(), &width3, &height3, 0, STBI_rgb_alpha);
     if (data3) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width3, height3, 0, GL_RGBA, GL_UNSIGNED_BYTE, data3);
         glGenerateMipmap(GL_TEXTURE_2D);

@@ -20,7 +20,8 @@ public:
     Texture(std::string name);
 
     Texture(const char* name, const char* path, const char* normalPath, float roughness, float metalic);
-    Texture(const char* name, const char* path, const char* normalPath, const char* roughnessPath, const char* metalicPath);
+    //TODO THESE SHOULD BS C strs
+    Texture(const char* name, const char* path, const char* normalPath, std::string roughnessPath, std::string metalicPath);
     Texture(aiMaterial* material, const aiScene* scene);
 
     std::string GetName();

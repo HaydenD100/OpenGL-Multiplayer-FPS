@@ -37,12 +37,12 @@ void main()
     vec3 MaterialDiffuseColor = texture(DiffuseTextureSampler, UV).rgb;
 
     float MaterialRoughness = Roughness;
-    if(MaterialRoughness == -1)
-        MaterialRoughness = texture(RoughnessTextureSampler, UV).r;
+    //if(MaterialRoughness == -1)
+    MaterialRoughness = texture(RoughnessTextureSampler, UV).r;
 
     float MaterialMetalic = Metalic;
-    if(MaterialRoughness == -1)
-        MaterialMetalic = texture(MetalicTextureSampler, UV).r;
+    //if(MaterialRoughness == -1)
+    MaterialMetalic = texture(MetalicTextureSampler, UV).r;
     
     // Sample the normal map and transform it to world space using the TBN matrix
     vec3 normalMap = texture(NormalTextureSampler, UV).rgb;
