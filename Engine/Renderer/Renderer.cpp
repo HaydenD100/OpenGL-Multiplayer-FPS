@@ -565,6 +565,7 @@ namespace Renderer
 		Renderer::CheckDebugState();
 		//ParticleSystem::Simulate(dt);
 		
+		Renderer::probeGrid.ReLight(UPDATED_PROBE_COUNT_PER_FRAME);
 
 		//cs_water_height_fft_col.SetBool("uHorizontalPass", false);
 
@@ -786,7 +787,6 @@ namespace Renderer
 		//RenderPlane();
 		//---------------------------------------------------LIGHTING-------------------------------------
 
-		Renderer::probeGrid.ReLight(UPDATED_PROBE_COUNT_PER_FRAME);
 
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

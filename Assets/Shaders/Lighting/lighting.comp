@@ -546,7 +546,7 @@ void main() {
     adjustedIndirectLighting = max(adjustedIndirectLighting, vec3(0));
     adjustedIndirectLighting *= albedo * 1;
 
-    vec3 ambientColor = albedo * envLighting;
+    vec3 ambientColor = albedo * (envLighting + 0.4);
     vec3 ambientLighting = ambientColor * vec3((ambeint == 0) ? 0.1 : ambeint);
 
     // Ambient hack
