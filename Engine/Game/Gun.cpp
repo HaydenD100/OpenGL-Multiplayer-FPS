@@ -69,7 +69,6 @@ void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
 void Gun::Equip() {
 	if (hasAnimations) {
 		Animator::PlayAnimation(&equipAnim, name, false);
-		NetworkManager::SendAnimation(equipAnim.GetName(), name + "_PlayerTwo");
 	}
 		
 }
@@ -79,7 +78,6 @@ void Gun::Reload() {
 		return;
 	if (hasAnimations) {
 		Animator::PlayAnimation(&reloadAnim, name, false);
-		NetworkManager::SendAnimation(reloadAnim.GetName(), name + "_PlayerTwo");
 	}
 	else 
 		AnimationManager::Play("ak47_reload", Player::getCurrentGun());
@@ -91,13 +89,10 @@ void Gun::Reload() {
 void Gun::Shoot(){
 	int randomnum = (rand() % firesounds) + 1;
 	AudioManager::PlaySound(gunsShotName + std::to_string(randomnum));
-	NetworkManager::SendSound(gunsShotName + std::to_string(randomnum), Player::getPosition());
 
 	if (hasAnimations) {
 		Animator::PlayAnimation(&shootAnim, name, false);
-		//tell the other instance to play animation
-		NetworkManager::SendAnimation(shootAnim.GetName(), name + "_PlayerTwo");
-		
+		//tell the other instance to play animation		
 	}
 	else 
 		kickbackOffset += kickback;
@@ -295,15 +290,7 @@ void GunPickUp::Update() {
 }
 
 bool GunPickUp::Interact() {
-	if (PlayerTwo::GetInteractingWithName() == objectName && PlayerTwo::GetCurrentWeapon() != gunName) {
-		GameObject* object = SceneManager::GetCurrentScene()->GetGameObject(objectName);
-		PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(object->GetRigidBody());
-		object->SetRender(false);
-		SceneManager::GetCurrentScene()->RemoveGameObject(objectName);
-
-		AudioManager::PlaySound("item_pickup", Player::getPosition());
-		return true;
-	}
+	
 	if (Player::GetInteractingWithName() != objectName || !Player::SelectWeapon(gunName))
 		return false;
 	

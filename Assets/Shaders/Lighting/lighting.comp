@@ -460,11 +460,14 @@ void main() {
     ivec2 coords = ivec2(gl_GlobalInvocationID.xy );
     vec2 UV = (vec2(gl_GlobalInvocationID.xy) + 0.5) / screen;
 
+
     float threshold = 0.0009; // Distance threshold
     if (length(UV - vec2(0.5, 0.5)) <= threshold) {
         imageStore(gLighting, coords,vec4(1));
         return;
     }
+
+
 
  // Retrieve data from G-buffer
     vec3 FragPos_view = texture(gPostion, UV).rgb;
@@ -538,15 +541,13 @@ void main() {
     
 
     vec3 indirectLighting = GetIndirectLighting(FragPos,trueNormal);
-
     vec3 adjustedIndirectLighting = indirectLighting;
-    indirectLighting = pow(indirectLighting,vec3(2.2f));
     float factor = min(1, roughness * 1.5);
     adjustedIndirectLighting *= (0.8) * vec3(factor);
     adjustedIndirectLighting = max(adjustedIndirectLighting, vec3(0));
     adjustedIndirectLighting *= albedo * 1;
 
-    vec3 ambientColor = albedo * (envLighting + 0.4);
+    vec3 ambientColor = albedo * (envLighting);
     vec3 ambientLighting = ambientColor * vec3((ambeint == 0) ? 0.1 : ambeint);
 
     // Ambient hack

@@ -43,6 +43,9 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	body->setActivationState(DISABLE_DEACTIVATION);
 	body->setFriction(0.7f);
 	body->setUserIndex(-1);
+body->setUserPointer(reinterpret_cast<void*>(static_cast<uintptr_t>(ObjectType::DEFAULT)));
+
+
 	//if(!NetworkManager::IsServer() && name != "player")
 		//body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
 
@@ -56,8 +59,6 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	setPosition(position);
 	for (int i = 0; i < 100; i++)
 		m_FinalBoneMatrices.push_back(glm::mat4(1.0f));
-
-
 }
 
 GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, btCollisionShape* shape) {
@@ -88,6 +89,9 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	body->setActivationState(DISABLE_DEACTIVATION);
 	body->setFriction(0.7f);
 	body->setUserIndex(-1);
+	body->setUserPointer(reinterpret_cast<void*>(static_cast<uintptr_t>(ObjectType::DEFAULT)));
+
+
 	//if (!NetworkManager::IsServer() && name != "player")
 		//body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
 
@@ -266,6 +270,9 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	body->setActivationState(DISABLE_DEACTIVATION);
 	body->setFriction(0.7f);
 	body->setUserIndex(-1);
+	body->setUserPointer(reinterpret_cast<void*>(static_cast<uintptr_t>(ObjectType::DEFAULT)));
+
+
 	//if (!NetworkManager::IsServer() && name != "player")
 		//body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
 
@@ -314,8 +321,7 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	body->setActivationState(DISABLE_DEACTIVATION);
 	body->setFriction(0.7f);
 	body->setUserIndex(-1);
-	if (!NetworkManager::IsServer() && name != "player")
-		body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+	body->setUserPointer(reinterpret_cast<void*>(static_cast<uintptr_t>(ObjectType::DEFAULT)));
 
 	// Add the body to the dynamics world
 	if (mass != 0)

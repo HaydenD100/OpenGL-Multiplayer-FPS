@@ -25,7 +25,7 @@ void Scene::LoadAssets() {
 
 
 	AssetManager::AddTexture("white", "Assets/Textures/white.png", 0.5, 0.0);
-	AssetManager::AddTexture("dev_textures", "Assets/Textures/dev_textures.png", 0.5, 0.0);
+	AssetManager::AddTexture(Texture("dev_textures", "Assets/Textures/dev_textures.png", "Assets/Normals/no_normal.png", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_metallic.jpg"));
 
 	AssetManager::AddTexture("metalic", "Assets/Textures/white.png", 0.0f, 1.0f);
 
@@ -46,7 +46,7 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("drawer", "Assets/Textures/drawerred.png", "Assets/Normals/drawer_normal.png", 0.7, 0);
 	//AssetManager::AddTexture("lamp", "Assets/Textures/lamp.png", "Assets/Normals/lamp_normal.png", 0.7, 0.1);
 	AssetManager::AddTexture("arm", "Assets/Textures/Arm_COL.png", "Assets/Normals/Arm_NOR.png", 0.7, 0);
-	//AssetManager::AddTexture("ladder", "Assets/Textures/ladder.png", "Assets/Normals/ladder_normal.png", "Assets/Roughness/ladder_roughness.png", "Assets/Metalic/ladder_metallic.png");
+	AssetManager::AddTexture("ladder", "Assets/Textures/ladder.png", "Assets/Normals/ladder_normal.png", "Assets/Roughness/ladder_roughness.png", "Assets/Metalic/ladder_metallic.png");
 	//AssetManager::AddTexture("pallet", "Assets/Textures/pallet.png", "Assets/Normals/pallet_normal.png", "Assets/Roughness/pallet_roughness.png", "Assets/Metalic/pallet_metallic.png");
 	AssetManager::AddTexture("knife", "Assets/Textures/knife.png", "Assets/Normals/knife_normal.png", "Assets/Roughness/knife_roughness.png", "Assets/Metalic/knife_metallic.png");
 	AssetManager::AddTexture("shotgun", "Assets/Textures/remington.png", "Assets/Normals/remington_normal.png", "Assets/Roughness/remington_roughness.png","Assets/Metalic/remington_metallic.png");
@@ -86,7 +86,7 @@ void Scene::LoadAssets() {
 	//AssetManager::AddModel("running", Model("Assets/Objects/FBX/Running.fbx", AssetManager::GetTexture("white")));
 
 
-	//AssetManager::AddModel("ladder", Model("Assets/Objects/FBX/ladder.fbx", AssetManager::GetTexture("ladder")));
+	AssetManager::AddModel("ladder", Model("Assets/Objects/FBX/ladder.fbx", AssetManager::GetTexture("ladder")));
 	//AssetManager::AddModel("shelf", Model("Assets/Objects/FBX/shelf.fbx", AssetManager::GetTexture("shelf")));
 	//AssetManager::AddModel("vase", Model("Assets/Objects/FBX/vase.fbx", AssetManager::GetTexture("vase")));
 	//AssetManager::GetModel("vase")->GetMeshByName("Mesh.001")->SetTexture(AssetManager::GetTexture("plant"));
@@ -149,12 +149,9 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("water_COL", Model("Assets/Objects/FBX/water_test.obj", AssetManager::GetTexture("white")));
 
 	//AssetManager::AddModel("GI_map_1", Model("Assets/Maps/cornel_box.obj", AssetManager::GetTexture("cornel")));
-	AssetManager::AddModel("GI_map_1", Model("Assets/Maps/sand_box.fbx", AssetManager::GetTexture("dev_textures")));
-	AssetManager::GetModel("GI_map_1")->GetMeshByName("stairs_plane")->ToggleRender(false);
+	AssetManager::AddModel("GI_map_1", Model("Assets/Maps/sand_box.obj", AssetManager::GetTexture("angled-tiled-floor")));
+	//AssetManager::GetModel("GI_map_1")->GetMeshByName("stairs_plane")->ToggleRender(false);
 
-	AssetManager::AddModel("GI_map_1", Model("Assets/Maps/sand_box.fbx", AssetManager::GetTexture("dev_textures")));
-
-	AssetManager::GetModel("GI_map_1")->GetMeshByName("stairs_plane")->ToggleRender(false);
 	AssetManager::AddModel("Cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("metalic")));
 
 	//Super laggy
@@ -201,27 +198,29 @@ void Scene::LoadAssets() {
 void Scene::Load() { 
 	LoadAssets();
 
+
+	//AddGameObject("GI_map_1", AssetManager::GetModel("GI_map_1"), glm::vec3(0, 0, 0), true, 0, Concave);
+	//GetGameObject("GI_map_1")->IncludInGI(true);
+	//GetGameObject("GI_map_1")->SetRotationX(-1.5708f);
 	AddGameObject("Tiltedfloor", AssetManager::GetModel("Tiltedfloor"), glm::vec3(0, 0.1, 0), true, 0, Box);
 	GetGameObject("Tiltedfloor")->IncludInGI(true);
-	AddGameObject("GI_map_1", AssetManager::GetModel("GI_map_1"), glm::vec3(0, 0, 0), true, 0, Concave);
-	GetGameObject("GI_map_1")->IncludInGI(true);
-	GetGameObject("GI_map_1")->SetRotationX(-1.5708f);
-	AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), false, 10.0f, Box);
-	
-	//AddGameObject("cat", AssetManager::GetModel("cat"), glm::vec3(0, 4, 0), true, 0, None);
-	//GetGameObject("cat")->SetScale(0.02);
-	//Animator::PlayAnimation(&cute_cat, "cat", true);
-	g_water.push_back(GameObject("water", AssetManager::GetModel("water"), glm::vec3(0, -2, 90), true, 0, Box));
-	g_glass.push_back(GameObject("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(0, 1, 0), false, 0, Box));
-	g_glass.push_back(GameObject("cubeGlass", AssetManager::GetModel("cubeGlass"), glm::vec3(-3, 2, 0), false, 0, Box));
+	//AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), false, 10.0f, Box);
+
+	g_water.push_back(GameObject("water", AssetManager::GetModel("water"), glm::vec3(0, -2, 0), true, 0, Box));
+	g_water[0].GetRigidBody()->setUserIndex(0);
+	g_water[0].GetRigidBody()->setUserPointer((void*)ObjectType::WATER);
+
+	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(0, 1, 0), false, 0, Box);
+	AddGlass("cubeGlass", AssetManager::GetModel("cubeGlass"), glm::vec3(-3, 2, 0), false, 0, Box);
 
 	
+	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(-6.46, 1, 14), false, 0, Box);
 
 	//SceneManager::GetCurrentScene()->AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
 	//SceneManager::GetCurrentScene()->GetGameObject("ladder_object")->SetRotationX(-1.5708f);
 
-	//SceneManager::GetCurrentScene()->AddGameObject("Bench_object", AssetManager::GetModel("Bench"), glm::vec3(0, 0, 0), true, 0, Concave);
-	//SceneManager::GetCurrentScene()->GetGameObject("Bench_object")->SetRotationX(-1.5708f);
+	AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
+	GetGameObject("ladder_object")->SetRotationX(-1.5708f);
 
 	// Sets renderer
 	std::vector<std::string> faces{
@@ -236,7 +235,7 @@ void Scene::Load() {
 	envLight.sky = SkyBox(faces);
 	//Average light of skybox
 	envLight.indirectLight = glm::vec3(0.188, 0.278, 0.4);
-
+	//envLight.indirectLight = glm::vec3(0.569, 0.69, 0.965);
 
 
 	{
@@ -316,7 +315,18 @@ void Scene::RemoveLight(int index) {
 size_t Scene::AddGameObject(GameObject gameobject) {
 	g_objects.push_back(gameobject);
 	g_objects[g_objects.size() - 1].GetRigidBody()->setUserPointer((void*)(g_objects.size() - 1));
+
 	return g_objects.size() - 1;
+}
+
+size_t Scene::AddGlass(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape) {
+	// Add to g_glass vector
+	g_glass.push_back(GameObject(name, model, position, save, mass, shape));
+	size_t index = g_glass.size() - 1;  // Get index in g_glass
+	g_glass[index].GetRigidBody()->setUserIndex(index);
+	g_glass[index].GetRigidBody()->setUserPointer((void*)ObjectType::GLASS);
+
+	return index;
 }
 
 size_t Scene::AddGameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape) {

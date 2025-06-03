@@ -6,7 +6,12 @@
 #include "Engine/Physics/BulletPhysics.h"
 #include "Engine/Renderer/Model.h"
 
-
+enum ObjectType {
+	DEFAULT,
+	GLASS,
+	PLAYER,
+	WATER
+};
 //#include "Loaders/nlohmann/json.hpp"
 
 
@@ -100,6 +105,8 @@ public:
 	void IncludInGI(bool state);
 
 	bool IncludedInGI();
+
+	ObjectType objectType = ObjectType::DEFAULT;
 
 private:
 	Transform transform = Transform();

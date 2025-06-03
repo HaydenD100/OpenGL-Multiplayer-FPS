@@ -9,10 +9,10 @@ static glm::vec3 spawnpoints[spawnpointsize] = { glm::vec3(0, 20, 0) };
 
 
 //Player Data
-#define WALKINGSPEED  6000
-#define CRROUCHINGSPEED  3000
-#define RUNNINGSPEED  8500
-#define JUMPFORCE 9
-#define MAXSPEED 6
+#define WALKINGSPEED  4000
+#define CRROUCHINGSPEED  2000
+#define RUNNINGSPEED  6500
+#define JUMPFORCE 6
+#define MAXSPEED 4
 
 

@@ -29,7 +29,6 @@ struct Gun
 	std::string gunsShotName;
 	GunType type;
 
-
 	//animations
 	bool hasAnimations = false;
 	SkinnedAnimation shootAnim;

@@ -87,12 +87,17 @@ namespace Engine
 				Editor::RenderUI();
 			}
 
+			
+
 
 			//TODO :: put this in the scnene or somthing idk why its still here in ENGINE.cpp
 			// TDOO :: acctualy I want to make a UI class, and also change the UI shader this is really old when i was first learning
 			// OpenGL, so it needs to be updated, and maybe just replaced with myGUI
 
 			//Dont use this its not working rightnow
+			std::ostringstream oss;
+			oss << "FPS: " << FPS;
+			Renderer::RenderText(oss.str().c_str(), 660, 585, 15);
 			if ((Renderer::DebugState & NoGUi) != NoGUi) {
 
 				std::ostringstream oss;
@@ -122,8 +127,6 @@ namespace Engine
 				oss.precision(4);
 				oss << "Enemy Kills " << Player::GetDeaths();
 				Renderer::RenderText(oss.str().c_str(), 0, 500, 15);
-
-				
 			}
 			
 			ImGuiUI::DrawUI();

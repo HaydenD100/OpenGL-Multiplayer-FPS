@@ -37,21 +37,7 @@ void Door::Open() {
 }
 
 void Door::Interact() {
-	if ((Player::GetInteractingWithName() == name + "_door"  || PlayerTwo::GetInteractingWithName() == name + "_door")  && opening == false) {
-		opening = true;
-		if (!opened) {
-			//AnimationManager::Play("door_open", name + "_door");
-			AudioManager::PlaySound("door_open", door_position);
-			//opened = true;
-		}
-			
-		else {
-			//AnimationManager::Play("door_close", name + "_door");	
-			AudioManager::PlaySound("door_close", door_position);
-			//opened = false;
-		}
-		
-	}
+	
 }
 
 void Door::Update(float deltaTime) {

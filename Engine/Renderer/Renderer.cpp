@@ -565,7 +565,6 @@ namespace Renderer
 		Renderer::CheckDebugState();
 		//ParticleSystem::Simulate(dt);
 		
-		Renderer::probeGrid.ReLight(UPDATED_PROBE_COUNT_PER_FRAME);
 
 		//cs_water_height_fft_col.SetBool("uHorizontalPass", false);
 
@@ -591,7 +590,6 @@ namespace Renderer
 		s_geomerty.SetMat4("P", Camera::getProjectionMatrix());
 		s_geomerty.SetMat4("V", Camera::getViewMatrix());
 
-		NeedRendering.clear();
 		glm::mat4 ViewMatrix = Camera::getViewMatrix();
 		for (int i = 0; i < SceneManager::GetCurrentScene()->g_objects.size(); i++) {
 			GameObject* gameobjectRender = &SceneManager::GetCurrentScene()->g_objects[i];
@@ -679,8 +677,6 @@ namespace Renderer
 			s_decal.SetVec3("size", size);
 			decal.RenderDecal(s_decal.GetShaderID());
 		}
-
-
 
 		//-----------------------------------------Transaprent stuff---------------------------------------
 		
@@ -781,12 +777,13 @@ namespace Renderer
 
 		glBindImageTexture(7, ssaoBuffer.gSSAO, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R16F);
 
-		glDispatchCompute(Backend::GetWidth() / 32, Backend::GetHeight() / 32, 1);
+		glDispatchCompute(Backend::GetWidth() / 32 + 1, Backend::GetHeight() / 32 + 1, 1);
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 		//RenderPlane();
 		//---------------------------------------------------LIGHTING-------------------------------------
 
+		Renderer::probeGrid.ReLight(UPDATED_PROBE_COUNT_PER_FRAME);
 
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -807,13 +804,6 @@ namespace Renderer
 		glActiveTexture(GL_TEXTURE5);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gTrueNormal);
 
-
-		glBindImageTexture(7, lightingBuffer.gLighting, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
-
-		glDispatchCompute(Backend::GetWidth() / 32, Backend::GetHeight() / 32, 1);
-		glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
-
 		SHBuffer.Bind(7);
 		probeTexture.Bind(6);
 
@@ -828,7 +818,8 @@ namespace Renderer
 		cs_lighting.SetVec2("screen", glm::vec2(Backend::GetWidth(), Backend::GetHeight()));
 		cs_lighting.SetVec3("envLighting", SceneManager::GetCurrentScene()->GetEnviromentLighting().indirectLight);
 
-		glDispatchCompute(Backend::GetWidth()/32, Backend::GetHeight()/32, 1);
+		glBindImageTexture(7, lightingBuffer.gLighting, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
+		glDispatchCompute(Backend::GetWidth()/32 + 1, Backend::GetHeight()/32 + 1, 1);
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 		
 
@@ -863,8 +854,6 @@ namespace Renderer
 
 		//---------------------------------------------------Post-------------------------------------
 
-
-
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		cs_post.Use();
@@ -883,7 +872,7 @@ namespace Renderer
 
 		probeGrid.Bind(15);
 		//2.23ms with plane and 0.17 with compute
-		glDispatchCompute(Backend::GetWidth() / 32, Backend::GetHeight() / 32, 1);
+		glDispatchCompute(Backend::GetWidth() / 32 + 1, Backend::GetHeight() / 32 + 1, 1);
 		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -957,6 +946,7 @@ namespace Renderer
 	void Renderer::SwapBuffers(GLFWwindow* window) {
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+		glfwSwapInterval(0);  // Disable V-Sync
 	}
 
 	GLuint Renderer::GetCurrentProgramID() {

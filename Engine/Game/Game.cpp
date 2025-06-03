@@ -23,19 +23,12 @@ namespace Game {
 		float startLoadTime = glfwGetTime();
 
 		if (multiPlayerMode == MultiPlayer) {
-			NetworkManager::Init();
 			//TODO :: myGui ConnectMenu
 			std::cout << "==================================CONNECT/HOST=========================================================================\n";
-			std::cout << "ENTER 0 to create/host a Game OR Type the IP of the server to join:";
-			char temp[255];
+			std::cout << "ENTER the IP of the server to join:";
+			char temp[256];
 			std::cin.getline(temp, sizeof(temp));
-			std::cout << "If you are hosting/creating a game for others outside of your network to join you remember to port forward PORT: " << DEFAULT_PORT << "\n";
-			std::cout << "=======================================================================================================================\n";
-
-			if (temp[0] == '0')
-				NetworkManager::InitServer();
-			else
-				NetworkManager::InitClient(temp);
+			Client::Init(temp);
 		}
 
 		AssetManager::Init();
@@ -49,13 +42,6 @@ namespace Game {
 		Player::setPosition(glm::vec3(0, 10, 0));
 		Animator::Init();
 
-		if (multiPlayerMode == MultiPlayer) {
-			NetworkManager::LoadedIn();
-			NetworkManager::SendControl(CONNECTED);
-			NetworkManager::SendPackets();
-			PlayerTwo::Init();
-		}
-
 		//PathFinding::Init();
 		std::cout << "Scene and Asset Load took " << (glfwGetTime() - startLoadTime) << "s \n";
 	}
@@ -63,7 +49,7 @@ namespace Game {
 		CheckDebugPress();
 	
 		if(m_multiPlayerMode == MultiPlayer)
-			NetworkManager::EvaulatePackets();
+			//NetworkManager::EvaulatePackets();
 
 		SceneManager::Update(dt);
 		Player::Update(dt);
@@ -73,21 +59,8 @@ namespace Game {
 		Animator::UpdateAnimation(dt);
 		AudioManager::UpdateListener(Player::getPosition(), Player::getForward(), Player::getForward());
 
-		if (m_multiPlayerMode == MultiPlayer)
-			NetworkManager::SendPlayerData(Player::getPosition(), glm::vec3(-Camera::GetVerticalAngle(), Camera::GetHorizontalAngle(), 0), Player::getCurrentGun(), Player::GetInteractingWithName());
 		//Host keeps track of all the physics objects 
-		if (NetworkManager::IsServer && m_multiPlayerMode == MultiPlayer) {
-			for (int i = 0; i < SceneManager::GetCurrentScene()->g_objects.size(); i++) {
-				GameObject* gameobject = &SceneManager::GetCurrentScene()->g_objects[i];
-				if (!gameobject->IsDynamic() || gameobject->GetName() == "PlayerTwo" || gameobject->GetName() == "player")
-					continue;
-
-				NetworkManager::SendDyanmicObjectData(gameobject->GetName(), gameobject->GetPosition(), gameobject->getRotation(), btToGlmVector3(gameobject->GetRigidBody()->getLinearVelocity()));
-			}
-		}
-
-		if (m_multiPlayerMode == MultiPlayer)
-			NetworkManager::SendPackets();
+		
 	}
 	void CheckDebugPress() {
 		if (Input::KeyDown(RELOADSHADERS))
@@ -96,7 +69,6 @@ namespace Game {
 			Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->g_lights);
 	}
 	void CleanUp() {
-		NetworkManager::SendControl(DISCONNECTED);
-		NetworkManager::CleanUp();
+		Client::CleanUp();
 	}
 }

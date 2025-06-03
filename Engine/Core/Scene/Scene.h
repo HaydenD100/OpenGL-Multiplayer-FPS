@@ -50,6 +50,8 @@ public:
 	std::vector<GameObject*> NeedRenderingObjects();
 
 	unsigned long long AddGameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape);
+	size_t AddGlass(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape);
+
 	size_t AddGameObject(GameObject gameobject);
 	GameObject* GetGameObject(std::string name);
 

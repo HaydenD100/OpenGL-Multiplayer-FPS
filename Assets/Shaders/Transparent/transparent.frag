@@ -182,7 +182,7 @@ void main() {
     vec3 refractDir = refract(viewDir, FragN, 1.0 / 1.5);
 
     // Apply distortion to UVs
-    vec2 distortedUV =  (refractDir.xy * 0.15);
+    vec2 distortedUV =  (refractDir.xy * 0.05);
 
     // Sample the background scene with distortion
 

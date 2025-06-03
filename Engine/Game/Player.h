@@ -36,15 +36,3 @@ namespace Player
 
 }
 
-namespace PlayerTwo
-{
-	void Init();
-	void SetData(std::string interact, std::string gunname, glm::vec3 position, glm::vec3 rotation);
-	void SetIneractingWith(std::string interact);
-	void Update();
-
-	int GetKills();
-
-	std::string GetInteractingWithName();
-	std::string GetCurrentWeapon();
-}
