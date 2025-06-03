@@ -53,23 +53,35 @@ namespace Client {
 
 	void Run() {
 		// Send a message to the server
+		std::string s("Testing");
+		int sendOk = sendto(out, s.c_str(), s.size() + 1, 0, (sockaddr*)&server, sizeof(server));
+		if (sendOk == SOCKET_ERROR) {
+			std::cout << "That didn't work! " << WSAGetLastError() << std::endl;
+			return;
+		}
 
 		// Buffer to receive data
-		char bufin[1024];
+		char buf[1024];
 		sockaddr_in from;
 		int fromLen = sizeof(from);
 
 		while (IsConnected) {
-			ZeroMemory(bufin, 1024);
+			ZeroMemory(buf, 1024);
 
-			int bytesIn = recvfrom(out, bufin, 1024, 0, (sockaddr*)&from, &fromLen);
+			int bytesIn = recvfrom(out, buf, 1024, 0, (sockaddr*)&from, &fromLen);
 			if (bytesIn == SOCKET_ERROR) {
 				std::cout << "Error receiving from server: " << WSAGetLastError() << std::endl;
 				continue;
 			}
 
 			// Print the received message
-			std::cout << "SERVER> " << bufin << "\n";
+			Packet packet;
+			// Safely extract ID and code from first 4 bytes
+			std::memcpy(&packet.ID, buf, sizeof(uint16_t));
+			std::memcpy(&packet.code, buf + 2, sizeof(uint16_t));
+			// Copy rest of the data (512 bytes)
+			std::memcpy(packet.data, buf + 4, sizeof(packet.data));
+			std::cout << "SERVER> " << packet.code << " : " << packet.data << "\n";
 		}
 	}
 	void SendWorldPosition(glm::vec3 position, glm::vec3 rotation) {

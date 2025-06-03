@@ -10,6 +10,15 @@
             "rotationZ": 0.0
         },
         {
+            "name": "Crates",
+            "positionX": 3.0,
+            "positionY": 1.0,
+            "positionZ": 8.0,
+            "rotationX": 0.0,
+            "rotationY": -0.0,
+            "rotationZ": 0.0
+        },
+        {
             "name": "ladder_object",
             "positionX": 0.0,
             "positionY": 1.100000023841858,
@@ -65,21 +74,21 @@
         },
         {
             "name": "player",
-            "positionX": 5.1373491287231445,
-            "positionY": 2.1999924182891846,
-            "positionZ": 6.114790916442871,
+            "positionX": -4.7068891525268555,
+            "positionY": 2.2000010013580322,
+            "positionZ": 3.95491886138916,
             "rotationX": 0.0,
             "rotationY": -0.0,
             "rotationZ": 0.0
         },
         {
             "name": "player_head",
-            "positionX": 5.1373491287231445,
-            "positionY": 3.1999924182891846,
-            "positionZ": 6.114790916442871,
-            "rotationX": 2.971592664718628,
-            "rotationY": -0.7207174301147461,
-            "rotationZ": 3.1415927410125732
+            "positionX": -4.7068891525268555,
+            "positionY": 3.2000010013580322,
+            "positionZ": 3.95491886138916,
+            "rotationX": 0.2480001598596573,
+            "rotationY": 0.9831887483596802,
+            "rotationZ": 2.6879376946453704e-08
         }
     ],
     "lights": [

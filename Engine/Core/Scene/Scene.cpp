@@ -55,7 +55,7 @@ void Scene::LoadAssets() {
 	//AssetManager::AddTexture(Texture("plant"));
 	AssetManager::AddTexture(Texture("angled-tiled-floor"));
 	AssetManager::AddTexture("angled-tiled-floor", "Assets/Textures/angled-tiled-floor.png",0.0f,0.0f);
-
+	AssetManager::AddTexture("CratePile", "Assets/Textures/Crate.jpeg", "Assets/Normals/Crate.jpeg", "Assets/Roughness/Crate.jpeg", "Assets/Metalic/vase_metalic.png");
 
 	//Double Barel
 	AssetManager::AddTexture("double_barrel_shotgun_main_barrel", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_normal.png", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_metallic.jpg");
@@ -115,6 +115,8 @@ void Scene::LoadAssets() {
 	//AssetManager::AddModel("crate", Model("Assets/Objects/FBX/crate.fbx", AssetManager::GetTexture("crate")));
 	//AssetManager::AddModel("cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("red_glass")));
 	//AssetManager::AddModel("cube1", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("green_glass")));
+	
+	AssetManager::AddModel("model_crate", Model("Assets/Objects/FBX/model_crate.obj", AssetManager::GetTexture("CratePile")));
 
 	AssetManager::AddModel("glock", Model("Assets/Objects/FBX/glock17.fbx", "Assets/Objects/glock17_convex.obj", AssetManager::GetTexture("glock")));
 	AssetManager::AddModel("glockhand", Model("Assets/Objects/FBX/glock17_shoot1.dae", AssetManager::GetTexture("glock")));
@@ -215,7 +217,7 @@ void Scene::Load() {
 
 	
 	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(-6.46, 1, 14), false, 0, Box);
-
+	AddGameObject("Crates", AssetManager::GetModel("model_crate"), glm::vec3(3, 0, 3), true, 0, Convex);
 	//SceneManager::GetCurrentScene()->AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
 	//SceneManager::GetCurrentScene()->GetGameObject("ladder_object")->SetRotationX(-1.5708f);
 

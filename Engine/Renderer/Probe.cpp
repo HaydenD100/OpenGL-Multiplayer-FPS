@@ -140,6 +140,7 @@ Probe::Probe(glm::vec3 postion) {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, probeAlbedo);
 	for (unsigned int i = 0; i < 6; ++i) {
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16F, PROBESIZE, PROBESIZE, 0, GL_RGBA, GL_FLOAT, NULL);
+
 	}
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

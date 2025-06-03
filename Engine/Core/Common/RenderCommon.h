@@ -20,8 +20,10 @@
 
 
 const glm::vec3 DEFAULT_SKY_COLOR(0.1, 0.1, 0.1);
-const int PROBESIZE = 64;
+const int PROBESIZE = 16;
 const int DDGIPROBESIZE = 16;
+
+
 
 enum LightType
 {

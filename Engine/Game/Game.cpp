@@ -17,6 +17,7 @@ namespace Game {
 	int m_playerKills = 0;
 	int m_enemyKills = 0;
 
+	std::vector<PlayerN> players;
 
 	void Init(GameNetworkingMode multiPlayerMode) {
 		m_multiPlayerMode = multiPlayerMode;
@@ -24,11 +25,13 @@ namespace Game {
 
 		if (multiPlayerMode == MultiPlayer) {
 			//TODO :: myGui ConnectMenu
-			std::cout << "==================================CONNECT/HOST=========================================================================\n";
-			std::cout << "ENTER the IP of the server to join:";
-			char temp[256];
-			std::cin.getline(temp, sizeof(temp));
-			Client::Init(temp);
+			//std::cout << "==================================CONNECT/HOST=========================================================================\n";
+			//std::cout << "ENTER the IP of the server to join:";
+			//char temp[256];
+			//std::cin.getline(temp, sizeof(temp));
+			//Client::Init(temp);
+
+			Client::Init("127.0.0.1");
 		}
 
 		AssetManager::Init();
