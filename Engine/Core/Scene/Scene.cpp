@@ -158,6 +158,8 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("room1", Model("Assets/Maps/room1.obj", AssetManager::GetTexture("white")));
 
 	
+	AssetManager::AddModel("target", Model("Assets/Objects/FBX/target.obj", AssetManager::GetTexture("white")));
+
 	//Super laggy
 	//AssetManager::AddModel("GI_map_1", Model("Assets/Maps/Sponza/sponza.obj", AssetManager::GetTexture("white")));
 	
@@ -213,17 +215,66 @@ void Scene::Load() {
 	g_water[0].GetRigidBody()->setUserIndex(0);
 	g_water[0].GetRigidBody()->setUserPointer((void*)ObjectType::WATER);
 
-	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(0, -1, 0), false, 4.0, Box);
-	AddGlass("cubeGlass", AssetManager::GetModel("cubeGlass"), glm::vec3(-3, 0, 0), false, 0, Box);
+	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(0, 0, 0), false, 1.0, Convex);
+	AddGlass("cubeGlass", AssetManager::GetModel("cubeGlass"), glm::vec3(-3, 0, 0), false, 0.0, Convex);
 
 	
-	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(-6.46, -1, 14), false, 4.0, Box);
+	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(-6.46, -1, 14), false, 0.0, Box);
 	AddGameObject("Crates", AssetManager::GetModel("model_crate"), glm::vec3(3, 0, 3), true, 0, Convex);
 	//SceneManager::GetCurrentScene()->AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
 	//SceneManager::GetCurrentScene()->GetGameObject("ladder_object")->SetRotationX(-1.5708f);
 
 	AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
 	GetGameObject("ladder_object")->SetRotationX(-1.5708f);
+
+
+	AddGameObject("targetHolder", AssetManager::GetModel("target"), glm::vec3(6, 2, 0), true, 0, Convex);
+	AddGameObject("target", AssetManager::GetModel("target"), glm::vec3(6, 1.5, 0), true, 5, Convex);
+	AddGameObject("targetHolder2", AssetManager::GetModel("target"), glm::vec3(6, 2, 0.5), true, 0, Convex);
+	AddGameObject("target2", AssetManager::GetModel("target"), glm::vec3(6, 1.5, 0.5), true, 5, Convex);
+	AddGameObject("targetHolder3", AssetManager::GetModel("target"), glm::vec3(6, 2, 1), true, 0, Convex);
+	AddGameObject("target3", AssetManager::GetModel("target"), glm::vec3(6, 1.5, 1), true, 5, Convex);
+
+	btVector3 pivotInA(0.0f, -0.22f, 0.0f);    // Hinge is at origin in body A
+	btVector3 pivotInB(0.0f, 0.22f, 0.0f);    // Hinge is 1 unit right in body B's local space
+	btVector3 axisInA(0.0f, 0.0f, 1.0f);     // Rotate around Y
+	btVector3 axisInB(0.0f, 0.0f, 1.0f);     // Same rotation axis in B
+
+	// Create hinge constraint
+	btHingeConstraint* hinge = new btHingeConstraint(
+		*GetGameObject("targetHolder")->GetRigidBody(), *GetGameObject("target")->GetRigidBody(),
+		pivotInA, pivotInB,
+		axisInA, axisInB,
+		false // <-- Add this
+	);
+	// Optional: limit the hinge rotation
+	hinge->setLimit(-SIMD_PI / 1.2, SIMD_PI / 1.2);
+	// Add to dynamics world
+	PhysicsManagerBullet::GetDynamicWorld()->addConstraint(hinge, true);
+
+	// Create hinge constraint
+	btHingeConstraint* hinge1 = new btHingeConstraint(
+		*GetGameObject("targetHolder2")->GetRigidBody(), *GetGameObject("target2")->GetRigidBody(),
+		pivotInA, pivotInB,
+		axisInA, axisInB,
+		false // <-- Add this
+	);
+	// Optional: limit the hinge rotation
+	hinge1->setLimit(-SIMD_PI / 1.2, SIMD_PI / 1.2);
+	// Add to dynamics world
+	PhysicsManagerBullet::GetDynamicWorld()->addConstraint(hinge1, true);
+
+	// Create hinge constraint
+	btHingeConstraint* hinge2 = new btHingeConstraint(
+		*GetGameObject("targetHolder3")->GetRigidBody(), *GetGameObject("target3")->GetRigidBody(),
+		pivotInA, pivotInB,
+		axisInA, axisInB,
+		false // <-- Add this
+	);
+	// Optional: limit the hinge rotation
+	hinge2->setLimit(-SIMD_PI/1.2, SIMD_PI/1.2);
+	// Add to dynamics world
+	PhysicsManagerBullet::GetDynamicWorld()->addConstraint(hinge2, true);
 
 	// Sets renderer
 	std::vector<std::string> faces{

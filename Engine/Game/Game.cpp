@@ -50,9 +50,6 @@ namespace Game {
 	}
 	void Update(float dt) {
 		CheckDebugPress();
-	
-		if(m_multiPlayerMode == MultiPlayer)
-			//NetworkManager::EvaulatePackets();
 
 		SceneManager::Update(dt);
 		Player::Update(dt);

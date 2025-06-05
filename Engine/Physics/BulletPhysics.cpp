@@ -50,6 +50,6 @@ namespace PhysicsManagerBullet
 	
 	void Update(float deltaTime) {
 		dynamicsWorld->stepSimulation(deltaTime, 3);
-		dynamicsWorld->debugDrawWorld();
+		//dynamicsWorld->debugDrawWorld();
 	}
 }

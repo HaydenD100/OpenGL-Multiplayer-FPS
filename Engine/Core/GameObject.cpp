@@ -274,7 +274,7 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 
 
 	//if (!NetworkManager::IsServer() && name != "player")
-		//body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+	//body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
 
 	// Add the body to the dynamics world
 	if (mass != 0)

@@ -175,6 +175,7 @@ namespace Player
 				float maxSpread = WeaponManager::GetGunByName(gunName)->spread;
 				btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit(maxSpread);
 				if (hit.m_collisionObject != nullptr) {
+					std::cout << "Test \n";
 					ObjectType type = static_cast<ObjectType>(reinterpret_cast<uintptr_t>(hit.m_collisionObject->getUserPointer()));
 					GameObject* gameobject = nullptr;
 					if (type == ObjectType::GLASS) {
