@@ -26,6 +26,17 @@ float random (in vec2 st) {
 vec3 BrownianMotion(vec3 pos) {
     float f = 1.0;
     float a = 1.0;
+    float speed = 0.8;
+    float seed = 0.0;
+    vec3 p = pos;
+    float amplitudeSum = 0;
+    float h = 0.0;
+    vec2 derivatives = vec2(0.0); // Stores (dh/dx, dh/dz)
+    float maxPeak = 0.9;
+    //h += 0.5 * sin(dot(pos.xz,windDir) + time * windSpeed);
+    /*
+    float f = 1.0;
+    float a = 1.0;
     float speed = 1.0;
     float seed = 0.0;
     vec3 p = pos;
@@ -33,7 +44,7 @@ vec3 BrownianMotion(vec3 pos) {
     float h = 0.0;
     vec2 derivatives = vec2(0.0); // Stores (dh/dx, dh/dz)
     float maxPeak = 1.5;
-    //h += 0.5 * sin(dot(pos.xz,windDir) + time * windSpeed);
+    */
 
 
     for (int i = 0; i < 64; i++) {

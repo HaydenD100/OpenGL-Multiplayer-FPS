@@ -54,8 +54,9 @@ void main() {
 
         vec4 backgroundSample = texture(gLighting, clamp(UV + transparent.xy,0.0,1.0));
         backgroundSample += texture(gEmissive, clamp(UV + transparent.xy,0.0,1.0));
+        backgroundSample = boxBlur2D(UV + transparent.xy,vec2(0.0005),3);
 
-        vec4 blended = backgroundSample + vec4(transparent.z);
+        vec4 blended = backgroundSample + vec4(transparent.z * 2);
 
         imageStore(gFinal, coords, blended);
     }else{

@@ -39,7 +39,8 @@ public:
 
 private:
     std::string name;
-
+    void CreateTexture(GLuint* texture, const char* path, GLenum internalFormat, GLenum format, int stbi_load_format);
+    void CreateTexture(GLuint* texture, std::vector<GLfloat> data, int width, int height, GLenum internalFormat, GLenum format);
     GLuint texture = NULL;
     GLuint textureNormal = NULL;
     GLuint textureRoughness = NULL;

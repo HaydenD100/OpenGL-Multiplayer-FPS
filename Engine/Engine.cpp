@@ -95,9 +95,7 @@ namespace Engine
 			// OpenGL, so it needs to be updated, and maybe just replaced with myGUI
 
 			//Dont use this its not working rightnow
-			std::ostringstream oss;
-			oss << "FPS: " << FPS;
-			Renderer::RenderText(oss.str().c_str(), 660, 585, 15);
+			
 			if ((Renderer::DebugState & NoGUi) != NoGUi) {
 
 				std::ostringstream oss;

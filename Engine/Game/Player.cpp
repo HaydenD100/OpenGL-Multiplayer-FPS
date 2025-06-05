@@ -183,11 +183,14 @@ namespace Player
 					else if (type == ObjectType::DEFAULT) {
 						gameobject = &SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()];
 					}
+					else {
+						return;
+					}
 					
 					if (gameobject != nullptr)
 					{
 						btRigidBody* body = gameobject->GetRigidBody();
-						if (body) {
+						if (body ) {
 							btVector3 localForcePos = body->getWorldTransform().inverse() * hit.m_hitPointWorld;
 							body->applyImpulse(2 * glmToBtVector3(Camera::ComputeRay()), localForcePos);
 							glm::vec4 worldPositionHomogeneous(glm::vec3(hit.m_hitPointWorld.getX(), hit.m_hitPointWorld.getY(), hit.m_hitPointWorld.getZ()), 1.0f);
@@ -200,10 +203,10 @@ namespace Player
 						}
 						//NetworkManager::SendGunShotData(gameobject->GetName(), "bullet_hole", vec3local, normal, btToGlmVector3(localForcePos), WeaponManager::GetGunByName(gunName)->damage, btToGlmVector3(2 * glmToBtVector3(Camera::ComputeRay())));
 						int randomnum = (rand() % 3) + 1;
-						if (type == DEFAULT)
-							AudioManager::PlaySound("bullet_impact_" + std::to_string(randomnum), gameobject->GetPosition());
-						else if (type == GLASS)
-							AudioManager::PlaySound("bullet_impact_glass_" + std::to_string(randomnum), gameobject->GetPosition());
+						//if (type == DEFAULT)
+							//AudioManager::PlaySound("bullet_impact_" + std::to_string(randomnum), gameobject->GetPosition());
+						if (type == GLASS)
+							AudioManager::PlaySound("bullet_impact_glass_" + std::to_string(randomnum), glm::vec3(hit.m_hitPointWorld.getX(), hit.m_hitPointWorld.getY(), hit.m_hitPointWorld.getZ()));
 					}
 				}
 			}

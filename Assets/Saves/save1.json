@@ -3,8 +3,17 @@
         {
             "name": "Tiltedfloor",
             "positionX": 0.0,
-            "positionY": 0.10000000149011612,
+            "positionY": -2.0,
             "positionZ": 0.0,
+            "rotationX": 0.0,
+            "rotationY": -0.0,
+            "rotationZ": 0.0
+        },
+        {
+            "name": "room1",
+            "positionX": 3.0,
+            "positionY": -1.0,
+            "positionZ": 16.0,
             "rotationX": 0.0,
             "rotationY": -0.0,
             "rotationZ": 0.0
@@ -12,7 +21,7 @@
         {
             "name": "Crates",
             "positionX": 3.0,
-            "positionY": 1.0,
+            "positionY": -1.0,
             "positionZ": 8.0,
             "rotationX": 0.0,
             "rotationY": -0.0,
@@ -21,7 +30,7 @@
         {
             "name": "ladder_object",
             "positionX": 0.0,
-            "positionY": 1.100000023841858,
+            "positionY": -1.0,
             "positionZ": -2.0,
             "rotationX": -1.5708000659942627,
             "rotationY": 0.0,
@@ -74,21 +83,30 @@
         },
         {
             "name": "player",
-            "positionX": -4.7068891525268555,
-            "positionY": 2.2000010013580322,
-            "positionZ": 3.95491886138916,
+            "positionX": -5.862951278686523,
+            "positionY": 0.09597969055175781,
+            "positionZ": 12.66675853729248,
             "rotationX": 0.0,
             "rotationY": -0.0,
             "rotationZ": 0.0
         },
         {
             "name": "player_head",
-            "positionX": -4.7068891525268555,
-            "positionY": 3.2000010013580322,
-            "positionZ": 3.95491886138916,
-            "rotationX": 0.2480001598596573,
-            "rotationY": 0.9831887483596802,
-            "rotationZ": 2.6879376946453704e-08
+            "positionX": -5.862951278686523,
+            "positionY": 1.0959796905517578,
+            "positionZ": 12.66675853729248,
+            "rotationX": -2.9735937118530273,
+            "rotationY": 0.6049143075942993,
+            "rotationZ": -3.1415927410125732
+        },
+        {
+            "name": "pickupco9QR62hdO",
+            "positionX": -1.7631100416183472,
+            "positionY": -0.8873933553695679,
+            "positionZ": 8.841498374938965,
+            "rotationX": -0.13729628920555115,
+            "rotationY": 6.906688213348389e-06,
+            "rotationZ": -1.5707368850708008
         }
     ],
     "lights": [
@@ -103,14 +121,14 @@
             "strength": 5.0
         },
         {
-            "colourB": 0.6438869833946228,
-            "colourG": 0.9100220203399658,
-            "colourR": 0.9950980544090271,
-            "positionX": 0.0,
+            "colourB": 1.0,
+            "colourG": 1.0,
+            "colourR": 1.0,
+            "positionX": -3.0,
             "positionY": 6.0,
-            "positionZ": 4.0,
+            "positionZ": 15.0,
             "radius": 30.0,
-            "strength": 10.0
+            "strength": 5.0
         }
     ]
 }

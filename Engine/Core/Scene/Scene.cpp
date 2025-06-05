@@ -53,8 +53,7 @@ void Scene::LoadAssets() {
 	//AssetManager::AddTexture(Texture("shelf"));
 	//AssetManager::AddTexture(Texture("vase"));
 	//AssetManager::AddTexture(Texture("plant"));
-	AssetManager::AddTexture(Texture("angled-tiled-floor"));
-	AssetManager::AddTexture("angled-tiled-floor", "Assets/Textures/angled-tiled-floor.png",0.0f,0.0f);
+	AssetManager::AddTexture("angled-tiled-floor", "Assets/Textures/angled-tiled-floor.png",0.5f,0.0f);
 	AssetManager::AddTexture("CratePile", "Assets/Textures/Crate.jpeg", "Assets/Normals/Crate.jpeg", "Assets/Roughness/Crate.jpeg", "Assets/Metalic/vase_metalic.png");
 
 	//Double Barel
@@ -156,6 +155,9 @@ void Scene::LoadAssets() {
 
 	AssetManager::AddModel("Cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("metalic")));
 
+	AssetManager::AddModel("room1", Model("Assets/Maps/room1.obj", AssetManager::GetTexture("white")));
+
+	
 	//Super laggy
 	//AssetManager::AddModel("GI_map_1", Model("Assets/Maps/Sponza/sponza.obj", AssetManager::GetTexture("white")));
 	
@@ -200,23 +202,22 @@ void Scene::LoadAssets() {
 void Scene::Load() { 
 	LoadAssets();
 
-
-	//AddGameObject("GI_map_1", AssetManager::GetModel("GI_map_1"), glm::vec3(0, 0, 0), true, 0, Concave);
-	//GetGameObject("GI_map_1")->IncludInGI(true);
-	//GetGameObject("GI_map_1")->SetRotationX(-1.5708f);
 	AddGameObject("Tiltedfloor", AssetManager::GetModel("Tiltedfloor"), glm::vec3(0, 0.1, 0), true, 0, Box);
 	GetGameObject("Tiltedfloor")->IncludInGI(true);
 	//AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), false, 10.0f, Box);
+	AddGameObject("room1", AssetManager::GetModel("room1"), glm::vec3(0, 0.1, 0), true, 0, Concave);
+	GetGameObject("room1")->IncludInGI(true);
 
+	
 	g_water.push_back(GameObject("water", AssetManager::GetModel("water"), glm::vec3(0, -2, 0), true, 0, Box));
 	g_water[0].GetRigidBody()->setUserIndex(0);
 	g_water[0].GetRigidBody()->setUserPointer((void*)ObjectType::WATER);
 
-	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(0, 1, 0), false, 0, Box);
-	AddGlass("cubeGlass", AssetManager::GetModel("cubeGlass"), glm::vec3(-3, 2, 0), false, 0, Box);
+	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(0, -1, 0), false, 4.0, Box);
+	AddGlass("cubeGlass", AssetManager::GetModel("cubeGlass"), glm::vec3(-3, 0, 0), false, 0, Box);
 
 	
-	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(-6.46, 1, 14), false, 0, Box);
+	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(-6.46, -1, 14), false, 4.0, Box);
 	AddGameObject("Crates", AssetManager::GetModel("model_crate"), glm::vec3(3, 0, 3), true, 0, Convex);
 	//SceneManager::GetCurrentScene()->AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
 	//SceneManager::GetCurrentScene()->GetGameObject("ladder_object")->SetRotationX(-1.5708f);
@@ -278,6 +279,10 @@ void Scene::Update(float deltaTime) {
 	for (int i = 0; i < g_objects.size(); i++) {
 		g_objects[i].Update();
 	}
+	for (int i = 0; i < g_glass.size(); i++) {
+		g_glass[i].Update();
+	}
+
 
 	for (int i = 0; i <  m_gunPickups.size(); i++)
 	{
