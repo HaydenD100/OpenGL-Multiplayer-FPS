@@ -160,6 +160,11 @@ void Scene::LoadAssets() {
 	
 	AssetManager::AddModel("target", Model("Assets/Objects/FBX/target.obj", AssetManager::GetTexture("white")));
 
+	AssetManager::AddModel("breakable_crate_t", Model("Assets/Objects/FBX/Crate/top.obj", AssetManager::GetTexture("white")));
+	AssetManager::AddModel("breakable_crate_b", Model("Assets/Objects/FBX/Crate/bottom.obj", AssetManager::GetTexture("white")));
+	AssetManager::AddModel("breakable_crate_l", Model("Assets/Objects/FBX/Crate/side.obj", AssetManager::GetTexture("white")));
+
+
 	//Super laggy
 	//AssetManager::AddModel("GI_map_1", Model("Assets/Maps/Sponza/sponza.obj", AssetManager::GetTexture("white")));
 	
@@ -226,6 +231,27 @@ void Scene::Load() {
 
 	AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
 	GetGameObject("ladder_object")->SetRotationX(-1.5708f);
+
+	AddGameObject("crate_t", AssetManager::GetModel("breakable_crate_t"), glm::vec3(6, 2, 0), true, 2, Convex);
+	AddGameObject("crate_b", AssetManager::GetModel("breakable_crate_b"), glm::vec3(6, 2, 0), true, 2, Convex);
+	AddGameObject("crate_l", AssetManager::GetModel("breakable_crate_l"), glm::vec3(6, 2, 0), true, 2, Convex);
+	AddGameObject("crate_l2", AssetManager::GetModel("breakable_crate_l"), glm::vec3(6, 2, 0), true, 2, Convex);
+	//GetGameObject("crate_l2")->setRotation(glm::vec3(0,glm::radians(90.0f),0));
+
+	//TODO clean all this up
+	btTransform localA, localB;
+
+	localA.setIdentity(); // or offset if needed
+	localB.setIdentity();
+
+	btFixedConstraint* fixed = new btFixedConstraint(*GetGameObject("crate_t")->GetRigidBody(), *GetGameObject("crate_b")->GetRigidBody(), localA, localB);
+	PhysicsManagerBullet::GetDynamicWorld()->addConstraint(fixed, true);
+	btFixedConstraint* fixed1 = new btFixedConstraint(*GetGameObject("crate_t")->GetRigidBody(), *GetGameObject("crate_l")->GetRigidBody(), localA, localB);
+	PhysicsManagerBullet::GetDynamicWorld()->addConstraint(fixed1, true);
+	localB.setOrigin(btVector3(1.0, 0.0, 0.0)); // local offset in bodyB's space
+
+	btFixedConstraint* fixed2 = new btFixedConstraint(*GetGameObject("crate_l")->GetRigidBody(), *GetGameObject("crate_l2")->GetRigidBody(), localA, localB);
+	PhysicsManagerBullet::GetDynamicWorld()->addConstraint(fixed2, true);
 
 
 	AddGameObject("targetHolder", AssetManager::GetModel("target"), glm::vec3(6, 2, 0), true, 0, Convex);
@@ -406,7 +432,7 @@ GameObject* Scene::GetGameObject(std::string name) {
 void Scene::RemoveGameObject(std::string name) {
 	for (int i = 0; i < g_objects.size(); i++) {
 		if (g_objects[i].GetName() == name) {
-			PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(g_objects[i].GetRigidBody());
+			PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(g_objects[i].GetRigidBody().get());
 			g_objects.erase(g_objects.begin() + i);
 		}
 	}

@@ -157,7 +157,7 @@ namespace WeaponManager
 		glock.name = "glock";
 		glock.ammo = 18;
 		glock.reloadtime = 1.5;
-		glock.firerate = 250; 
+		glock.firerate = 350; 
 		glock.shootAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_shoot1.dae", AssetManager::GetModel("glockhand"),0, "glock17_shoot");
 		glock.reloadAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_reload.dae", AssetManager::GetModel("glockhand"), 0, "glock17_reload");
 		glock.equipAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_equip.dae", AssetManager::GetModel("glockhand"), 0, "glock17_equip");
@@ -166,7 +166,7 @@ namespace WeaponManager
 		glock.currentammo = 18;
 		glock.damage = 14;
 		glock.type = Semi;
-		glock.recoil = 0.03f;
+		glock.recoil = 10.0f;
 		glock.recoilY = 50;
 		glock.kickback = 3;
 		glock.weaponOffSet = glm::vec3(-0.3, -0.2f, 0.9);
@@ -183,8 +183,8 @@ namespace WeaponManager
 		ak47.currentammo = 30;
 		ak47.damage = 18;
 		ak47.type = Auto;
-		ak47.recoil = 0.03f;
-		ak47.recoilY = 175;
+		ak47.recoil = 20.0f;
+		ak47.recoilY = 60;
 		ak47.kickback = 2;
 
 		ak47.shootAnim = SkinnedAnimation("Assets/Objects/FBX/ak47_shoot.dae", AssetManager::GetModel("ak47hand"), 0, "ak47_shoot");
@@ -207,8 +207,8 @@ namespace WeaponManager
 		shotgun.currentammo = 6;
 		shotgun.damage = 10;
 		shotgun.type = Semi;
-		shotgun.recoil = 0.05f;
-		shotgun.recoilY = 200;
+		shotgun.recoil = 50.0f;
+		shotgun.recoilY = 350;
 		shotgun.kickback = 2;
 		shotgun.firesounds = 1;
 		shotgun.bulletsPerShot = 12;
@@ -227,8 +227,8 @@ namespace WeaponManager
 		doublebarrel.currentammo = 2;
 		doublebarrel.damage = 10;
 		doublebarrel.type = Semi;
-		doublebarrel.recoil = 0.07f;
-		doublebarrel.recoilY = 250;
+		doublebarrel.recoil = 40;
+		doublebarrel.recoilY = 300;
 		doublebarrel.kickback = 2;
 
 		doublebarrel.shootAnim = SkinnedAnimation("Assets/Objects/FBX/db_shoot.dae", AssetManager::GetModel("double_barrel_hand"), 1, "db_shoot");
@@ -238,7 +238,7 @@ namespace WeaponManager
 
 		doublebarrel.firesounds = 1;
 		doublebarrel.bulletsPerShot = 12;
-		doublebarrel.spread = 0.15f;
+		doublebarrel.spread = 0.05f;
 		doublebarrel.gunModel = "double_barrel";
 		doublebarrel.gunsShotName = "shotgun_fire";
 		doublebarrel.weaponOffSet = glm::vec3(-0.27, -0.2f, 1.5);
@@ -295,7 +295,7 @@ bool GunPickUp::Interact() {
 		return false;
 	
 	GameObject* object = SceneManager::GetCurrentScene()->GetGameObject(objectName);
-	PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(object->GetRigidBody());
+	PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(object->GetRigidBody().get());
 	object->SetRender(false);
 		
 	WeaponManager::GetGunByName(gunName)->currentammo = WeaponManager::GetGunByName(gunName)->ammo;

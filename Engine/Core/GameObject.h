@@ -86,7 +86,7 @@ public:
 	void SetUserPoint(void* pointer);
 
 	Model* GetModel();
-	btRigidBody* GetRigidBody();
+	std::shared_ptr<btRigidBody> GetRigidBody();
 	btCollisionShape* GetCollisionShape();
 	btConvexHullShape* GetConvexHull();
 
@@ -94,7 +94,7 @@ public:
 	void SetFinalBoneMatricies(int index, glm::mat4 mat);
 
 	glm::vec3 GetPosition() const {
-		return btToGlmVector3(body->getWorldTransform().getOrigin());
+		return btToGlmVector3(m_rigidBody->getWorldTransform().getOrigin());
 	}
 
 	bool IsDynamic();
@@ -112,8 +112,8 @@ private:
 	Transform transform = Transform();
 	Model* model = nullptr;
 
-	std::string parentName;
-	std::string name;
+	std::string parentName = "";
+	std::string name = "";
 	bool isDynamic = false;
 	//Water or Glass
 	std::string shaderType = "Default";
@@ -123,7 +123,9 @@ private:
 	btConvexHullShape* convexHullShape = nullptr;
 	btBvhTriangleMeshShape* triangleCollison = nullptr;
 	btTransform Btransform;
-	btRigidBody* body;
+
+	std::shared_ptr<btRigidBody> m_rigidBody;
+
 	
 	//canSave is used for json
 	bool canSave = false;

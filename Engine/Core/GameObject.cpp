@@ -38,12 +38,12 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	// Using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
 	btDefaultMotionState* myMotionState = new btDefaultMotionState(Btransform);
 	btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, convexHullShape, localInertia);
-	body = new btRigidBody(rbInfo);
+	m_rigidBody = std::shared_ptr<btRigidBody>(new btRigidBody(rbInfo));
 
-	body->setActivationState(DISABLE_DEACTIVATION);
-	body->setFriction(0.7f);
-	body->setUserIndex(-1);
-body->setUserPointer(reinterpret_cast<void*>(static_cast<uintptr_t>(ObjectType::DEFAULT)));
+	m_rigidBody->setActivationState(DISABLE_DEACTIVATION);
+	m_rigidBody->setFriction(0.7f);
+	m_rigidBody->setUserIndex(-1);
+	m_rigidBody->setUserPointer(reinterpret_cast<void*>(static_cast<uintptr_t>(ObjectType::DEFAULT)));
 
 
 	//if(!NetworkManager::IsServer() && name != "player")
@@ -52,9 +52,9 @@ body->setUserPointer(reinterpret_cast<void*>(static_cast<uintptr_t>(ObjectType::
 
 	// Add the body to the dynamics world
 	if (mass != 0)
-		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_DYNAMIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
+		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(m_rigidBody.get(), GROUP_DYNAMIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
 	else
-		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
+		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(m_rigidBody.get(), GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
 
 	setPosition(position);
 	for (int i = 0; i < 100; i++)
@@ -83,23 +83,23 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	// Using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
 	btDefaultMotionState* myMotionState = new btDefaultMotionState(Btransform);
 	btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, collider, localInertia);
-	body = new btRigidBody(rbInfo);
+	m_rigidBody = std::shared_ptr<btRigidBody>(new btRigidBody(rbInfo));
+
+	m_rigidBody->setActivationState(DISABLE_DEACTIVATION);
+	m_rigidBody->setFriction(0.7f);
+	m_rigidBody->setUserIndex(-1);
+	m_rigidBody->setUserPointer(reinterpret_cast<void*>(static_cast<uintptr_t>(ObjectType::DEFAULT)));
 
 
-	body->setActivationState(DISABLE_DEACTIVATION);
-	body->setFriction(0.7f);
-	body->setUserIndex(-1);
-	body->setUserPointer(reinterpret_cast<void*>(static_cast<uintptr_t>(ObjectType::DEFAULT)));
-
-
-	//if (!NetworkManager::IsServer() && name != "player")
+	//if(!NetworkManager::IsServer() && name != "player")
 		//body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+
 
 	// Add the body to the dynamics world
 	if (mass != 0)
-		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_DYNAMIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
+		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(m_rigidBody.get(), GROUP_DYNAMIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
 	else
-		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
+		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(m_rigidBody.get(), GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
 
 	setPosition(position);
 
@@ -256,31 +256,32 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	btDefaultMotionState* myMotionState = new btDefaultMotionState(Btransform);
 	if (convexHullShape != nullptr) {
 		btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, convexHullShape, localInertia);
-		body = new btRigidBody(rbInfo);
+		m_rigidBody = std::shared_ptr<btRigidBody>(new btRigidBody(rbInfo));
 	}
 	else if (triangleCollison != nullptr) {
 		btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, triangleCollison, localInertia);
-		body = new btRigidBody(rbInfo);
+		m_rigidBody = std::shared_ptr<btRigidBody>(new btRigidBody(rbInfo));
 	}
 	else {
 		btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, collider, localInertia);
-		body = new btRigidBody(rbInfo);
+		m_rigidBody = std::shared_ptr<btRigidBody>(new btRigidBody(rbInfo));
+
 	}
 
-	body->setActivationState(DISABLE_DEACTIVATION);
-	body->setFriction(0.7f);
-	body->setUserIndex(-1);
-	body->setUserPointer(reinterpret_cast<void*>(static_cast<uintptr_t>(ObjectType::DEFAULT)));
+	m_rigidBody->setActivationState(DISABLE_DEACTIVATION);
+	m_rigidBody->setFriction(0.7f);
+	m_rigidBody->setUserIndex(-1);
+	m_rigidBody->setUserPointer(reinterpret_cast<void*>(static_cast<uintptr_t>(ObjectType::DEFAULT)));
 
+	//if(!NetworkManager::IsServer() && name != "player")
+		//body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
 
-	//if (!NetworkManager::IsServer() && name != "player")
-	//body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
 
 	// Add the body to the dynamics world
 	if (mass != 0)
-		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_DYNAMIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
+		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(m_rigidBody.get(), GROUP_DYNAMIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
 	else
-		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
+		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(m_rigidBody.get(), GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
 
 	setPosition(position);
 	for (int i = 0; i < 100; i++)
@@ -317,17 +318,24 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	// Using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
 	btDefaultMotionState* myMotionState = new btDefaultMotionState(Btransform);
 	btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, collider, localInertia);
-	body = new btRigidBody(rbInfo);
-	body->setActivationState(DISABLE_DEACTIVATION);
-	body->setFriction(0.7f);
-	body->setUserIndex(-1);
-	body->setUserPointer(reinterpret_cast<void*>(static_cast<uintptr_t>(ObjectType::DEFAULT)));
+	m_rigidBody = std::shared_ptr<btRigidBody>(new btRigidBody(rbInfo));
+
+	m_rigidBody->setActivationState(DISABLE_DEACTIVATION);
+	m_rigidBody->setFriction(0.7f);
+	m_rigidBody->setUserIndex(-1);
+	m_rigidBody->setUserPointer(reinterpret_cast<void*>(static_cast<uintptr_t>(ObjectType::DEFAULT)));
+
+
+	//if(!NetworkManager::IsServer() && name != "player")
+		//body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+
 
 	// Add the body to the dynamics world
 	if (mass != 0)
-		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_DYNAMIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
+		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(m_rigidBody.get(), GROUP_DYNAMIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
 	else
-		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(body, GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
+		PhysicsManagerBullet::GetDynamicWorld()->addRigidBody(m_rigidBody.get(), GROUP_STATIC, GROUP_PLAYER | GROUP_STATIC | GROUP_DYNAMIC);
+
 
 	setPosition(position);
 	for (int i = 0; i < 100; i++)
@@ -345,7 +353,7 @@ Model* GameObject::GetModel() {
 }
 
 void GameObject::SetUserPoint(void* pointer) {
-	body->setUserPointer(pointer);
+	m_rigidBody->setUserPointer(pointer);
 }
 
 // Parent child transformations
@@ -369,8 +377,8 @@ glm::mat4 GameObject::GetLocalModelMatrix() {
 	return transform.to_mat4();
 }
 
-btRigidBody* GameObject::GetRigidBody() {
-	return body;
+std::shared_ptr<btRigidBody> GameObject::GetRigidBody() {
+	return m_rigidBody;
 }
 
 btCollisionShape* GameObject::GetCollisionShape() {
@@ -378,8 +386,8 @@ btCollisionShape* GameObject::GetCollisionShape() {
 }
 
 void GameObject::Update() {
-	transform.position = glm::vec3(body->getWorldTransform().getOrigin().x(), body->getWorldTransform().getOrigin().y(), body->getWorldTransform().getOrigin().z());
-	transform.rotation = glm::eulerAngles(glm::quat(body->getWorldTransform().getRotation().w(), body->getWorldTransform().getRotation().x(), body->getWorldTransform().getRotation().y(), body->getWorldTransform().getRotation().z()));
+	transform.position = glm::vec3(m_rigidBody->getWorldTransform().getOrigin().x(), m_rigidBody->getWorldTransform().getOrigin().y(), m_rigidBody->getWorldTransform().getOrigin().z());
+	transform.rotation = glm::eulerAngles(glm::quat(m_rigidBody->getWorldTransform().getRotation().w(), m_rigidBody->getWorldTransform().getRotation().x(), m_rigidBody->getWorldTransform().getRotation().y(), m_rigidBody->getWorldTransform().getRotation().z()));
 }
 
 void GameObject::RenderObject(GLuint programID) {
@@ -391,18 +399,18 @@ void GameObject::RenderObject(GLuint programID) {
 
 void GameObject::setPosition(glm::vec3 position) {
 	transform.position = position;
-	btTransform& t = body->getWorldTransform();
+	btTransform& t = m_rigidBody->getWorldTransform();
 	t.setOrigin(btVector3(position.x, position.y, position.z));
-	body->getMotionState()->setWorldTransform(t);
+	m_rigidBody->getMotionState()->setWorldTransform(t);
 }
 
 void GameObject::setRotation(glm::vec3 rotation) {
 	transform.rotation = rotation;
-	btTransform& t = body->getWorldTransform();
+	btTransform& t = m_rigidBody->getWorldTransform();
 	btQuaternion quat;
 	quat.setEuler(rotation.y, rotation.x, rotation.z);
 	t.setRotation(quat);
-	body->getMotionState()->setWorldTransform(t);
+	m_rigidBody->getMotionState()->setWorldTransform(t);
 }
 
 void GameObject::setScale(glm::vec3 scale) {
@@ -411,11 +419,11 @@ void GameObject::setScale(glm::vec3 scale) {
 
 
 glm::vec3 GameObject::getPosition() {
-	return btToGlmVector3(body->getWorldTransform().getOrigin());
+	return btToGlmVector3(m_rigidBody->getWorldTransform().getOrigin());
 }
 
 glm::vec3 GameObject::getRotation() {
-	return btQuatToGLMVec(body->getWorldTransform().getRotation());
+	return btQuatToGLMVec(m_rigidBody->getWorldTransform().getRotation());
 }
 
 glm::vec3 GameObject::getScale() {
@@ -424,65 +432,65 @@ glm::vec3 GameObject::getScale() {
 
 void GameObject::addPosition(glm::vec3 position) {
 	transform.position += position;
-	body->getWorldTransform().setOrigin(btVector3(transform.position.x, transform.position.y, transform.position.z));
+	m_rigidBody->getWorldTransform().setOrigin(btVector3(transform.position.x, transform.position.y, transform.position.z));
 	//body->getMotionState()->setWorldTransform(t);
 }
 
 void GameObject::setPositionX(float x) {
 	transform.position.x = x;
-	body->getWorldTransform().setOrigin(btVector3(transform.position.x, transform.position.y, transform.position.z));
+	m_rigidBody->getWorldTransform().setOrigin(btVector3(transform.position.x, transform.position.y, transform.position.z));
 	//body->getMotionState()->setWorldTransform(t);
 }
 
 void GameObject::setPositionY(float y) {
 	transform.position.y = y;
-	btTransform& t = body->getWorldTransform();
+	btTransform& t = m_rigidBody->getWorldTransform();
 	t.setOrigin(btVector3(transform.position.x, transform.position.y, transform.position.z));
-	body->getMotionState()->setWorldTransform(t);
+	m_rigidBody->getMotionState()->setWorldTransform(t);
 }
 
 void GameObject::setPositionZ(float z) {
 	transform.position.z = z;
-	btTransform& t = body->getWorldTransform();
+	btTransform& t = m_rigidBody->getWorldTransform();
 	t.setOrigin(btVector3(transform.position.x, transform.position.y, transform.position.z));
-	body->getMotionState()->setWorldTransform(t);
+	m_rigidBody->getMotionState()->setWorldTransform(t);
 }
 
 void GameObject::SetRotationX(float x) {
 	transform.rotation.x = x;
-	btTransform& t = body->getWorldTransform();
+	btTransform& t = m_rigidBody->getWorldTransform();
 	btQuaternion quat;
 	quat.setEuler(transform.rotation.y, transform.rotation.x, transform.rotation.z);
 	t.setRotation(quat);
-	body->getMotionState()->setWorldTransform(t);
+	m_rigidBody->getMotionState()->setWorldTransform(t);
 }
 
 void GameObject::SetRotationY(float y) {
 	transform.rotation.y = y;
-	btTransform& t = body->getWorldTransform();
+	btTransform& t = m_rigidBody->getWorldTransform();
 	btQuaternion quat;
 	quat.setEuler(transform.rotation.y, transform.rotation.x, transform.rotation.z);
 	t.setRotation(quat);
-	body->getMotionState()->setWorldTransform(t);
+	m_rigidBody->getMotionState()->setWorldTransform(t);
 }
 void GameObject::SetTransform(Transform transform) {
 	this->transform = transform;
 
-	btTransform& t = body->getWorldTransform();
+	btTransform& t = m_rigidBody->getWorldTransform();
 	btQuaternion quat;
 	quat.setEuler(transform.rotation.y, transform.rotation.x, transform.rotation.z);
 	t.setRotation(quat);
-	body->getMotionState()->setWorldTransform(t);
-	body->getWorldTransform().setOrigin(btVector3(transform.position.x, transform.position.y, transform.position.z));
+	m_rigidBody->getMotionState()->setWorldTransform(t);
+	m_rigidBody->getWorldTransform().setOrigin(btVector3(transform.position.x, transform.position.y, transform.position.z));
 }
 
 void GameObject::SetRotationZ(float z) {
 	transform.rotation.z = z;
-	btTransform& t = body->getWorldTransform();
+	btTransform& t = m_rigidBody->getWorldTransform();
 	btQuaternion quat;
 	quat.setEuler(transform.rotation.y, transform.rotation.x, transform.rotation.z);
 	t.setRotation(quat);
-	body->getMotionState()->setWorldTransform(t);
+	m_rigidBody->getMotionState()->setWorldTransform(t);
 }
 
 void GameObject::SetScale(float scale) {
@@ -569,8 +577,6 @@ bool GameObject::DontCull() {
 void GameObject::SetDontCull(bool cull) {
 	dontCull = cull;
 }
-
-
 void GameObject::IncludInRayCast() {
 	includedInRayCast = true;
 }

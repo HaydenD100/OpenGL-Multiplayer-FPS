@@ -12,6 +12,7 @@
 #include "Engine/Core/Common/GameCommon.h"
 
 
+
 namespace Player
 {
 	glm::vec3 forward;
@@ -27,6 +28,8 @@ namespace Player
 	float swaySpeed = 0.0f;
 	float smoothFactor = 0.1f;
 	float speed = 4000;
+	glm::vec2 totalRecoil = glm::vec2(0);
+
 
 
 	float airSpeed = 800;
@@ -90,10 +93,10 @@ namespace Player
 		otherProxy->m_collisionFilterMask &= ~GROUP_PLAYER; // Remove the player group from the other object's collision mask
 
 
-		btRigidBody* playerHeadRigidBody = player_head->GetRigidBody(); // Assuming GetRigidBody() returns btRigidBody*
+		std::shared_ptr<btRigidBody> playerHeadRigidBody = player_head->GetRigidBody(); // Assuming GetRigidBody() returns btRigidBody*
 		playerHeadRigidBody->setActivationState(DISABLE_SIMULATION);
 
-		btRigidBody* body = SceneManager::GetCurrentScene()->GetGameObject("player")->GetRigidBody();
+		std::shared_ptr<btRigidBody> body = SceneManager::GetCurrentScene()->GetGameObject("player")->GetRigidBody();
 		SceneManager::GetCurrentScene()->GetGameObject("player")->SetRender(false);
 		body->setFriction(0.0f);
 		body->setRestitution(0.0f);
@@ -141,7 +144,9 @@ namespace Player
 					float distance = (end - start).length();
 					if (distance > 2)
 						return;
-					btRigidBody* body = gameobject->GetRigidBody();
+
+
+					std::shared_ptr<btRigidBody> body = gameobject->GetRigidBody();
 					if (body) {
 						btVector3 localForcePos = body->getWorldTransform().inverse() * hit.m_hitPointWorld;
 						body->applyImpulse(2 * glmToBtVector3(Camera::ComputeRay()), localForcePos);
@@ -165,21 +170,29 @@ namespace Player
 			return;
 		}
 
-		if (WeaponManager::GetGunByName(gunName)->currentammo > 0) {
+		if (WeaponManager::GetGunByName(gunName)->currentammo >= 0) {
+
+			if (WeaponManager::GetGunByName(gunName)->currentammo == 0) {
+				AudioManager::PlaySound("dry_fire", Player::getPosition());
+				WeaponManager::GetGunByName(gunName)->currentammo = -1;
+				return;
+			}
+			
 			WeaponManager::GetGunByName(gunName)->currentammo--;
 			WeaponManager::GetGunByName(gunName)->Shoot();
-			verticalAngle += WeaponManager::GetGunByName(gunName)->recoil;
-			horizontalAngle += (float)rand() / RAND_MAX / WeaponManager::GetGunByName(gunName)->recoilY;
+			totalRecoil.x += WeaponManager::GetGunByName(gunName)->recoil * 0.01;
+			totalRecoil.y += WeaponManager::GetGunByName(gunName)->recoilY * 0.1;
 
 			for (int i = 0; i < WeaponManager::GetGunByName(gunName)->bulletsPerShot; i++) {
 				float maxSpread = WeaponManager::GetGunByName(gunName)->spread;
 				btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit(maxSpread);
 				if (hit.m_collisionObject != nullptr) {
-					std::cout << "Test \n";
 					ObjectType type = static_cast<ObjectType>(reinterpret_cast<uintptr_t>(hit.m_collisionObject->getUserPointer()));
 					GameObject* gameobject = nullptr;
 					if (type == ObjectType::GLASS) {
-						gameobject = &SceneManager::GetCurrentScene()->g_glass[hit.m_collisionObject->getUserIndex()];
+						int randomnum = (rand() % 3) + 1;
+						AudioManager::PlaySound("bullet_impact_glass_" + std::to_string(randomnum), glm::vec3(hit.m_hitPointWorld.getX(), hit.m_hitPointWorld.getY(), hit.m_hitPointWorld.getZ()));
+						return;
 					}
 					else if (type == ObjectType::DEFAULT) {
 						gameobject = &SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()];
@@ -188,34 +201,71 @@ namespace Player
 						return;
 					}
 					
-					if (gameobject != nullptr)
+					if (gameobject != nullptr )
 					{
-						btRigidBody* body = gameobject->GetRigidBody();
-						if (body ) {
-							btVector3 localForcePos = body->getWorldTransform().inverse() * hit.m_hitPointWorld;
-							body->applyImpulse(2 * glmToBtVector3(Camera::ComputeRay()), localForcePos);
-							glm::vec4 worldPositionHomogeneous(glm::vec3(hit.m_hitPointWorld.getX(), hit.m_hitPointWorld.getY(), hit.m_hitPointWorld.getZ()), 1.0f);
-							glm::vec4 localPositionHomogeneous = glm::inverse(gameobject->GetModelMatrix()) * worldPositionHomogeneous;
-							glm::vec3 vec3local = glm::vec3(localPositionHomogeneous.x, localPositionHomogeneous.y, localPositionHomogeneous.z);
-							glm::vec3 normal = glm::vec3(hit.m_hitNormalWorld.getX(), hit.m_hitNormalWorld.getY(), hit.m_hitNormalWorld.getZ());
-							glm::mat4 rotation_matrix = glm::mat4_cast(glm::quat(gameobject->getRotation()));
-							normal = glm::vec3(glm::inverse(rotation_matrix) * glm::vec4(normal, 0));
-							AssetManager::AddDecalInstance(vec3local, normal, AssetManager::GetDecal("bullet_hole"), gameobject);
+						std::cout << "Object Name: " << gameobject->GetName() << "\n";
+						std::shared_ptr<btRigidBody> body = gameobject->GetRigidBody();
+						if (!body) {
+							return; // Early exit if no rigid body
+						}
+
+						btTransform transform = body->getWorldTransform();
+						btVector3 origin = transform.getOrigin();
+
+						// Check for NaN/Inf in the transform
+						if (std::isnan(origin.x()) || std::isinf(origin.x()) ||
+							std::isnan(origin.y()) || std::isinf(origin.y()) ||
+							std::isnan(origin.z()) || std::isinf(origin.z())) {
+							std::cerr << "Invalid transform (NaN/Inf detected)!" << std::endl;
+							return;
+						}
+
+						// Compute local force position safely
+						btVector3 hitPointWorld = hit.m_hitPointWorld;
+						btVector3 localForcePos = transform.inverse() * hitPointWorld;
+
+						// Check for NaN/Inf in the impulse calculation
+						btVector3 impulse = 2 * glmToBtVector3(Camera::ComputeRay());
+						if (std::isnan(impulse.x()) || std::isinf(impulse.x()) ||
+							std::isnan(impulse.y()) || std::isinf(impulse.y()) ||
+							std::isnan(impulse.z()) || std::isinf(impulse.z())) {
+							std::cerr << "Invalid impulse (NaN/Inf detected)!" << std::endl;
+							return;
+						}
+
+						// Apply impulse
+						body->applyImpulse(impulse, localForcePos);
+
+						// Convert hit point to glm
+						glm::vec4 worldPositionHomogeneous(
+							hitPointWorld.x(), hitPointWorld.y(), hitPointWorld.z(),
+							1.0f
+						);
+
+						// Get model matrix once
+						glm::mat4 modelMatrix = gameobject->GetModelMatrix();
+						glm::vec4 localPositionHomogeneous = glm::inverse(modelMatrix) * worldPositionHomogeneous;
+						glm::vec3 vec3local(localPositionHomogeneous);
+
+						// Convert normal and rotate into local space
+						btVector3 btNormal = hit.m_hitNormalWorld;
+						glm::vec3 normal(btNormal.x(), btNormal.y(), btNormal.z());
+						glm::quat rotation = gameobject->getRotation(); // Ensure this exists!
+						glm::mat4 rotationMatrix = glm::mat4_cast(rotation);
+						normal = glm::vec3(glm::inverse(rotationMatrix) * glm::vec4(normal, 0.0f));
+
+						// Ensure decal asset exists before adding
+						Decal* decal = AssetManager::GetDecal("bullet_hole");
+						if (decal) {
+							AssetManager::AddDecalInstance(vec3local, normal, decal, gameobject);
 						}
 						//NetworkManager::SendGunShotData(gameobject->GetName(), "bullet_hole", vec3local, normal, btToGlmVector3(localForcePos), WeaponManager::GetGunByName(gunName)->damage, btToGlmVector3(2 * glmToBtVector3(Camera::ComputeRay())));
-						int randomnum = (rand() % 3) + 1;
 						//if (type == DEFAULT)
 							//AudioManager::PlaySound("bullet_impact_" + std::to_string(randomnum), gameobject->GetPosition());
-						if (type == GLASS)
-							AudioManager::PlaySound("bullet_impact_glass_" + std::to_string(randomnum), glm::vec3(hit.m_hitPointWorld.getX(), hit.m_hitPointWorld.getY(), hit.m_hitPointWorld.getZ()));
+						
 					}
 				}
 			}
-		}
-		else {
-			// Click click
-			AudioManager::PlaySound("dry_fire", Player::getPosition());
-
 		}
 		
 	}
@@ -230,7 +280,7 @@ namespace Player
 				float distance = (end - start).length();
 				if (distance > 4)
 					return;
-				btRigidBody* body = gameobject->GetRigidBody();
+				std::shared_ptr<btRigidBody> body = gameobject->GetRigidBody();
 				glm::vec4 worldPositionHomogeneous(glm::vec3(hit.m_hitPointWorld.getX(), hit.m_hitPointWorld.getY(), hit.m_hitPointWorld.getZ()), 1.0f);
 				glm::vec4 localPositionHomogeneous = glm::inverse(gameobject->GetModelMatrix()) * worldPositionHomogeneous;
 				glm::vec3 vec3local = glm::vec3(localPositionHomogeneous.x, localPositionHomogeneous.y, localPositionHomogeneous.z);
@@ -280,6 +330,16 @@ namespace Player
 		if (isDead) 
 			return;
 
+		horizontalAngle += totalRecoil.x * 0.001;
+		verticalAngle += totalRecoil.y * 0.001;
+
+		totalRecoil -= totalRecoil * 0.2f;
+
+		if (glm::length(totalRecoil) < 0.001f)
+			totalRecoil = glm::vec2(0.0f);
+
+		//float recoilDamping = 5.0f; // adjust this for how fast it fades
+		//totalRecoil -= totalRecoil * recoilDamping * deltaTime;
 			
 
 		GameObject* player =  SceneManager::GetCurrentScene()->GetGameObject("player");
