@@ -49,6 +49,9 @@ void main()
     normalMap = normalMap * 2.0 - 1.0; // Convert from [0,1] range to [-1,1]
     vec3 transformedNormal = normalize(TBN * normalMap);
     
+    if(isnan(transformedNormal.x) || isnan(transformedNormal.y) || isnan(transformedNormal.z)){
+        transformedNormal = vec3(V * vec4(TrueNormal, 0));
+    }
 
     // store the fragment position vector in the first gbuffer texture
     gPosition = FragPos;

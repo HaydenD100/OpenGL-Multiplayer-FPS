@@ -1,0 +1,13 @@
+# Blender 4.1.1 MTL File: 'None'
+# www.blender.org
+
+newmtl Material.001
+Ns 621.069153
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/kokok/Downloads/white-unicorn-pool-float/source/PoolFloat2/Textures2/Diffuse5.png
+map_Bump C:/Users/kokok/Downloads/white-unicorn-pool-float/source/PoolFloat2/Textures2/Normal2.png

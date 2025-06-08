@@ -36,7 +36,7 @@ namespace Game {
 
 		AssetManager::Init();
 		SceneManager::Init();
-		SceneManager::CreateScene(Scene());
+		SceneManager::CreateScene(std::move(Scene()));
 		SceneManager::LoadScene(0);
 		WeaponManager::Init();
 		AssetManager::LoadAssets();

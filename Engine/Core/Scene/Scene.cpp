@@ -63,6 +63,8 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("double_barrel_shotgun_metal_receiver", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_normal.png", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_metallic.jpg");
 
 	AssetManager::AddTexture("transparent", "Assets/Textures/dusty1.png","Assets/Normals/dirty_glass.png", 0.1f,0.0f);
+	AssetManager::AddTexture("unicorn", "Assets/Textures/unicorn.png", "Assets/Normals/unicorn_normal.png", 0.3f, 0.0f);
+
 
 	AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
 	AssetManager::AddModel("probe", Model("Assets/Objects/FBX/probe_cube.fbx", AssetManager::GetTexture("uvmap")));
@@ -164,6 +166,8 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("breakable_crate_b", Model("Assets/Objects/FBX/Crate/bottom.obj", AssetManager::GetTexture("white")));
 	AssetManager::AddModel("breakable_crate_l", Model("Assets/Objects/FBX/Crate/side.obj", AssetManager::GetTexture("white")));
 
+	AssetManager::AddModel("uni_float", Model("Assets/Objects/FBX/unicorn.fbx", AssetManager::GetTexture("unicorn")));
+	AssetManager::AddModel("uni_float_defalated", Model("Assets/Objects/FBX/unicorn_defalated.fbx", AssetManager::GetTexture("unicorn")));
 
 	//Super laggy
 	//AssetManager::AddModel("GI_map_1", Model("Assets/Maps/Sponza/sponza.obj", AssetManager::GetTexture("white")));
@@ -185,8 +189,8 @@ void Scene::LoadAssets() {
 	//AssetManager::AddModel("cat", Model("Assets/Objects/FBX/run_fast.fbx", AssetManager::GetTexture("white")));
 
 	AssetManager::AddModel("ak47", Model("Assets/Objects/FBX/ak47.fbx", "Assets/Objects/ak47_convex.obj", AssetManager::GetTexture("ak47")));
-	AssetManager::AddModel("door", Model(Mesh("Assets/Objects/door.obj"), AssetManager::GetTexture("door")));
-	AssetManager::AddModel("door_frame", Model(Mesh("Assets/Objects/door_frame.obj"), AssetManager::GetTexture("door")));
+	//AssetManager::AddModel("door", Model(Mesh("Assets/Objects/door.obj"), AssetManager::GetTexture("door")));
+	//AssetManager::AddModel("door_frame", Model(Mesh("Assets/Objects/door_frame.obj"), AssetManager::GetTexture("door")));
 	AssetManager::AddModel("player", Model("Assets/Objects/FBX/player.fbx", AssetManager::GetTexture("uvmap")));
 
 	AssetManager::AddModel("shotgun", Model("Assets/Objects/fbx/remington.fbx", "Assets/Objects/shotgun_convex.obj", AssetManager::GetTexture("shotgun")));
@@ -199,8 +203,8 @@ void Scene::LoadAssets() {
 	AssetManager::AddDecal("freaky_decal", AssetManager::GetTexture("freaky"), glm::vec3(1, 0.1, 1));
 
 	//these are diffrent animations from skinnedanimation
-	AnimationManager::AddAnimation(Animation("Assets/Animations/door_open.fbx", "door_open"));
-	AnimationManager::AddAnimation(Animation("Assets/Animations/door_close.fbx", "door_close"));	
+	//AnimationManager::AddAnimation(Animation("Assets/Animations/door_open.fbx", "door_open"));
+	//AnimationManager::AddAnimation(Animation("Assets/Animations/door_close.fbx", "door_close"));	
 
 }
 
@@ -216,9 +220,9 @@ void Scene::Load() {
 	GetGameObject("room1")->IncludInGI(true);
 
 	
-	g_water.push_back(GameObject("water", AssetManager::GetModel("water"), glm::vec3(0, -2, 0), true, 0, Box));
-	g_water[0].GetRigidBody()->setUserIndex(0);
-	g_water[0].GetRigidBody()->setUserPointer((void*)ObjectType::WATER);
+	g_water.push_back(std::make_unique<GameObject>("water", AssetManager::GetModel("water"), glm::vec3(0, -2, 0), true, 0, Box));
+	g_water[0]->GetRigidBody()->setUserIndex(0);
+	g_water[0]->GetRigidBody()->setUserPointer((void*)ObjectType::WATER);
 
 	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(0, 0, 0), false, 1.0, Convex);
 	AddGlass("cubeGlass", AssetManager::GetModel("cubeGlass"), glm::vec3(-3, 0, 0), false, 0.0, Convex);
@@ -232,26 +236,48 @@ void Scene::Load() {
 	AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
 	GetGameObject("ladder_object")->SetRotationX(-1.5708f);
 
-	AddGameObject("crate_t", AssetManager::GetModel("breakable_crate_t"), glm::vec3(6, 2, 0), true, 2, Convex);
-	AddGameObject("crate_b", AssetManager::GetModel("breakable_crate_b"), glm::vec3(6, 2, 0), true, 2, Convex);
-	AddGameObject("crate_l", AssetManager::GetModel("breakable_crate_l"), glm::vec3(6, 2, 0), true, 2, Convex);
-	AddGameObject("crate_l2", AssetManager::GetModel("breakable_crate_l"), glm::vec3(6, 2, 0), true, 2, Convex);
+	
+	AddGameObject("uni_float", AssetManager::GetModel("uni_float"), glm::vec3(6, 2, 0), true, 2, Convex);
+	AudioManager::AddSound("Assets/Audio/balloonpop.wav", "pop", glm::vec3(0, 0, 0), 20, 1.8);
+	Destructible desruct;
+	desruct.CreateConvex(AssetManager::GetModel("uni_float_defalated"));
+	desruct.m_destoryed_object = "uni_float_defalated";
+	desruct.m_destoryed_sound = "pop";
+
+	GetGameObject("uni_float")->destructable = desruct;
+
+	AddGameObject("uni_float1", AssetManager::GetModel("uni_float"), glm::vec3(3, 2, 2), true, 2, Convex);
+	GetGameObject("uni_float1")->GetRigidBody()->setUserPointer((void*)ObjectType::DESTORYABLE);
+	GetGameObject("uni_float1")->destructable = desruct;
+
+	AddGameObject("uni_float2", AssetManager::GetModel("uni_float"), glm::vec3(3, 4, 2), true, 2, Convex);
+	GetGameObject("uni_float2")->GetRigidBody()->setUserPointer((void*)ObjectType::DESTORYABLE);
+	GetGameObject("uni_float2")->destructable = desruct;
+
+	AddGameObject("uni_float3", AssetManager::GetModel("uni_float"), glm::vec3(3, 5, 2), true, 2, Convex);
+	GetGameObject("uni_float3")->GetRigidBody()->setUserPointer((void*)ObjectType::DESTORYABLE);
+	GetGameObject("uni_float3")->destructable = desruct;
+
+	//AddGameObject("crate_t", AssetManager::GetModel("breakable_crate_t"), glm::vec3(6, 2, 0), true, 2, Convex);
+	//AddGameObject("crate_b", AssetManager::GetModel("breakable_crate_b"), glm::vec3(6, 2, 0), true, 2, Convex);
+	//AddGameObject("crate_l", AssetManager::GetModel("breakable_crate_l"), glm::vec3(6, 2, 0), true, 2, Convex);
+	//AddGameObject("crate_l2", AssetManager::GetModel("breakable_crate_l"), glm::vec3(6, 2, 0), true, 2, Convex);
 	//GetGameObject("crate_l2")->setRotation(glm::vec3(0,glm::radians(90.0f),0));
 
 	//TODO clean all this up
-	btTransform localA, localB;
+	//btTransform localA, localB;
 
-	localA.setIdentity(); // or offset if needed
-	localB.setIdentity();
+	//localA.setIdentity(); // or offset if needed
+	//localB.setIdentity();
 
-	btFixedConstraint* fixed = new btFixedConstraint(*GetGameObject("crate_t")->GetRigidBody(), *GetGameObject("crate_b")->GetRigidBody(), localA, localB);
-	PhysicsManagerBullet::GetDynamicWorld()->addConstraint(fixed, true);
-	btFixedConstraint* fixed1 = new btFixedConstraint(*GetGameObject("crate_t")->GetRigidBody(), *GetGameObject("crate_l")->GetRigidBody(), localA, localB);
-	PhysicsManagerBullet::GetDynamicWorld()->addConstraint(fixed1, true);
-	localB.setOrigin(btVector3(1.0, 0.0, 0.0)); // local offset in bodyB's space
+	//btFixedConstraint* fixed = new btFixedConstraint(*GetGameObject("crate_t")->GetRigidBody(), *GetGameObject("crate_b")->GetRigidBody(), localA, localB);
+	//PhysicsManagerBullet::GetDynamicWorld()->addConstraint(fixed, true);
+	//btFixedConstraint* fixed1 = new btFixedConstraint(*GetGameObject("crate_t")->GetRigidBody(), *GetGameObject("crate_l")->GetRigidBody(), localA, localB);
+	//PhysicsManagerBullet::GetDynamicWorld()->addConstraint(fixed1, true);
+	//localB.setOrigin(btVector3(1.0, 0.0, 0.0)); // local offset in bodyB's space
 
-	btFixedConstraint* fixed2 = new btFixedConstraint(*GetGameObject("crate_l")->GetRigidBody(), *GetGameObject("crate_l2")->GetRigidBody(), localA, localB);
-	PhysicsManagerBullet::GetDynamicWorld()->addConstraint(fixed2, true);
+	//btFixedConstraint* fixed2 = new btFixedConstraint(*GetGameObject("crate_l")->GetRigidBody(), *GetGameObject("crate_l2")->GetRigidBody(), localA, localB);
+	//PhysicsManagerBullet::GetDynamicWorld()->addConstraint(fixed2, true);
 
 
 	AddGameObject("targetHolder", AssetManager::GetModel("target"), glm::vec3(6, 2, 0), true, 0, Convex);
@@ -354,10 +380,10 @@ void Scene::Update(float deltaTime) {
 			g_lights[i].GenerateShadows();
 	}
 	for (int i = 0; i < g_objects.size(); i++) {
-		g_objects[i].Update();
+		g_objects[i]->Update();
 	}
 	for (int i = 0; i < g_glass.size(); i++) {
-		g_glass[i].Update();
+		g_glass[i]->Update();
 	}
 
 
@@ -396,33 +422,32 @@ void Scene::RemoveLight(int index) {
 		g_lights.erase(g_lights.begin() + index);
 }
 
-size_t Scene::AddGameObject(GameObject gameobject) {
-	g_objects.push_back(gameobject);
-	g_objects[g_objects.size() - 1].GetRigidBody()->setUserPointer((void*)(g_objects.size() - 1));
-
+size_t Scene::AddGameObject(std::unique_ptr<GameObject> gameobject) {
+	gameobject->GetRigidBody()->setUserPointer((void*)(g_objects.size()));
+	g_objects.push_back(std::move(gameobject));
 	return g_objects.size() - 1;
 }
 
 size_t Scene::AddGlass(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape) {
 	// Add to g_glass vector
-	g_glass.push_back(GameObject(name, model, position, save, mass, shape));
+	g_glass.push_back(std::make_unique<GameObject>(name, model, position, save, mass, shape));
 	size_t index = g_glass.size() - 1;  // Get index in g_glass
-	g_glass[index].GetRigidBody()->setUserIndex(index);
-	g_glass[index].GetRigidBody()->setUserPointer((void*)ObjectType::GLASS);
+	g_glass[index]->GetRigidBody()->setUserIndex(index);
+	g_glass[index]->GetRigidBody()->setUserPointer((void*)ObjectType::GLASS);
 
 	return index;
 }
 
 size_t Scene::AddGameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape) {
-	g_objects.push_back(GameObject(name, model, position, save, mass, shape));
-	g_objects[g_objects.size() - 1].GetRigidBody()->setUserIndex((int)g_objects.size() - 1);
+	g_objects.push_back(std::make_unique<GameObject>(name, model, position, save, mass, shape));
+	g_objects.back()->GetRigidBody()->setUserIndex(static_cast<int>(g_objects.size() - 1));
 	return g_objects.size() - 1;
 }
 
 GameObject* Scene::GetGameObject(std::string name) {
 	for (int i = 0; i < g_objects.size(); i++) {
-		if (g_objects[i].GetName() == name)
-			return &g_objects[i];
+		if (g_objects[i]->GetName() == name)
+			return g_objects[i].get();
 	}
 	std::cout << "Object: " << name << " doesnt exsit \n";
 	return nullptr;
@@ -431,8 +456,8 @@ GameObject* Scene::GetGameObject(std::string name) {
 
 void Scene::RemoveGameObject(std::string name) {
 	for (int i = 0; i < g_objects.size(); i++) {
-		if (g_objects[i].GetName() == name) {
-			PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(g_objects[i].GetRigidBody().get());
+		if (g_objects[i]->GetName() == name) {
+			PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(g_objects[i]->GetRigidBody().get());
 			g_objects.erase(g_objects.begin() + i);
 		}
 	}

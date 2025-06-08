@@ -92,7 +92,7 @@ namespace AssetManager
 		
 		// name,pos,rotation,scale
 		for (int i = 0; i < SceneManager::GetCurrentScene()->g_objects.size(); i++) {
-			GameObject* gameobject = &SceneManager::GetCurrentScene()->g_objects[i];
+			GameObject* gameobject = SceneManager::GetCurrentScene()->g_objects[i].get();
 			json gameobjectJSON;
 			gameobjectJSON["name"] = gameobject->GetName();
 			glm::vec3 position = gameobject->GetPosition();

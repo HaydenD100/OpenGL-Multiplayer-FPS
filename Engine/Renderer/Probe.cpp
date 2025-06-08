@@ -304,7 +304,7 @@ void Probe::Bake() {
 		Renderer::s_probeDeffered.SetMat4("V", captureViews[i]);
 
 		for (int i = 0; i < SceneManager::GetCurrentScene()->g_objects.size(); i++) {
-			GameObject* gameobjectRender = &SceneManager::GetCurrentScene()->g_objects[i];
+			GameObject* gameobjectRender = SceneManager::GetCurrentScene()->g_objects[i].get();
 
 			if (gameobjectRender->GetShaderType() != "Default" || !gameobjectRender->ShouldRender() || !gameobjectRender->IncludedInGI()) {
 				continue;

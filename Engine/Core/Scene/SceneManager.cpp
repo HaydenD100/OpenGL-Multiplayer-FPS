@@ -9,8 +9,8 @@ namespace SceneManager
 		currentScene = 0;
 	}
 
-	size_t SceneManager::CreateScene(Scene scene) {
-		scenes.push_back(scene);
+	size_t SceneManager::CreateScene(Scene&& scene) {  // Takes temporary/movable scene
+		scenes.push_back(std::move(scene));
 		return scenes.size() - 1;
 	}
 	

@@ -60,7 +60,7 @@ namespace Raycaster
 		verticies.clear();
 
 		for (int i = 0; i < objectListSize; i++) {
-			GameObject* object = &SceneManager::GetCurrentScene()->g_objects[i];
+			GameObject* object = SceneManager::GetCurrentScene()->g_objects[i].get();
 			//for now just keep tbis the map as it only has a few verticies
 			if (!object->IncludedInRayCast())
 				continue;
@@ -177,7 +177,7 @@ namespace SoftwareRaycaster
 	void FillBuffers() {
 		verticies.clear();
 		for (int i = 0; i < SceneManager::GetCurrentScene()->g_objects.size(); i++) {
-			GameObject* object = &SceneManager::GetCurrentScene()->g_objects[i];
+			GameObject* object = SceneManager::GetCurrentScene()->g_objects[i].get();
 			//for now just keep tbis the map as it only has a few verticies
 			if (!object->IncludedInRayCast())
 				continue;

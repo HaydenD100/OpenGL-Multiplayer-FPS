@@ -51,7 +51,7 @@ namespace Editor
 			RayCallback.m_collisionFilterMask = GROUP_STATIC | GROUP_DYNAMIC;
 			PhysicsManagerBullet::GetDynamicWorld()->rayTest(btVector3(cameraPosition.x, cameraPosition.y, cameraPosition.z), btVector3(out_end.x, out_end.y, out_end.z), RayCallback);
 			if (RayCallback.m_collisionObject != NULL) {
-				GameObject* gameobject = &SceneManager::GetCurrentScene()->g_objects[RayCallback.m_collisionObject->getUserIndex()];
+				GameObject* gameobject = SceneManager::GetCurrentScene()->g_objects[RayCallback.m_collisionObject->getUserIndex()].get();
 				bool alreadyIncluded = false;
 				for (GameObject* object : objects) {
 					if (gameobject == object)

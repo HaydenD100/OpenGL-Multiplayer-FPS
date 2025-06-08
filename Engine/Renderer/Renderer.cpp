@@ -523,7 +523,7 @@ namespace Renderer
 		NeedRendering.clear();
 		glm::mat4 ViewMatrix = Camera::getViewMatrix();
 		for (int i = 0; i < SceneManager::GetCurrentScene()->g_lights.size(); i++) {
-			GameObject* gameobjectRender = &SceneManager::GetCurrentScene()->g_objects[i];
+			GameObject* gameobjectRender = SceneManager::GetCurrentScene()->g_objects[i].get();
 
 			if (!gameobjectRender->ShouldRender())
 				continue;
@@ -592,7 +592,7 @@ namespace Renderer
 
 		glm::mat4 ViewMatrix = Camera::getViewMatrix();
 		for (int i = 0; i < SceneManager::GetCurrentScene()->g_objects.size(); i++) {
-			GameObject* gameobjectRender = &SceneManager::GetCurrentScene()->g_objects[i];
+			GameObject* gameobjectRender = SceneManager::GetCurrentScene()->g_objects[i].get();
 
 			if (!gameobjectRender->ShouldRender())
 				continue;
@@ -692,22 +692,21 @@ namespace Renderer
 		//TODO :: CHANGE THIS TO OIT this gets slow if theres too many transparent objects
 		
 		auto& glassObjects = SceneManager::GetCurrentScene()->g_glass;
-
 		std::sort(glassObjects.begin(), glassObjects.end(),
-			[&cameraPosition](const GameObject& a, const GameObject& b) {
-				float distA = glm::length2(a.GetPosition() - cameraPosition);
-				float distB = glm::length2(b.GetPosition() - cameraPosition);
+			[&cameraPosition](const std::unique_ptr<GameObject>& a, const std::unique_ptr<GameObject>& b) {
+				float distA = glm::length2(a->GetPosition() - cameraPosition);
+				float distB = glm::length2(b->GetPosition() - cameraPosition);
 				return distA > distB;
 			});
 
 		for (int i = 0; i < glassObjects.size(); i++) {
 			
-			glm::mat4 ModelMatrix = glassObjects[i].GetModelMatrix();
+			glm::mat4 ModelMatrix = glassObjects[i]->GetModelMatrix();
 			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(ModelMatrix)));
 
 			s_transparent.SetMat3("normalMatrix3", normalMatrix);
 			s_transparent.SetMat4("M", ModelMatrix);
-			glassObjects[i].RenderObject(s_transparent.GetShaderID());
+			glassObjects[i]->RenderObject(s_transparent.GetShaderID());
 
 		}
 		
@@ -900,7 +899,7 @@ namespace Renderer
 
 		s_water.Use();
 		glPatchParameteri(GL_PATCH_VERTICES, 4);
-		GameObject* water = &SceneManager::GetCurrentScene()->g_water[0];
+		GameObject* water = SceneManager::GetCurrentScene()->g_water[0].get();
 		//Upload the water plane data
 		glm::mat4 ModelMatrix = water->GetModelMatrix();
 

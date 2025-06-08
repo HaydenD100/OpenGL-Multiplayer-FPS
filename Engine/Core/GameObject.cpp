@@ -16,6 +16,7 @@ GameObject::GameObject(std::string name, glm::vec3 position, bool save, float ma
 	this->name = name;
 	setPosition(position);
 	parentName = "";
+
 	canSave = save;
 }
 GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, btConvexHullShape* shape) {
@@ -325,7 +326,6 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	m_rigidBody->setUserIndex(-1);
 	m_rigidBody->setUserPointer(reinterpret_cast<void*>(static_cast<uintptr_t>(ObjectType::DEFAULT)));
 
-
 	//if(!NetworkManager::IsServer() && name != "player")
 		//body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
 
@@ -497,7 +497,7 @@ void GameObject::SetScale(float scale) {
 	transform.scale = glm::vec3(scale);
 }
 
-std::string GameObject::GetName() {
+const std::string& GameObject::GetName() const {
 	return name;
 }
 
@@ -589,6 +589,12 @@ bool GameObject::IncludedInGI() {
 void GameObject::IncludInGI(bool state) {
 	includedInGI = state;
 }
+void GameObject::SetModel(Model* model) {
+	this->model = model;
+}
+
+
+
 
 
 

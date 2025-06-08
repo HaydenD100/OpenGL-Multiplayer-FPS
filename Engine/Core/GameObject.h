@@ -10,10 +10,41 @@ enum ObjectType {
 	DEFAULT,
 	GLASS,
 	PLAYER,
-	WATER
+	WATER,
+	DESTORYABLE
 };
 //#include "Loaders/nlohmann/json.hpp"
 
+
+struct Destructible {
+	std::string m_destoryed_object = "";
+	std::string m_destoryed_sound = "";
+
+	btConvexHullShape* convexHullShape;
+
+	void CreateConvex(Model* model) {
+		m_destoryed_object = model->GetName();
+		convexHullShape = new btConvexHullShape();
+		//Models can have Conex hull meshes, these meshes are a simplifed version of the original mesh and can imported from a OBJ file
+		if (model->GetColliderShapeVerticiesSize() > 0) {
+			for (const auto& vertex : model->GetColliderShapeVerticies()) {
+				convexHullShape->addPoint(glmToBtVector3(vertex));
+			}
+		}
+		else {
+			for (int i = 0; i < model->GetAllMeshes()->size(); i++) {
+				for (const auto& vertex : model->GetMesh(i)->indexed_vertices) {
+					convexHullShape->addPoint(glmToBtVector3(vertex));
+				}
+				//only create a collider for the entire model/everymesh if the entire mesh is being renderered
+				if (!model->RenderAll())
+					break;
+			}
+		}
+		convexHullShape->optimizeConvexHull();
+	}
+
+};
 
 //Just a little reminder that scaling will scale the model but not the collider or the AABB from frustum culling yet
 
@@ -64,7 +95,7 @@ public:
 	 
 	void SetScale(float scale);
 
-	std::string GetName();
+	const std::string& GetName() const;
 	std::string GetParentName();
 
 	void SetParentName(std::string name);
@@ -86,6 +117,7 @@ public:
 	void SetUserPoint(void* pointer);
 
 	Model* GetModel();
+	void SetModel(Model* model);
 	std::shared_ptr<btRigidBody> GetRigidBody();
 	btCollisionShape* GetCollisionShape();
 	btConvexHullShape* GetConvexHull();
@@ -104,9 +136,14 @@ public:
 	bool IncludedInRayCast();
 	void IncludInGI(bool state);
 
+
 	bool IncludedInGI();
 
 	ObjectType objectType = ObjectType::DEFAULT;
+
+
+	Destructible destructable;
+
 
 private:
 	Transform transform = Transform();

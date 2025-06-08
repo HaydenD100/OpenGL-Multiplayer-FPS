@@ -7,7 +7,7 @@
 
 Door::Door(std::string Name, Model* door, Model* frame, glm::vec3 position, glm::vec3 GameObjectRotation, bool inWards) {
 	name = Name;
-	int doorFrameIndex = SceneManager::GetCurrentScene()->AddGameObject(GameObject(name + "_frame", frame, position, false, 0, Concave)) ;
+	int doorFrameIndex = SceneManager::GetCurrentScene()->AddGameObject(std::move(std::make_unique<GameObject>(name + "_frame", frame, position, false, 0, Concave))) ;
 	int doorIndex = SceneManager::GetCurrentScene()->AddGameObject(name + "_door", door, position, false, 0, Concave);
 	GameObject* gameobject = SceneManager::GetCurrentScene()->GetGameObject(name + "_door");
 	GameObject* gameobjectFrame = SceneManager::GetCurrentScene()->GetGameObject(name + "_frame");

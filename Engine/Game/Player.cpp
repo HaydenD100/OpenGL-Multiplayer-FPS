@@ -71,8 +71,8 @@ namespace Player
 	void Player::Init() {
 		timeSinceDeath = glfwGetTime();
 		srand((unsigned int)time(nullptr));
-		SceneManager::GetCurrentScene()->g_objects.push_back(GameObject("player", AssetManager::GetModel("player") , glm::vec3(0, 10, 5), false, 1, Capsule, 0.5, 2.2, 0.5));
-		SceneManager::GetCurrentScene()->g_objects.push_back(GameObject("player_head", AssetManager::GetModel("player"), glm::vec3(0, 10, 5), false, 0, Sphere, 0, 0, 0));
+		SceneManager::GetCurrentScene()->g_objects.push_back(std::make_unique<GameObject>("player", AssetManager::GetModel("player") , glm::vec3(0, 10, 5), false, 1, Capsule, 0.5, 2.2, 0.5));
+		SceneManager::GetCurrentScene()->g_objects.push_back(std::make_unique<GameObject>("player_head", AssetManager::GetModel("player"), glm::vec3(0, 10, 5), false, 0, Sphere, 0, 0, 0));
 		GameObject* player_head = SceneManager::GetCurrentScene()->GetGameObject("player_head");
 		GameObject* player_body = SceneManager::GetCurrentScene()->GetGameObject("player");
 
@@ -131,10 +131,10 @@ namespace Player
 				ObjectType type = static_cast<ObjectType>(reinterpret_cast<uintptr_t>(hit.m_collisionObject->getUserPointer()));
 				GameObject* gameobject = nullptr;
 				if (type == ObjectType::GLASS) {
-					gameobject = &SceneManager::GetCurrentScene()->g_glass[hit.m_collisionObject->getUserIndex()];
+					gameobject = SceneManager::GetCurrentScene()->g_glass[hit.m_collisionObject->getUserIndex()].get();
 				}
 				else if(type == ObjectType::DEFAULT) {
-					gameobject = &SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()];
+					gameobject = SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()].get();
 				}
 
 				if (gameobject != nullptr)
@@ -195,7 +195,21 @@ namespace Player
 						return;
 					}
 					else if (type == ObjectType::DEFAULT) {
-						gameobject = &SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()];
+						gameobject = SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()].get();
+					}
+					else if (type == ObjectType::DESTORYABLE) {
+						gameobject = SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()].get();
+						if (gameobject->destructable.m_destoryed_object != "") {
+							Model* model = AssetManager::GetModel(gameobject->destructable.m_destoryed_object);
+							if (model) {
+								gameobject->SetModel(model);
+								gameobject->GetRigidBody()->setCollisionShape(gameobject->destructable.convexHullShape);
+								AudioManager::PlaySound(gameobject->destructable.m_destoryed_sound, gameobject->GetPosition());
+								std::cout << gameobject->destructable.m_destoryed_object << "\n";
+							}
+								
+								//PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody()
+						}
 					}
 					else {
 						return;
@@ -272,7 +286,7 @@ namespace Player
 	void Player::Graffite() {
 		btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit();
 		if (hit.m_collisionObject != nullptr) {
-			GameObject* gameobject = &SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()];
+			GameObject* gameobject = SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()].get();
 			if (gameobject != nullptr)
 			{
 				btVector3 start = hit.m_rayFromWorld; // Ray origin
@@ -439,7 +453,7 @@ namespace Player
 		if (Input::KeyPressed(INTERACT)) {
 			btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit();
 			if (hit.m_collisionObject != nullptr) {
-				GameObject* gameobject = &SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()];
+				GameObject* gameobject = SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()].get();
 				if (gameobject != nullptr && glm::distance(gameobject->getPosition(), getPosition()) <= interactDistance)
 					interactingWithName = gameobject->GetName();
 			}
