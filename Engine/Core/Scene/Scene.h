@@ -72,7 +72,7 @@ public:
 
 
 
-
+	float m_seaLevel = 0;
 private:
 	std::vector<GameObject*> NeedRendering;
 	EnviromentLighting envLight;

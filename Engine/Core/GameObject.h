@@ -150,6 +150,9 @@ public:
 
 	Destructible destructable;
 
+	float m_mass = 1;
+	float m_buoyancy = 0;
+
 
 private:
 	Transform transform = Transform();

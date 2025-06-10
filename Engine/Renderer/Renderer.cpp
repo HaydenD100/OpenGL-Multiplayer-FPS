@@ -904,9 +904,6 @@ namespace Renderer
 
 		s_water.Use();
 		glPatchParameteri(GL_PATCH_VERTICES, 4);
-		GameObject* water = SceneManager::GetCurrentScene()->g_water[0].get();
-		//Upload the water plane data
-		glm::mat4 ModelMatrix = water->GetModelMatrix();
 
 		s_water.SetVec3("viewpos", Camera::GetPosition());
 		glActiveTexture(GL_TEXTURE0);
@@ -915,21 +912,26 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
 		s_water.SetMat4("P", Camera::getProjectionMatrix());
 		s_water.SetMat4("V", Camera::getViewMatrix());
-		s_water.SetMat4("M", water->GetModelMatrix());
+		s_water.SetVec3("cameraPosition", Camera::GetPosition());
+
 		s_water.SetFloat("time", glfwGetTime());
 		s_water.SetVec3Array("randomDir", _randomdir);
 
-		s_water.SetVec3("cameraPosition", Camera::GetPosition());
-		water->GetModel()->GetMesh(0)->UploadData();
 
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+		for (int i = 0; i < SceneManager::GetCurrentScene()->g_water.size(); i++) {
+			GameObject* water = SceneManager::GetCurrentScene()->g_water[i].get();
+			//Upload the water plane data
+			glm::mat4 ModelMatrix = water->GetModelMatrix();
 
-		glDrawElements(
-			GL_PATCHES,      // mode
-			(GLsizei)water->GetModel()->GetMesh(0)->indices.size(),    // count
-			GL_UNSIGNED_SHORT,   // type
-			(void*)0           // element array buffer offset
-		);
+			s_water.SetMat4("M", water->GetModelMatrix());
+			water->GetModel()->GetMesh(0)->UploadData();
+			glDrawElements(
+				GL_PATCHES,      // mode
+				(GLsizei)water->GetModel()->GetMesh(0)->indices.size(),    // count
+				GL_UNSIGNED_SHORT,   // type
+				(void*)0           // element array buffer offset
+			);
+		}
 
 		if (Input::KeyDown('m'))
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

@@ -10,6 +10,8 @@ GameObject::GameObject() = default;
 GameObject::GameObject(std::string name, bool save, float mass, ColliderShape shape) {
 	this->name = name;
 	parentName = "";
+	m_mass = mass;
+
 }
 
 GameObject::GameObject(std::string name, glm::vec3 position, bool save, float mass, ColliderShape shape) {
@@ -22,6 +24,7 @@ GameObject::GameObject(std::string name, glm::vec3 position, bool save, float ma
 GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, btConvexHullShape* shape) {
 	this->name = name;
 	this->model = model;
+	m_mass = mass;
 	parentName = "";
 	canSave = save;
 	Btransform.setOrigin(glmToBtVector3(position));
@@ -116,6 +119,7 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 		std::cout << "model is null \n";
 	this->name = name;
 	this->model = model;
+	m_mass = mass;
 	parentName = "";
 
 	canSave = save;
@@ -295,6 +299,7 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	this->model = model;
 	parentName = "";
 	canSave = save;
+	m_mass = mass;
 
 	Btransform.setOrigin(glmToBtVector3(position));
 

@@ -19,6 +19,15 @@
             "rotationZ": 0.0
         },
         {
+            "name": "pool",
+            "positionX": 3.0,
+            "positionY": 0.20000000298023224,
+            "positionZ": 0.0,
+            "rotationX": 0.0,
+            "rotationY": -0.0,
+            "rotationZ": 0.0
+        },
+        {
             "name": "Crates",
             "positionX": 3.0,
             "positionY": -1.0,
@@ -35,6 +44,96 @@
             "rotationX": -1.5708000659942627,
             "rotationY": 0.0,
             "rotationZ": 0.0
+        },
+        {
+            "name": "uni_float",
+            "positionX": 6.916021347045898,
+            "positionY": -0.683959424495697,
+            "positionZ": -0.5363954305648804,
+            "rotationX": -1.5706350803375244,
+            "rotationY": -0.09917294979095459,
+            "rotationZ": 2.462221891619265e-05
+        },
+        {
+            "name": "uni_float1",
+            "positionX": 1.3990864753723145,
+            "positionY": 0.6884729862213135,
+            "positionZ": 1.799473524093628,
+            "rotationX": -0.4526434540748596,
+            "rotationY": -0.4706990420818329,
+            "rotationZ": 2.1553261280059814
+        },
+        {
+            "name": "uni_float2",
+            "positionX": 7.5163960456848145,
+            "positionY": -0.3115231990814209,
+            "positionZ": 1.1299077272415161,
+            "rotationX": 1.6011199951171875,
+            "rotationY": -0.3986091613769531,
+            "rotationZ": 0.9382540583610535
+        },
+        {
+            "name": "uni_float3",
+            "positionX": 0.05817440524697304,
+            "positionY": -0.6839856505393982,
+            "positionZ": 2.9400482177734375,
+            "rotationX": -1.5706180334091187,
+            "rotationY": 0.3928365111351013,
+            "rotationZ": 3.9582577301189303e-05
+        },
+        {
+            "name": "targetHolder",
+            "positionX": 6.0,
+            "positionY": 2.0,
+            "positionZ": 0.0,
+            "rotationX": 0.0,
+            "rotationY": -0.0,
+            "rotationZ": 0.0
+        },
+        {
+            "name": "target",
+            "positionX": 5.994568824768066,
+            "positionY": 1.5600662231445313,
+            "positionZ": 4.203895392974451e-45,
+            "rotationX": -5.605193857299268e-45,
+            "rotationY": 2.802596928649634e-45,
+            "rotationZ": -0.02468818612396717
+        },
+        {
+            "name": "targetHolder2",
+            "positionX": 6.0,
+            "positionY": 2.0,
+            "positionZ": 0.5,
+            "rotationX": 0.0,
+            "rotationY": -0.0,
+            "rotationZ": 0.0
+        },
+        {
+            "name": "target2",
+            "positionX": 6.009432792663574,
+            "positionY": 1.560191035270691,
+            "positionZ": 0.5000001192092896,
+            "rotationX": 0.0,
+            "rotationY": 5.605193857299268e-45,
+            "rotationZ": 0.04288725554943085
+        },
+        {
+            "name": "targetHolder3",
+            "positionX": 6.0,
+            "positionY": 2.0,
+            "positionZ": 1.0,
+            "rotationX": 0.0,
+            "rotationY": -0.0,
+            "rotationZ": 0.0
+        },
+        {
+            "name": "target3",
+            "positionX": 5.970619201660156,
+            "positionY": 1.561959981918335,
+            "positionZ": 1.000000238418579,
+            "rotationX": 5.605193857299268e-45,
+            "rotationY": 5.605193857299268e-45,
+            "rotationZ": -0.13394422829151154
         },
         {
             "name": "knife",
@@ -83,30 +182,21 @@
         },
         {
             "name": "player",
-            "positionX": -5.862951278686523,
-            "positionY": 0.09597969055175781,
-            "positionZ": 12.66675853729248,
+            "positionX": 0.06501883268356323,
+            "positionY": 0.6665117144584656,
+            "positionZ": -1.3313748836517334,
             "rotationX": 0.0,
             "rotationY": -0.0,
             "rotationZ": 0.0
         },
         {
             "name": "player_head",
-            "positionX": -5.862951278686523,
-            "positionY": 1.0959796905517578,
-            "positionZ": 12.66675853729248,
-            "rotationX": -2.9735937118530273,
-            "rotationY": 0.6049143075942993,
-            "rotationZ": -3.1415927410125732
-        },
-        {
-            "name": "pickupco9QR62hdO",
-            "positionX": -1.7631100416183472,
-            "positionY": -0.8873933553695679,
-            "positionZ": 8.841498374938965,
-            "rotationX": -0.13729628920555115,
-            "rotationY": 6.906688213348389e-06,
-            "rotationZ": -1.5707368850708008
+            "positionX": 0.06501883268356323,
+            "positionY": 1.6665117740631104,
+            "positionZ": -1.3313748836517334,
+            "rotationX": -2.3255929946899414,
+            "rotationY": 0.722137451171875,
+            "rotationZ": 3.141592502593994
         }
     ],
     "lights": [

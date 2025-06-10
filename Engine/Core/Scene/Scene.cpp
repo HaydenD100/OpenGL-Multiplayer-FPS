@@ -157,6 +157,10 @@ void Scene::LoadAssets() {
 
 	AssetManager::AddModel("Cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("metalic")));
 
+	AssetManager::AddModel("pool", Model("Assets/Objects/FBX/pool.obj", AssetManager::GetTexture("white")));
+	AssetManager::AddModel("pool_water", Model("Assets/Objects/FBX/pool_water.obj", AssetManager::GetTexture("white"), 0));
+
+
 	AssetManager::AddModel("room1", Model("Assets/Maps/room1.obj", AssetManager::GetTexture("white")));
 
 	
@@ -220,10 +224,18 @@ void Scene::Load() {
 	AddGameObject("room1", AssetManager::GetModel("room1"), glm::vec3(0, 0.1, 0), true, 0, Concave);
 	GetGameObject("room1")->IncludInGI(true);
 
-	
-	g_water.push_back(std::make_unique<GameObject>("water", AssetManager::GetModel("water"), glm::vec3(0, -2, 0), true, 0, Box));
+
+	AddGameObject("pool", AssetManager::GetModel("pool"), glm::vec3(3, 0, 0), true, 0, Concave);
+	g_water.push_back(std::make_unique<GameObject>("pool_water", AssetManager::GetModel("pool_water"), glm::vec3(3, 0, 0), true, 0, None));
 	g_water[0]->GetRigidBody()->setUserIndex(0);
 	g_water[0]->GetRigidBody()->setUserPointer((void*)ObjectType::WATER);
+	
+	g_water.push_back(std::make_unique<GameObject>("water", AssetManager::GetModel("water"), glm::vec3(0, -2, 0), true, 0, None));
+	g_water[1]->GetRigidBody()->setUserIndex(1);
+	g_water[1]->GetRigidBody()->setUserPointer((void*)ObjectType::WATER);
+	m_seaLevel = -2;
+
+
 
 	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(0, 0, 0), false, 1.0, Convex);
 	AddGlass("cubeGlass", AssetManager::GetModel("cubeGlass"), glm::vec3(-3, 0, 0), false, 0.0, Convex);
@@ -247,17 +259,20 @@ void Scene::Load() {
 
 	GetGameObject("uni_float")->destructable = desruct;
 
-	AddGameObject("uni_float1", AssetManager::GetModel("uni_float"), glm::vec3(3, 2, 2), true, 2, Convex);
+	AddGameObject("uni_float1", AssetManager::GetModel("uni_float"), glm::vec3(3, 2, 2), true, 0.5, Convex);
 	GetGameObject("uni_float1")->GetRigidBody()->setUserPointer((void*)ObjectType::DESTORYABLE);
 	GetGameObject("uni_float1")->destructable = desruct;
+	GetGameObject("uni_float1")->m_buoyancy = 6.0;
 
-	AddGameObject("uni_float2", AssetManager::GetModel("uni_float"), glm::vec3(3, 4, 2), true, 2, Convex);
+	AddGameObject("uni_float2", AssetManager::GetModel("uni_float"), glm::vec3(3, 4, 2), true, 0.5, Convex);
 	GetGameObject("uni_float2")->GetRigidBody()->setUserPointer((void*)ObjectType::DESTORYABLE);
 	GetGameObject("uni_float2")->destructable = desruct;
+	GetGameObject("uni_float2")->m_buoyancy = 6.0;
 
-	AddGameObject("uni_float3", AssetManager::GetModel("uni_float"), glm::vec3(3, 5, 2), true, 2, Convex);
+	AddGameObject("uni_float3", AssetManager::GetModel("uni_float"), glm::vec3(3, 5, 2), true, 0.5, Convex);
 	GetGameObject("uni_float3")->GetRigidBody()->setUserPointer((void*)ObjectType::DESTORYABLE);
 	GetGameObject("uni_float3")->destructable = desruct;
+	GetGameObject("uni_float3")->m_buoyancy = 6.0;
 
 	//AddGameObject("crate_t", AssetManager::GetModel("breakable_crate_t"), glm::vec3(6, 2, 0), true, 2, Convex);
 	//AddGameObject("crate_b", AssetManager::GetModel("breakable_crate_b"), glm::vec3(6, 2, 0), true, 2, Convex);
@@ -383,6 +398,58 @@ void Scene::Update(float deltaTime) {
 	}
 	for (int i = 0; i < g_objects.size(); i++) {
 		g_objects[i]->Update();
+		btRigidBody* rb = g_objects[i]->GetRigidBody().get();
+		if (!rb || g_objects[i]->m_mass == 0)
+			continue;
+
+		//A little hack for the unicorn's if not they dont float on the middle
+		if (g_objects[i]->GetPosition().y < m_seaLevel) {
+
+			if (g_objects[i]->destructable.m_destoryed) {
+				float buoyancy = g_objects[i]->m_buoyancy; // e.g. 8
+				float upwardForce = 4;
+				rb->applyCentralForce(btVector3(0, upwardForce, 0));
+				continue;
+			}
+
+			float depth = m_seaLevel - g_objects[i]->GetPosition().y;
+			//rb->setGravity(btVector3(0, g_objects[i]->m_buoyancy * depth, 0));
+
+			float buoyancy = g_objects[i]->m_buoyancy; // e.g. 8
+			float upwardForce = buoyancy * depth * 8;
+			rb->applyCentralForce(btVector3(0, upwardForce, 0));
+			rb->setDamping(0.5f, 0.5f);
+
+			btQuaternion currentRot = rb->getOrientation();
+			btQuaternion targetRot(btVector3(1, 0, 0), -SIMD_HALF_PI);
+
+			
+			btQuaternion error = targetRot * currentRot.inverse();
+			error.normalize();
+
+			btVector3 axis(error.x(), error.y(), error.z());
+			float angle = 2 * acos(error.w());
+			if (angle > SIMD_PI) angle -= SIMD_2_PI;
+
+			if (axis.length2() > 0.0001f) {
+				axis.normalize();
+
+				float stiffness = 2.0f;
+				btVector3 correctiveTorque = axis * angle * stiffness;
+
+				float damping = 5.0f;
+				btVector3 angularVel = rb->getAngularVelocity();
+				btVector3 dampingTorque = -angularVel * damping;
+
+				rb->applyTorque(correctiveTorque + dampingTorque);
+			}
+			
+		}
+		else {
+			//rb->setDamping(0.0f, 0.0f);
+
+		}
+
 	}
 	for (int i = 0; i < g_glass.size(); i++) {
 		g_glass[i]->Update();

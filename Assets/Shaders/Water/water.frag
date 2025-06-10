@@ -110,7 +110,7 @@ vec3 Tonemap_ACES(const vec3 x) { // Narkowicz 2015, "ACES Filmic Tone Mapping C
 void main() {
 
 
-    vec3 albedo = vec3(0, 0.4, 0.6);
+    vec3 albedo = vec3(0, 0.4, 0.6) * 2;
 
     vec3 I = normalize(viewpos - FragPos);
     vec3 R = reflect(I, normalize(N));
@@ -122,11 +122,7 @@ void main() {
     // Tone mapping and gamma correction FIRST
 
     float roughness = 0.04;
-    //if(roughness == -1)
-        //roughness = texture(RoughnessTextureSampler, UV).r;
     float metallic = 0.0;
-    //if(metallic == -1)
-       // metallic =texture(MetalicTextureSampler, UV).r;
 
 
     vec2 uv = gl_FragCoord.xy / vec2(textureSize(uDepthMap, 0));
@@ -245,6 +241,6 @@ void main() {
     //distortedUV *= mix(1.0, 1.0 + 2.0 * 0.2, 0.3);
 
     gTransparent = vec4(Lo+ 0.01,0.2);
-    gData = vec4(0,0,0,0.2);
+    gData = vec4(distortedUV,0,0.2);
 
 }
