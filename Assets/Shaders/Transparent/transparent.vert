@@ -10,6 +10,7 @@ out vec2 UV;
 out mat3 TBN; // Tangent-Bitangent-Normal matrix
 out vec4 FragPos;
 out vec3 FragN;
+out vec4 viewFragPos;
 
 uniform mat4 MVP;
 uniform mat4 V;
@@ -32,4 +33,5 @@ void main()
     TBN = mat3(tangent, bitangent, normal); // Construct TBN matrix for transforming the normal map
     FragN = normalize(M * vec4(vertexNormal_modelspace,0)).xyz;
     gl_Position = P * V * FragPos;
+    viewFragPos = V * FragPos;
 }

@@ -1,10 +1,14 @@
 #pragma once
 #include "Engine/Core/Common/Header.h"
+#include "Engine/Animation/Bone.h"
+#include "Engine/Renderer/Model.h"
+
+#include <iostream>
+#include <map>
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
-#include <iostream>
 
 struct RigidComponent {
 	int ID;
@@ -37,4 +41,6 @@ private:
 	
 	
 };
+
+
 

@@ -167,7 +167,7 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("breakable_crate_l", Model("Assets/Objects/FBX/Crate/side.obj", AssetManager::GetTexture("white")));
 
 	AssetManager::AddModel("uni_float", Model("Assets/Objects/FBX/unicorn.fbx", AssetManager::GetTexture("unicorn")));
-	AssetManager::AddModel("uni_float_defalated", Model("Assets/Objects/FBX/unicorn_defalated.fbx", AssetManager::GetTexture("unicorn")));
+	AssetManager::AddModel("uni_float_defalated", Model("Assets/Objects/FBX/unicorn_defalated_rig.fbx", AssetManager::GetTexture("unicorn")));
 
 	//Super laggy
 	//AssetManager::AddModel("GI_map_1", Model("Assets/Maps/Sponza/sponza.obj", AssetManager::GetTexture("white")));
@@ -203,8 +203,9 @@ void Scene::LoadAssets() {
 	AssetManager::AddDecal("freaky_decal", AssetManager::GetTexture("freaky"), glm::vec3(1, 0.1, 1));
 
 	//these are diffrent animations from skinnedanimation
-	//AnimationManager::AddAnimation(Animation("Assets/Animations/door_open.fbx", "door_open"));
+	//AnimationManager::AddAnimation(Animation(, "unicorn_deflated"));
 	//AnimationManager::AddAnimation(Animation("Assets/Animations/door_close.fbx", "door_close"));	
+	//ragdoll = SkinnedAnimation("Assets/Objects/FBX/unicorn_defalated_rig.fbx", AssetManager::GetModel("uni_float_defalated"), 0, "uni_float_defalated");
 
 }
 
@@ -311,6 +312,7 @@ void Scene::Load() {
 		axisInA, axisInB,
 		false // <-- Add this
 	);
+
 	// Optional: limit the hinge rotation
 	hinge1->setLimit(-SIMD_PI / 1.2, SIMD_PI / 1.2);
 	// Add to dynamics world

@@ -15,6 +15,10 @@ struct AssimpNodeData
     std::vector<AssimpNodeData> children;
 };
 
+struct RagDollData {
+    std::vector<btRigidBody> m_bodies;
+};
+
 class SkinnedAnimation
 {
 public:
@@ -39,13 +43,13 @@ public:
             ReadMissingBones(animation, *model);
 
 
-            //std::vector<float> boneLengths;
-            //calculateBoneLengths(scene->mRootNode, scene, boneLengths);
+           // std::vector<float> boneLengths;
+            // calculateBoneLengths(scene->mRootNode, scene, boneLengths);
 
             // Output the bone lengths
             //for (float length : boneLengths) {
                 //std::cout << "Bone length: " << length << std::endl;
-            //}
+           // }
         }
         animationName = AnimationName;
     }

@@ -4,7 +4,10 @@ layout(quads, equal_spacing, ccw) in; // Correct input primitive
 out vec2 UV;
 out vec3 N;
 out vec3 FragPos;
+out vec4 viewFragPos;
+
 in vec2 uvsCoord[];
+
 
 uniform mat4 MVP;
 uniform mat4 V;
@@ -150,5 +153,6 @@ void main() {
 
 
     FragPos = pos;
+    viewFragPos = V * vec4(pos, 1.0);
     gl_Position = P * V * vec4(pos, 1.0); // Add model-view-projection matrix here
 }

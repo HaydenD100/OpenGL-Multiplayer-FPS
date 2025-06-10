@@ -8,6 +8,8 @@
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/Gbuffer.h"
 #include "Engine/Renderer/BufferLighting.h"
+#include "Engine/Renderer/BufferTransparent.h"
+
 #include "Engine/Renderer/BufferSSAO.h"
 #include "Engine/Renderer/BufferSSR.h"
 #include "Engine/Renderer/Texture3D.h"

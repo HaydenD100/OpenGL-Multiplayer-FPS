@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Renderer\BufferTransparent.cpp" />
     <ClCompile Include="Engine\Editor\Editor.cpp" />
     <ClCompile Include="Engine\Core\Common\RenderCommon.h" />
     <ClCompile Include="Engine\Core\Debug\BulletDebug.cpp" />
@@ -242,8 +243,6 @@
     <None Include="Assets\Shaders\Particles\particle.vert" />
     <None Include="Assets\Shaders\Particles\simParticle.comp" />
     <None Include="Assets\Shaders\PostProccess\post.comp" />
-    <None Include="Assets\Shaders\PostProccess\post.frag" />
-    <None Include="Assets\Shaders\PostProccess\post.vert" />
     <None Include="Assets\Shaders\Shadow\depth.frag" />
     <None Include="Assets\Shaders\Shadow\depth.geom" />
     <None Include="Assets\Shaders\Shadow\depth.vert" />
@@ -274,6 +273,7 @@
     <Text Include="todo.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Renderer\BufferTransparent.h" />
     <ClInclude Include="Engine\Editor\Editor.h" />
     <ClInclude Include="Engine\Core\Common\GameCommon.h" />
     <ClInclude Include="Engine\Core\Debug\BulletDebug.h" />

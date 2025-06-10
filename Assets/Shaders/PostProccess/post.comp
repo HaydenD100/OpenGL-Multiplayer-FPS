@@ -7,7 +7,7 @@ layout(binding = 0)uniform sampler2D gLighting;
 layout(binding = 2) uniform sampler2D gEmissive; 
 layout(binding = 1) uniform sampler2D gSSR; 
 layout(binding = 3 )uniform sampler2D gTransparent; 
-layout(binding = 4 )uniform sampler2D gTransparentUV; 
+layout(binding = 4 )uniform sampler2D gData; 
 
 uniform vec2 screen;
 
@@ -41,6 +41,8 @@ void main() {
 
     // Retrieve data from G-buffer
     vec4 transparent = texture(gTransparent, UV).rgba;
+    vec4 transparentData = texture(gData, UV).rgba;
+
     vec4 lighting = vec4(texture(gLighting, UV).rgb, 1.0);
 
     vec4 ssr = vec4(texture(gSSR, UV).rg,0,0);
@@ -52,11 +54,11 @@ void main() {
     if(transparent.rgb != vec3(0)){
         //vec4 blurredImage = boxBlur2D(UV, vec2(0.0015), 5);
 
-        vec4 backgroundSample = texture(gLighting, clamp(UV + transparent.xy,0.0,1.0));
-        backgroundSample += texture(gEmissive, clamp(UV + transparent.xy,0.0,1.0));
-        backgroundSample = boxBlur2D(UV + transparent.xy,vec2(0.0005),3);
+        vec4 backgroundSample = texture(gLighting, clamp(UV + transparentData.xy,0.0,1.0));
+        backgroundSample += texture(gEmissive, clamp(UV + transparentData.xy,0.0,1.0));
+        backgroundSample = boxBlur2D(UV + transparentData.xy,vec2(0.0005),3);
 
-        vec4 blended = backgroundSample + vec4(transparent.z * 2);
+        vec4 blended =  backgroundSample + vec4(transparent.rgb,0);
 
         imageStore(gFinal, coords, blended);
     }else{

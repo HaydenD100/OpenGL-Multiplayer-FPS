@@ -129,9 +129,6 @@ namespace Renderer
 	ComputeShader cs_water_height_fft_col;
 	ComputeShader cs_water_height_fft_row;
 	ComputeShader cs_sim_particle;
-
-
-
 	ComputeShader cs_probeIrradiance;
 	ComputeShader cs_Raycaster;
 
@@ -149,6 +146,8 @@ namespace Renderer
 	BufferSSR fxaaBuffer;
 	BufferLighting lightingBuffer;
 	BufferLighting postBuffer;
+	BufferTransparent transparentBuffer;
+
 	ProbeGrid probeGrid;
 
 	//some objects will be withheld from rendering in the gemoetry render
@@ -206,7 +205,7 @@ namespace Renderer
 
 		s_water.Use();
 		for (int i = 0; i < 26; i++) {
-			s_water.SetInt("depthMap[" + std::to_string(i) + "]", 8 + i);
+			s_water.SetInt("lights[" + std::to_string(i) + "].depthMap", 8 + i);
 		}
 
 
@@ -214,11 +213,6 @@ namespace Renderer
 		s_skybox.SetInt("skybox", 0);
 
 		s_transparent.Use();
-		s_transparent.SetInt("DiffuseTextureSampler", 0);
-		s_transparent.SetInt("NormalTextureSampler", 1);
-		s_transparent.SetInt("RoughnessTextureSampler", 2);
-		s_transparent.SetInt("MetalicTextureSampler", 3);
-		s_transparent.SetInt("envMap", 4);
 
 		for (int i = 0; i < 26; i++) {
 			s_transparent.SetInt("lights[" + std::to_string(i) + "].depthMap", 8 + i);
@@ -415,7 +409,7 @@ namespace Renderer
 		postBuffer.Configure();
 		fxaaBuffer.Configure(Backend::GetWidth(), Backend::GetHeight());
 		emmisiveRenderer.Init(Backend::GetWidth(), Backend::GetHeight());
-
+		transparentBuffer.Configure();
 
 		//TODO :: I hate this i wish i could just get it work in the gbuffer but ive spent to long trying to fix it 
 		glGenFramebuffers(1, &FinalFrameFBO);
@@ -439,6 +433,7 @@ namespace Renderer
 		lightingBuffer.Destroy();
 		postBuffer.Destroy();
 		fxaaBuffer.Destroy();
+		transparentBuffer.Destroy();
 		//emmisiveRenderer.Destroy();
 	}
 
@@ -584,7 +579,6 @@ namespace Renderer
 		gbuffer.Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetEnviromentLighting().sky);
-		waterObjects.clear();
 
 		s_geomerty.Use();
 		s_geomerty.SetMat4("P", Camera::getProjectionMatrix());
@@ -620,7 +614,8 @@ namespace Renderer
 			gameobjectRender->RenderObject(s_geomerty.GetShaderID());
 		}
 
-		RenderWater();
+
+
 
 		//ParticleSystem::RenderParticles();
 
@@ -679,7 +674,13 @@ namespace Renderer
 		}
 
 		//-----------------------------------------Transaprent stuff---------------------------------------
-		
+		transparentBuffer.Bind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		SetLights(SceneManager::GetCurrentScene()->g_lights, &s_water);
+
+		RenderWater();
+
 		s_transparent.Use();
 		s_transparent.SetMat4("P", Camera::getProjectionMatrix());
 		s_transparent.SetMat4("V", Camera::getViewMatrix());
@@ -688,6 +689,8 @@ namespace Renderer
 		SetLights(SceneManager::GetCurrentScene()->g_lights, &s_transparent);
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, SceneManager::GetCurrentScene()->GetEnviromentLighting().sky.GetTextureID());
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
 		glm::vec3 cameraPosition = Camera::GetPosition(); // Camera position
 		//TODO :: CHANGE THIS TO OIT this gets slow if theres too many transparent objects
 		
@@ -863,7 +866,9 @@ namespace Renderer
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, emmisiveRenderer.BloomTexture());
 		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, gbuffer.gtransparent);
+		glBindTexture(GL_TEXTURE_2D, transparentBuffer.gLighting);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, transparentBuffer.gData);
 
 		glBindImageTexture(7, postBuffer.gLighting, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
@@ -906,6 +911,8 @@ namespace Renderer
 		s_water.SetVec3("viewpos", Camera::GetPosition());
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, SceneManager::GetCurrentScene()->GetEnviromentLighting().sky.GetTextureID());
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
 		s_water.SetMat4("P", Camera::getProjectionMatrix());
 		s_water.SetMat4("V", Camera::getViewMatrix());
 		s_water.SetMat4("M", water->GetModelMatrix());

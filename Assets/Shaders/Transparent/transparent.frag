@@ -1,7 +1,7 @@
 #version 430 core
 
-layout (location = 6) out vec4 gTransparent;  // Stores both albedo and specular in one vector
-layout (location = 7) out vec4 gTransparentUV;  // Stores both albedo and specular in one vector
+layout (location = 0) out vec4 gTransparent;  // Stores both albedo and specular in one vector
+layout (location = 1) out vec4 gData;  // Stores both albedo and specular in one vector
 
 #define MAXLIGHTS 26
 
@@ -10,17 +10,22 @@ layout (location = 7) out vec4 gTransparentUV;  // Stores both albedo and specul
 in vec2 UV;
 in mat3 TBN; // Tangent-Bitangent-Normal matrix\
 in vec3 worldPos;
+in vec4 viewFragPos;
+
 in vec3 Normal;
 in vec3 FragN;
 
 in vec4 FragPos;
 
 
-uniform sampler2D DiffuseTextureSampler;
-uniform sampler2D NormalTextureSampler;
-uniform sampler2D RoughnessTextureSampler;
-uniform sampler2D MetalicTextureSampler;
+layout(binding = 0) uniform sampler2D DiffuseTextureSampler;
+layout(binding = 1) uniform sampler2D NormalTextureSampler;
+layout(binding = 2) uniform sampler2D RoughnessTextureSampler;
+layout(binding = 3) uniform sampler2D MetalicTextureSampler;
 layout(binding = 4) uniform samplerCube envMap;
+
+layout(binding = 5 )uniform sampler2D uDepthMap;
+
 
 uniform float Roughness;
 uniform float Metalic;
@@ -115,7 +120,26 @@ vec3 Tonemap_ACES(const vec3 x) { // Narkowicz 2015, "ACES Filmic Tone Mapping C
     return (x * (a * x + b)) / (x * (c * x + d) + e);
 }
 
+// Function to linearize depth
+float LinearizeDepth(float depth, float near, float far) {
+    float z = depth * 2.0 - 1.0; // Back to NDC [-1, 1]
+    return (2.0 * near * far) / (far + near - z * (far - near));
+}
+
+
 void main() {
+    
+
+    vec2 uv = gl_FragCoord.xy / vec2(textureSize(uDepthMap, 0));
+
+    float fragDepth = -viewFragPos.z;
+    vec3 backgroundPos = texture(uDepthMap, uv).rgb;
+    float sampleDepth = -backgroundPos.z;
+
+
+
+    if(fragDepth > sampleDepth && sampleDepth != 0)
+        discard;
 
 
     vec3 albedo =  pow(texture(DiffuseTextureSampler, UV).rgb,vec3(2.2));
@@ -174,7 +198,11 @@ void main() {
     float Changedalpha = 0.1 * intensity ; 
 
     // Tone mapping and gamma correction FIRST
+   
+    color = mix(color, Tonemap_ACES(color), 1.0);   
+    //color = color / (color  + vec3(1.0));
 
+    color = pow(color, vec3(1.0/2.2));
 
 
     // Calculate refraction direction (simplified)
@@ -189,6 +217,10 @@ void main() {
     // Optional: Add fresnel effect for more realism
     //float edgeScale = 1.0 - smoothstep(0.4, 0.45, length(UV - 0.5));
     //distortedUV *= mix(1.0, 1.0 + 2.0 * 0.2, 0.3);
+    
 
-    gTransparent = vec4(distortedUV,color.x * 10,0.2);
+
+    gTransparent = vec4(color * 2 + 0.01,0.2);
+    gData = vec4(distortedUV,0,0.2);
+
 }
