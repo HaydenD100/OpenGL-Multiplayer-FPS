@@ -19,6 +19,7 @@ enum ObjectType {
 struct Destructible {
 	std::string m_destoryed_object = "";
 	std::string m_destoryed_sound = "";
+	int m_destoryed = 0;
 
 	btConvexHullShape* convexHullShape;
 
@@ -59,6 +60,11 @@ public:
 
 	GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape);
 	GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape, float width, float height, float depth);
+
+	GameObject(const GameObject&) = delete;
+	GameObject& operator=(const GameObject&) = delete;
+	GameObject(GameObject&&) = delete;
+	GameObject& operator=(GameObject&&) = delete;
 
 	glm::mat4 GetModelMatrix();
 	glm::mat4 GetLocalModelMatrix();

@@ -199,16 +199,17 @@ namespace Player
 					}
 					else if (type == ObjectType::DESTORYABLE) {
 						gameobject = SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()].get();
-						if (gameobject->destructable.m_destoryed_object != "") {
+						if (gameobject->destructable.m_destoryed_object != "" && !gameobject->destructable.m_destoryed) {
 							Model* model = AssetManager::GetModel(gameobject->destructable.m_destoryed_object);
 							if (model) {
+								
+								gameobject->destructable.m_destoryed = 1;
 								gameobject->SetModel(model);
 								gameobject->GetRigidBody()->setCollisionShape(gameobject->destructable.convexHullShape);
 								AudioManager::PlaySound(gameobject->destructable.m_destoryed_sound, gameobject->GetPosition());
 								std::cout << gameobject->destructable.m_destoryed_object << "\n";
 							}
 								
-								//PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody()
 						}
 					}
 					else {
