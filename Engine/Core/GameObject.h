@@ -150,8 +150,8 @@ public:
 
 	Destructible destructable;
 
-	float m_mass = 1;
-	float m_buoyancy = 0;
+	float m_mass = 0;
+	float m_buoyancy = 0.0001;
 
 
 private:

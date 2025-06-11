@@ -46,6 +46,7 @@ namespace Player
 
 	const double walkingfootstep_interval = 0.5;
 	const double runningfootstep_interval = 0.3;
+	bool m_isSwimming = false;
 
 	
 	const int weapon_size = 4;
@@ -205,7 +206,7 @@ namespace Player
 								
 								gameobject->destructable.m_destoryed = 1;
 								gameobject->SetModel(model);
-								gameobject->GetRigidBody()->setCollisionShape(gameobject->destructable.convexHullShape);
+								//gameobject->GetRigidBody()->setCollisionShape(gameobject->destructable.convexHullShape);
 								AudioManager::PlaySound(gameobject->destructable.m_destoryed_sound, gameobject->GetPosition());
 								std::cout << gameobject->destructable.m_destoryed_object << "\n";
 							}
@@ -369,6 +370,8 @@ namespace Player
 		Camera::SetPosition(head->getPosition());
 
 		bool IsGrounded = OnGround();
+		m_isSwimming = (Camera::GetPosition().y < SceneManager::GetCurrentScene()->m_seaLevel);
+
 		if (IsGrounded) {
 			player->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
 			player->GetRigidBody()->setLinearVelocity(btVector3(player->GetRigidBody()->getLinearVelocity().x() * 0.0, 0, player->GetRigidBody()->getLinearVelocity().z() * 0.0));
@@ -394,8 +397,16 @@ namespace Player
 		
 		forward = Camera::GetRotation();
 		forward.y = 0;
+
+		//In the water move in the direction of the camera
+		if (m_isSwimming) {
+			player->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
+			player->GetRigidBody()->setLinearVelocity(btVector3( 0.8 * player->GetRigidBody()->getLinearVelocity().x(), 0, 0.8 * player->GetRigidBody()->getLinearVelocity().z()));
+			forward = Camera::GetRotation();
+		}
+
 		forward = glm::normalize(forward);
-		
+
 		// Right vector
 		glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0,1,0)));
 		// Move forward
@@ -419,10 +430,12 @@ namespace Player
 			movement += -right;
 		}
 		
+
 		// Jump
-		if (Input::KeyDown(JUMP) && IsGrounded) {
+		if (Input::KeyDown(JUMP) && (IsGrounded || m_isSwimming)) {
 			movement.y = 1 * jumpforce;
 		}
+
 		if (Input::LeftShiftDown()) {
 			speed = RUNNINGSPEED;
 			footstep_interval = runningfootstep_interval;
@@ -431,15 +444,19 @@ namespace Player
 			speed = CRROUCHINGSPEED;
 			footstep_interval = walkingfootstep_interval * 2;
 		}
-			
 		else {
 			speed = WALKINGSPEED;
 			footstep_interval = walkingfootstep_interval;
 		}
-			
+
+		if (m_isSwimming) {
+			speed *= SWIMMINGMOD;
+		}
+
 		
 		//movement = glm::normalize(movement);
-		float lenght = glm::vec3(movement.x, 0, movement.z).length();
+		//prevent / 0
+		float lenght = glm::vec3(movement.x, 0, movement.z).length() + 0.00001;
 		movement.x = movement.x / lenght;
 		movement.z = movement.z / lenght;
 

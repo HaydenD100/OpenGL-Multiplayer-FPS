@@ -230,10 +230,10 @@ void Scene::Load() {
 	g_water[0]->GetRigidBody()->setUserIndex(0);
 	g_water[0]->GetRigidBody()->setUserPointer((void*)ObjectType::WATER);
 	
-	g_water.push_back(std::make_unique<GameObject>("water", AssetManager::GetModel("water"), glm::vec3(0, -2, 0), true, 0, None));
+	g_water.push_back(std::make_unique<GameObject>("water", AssetManager::GetModel("water"), glm::vec3(0, -1.7, 0), true, 0, None));
 	g_water[1]->GetRigidBody()->setUserIndex(1);
 	g_water[1]->GetRigidBody()->setUserPointer((void*)ObjectType::WATER);
-	m_seaLevel = -2;
+	m_seaLevel = -1.7;
 
 
 
@@ -253,7 +253,7 @@ void Scene::Load() {
 	AddGameObject("uni_float", AssetManager::GetModel("uni_float"), glm::vec3(6, 2, 0), true, 2, Convex);
 	AudioManager::AddSound("Assets/Audio/balloonpop.wav", "pop", glm::vec3(0, 0, 0), 20, 1.8);
 	Destructible desruct;
-	desruct.CreateConvex(AssetManager::GetModel("uni_float_defalated"));
+	//desruct.CreateConvex(AssetManager::GetModel("uni_float_defalated"));
 	desruct.m_destoryed_object = "uni_float_defalated";
 	desruct.m_destoryed_sound = "pop";
 
@@ -403,7 +403,7 @@ void Scene::Update(float deltaTime) {
 			continue;
 
 		//A little hack for the unicorn's if not they dont float on the middle
-		if (g_objects[i]->GetPosition().y < m_seaLevel) {
+		if (g_objects[i]->GetPosition().y < m_seaLevel + 0.3) {
 
 			if (g_objects[i]->destructable.m_destoryed) {
 				float buoyancy = g_objects[i]->m_buoyancy; // e.g. 8
@@ -412,7 +412,7 @@ void Scene::Update(float deltaTime) {
 				continue;
 			}
 
-			float depth = m_seaLevel - g_objects[i]->GetPosition().y;
+			float depth = m_seaLevel + 0.3 - g_objects[i]->GetPosition().y;
 			//rb->setGravity(btVector3(0, g_objects[i]->m_buoyancy * depth, 0));
 
 			float buoyancy = g_objects[i]->m_buoyancy; // e.g. 8

@@ -118,7 +118,7 @@ void main() {
     float fresnel = pow(1.0 - dot(normalize(N), -I), 5.0);
     fresnel = clamp(fresnel, 0.0, 1.0);
 
-    albedo = envColor * albedo;
+    albedo = pow(envColor * albedo,vec3(2.2));
     // Tone mapping and gamma correction FIRST
 
     float roughness = 0.04;
@@ -240,7 +240,7 @@ void main() {
     //float edgeScale = 1.0 - smoothstep(0.4, 0.45, length(UV - 0.5));
     //distortedUV *= mix(1.0, 1.0 + 2.0 * 0.2, 0.3);
 
-    gTransparent = vec4(Lo+ 0.01,0.2);
-    gData = vec4(distortedUV,0,0.2);
+    gTransparent = vec4(color,0.2);
+    gData = vec4(0,0,0,0.2);
 
 }

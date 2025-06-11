@@ -51,5 +51,6 @@ enum Controls {
 	BAKEGI= 'j',
 	PROBETOGGLE = 'y',
 	GUITOGGLE = 'u',
-	EDITORTOGGLE = 'l'
+	EDITORTOGGLE = 'l',
+	SPAWNFLOATIES = 'n'
 };
