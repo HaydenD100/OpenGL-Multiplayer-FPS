@@ -1,5 +1,5 @@
 #version 430 core
-layout (location = 0) out vec3 gPosition;
+layout (location = 0) out vec4 gPosition;
 layout (location = 1) out vec4 gNormal;
 layout (location = 2) out vec4 gAlbedo;  // Stores both albedo and specular in one vector
 layout (location = 3) out vec4 gRMA;  // Stores both albedo and specular in one vector
@@ -30,7 +30,11 @@ uniform bool IsEmissive = false;
 uniform bool HasNormalMap = true;
 
 
-
+float LinearizeDepth(float z, float near, float far)
+{
+    float ndc = z * 2.0 - 1.0; // Convert to Normalized Device Coordinates [-1, 1]
+    return (2.0 * near * far) / (far + near - ndc * (far - near));
+}
 
 void main()
 {    
@@ -54,7 +58,9 @@ void main()
     }
 
     // store the fragment position vector in the first gbuffer texture
-    gPosition = FragPos;
+     float nonLinearDepth = gl_FragCoord.z;
+    float linearDepth = LinearizeDepth(nonLinearDepth, 0.0025, 200.0); // Use your camera near/far
+    gPosition = vec4(FragPos.xyz,linearDepth);
     // also store the per-fragment normals into the gbuffer
     gRMA = vec4(MaterialRoughness,MaterialMetalic,0,0);
     if(HasNormalMap)

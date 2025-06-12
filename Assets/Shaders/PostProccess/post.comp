@@ -8,12 +8,18 @@ layout(binding = 2) uniform sampler2D gEmissive;
 layout(binding = 1) uniform sampler2D gSSR; 
 layout(binding = 3 )uniform sampler2D gTransparent; 
 layout(binding = 4 )uniform sampler2D gData; 
+layout(binding = 5 )uniform sampler2D gTransparentPos; 
+layout(binding = 6 )uniform sampler2D gPosition; 
 
 uniform vec2 screen;
+uniform vec3 viewPos;
+
+uniform bool isDead;
+uniform float isSwimming;
 
 
 vec4 center;
-vec4 boxBlur2D(vec2 texCoords, vec2 texOffset, int kernelSize)
+vec4 boxBlur2D(vec2 texCoords,vec2 offset1, vec2 texOffset, int kernelSize)
 {
     vec4 result = vec4(0.0);
     int kernelRadius = kernelSize / 2; // Radius of the kernel
@@ -24,8 +30,22 @@ vec4 boxBlur2D(vec2 texCoords, vec2 texOffset, int kernelSize)
     {
         for (int y = -kernelRadius; y <= kernelRadius; ++y)
         {
-            // Sample the texture at the offset position
-            result += texture(gLighting, texCoords + vec2(texOffset.x * x, texOffset.y * y)) + texture(gEmissive, texCoords + vec2((texOffset.x + 0.005) * x, (texOffset.y + 0.005) * y));
+             vec2 texCoords2 = texCoords + offset1;
+            float gDepth = texture(gPosition, texCoords2).w;
+
+            vec2 screenCenter = vec2(0.5);
+            float distFromCenter = length(texCoords - screenCenter);
+            float falloff = clamp(1.0 - distFromCenter * 1.5, 0.0, 1.0); // 2.5 is tweakable
+
+            if (gDepth <= texture(gData, texCoords).z)
+                texCoords2 = texCoords; // fallback if in front
+
+            vec2 distortion = texCoords2 - texCoords;
+            texCoords2 = texCoords + distortion * falloff;
+
+            result += texture(gLighting, clamp(texCoords2 + vec2(texOffset.x * x, texOffset.y * y), vec2(0), vec2(1)))
+                    + texture(gEmissive, texCoords2 + vec2((texOffset.x + 0.005) * x, (texOffset.y + 0.005) * y));
+
         }
     }
 
@@ -48,20 +68,31 @@ void main() {
     vec4 ssr = vec4(texture(gSSR, UV).rg,0,0);
     vec2 texSize  = textureSize(gSSR, 0).xy;
     vec4 emissive = vec4(texture(gEmissive, UV).rgb,1); 
-
     vec4 albedo = lighting + emissive;
 
     if(transparent.rgb != vec3(0)){
         //vec4 blurredImage = boxBlur2D(UV, vec2(0.0015), 5);
+        float gDepth = texture(gPosition,UV).w;
+        vec2 backgroundUV = UV;
+        vec4 backgroundSample = boxBlur2D(backgroundUV,transparentData.xy,vec2(0.0000),3);
+        vec4 blended = backgroundSample + vec4(transparent.rgb,0);
 
-        vec4 backgroundSample = texture(gLighting, clamp(UV + transparentData.xy,0.0,1.0));
-        backgroundSample += texture(gEmissive, clamp(UV + transparentData.xy,0.0,1.0));
-        backgroundSample = boxBlur2D(UV + transparentData.xy,vec2(0.0005),3);
 
-        vec4 blended =  backgroundSample + vec4(transparent.rgb,0);
 
+        if(isDead)
+            blended = blended + vec4(1,-0.2,-0.2,1);
+        if(isSwimming > 0)
+            blended = blended + vec4(0, 0.161, 0.239,1) * clamp(isSwimming,0.0f,0.25f) * 4;
+           
+        //blended = vec4(gDepth,texture(gData, UV).z,0,1);
         imageStore(gFinal, coords, blended);
     }else{
+        if(isDead)
+            albedo = albedo + vec4(1,-0.2,-0.2,1);
+        if(isSwimming > 0)
+            albedo = albedo + vec4(0, 0.161, 0.239,1) * clamp(isSwimming,0.0f,0.25f) * 4;
+
+        
         imageStore(gFinal, coords,vec4(albedo.xyz,1));
     }
 

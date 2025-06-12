@@ -1,6 +1,7 @@
 #version 430 core
 layout (location = 0) out vec4 gTransparent;  // Stores both albedo and specular in one vector
 layout (location = 1) out vec4 gData;  // Stores both albedo and specular in one vector
+layout (location = 2) out vec3 gPosition;  // Stores both albedo and specular in one vector
 
 #define MAXLIGHTS 26
 
@@ -97,6 +98,11 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
 vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
+float LinearizeDepth(float z, float near, float far)
+{
+    float ndc = z * 2.0 - 1.0; // Convert to Normalized Device Coordinates [-1, 1]
+    return (2.0 * near * far) / (far + near - ndc * (far - near));
+}
 // ----------------------------------------------------------------------------
 vec3 Tonemap_ACES(const vec3 x) { // Narkowicz 2015, "ACES Filmic Tone Mapping Curve"
     const float a = 2.51;
@@ -110,7 +116,7 @@ vec3 Tonemap_ACES(const vec3 x) { // Narkowicz 2015, "ACES Filmic Tone Mapping C
 void main() {
 
 
-    vec3 albedo = vec3(0, 0.4, 0.6) * 2;
+    vec3 albedo = vec3(0, 1, 0.843);
 
     vec3 I = normalize(viewpos - FragPos);
     vec3 R = reflect(I, normalize(N));
@@ -118,7 +124,12 @@ void main() {
     float fresnel = pow(1.0 - dot(normalize(N), -I), 5.0);
     fresnel = clamp(fresnel, 0.0, 1.0);
 
-    albedo = pow(envColor * albedo,vec3(2.2));
+    vec3 fresnelReflect = pow(envColor, vec3(2.2)); // Convert envColor to linear
+    vec3 baseAlbedo = pow(albedo, vec3(2.2));       // Convert albedo to linear
+
+    albedo = mix(baseAlbedo, fresnelReflect, fresnel);
+
+    // Optional: convert back to sRGB
     // Tone mapping and gamma correction FIRST
 
     float roughness = 0.04;
@@ -189,7 +200,7 @@ void main() {
     //vec3 radiance = lights[i].color * attenuation;
 
     //strength color
-    vec3 radiance = 20.0f * vec3(1,1,1);// * 1.25;
+    vec3 radiance = 40.0f * vec3(1,1,1);// * 1.25;
     //radiuus = 200
 	float attenuation = smoothstep(200, 0,  distance);
 
@@ -232,7 +243,7 @@ void main() {
     vec3 refractDir = refract(viewDir, N, 1.0 / 1.5);
 
     // Apply distortion to UVs
-    vec2 distortedUV =  (refractDir.xy * 0.05);
+    vec2 distortedUV =  (refractDir.xy * 0.03);
 
     // Sample the background scene with distortion
 
@@ -240,7 +251,9 @@ void main() {
     //float edgeScale = 1.0 - smoothstep(0.4, 0.45, length(UV - 0.5));
     //distortedUV *= mix(1.0, 1.0 + 2.0 * 0.2, 0.3);
 
-    gTransparent = vec4(color,0.2);
-    gData = vec4(0,0,0,0.2);
+    float nonLinearDepth = gl_FragCoord.z;
+    float linearDepth = LinearizeDepth(nonLinearDepth, 0.0025, 200.0); // Use your camera near/far
+    gTransparent = vec4(color + vec3(0,0.6,0.6) * 1 ,0.2);
+    gData = vec4(distortedUV,linearDepth,1);
 
 }

@@ -12,6 +12,7 @@ out vec4 FragPos;
 out vec3 FragN;
 out vec4 viewFragPos;
 
+
 uniform mat4 MVP;
 uniform mat4 V;
 uniform mat4 M;

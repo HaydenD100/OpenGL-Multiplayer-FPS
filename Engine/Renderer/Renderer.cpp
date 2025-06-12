@@ -676,7 +676,6 @@ namespace Renderer
 		//-----------------------------------------Transaprent stuff---------------------------------------
 		transparentBuffer.Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		SetLights(SceneManager::GetCurrentScene()->g_lights, &s_water);
 
 		RenderWater();
@@ -712,7 +711,6 @@ namespace Renderer
 			glassObjects[i]->RenderObject(s_transparent.GetShaderID());
 
 		}
-		
 		glDisable(GL_BLEND);
 		
 		//---------------------------------------------------Overlay-------------------------------------
@@ -812,7 +810,6 @@ namespace Renderer
 		cs_lighting.SetVec3("viewPos", Camera::GetPosition());
 		cs_lighting.SetMat4("inverseV", glm::inverse(Camera::getViewMatrix()));
 		cs_lighting.SetMat4("V", Camera::getViewMatrix());
-		cs_lighting.SetBool("isDead", Player::IsDead());
 		cs_lighting.SetVec3("gridWorldPos", probeGrid.postion);
 		cs_lighting.SetVec3("volume", probeGrid.volume);
 		cs_lighting.SetVec3("spacing", probeGrid.spacing);
@@ -869,10 +866,17 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, transparentBuffer.gLighting);
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, transparentBuffer.gData);
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, transparentBuffer.gPosition);
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
+
 
 		glBindImageTexture(7, postBuffer.gLighting, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
 		cs_post.SetVec2("screen", glm::vec2(Backend::GetWidth(), Backend::GetHeight()));
+		cs_post.SetBool("isDead", Player::IsDead());
+		cs_post.SetFloat("isSwimming", Player::m_headUnder);
 
 		probeGrid.Bind(15);
 		//2.23ms with plane and 0.17 with compute
@@ -904,6 +908,7 @@ namespace Renderer
 
 		s_water.Use();
 		glPatchParameteri(GL_PATCH_VERTICES, 4);
+		glDisable(GL_CULL_FACE);
 
 		s_water.SetVec3("viewpos", Camera::GetPosition());
 		glActiveTexture(GL_TEXTURE0);
@@ -932,6 +937,8 @@ namespace Renderer
 				(void*)0           // element array buffer offset
 			);
 		}
+
+		glEnable(GL_CULL_FACE);
 
 		if (Input::KeyDown('m'))
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

@@ -49,7 +49,6 @@ uniform vec2 screen;
 uniform mat4 inverseV; // Inverse of the view matrix
 uniform mat4 V; // View matrix
 
-uniform bool isDead;
 uniform int lightingState;
 
 const float PI = 3.1415926535897932384626433832795;
@@ -482,8 +481,6 @@ void main() {
 
 
     if(skybox == 1){
-        if(isDead)
-            albedo = albedo  + vec3(1,-0.2,-0.2);
         imageStore(gLighting, coords, vec4(albedo,1));
 
         return; // Stop further execution and write this color to the framebuffer
@@ -563,8 +560,6 @@ void main() {
     //color = color / (color  + vec3(1.0));
 
     color = pow(color, vec3(1.0/2.2));
-    if(isDead)
-        color = color + vec3(1,-0.2,-0.2);
 
     //color = Lo;
 

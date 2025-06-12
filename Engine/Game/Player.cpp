@@ -47,6 +47,7 @@ namespace Player
 	const double walkingfootstep_interval = 0.5;
 	const double runningfootstep_interval = 0.3;
 	bool m_isSwimming = false;
+	float m_headUnder = 0;
 
 	
 	const int weapon_size = 4;
@@ -219,7 +220,7 @@ namespace Player
 					
 					if (gameobject != nullptr )
 					{
-						std::cout << "Object Name: " << gameobject->GetName() << "\n";
+						///std::cout << "Object Name: " << gameobject->GetName() << "\n";
 						std::shared_ptr<btRigidBody> body = gameobject->GetRigidBody();
 						if (!body) {
 							return; // Early exit if no rigid body
@@ -370,13 +371,14 @@ namespace Player
 		Camera::SetPosition(head->getPosition());
 
 		bool IsGrounded = OnGround();
-		m_isSwimming = (Camera::GetPosition().y < SceneManager::GetCurrentScene()->m_seaLevel);
+		m_isSwimming = (getPosition().y < SceneManager::GetCurrentScene()->m_seaLevel);
+		m_headUnder = SceneManager::GetCurrentScene()->m_seaLevel - head->getPosition().y;
 
 		if (IsGrounded) {
 			player->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
 			player->GetRigidBody()->setLinearVelocity(btVector3(player->GetRigidBody()->getLinearVelocity().x() * 0.0, 0, player->GetRigidBody()->getLinearVelocity().z() * 0.0));
 		}
-		player->GetRigidBody()->setLinearVelocity(btVector3(player->GetRigidBody()->getLinearVelocity().x() * 0.0, player->GetRigidBody()->getLinearVelocity().y(), player->GetRigidBody()->getLinearVelocity().z() * 0.0));
+		//player->GetRigidBody()->setLinearVelocity(btVector3(player->GetRigidBody()->getLinearVelocity().x() * 0.0, player->GetRigidBody()->getLinearVelocity().y(), player->GetRigidBody()->getLinearVelocity().z() * 0.0));
 			
 		btQuaternion quat;
 		quat.setEuler(0, player->getRotation().y, 0);
@@ -386,8 +388,6 @@ namespace Player
 
 		if (verticalAngle <= maxAngle && verticalAngle >= -maxAngle) 
 			verticalAngle += Input::GetSensitivity() * float(Backend::GetHeight() / 2 - Input::GetMouseY());
-		
-			
 		
 		else if (verticalAngle > maxAngle)
 			verticalAngle = maxAngle;
@@ -401,8 +401,14 @@ namespace Player
 		//In the water move in the direction of the camera
 		if (m_isSwimming) {
 			player->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
-			player->GetRigidBody()->setLinearVelocity(btVector3( 0.8 * player->GetRigidBody()->getLinearVelocity().x(), 0, 0.8 * player->GetRigidBody()->getLinearVelocity().z()));
+			player->GetRigidBody()->setGravity(btVector3(0, -0.1, 0));
+			player->GetRigidBody()->setLinearVelocity(btVector3( 0.8 * player->GetRigidBody()->getLinearVelocity().x(), 0.6 * player->GetRigidBody()->getLinearVelocity().y(), 0.8 * player->GetRigidBody()->getLinearVelocity().z()));
 			forward = Camera::GetRotation();
+
+		}
+		else {
+			player->GetRigidBody()->setGravity(btVector3(0, -10 * 3.0f, 0));
+
 		}
 
 		forward = glm::normalize(forward);
@@ -451,6 +457,7 @@ namespace Player
 
 		if (m_isSwimming) {
 			speed *= SWIMMINGMOD;
+			movement.y *= SWIMMINGMOD;
 		}
 
 		
@@ -645,8 +652,12 @@ namespace Player
 		if(gunName != "nothing")
 			SceneManager::GetCurrentScene()->GetGameObject(gunName)->SetRender(false);
 		gunName = "nothing";
-		setPosition(spawnpoints[spawnpointindex]);
+		setPosition(glm::vec3(0,20,0));
 		isDead = 0;
+
+		btRigidBody* player = SceneManager::GetCurrentScene()->GetGameObject("player")->GetRigidBody().get();
+		player->setAngularVelocity(btVector3(0, 0, 0));
+		player->setLinearVelocity(btVector3(0, 0, 0));
 
 		for (int i = 0; i < weapon_size; i++) {
 			Gun* gun = WeaponManager::GetGunByName(inv[i]);

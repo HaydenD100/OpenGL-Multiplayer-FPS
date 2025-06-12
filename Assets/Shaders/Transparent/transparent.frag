@@ -1,21 +1,18 @@
 #version 430 core
-
 layout (location = 0) out vec4 gTransparent;  // Stores both albedo and specular in one vector
 layout (location = 1) out vec4 gData;  // Stores both albedo and specular in one vector
+layout (location = 2) out vec3 gPosition;  // Stores both albedo and specular in one vector
 
 #define MAXLIGHTS 26
 
-//transparent
+//Glass Shader
 
 in vec2 UV;
 in mat3 TBN; // Tangent-Bitangent-Normal matrix\
-in vec3 worldPos;
-in vec4 viewFragPos;
-
 in vec3 Normal;
 in vec3 FragN;
-
 in vec4 FragPos;
+in vec4 viewFragPos;
 
 
 layout(binding = 0) uniform sampler2D DiffuseTextureSampler;
@@ -219,8 +216,10 @@ void main() {
     //distortedUV *= mix(1.0, 1.0 + 2.0 * 0.2, 0.3);
     
 
+    float nonLinearDepth = gl_FragCoord.z;
+    float linearDepth = LinearizeDepth(nonLinearDepth, 0.0025, 200.0); // Use your camera near/far
+    gTransparent = vec4(color  + 0.01,1);
+    gData = vec4(distortedUV ,linearDepth,1);
 
-    gTransparent = vec4(color * 2 + 0.01,0.2);
-    gData = vec4(distortedUV,0,0.2);
 
 }

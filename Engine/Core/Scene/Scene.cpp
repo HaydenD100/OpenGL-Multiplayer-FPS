@@ -156,6 +156,7 @@ void Scene::LoadAssets() {
 	//AssetManager::GetModel("GI_map_1")->GetMeshByName("stairs_plane")->ToggleRender(false);
 
 	AssetManager::AddModel("Cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("metalic")));
+	AssetManager::AddModel("seafloor", Model("Assets/Objects/FBX/seafloor.obj", AssetManager::GetTexture("white")));
 
 	AssetManager::AddModel("pool", Model("Assets/Objects/FBX/pool.obj", AssetManager::GetTexture("white")));
 	AssetManager::AddModel("pool_water", Model("Assets/Objects/FBX/pool_water.obj", AssetManager::GetTexture("white"), 0));
@@ -224,20 +225,22 @@ void Scene::Load() {
 	AddGameObject("room1", AssetManager::GetModel("room1"), glm::vec3(0, 0.1, 0), true, 0, Concave);
 	GetGameObject("room1")->IncludInGI(true);
 
+	AddGameObject("seafloor", AssetManager::GetModel("seafloor"), glm::vec3(0, -10, 0), true, 0, Concave);
 
-	AddGameObject("pool", AssetManager::GetModel("pool"), glm::vec3(3, 0, 0), true, 0, Concave);
-	g_water.push_back(std::make_unique<GameObject>("pool_water", AssetManager::GetModel("pool_water"), glm::vec3(3, 0, 0), true, 0, None));
+
+	AddGameObject("pool", AssetManager::GetModel("pool"), glm::vec3(3, -0.9, 0), true, 0, Concave);
+	g_water.push_back(std::make_unique<GameObject>("pool_water", AssetManager::GetModel("pool_water"), glm::vec3(3, -2.6, 0), true, 0, None));
 	g_water[0]->GetRigidBody()->setUserIndex(0);
 	g_water[0]->GetRigidBody()->setUserPointer((void*)ObjectType::WATER);
 	
-	g_water.push_back(std::make_unique<GameObject>("water", AssetManager::GetModel("water"), glm::vec3(0, -1.7, 0), true, 0, None));
+	g_water.push_back(std::make_unique<GameObject>("water", AssetManager::GetModel("water"), glm::vec3(0, -2, 0), true, 0, None));
 	g_water[1]->GetRigidBody()->setUserIndex(1);
 	g_water[1]->GetRigidBody()->setUserPointer((void*)ObjectType::WATER);
-	m_seaLevel = -1.7;
+	m_seaLevel = -2;
 
 
 
-	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(0, 0, 0), false, 1.0, Convex);
+	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(0, 0, 0), false, 1.0, Box);
 	AddGlass("cubeGlass", AssetManager::GetModel("cubeGlass"), glm::vec3(-3, 0, 0), false, 0.0, Convex);
 
 	
@@ -417,6 +420,8 @@ void Scene::Update(float deltaTime) {
 
 			float buoyancy = g_objects[i]->m_buoyancy; // e.g. 8
 			float upwardForce = buoyancy * depth * 8;
+			float wave = glm::sin(ENGINE_PI/2 * deltaTime) * 1;
+			upwardForce += wave > 0.0f ? wave : 0.0f;
 			rb->applyCentralForce(btVector3(0, upwardForce, 0));
 			rb->setDamping(0.5f, 0.5f);
 
@@ -434,10 +439,10 @@ void Scene::Update(float deltaTime) {
 			if (axis.length2() > 0.0001f) {
 				axis.normalize();
 
-				float stiffness = 2.0f;
+				float stiffness = 3.0f;
 				btVector3 correctiveTorque = axis * angle * stiffness;
 
-				float damping = 5.0f;
+				float damping = 4.5f;
 				btVector3 angularVel = rb->getAngularVelocity();
 				btVector3 dampingTorque = -angularVel * damping;
 

@@ -10,6 +10,7 @@ namespace Player
 {
 	extern GameObject* playerModel;
 	extern GameObject* gun;
+	extern float m_headUnder;
 
 	glm::vec3 getPosition();
 	glm::vec3 getForward();

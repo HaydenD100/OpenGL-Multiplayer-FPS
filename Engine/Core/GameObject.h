@@ -151,9 +151,7 @@ public:
 	Destructible destructable;
 
 	float m_mass = 0;
-	float m_buoyancy = 0.0001;
-
-
+	float m_buoyancy = 0.01;
 private:
 	Transform transform = Transform();
 	Model* model = nullptr;
@@ -161,7 +159,7 @@ private:
 	std::string parentName = "";
 	std::string name = "";
 	bool isDynamic = false;
-	//Water or Glass
+	//Water or Glass REDUNANT
 	std::string shaderType = "Default";
 	
 	// Physics stuff
