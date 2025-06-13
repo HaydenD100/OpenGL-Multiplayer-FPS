@@ -125,53 +125,6 @@ namespace Player
 			return;
 		WeaponManager::GetGunByName(gunName)->lastTimeShot = glfwGetTime();
 
-
-		if (WeaponManager::GetGunByName(gunName)->type == Melee) {
-			WeaponManager::GetGunByName(gunName)->Shoot();
-			btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit(0);
-			if (hit.m_collisionObject != nullptr) {
-				ObjectType type = static_cast<ObjectType>(reinterpret_cast<uintptr_t>(hit.m_collisionObject->getUserPointer()));
-				GameObject* gameobject = nullptr;
-				if (type == ObjectType::GLASS) {
-					gameobject = SceneManager::GetCurrentScene()->g_glass[hit.m_collisionObject->getUserIndex()].get();
-				}
-				else if(type == ObjectType::DEFAULT) {
-					gameobject = SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()].get();
-				}
-
-				if (gameobject != nullptr)
-				{
-					btVector3 start = hit.m_rayFromWorld; // Ray origin
-					btVector3 end = hit.m_hitPointWorld; // Hit point
-					float distance = (end - start).length();
-					if (distance > 2)
-						return;
-
-
-					std::shared_ptr<btRigidBody> body = gameobject->GetRigidBody();
-					if (body) {
-						btVector3 localForcePos = body->getWorldTransform().inverse() * hit.m_hitPointWorld;
-						body->applyImpulse(2 * glmToBtVector3(Camera::ComputeRay()), localForcePos);
-						glm::vec4 worldPositionHomogeneous(glm::vec3(hit.m_hitPointWorld.getX(), hit.m_hitPointWorld.getY(), hit.m_hitPointWorld.getZ()), 1.0f);
-						glm::vec4 localPositionHomogeneous = glm::inverse(gameobject->GetModelMatrix()) * worldPositionHomogeneous;
-						glm::vec3 vec3local = glm::vec3(localPositionHomogeneous.x, localPositionHomogeneous.y, localPositionHomogeneous.z);
-						glm::vec3 normal = glm::vec3(hit.m_hitNormalWorld.getX(), hit.m_hitNormalWorld.getY(), hit.m_hitNormalWorld.getZ());
-						glm::mat4 rotation_matrix = glm::mat4_cast(glm::quat(gameobject->getRotation()));
-						normal = glm::vec3(glm::inverse(rotation_matrix) * glm::vec4(normal, 0));
-						AssetManager::AddDecalInstance(vec3local, normal, AssetManager::GetDecal("bullet_hole"), gameobject);
-					}
-					//NetworkManager::SendGunShotData(gameobject->GetName(), "bullet_hole", vec3local, normal, btToGlmVector3(localForcePos), WeaponManager::GetGunByName(gunName)->damage, btToGlmVector3(2 * glmToBtVector3(Camera::ComputeRay())));
-					int randomnum = (rand() % 3) + 1;
-					//if (type == DEFAULT)
-						//AudioManager::PlaySound("bullet_impact_" + std::to_string(randomnum), gameobject->GetPosition());
-					if (type == GLASS)
-						AudioManager::PlaySound("bullet_impact_glass_" + std::to_string(randomnum), gameobject->GetPosition());
-
-				}
-			}
-			return;
-		}
-
 		if (WeaponManager::GetGunByName(gunName)->currentammo >= 0) {
 
 			if (WeaponManager::GetGunByName(gunName)->currentammo == 0) {
@@ -214,6 +167,7 @@ namespace Player
 								
 						}
 					}
+
 					else {
 						return;
 					}
@@ -221,7 +175,7 @@ namespace Player
 					if (gameobject != nullptr )
 					{
 						///std::cout << "Object Name: " << gameobject->GetName() << "\n";
-						std::shared_ptr<btRigidBody> body = gameobject->GetRigidBody();
+						btRigidBody* body = gameobject->GetRigidBody().get();
 						if (!body) {
 							return; // Early exit if no rigid body
 						}
@@ -318,22 +272,67 @@ namespace Player
 	
 	bool Player::OnGround() {
 		GameObject* player = SceneManager::GetCurrentScene()->GetGameObject("player");
-		glm::vec3 out_end = player->getPosition() + glm::vec3(0,-1.2,0);
+		if (!player || !player->GetRigidBody()) return false;
 
-		btCollisionWorld::ClosestRayResultCallback RayCallback(
-			btVector3(player->getPosition().x, player->getPosition().y, player->getPosition().z),
-			btVector3(out_end.x, out_end.y, out_end.z)
+		// Ray parameters - adjust these values to match your character's dimensions
+		const float rayLength = 1.2f;
+		const float rayStartOffset = 0.1f; // Small offset to prevent self-collision
+
+		btVector3 start(
+			player->getPosition().x,
+			player->getPosition().y + rayStartOffset,
+			player->getPosition().z
 		);
-		
-		PhysicsManagerBullet::GetDynamicWorld()->rayTest(
-			btVector3(player->getPosition().x, player->getPosition().y, player->getPosition().z),
-			btVector3(out_end.x, out_end.y, out_end.z),
-			RayCallback
-		);
-		
-		if (RayCallback.hasHit())
-			return true;
-		
+		btVector3 end(start.x(), start.y() - rayLength, start.z());
+
+		// Custom callback with comprehensive filtering
+		struct GroundRayCallback : public btCollisionWorld::ClosestRayResultCallback {
+			GroundRayCallback(const btVector3& rayFrom, const btVector3& rayTo)
+				: ClosestRayResultCallback(rayFrom, rayTo) {
+				// Configure what we want to hit
+				m_collisionFilterGroup = GROUP_PLAYER;
+				m_collisionFilterMask = GROUP_STATIC | GROUP_DYNAMIC; // Only these groups
+			}
+
+			virtual bool needsCollision(btBroadphaseProxy* proxy) const {
+				// First apply default Bullet filtering
+				if (!ClosestRayResultCallback::needsCollision(proxy))
+					return false;
+
+				// Additional custom filtering
+				btCollisionObject* obj = (btCollisionObject*)proxy->m_clientObject;
+
+				// Explicitly ignore these cases
+				if (obj->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE)
+					return false;
+				if (obj->getBroadphaseHandle()->m_collisionFilterGroup & GROUP_TRIGGER)
+					return false;
+				if (obj->getBroadphaseHandle()->m_collisionFilterGroup & GROUP_NONE)
+					return false;
+
+				return true;
+			}
+
+			virtual btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult, bool normalInWorldSpace) {
+				// Additional validation if needed
+				if (rayResult.m_collisionObject->getInternalType() == btCollisionObject::CO_GHOST_OBJECT)
+					return 1.0f;
+
+				return ClosestRayResultCallback::addSingleResult(rayResult, normalInWorldSpace);
+			}
+		};
+
+		GroundRayCallback rayCallback(start, end);
+		PhysicsManagerBullet::GetDynamicWorld()->rayTest(start, end, rayCallback);
+
+		// Consider the surface angle if needed
+		if (rayCallback.hasHit()) {
+			const float minGroundDot = 0.7f; // ~45 degree maximum slope
+			if (rayCallback.m_hitNormalWorld.y() >= minGroundDot) {
+				return true;
+			}
+		}
+
 		return false;
 	}
 
@@ -371,9 +370,14 @@ namespace Player
 		Camera::SetPosition(head->getPosition());
 
 		bool IsGrounded = OnGround();
-		m_isSwimming = (getPosition().y < SceneManager::GetCurrentScene()->m_seaLevel);
-		m_headUnder = SceneManager::GetCurrentScene()->m_seaLevel - head->getPosition().y;
 
+		glm::vec3 overlap = SceneManager::GetCurrentScene()->g_triggers[0]->CheckOverlap(player->GetRigidBody().get());
+
+		bool insideTrigger = overlap.x > 0 && overlap.y -0.3 > 0 && overlap.z > 0;
+
+		m_isSwimming = (getPosition().y < SceneManager::GetCurrentScene()->m_seaLevel || insideTrigger);
+		m_headUnder = SceneManager::GetCurrentScene()->m_seaLevel - head->getPosition().y;
+		//IsGrounded = IsGrounded && !m_isSwimming;
 		if (IsGrounded) {
 			player->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
 			player->GetRigidBody()->setLinearVelocity(btVector3(player->GetRigidBody()->getLinearVelocity().x() * 0.0, 0, player->GetRigidBody()->getLinearVelocity().z() * 0.0));
@@ -400,9 +404,9 @@ namespace Player
 
 		//In the water move in the direction of the camera
 		if (m_isSwimming) {
-			player->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
-			player->GetRigidBody()->setGravity(btVector3(0, -0.1, 0));
-			player->GetRigidBody()->setLinearVelocity(btVector3( 0.8 * player->GetRigidBody()->getLinearVelocity().x(), 0.6 * player->GetRigidBody()->getLinearVelocity().y(), 0.8 * player->GetRigidBody()->getLinearVelocity().z()));
+			//player->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
+			player->GetRigidBody()->setGravity(btVector3(0, 10, 0));
+			player->GetRigidBody()->setLinearVelocity(btVector3( 0.8 * player->GetRigidBody()->getLinearVelocity().x(), player->GetRigidBody()->getLinearVelocity().y(), 0.8 * player->GetRigidBody()->getLinearVelocity().z()));
 			forward = Camera::GetRotation();
 
 		}

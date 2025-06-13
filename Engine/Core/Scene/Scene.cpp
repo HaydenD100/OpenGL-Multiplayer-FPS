@@ -8,8 +8,6 @@
 
 //TODO LIST
 //rework guns
-//add transparency
-//
 
 
 
@@ -73,14 +71,6 @@ void Scene::LoadAssets() {
 	AssetManager::GetTexture("uvmap")->SetEmissive(true);
 	AssetManager::AddModel("shaderBall", Model("Assets/Objects/shaderBall.obj", AssetManager::GetTexture("transparent")));
 	AssetManager::AddModel("cubeGlass", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("transparent")));
-
-
-	// TODO: not currently working
-	//AssetManager::LoadAssets("Assets/Saves/mainScene.json");
-	//Loads Mode
-
-	
-
 	//AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 	//AssetManager::AddModel("window_glass", Model("Assets/Objects/FBX/window_glass.fbx", AssetManager::GetTexture("glass")));
 
@@ -158,7 +148,7 @@ void Scene::LoadAssets() {
 	AssetManager::AddModel("Cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("metalic")));
 	AssetManager::AddModel("seafloor", Model("Assets/Objects/FBX/seafloor.obj", AssetManager::GetTexture("white")));
 
-	AssetManager::AddModel("pool", Model("Assets/Objects/FBX/pool.obj", AssetManager::GetTexture("white")));
+	AssetManager::AddModel("pool", Model("Assets/Objects/FBX/pool.obj", AssetManager::GetTexture("angled-tiled-floor")));
 	AssetManager::AddModel("pool_water", Model("Assets/Objects/FBX/pool_water.obj", AssetManager::GetTexture("white"), 0));
 
 
@@ -229,16 +219,16 @@ void Scene::Load() {
 
 
 	AddGameObject("pool", AssetManager::GetModel("pool"), glm::vec3(3, -0.9, 0), true, 0, Concave);
-	g_water.push_back(std::make_unique<GameObject>("pool_water", AssetManager::GetModel("pool_water"), glm::vec3(3, -2.6, 0), true, 0, None));
+	g_water.emplace_back(std::make_unique<GameObject>("pool_water", AssetManager::GetModel("pool_water"), glm::vec3(3, -2.6, 0), true, 0, None));
 	g_water[0]->GetRigidBody()->setUserIndex(0);
 	g_water[0]->GetRigidBody()->setUserPointer((void*)ObjectType::WATER);
 	
-	g_water.push_back(std::make_unique<GameObject>("water", AssetManager::GetModel("water"), glm::vec3(0, -2, 0), true, 0, None));
+	g_water.emplace_back(std::make_unique<GameObject>("water", AssetManager::GetModel("water"), glm::vec3(0, -2, 0), true, 0, None));
 	g_water[1]->GetRigidBody()->setUserIndex(1);
 	g_water[1]->GetRigidBody()->setUserPointer((void*)ObjectType::WATER);
 	m_seaLevel = -2;
 
-
+	g_triggers.emplace_back(std::make_unique<TriggerCollider>(glm::vec3(3, -1.3, -1.8), glm::vec3(4, 1.8, 4)));
 
 	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(0, 0, 0), false, 1.0, Box);
 	AddGlass("cubeGlass", AssetManager::GetModel("cubeGlass"), glm::vec3(-3, 0, 0), false, 0.0, Convex);
@@ -377,9 +367,6 @@ void Scene::Load() {
 		g_lights.push_back(light);
 	}
 
-
-	// TODO: not currently working
-	//AssetManager::SaveAssets("Assets/Saves/mainScene.json");
 }
 
 void Scene::Update(float deltaTime) {
@@ -395,6 +382,9 @@ void Scene::Update(float deltaTime) {
 	// Update light position
 	//lights[1].position.y = newY;
 
+	for (int i = 0; i < g_triggers.size(); i++) {
+
+	}
 	for (int i = 0; i < g_lights.size(); i++) {
 		if(glm::distance(g_lights[i].position,Player::getPosition()) < g_lights[i].radius * 1.4f && g_lights[i].Dynamic)
 			g_lights[i].GenerateShadows();
@@ -405,8 +395,11 @@ void Scene::Update(float deltaTime) {
 		if (!rb || g_objects[i]->m_mass == 0)
 			continue;
 
-		//A little hack for the unicorn's if not they dont float on the middle
-		if (g_objects[i]->GetPosition().y < m_seaLevel + 0.3) {
+		glm::vec3 overlap = g_triggers[0]->CheckOverlap(rb);
+		bool insideTrigger = overlap.x > 0 && overlap.y > 0 && overlap.z > 0;
+
+		//A little hack for the unicorn's if not they dont float on the middle +0.3
+		if (g_objects[i]->GetPosition().y < m_seaLevel + 0.3 || insideTrigger) {
 
 			if (g_objects[i]->destructable.m_destoryed) {
 				float buoyancy = g_objects[i]->m_buoyancy; // e.g. 8
@@ -415,7 +408,12 @@ void Scene::Update(float deltaTime) {
 				continue;
 			}
 
-			float depth = m_seaLevel + 0.3 - g_objects[i]->GetPosition().y;
+			float depth = 0.0;
+			if(g_objects[i]->GetPosition().y < m_seaLevel + 0.3)
+				depth = m_seaLevel + 0.3 - g_objects[i]->GetPosition().y;
+			else {
+				depth = overlap.y;
+			}
 			//rb->setGravity(btVector3(0, g_objects[i]->m_buoyancy * depth, 0));
 
 			float buoyancy = g_objects[i]->m_buoyancy; // e.g. 8
@@ -498,13 +496,13 @@ void Scene::RemoveLight(int index) {
 
 size_t Scene::AddGameObject(std::unique_ptr<GameObject> gameobject) {
 	gameobject->GetRigidBody()->setUserPointer((void*)(g_objects.size()));
-	g_objects.push_back(std::move(gameobject));
+	g_objects.emplace_back(std::move(gameobject));
 	return g_objects.size() - 1;
 }
 
 size_t Scene::AddGlass(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape) {
 	// Add to g_glass vector
-	g_glass.push_back(std::make_unique<GameObject>(name, model, position, save, mass, shape));
+	g_glass.emplace_back(std::make_unique<GameObject>(name, model, position, save, mass, shape));
 	size_t index = g_glass.size() - 1;  // Get index in g_glass
 	g_glass[index]->GetRigidBody()->setUserIndex(index);
 	g_glass[index]->GetRigidBody()->setUserPointer((void*)ObjectType::GLASS);
@@ -513,7 +511,7 @@ size_t Scene::AddGlass(std::string name, Model* model, glm::vec3 position, bool 
 }
 
 size_t Scene::AddGameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape) {
-	g_objects.push_back(std::make_unique<GameObject>(name, model, position, save, mass, shape));
+	g_objects.emplace_back(std::make_unique<GameObject>(name, model, position, save, mass, shape));
 	g_objects.back()->GetRigidBody()->setUserIndex(static_cast<int>(g_objects.size() - 1));
 	return g_objects.size() - 1;
 }
@@ -536,5 +534,10 @@ void Scene::RemoveGameObject(std::string name) {
 		}
 	}
 }
+
+void Scene::Destory() {
+
+}
+
 
 

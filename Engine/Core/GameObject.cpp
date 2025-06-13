@@ -7,6 +7,18 @@
 
 GameObject::GameObject() = default;
 
+GameObject::~GameObject() {
+	if (m_rigidBody && PhysicsManagerBullet::GetDynamicWorld()) {
+		PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(m_rigidBody.get());
+	}
+
+	delete collider;
+	delete convexHullShape;
+	delete triangleCollison;
+	delete myMotionState;
+
+}
+
 GameObject::GameObject(std::string name, bool save, float mass, ColliderShape shape) {
 	this->name = name;
 	parentName = "";
@@ -40,7 +52,7 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	Btransform.setOrigin(btVector3(position.x, position.y, position.z));
 
 	// Using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
-	btDefaultMotionState* myMotionState = new btDefaultMotionState(Btransform);
+	myMotionState = new btDefaultMotionState(Btransform);
 	btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, convexHullShape, localInertia);
 	m_rigidBody = std::shared_ptr<btRigidBody>(new btRigidBody(rbInfo));
 
@@ -85,7 +97,7 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	Btransform.setOrigin(btVector3(position.x, position.y, position.z));
 
 	// Using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
-	btDefaultMotionState* myMotionState = new btDefaultMotionState(Btransform);
+	myMotionState = new btDefaultMotionState(Btransform);
 	btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, collider, localInertia);
 	m_rigidBody = std::shared_ptr<btRigidBody>(new btRigidBody(rbInfo));
 
@@ -258,7 +270,7 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	Btransform.setOrigin(btVector3(position.x, position.y, position.z));
 
 	// Using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
-	btDefaultMotionState* myMotionState = new btDefaultMotionState(Btransform);
+	myMotionState = new btDefaultMotionState(Btransform);
 	if (convexHullShape != nullptr) {
 		btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, convexHullShape, localInertia);
 		m_rigidBody = std::shared_ptr<btRigidBody>(new btRigidBody(rbInfo));
@@ -322,7 +334,7 @@ GameObject::GameObject(std::string name, Model* model, glm::vec3 position, bool 
 	Btransform.setOrigin(btVector3(position.x, position.y, position.z));
 
 	// Using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
-	btDefaultMotionState* myMotionState = new btDefaultMotionState(Btransform);
+	myMotionState = new btDefaultMotionState(Btransform);
 	btRigidBody::btRigidBodyConstructionInfo rbInfo(btScalar(mass), myMotionState, collider, localInertia);
 	m_rigidBody = std::shared_ptr<btRigidBody>(new btRigidBody(rbInfo));
 
@@ -499,6 +511,8 @@ void GameObject::SetRotationZ(float z) {
 }
 
 void GameObject::SetScale(float scale) {
+	if (collider) collider->setLocalScaling(glmToBtVector3(glm::vec3(scale)));
+	if (convexHullShape) convexHullShape->setLocalScaling(glmToBtVector3(glm::vec3(scale)));
 	transform.scale = glm::vec3(scale);
 }
 

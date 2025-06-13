@@ -178,7 +178,7 @@ void main() {
         vec3 H = normalize(Vpos + L);
         float NDF = DistributionGGX(N, H, roughness);
         float G = GeometrySmith(N, Vpos, L, roughness);
-        vec3 F = fresnelSchlick(max(dot(H, Vpos), 0.0), F0);
+        vec3 F = fresnelSchlick(max(dot(H, Vpos), 0.0), F0) * 1.5;
 
         vec3 numerator = NDF * G * F;
         float denominator = 4.0 * max(dot(N, Vpos), 0.0) * max(dot(N, L), 0.0) + 0.0001;
@@ -208,7 +208,7 @@ void main() {
     vec3 H = normalize(Vpos + L);
     float NDF = DistributionGGX(N, H, roughness);
     float G = GeometrySmith(N, Vpos, L, roughness);
-    vec3 F = fresnelSchlick(max(dot(H, Vpos), 0.0), F0);
+    vec3 F = fresnelSchlick(max(dot(H, Vpos), 0.0), F0) *  1.5;;
 
     vec3 numerator = NDF * G * F;
     float denominator = 4.0 * max(dot(N, Vpos), 0.0) * max(dot(N, L), 0.0) + 0.0001;
@@ -243,8 +243,8 @@ void main() {
     vec3 refractDir = refract(viewDir, N, 1.0 / 1.5);
 
     // Apply distortion to UVs
-    vec2 distortedUV =  (refractDir.xy * 0.03);
-
+    vec2 distortedUV =  (refractDir.xy * 0.06);
+    distortedUV = mix(distortedUV,distortedUV * 0.4,fresnel);
     // Sample the background scene with distortion
 
     // Optional: Add fresnel effect for more realism
@@ -254,6 +254,5 @@ void main() {
     float nonLinearDepth = gl_FragCoord.z;
     float linearDepth = LinearizeDepth(nonLinearDepth, 0.0025, 200.0); // Use your camera near/far
     gTransparent = vec4(color + vec3(0,0.6,0.6) * 1 ,0.2);
-    gData = vec4(distortedUV,linearDepth,1);
-
+    gData = vec4(distortedUV,linearDepth,0.9);
 }

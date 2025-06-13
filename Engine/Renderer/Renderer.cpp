@@ -139,7 +139,6 @@ namespace Renderer
 	Texture3D voxelizedScene;
 
 
-	//TODO make a general buffer class
 	GBuffer gbuffer;
 	BufferSSAO ssaoBuffer;
 	BufferSSR ssrBuffer;
@@ -411,7 +410,6 @@ namespace Renderer
 		emmisiveRenderer.Init(Backend::GetWidth(), Backend::GetHeight());
 		transparentBuffer.Configure();
 
-		//TODO :: I hate this i wish i could just get it work in the gbuffer but ive spent to long trying to fix it 
 		glGenFramebuffers(1, &FinalFrameFBO);
 		glBindFramebuffer(GL_FRAMEBUFFER, FinalFrameFBO);
 		glGenTextures(1, &FinalFrameTexture);
@@ -680,6 +678,10 @@ namespace Renderer
 
 		RenderWater();
 
+		glDisablei(GL_BLEND, 1);
+		glEnablei(GL_BLEND, 0);
+
+
 		s_transparent.Use();
 		s_transparent.SetMat4("P", Camera::getProjectionMatrix());
 		s_transparent.SetMat4("V", Camera::getViewMatrix());
@@ -691,7 +693,6 @@ namespace Renderer
 		glActiveTexture(GL_TEXTURE5);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
 		glm::vec3 cameraPosition = Camera::GetPosition(); // Camera position
-		//TODO :: CHANGE THIS TO OIT this gets slow if theres too many transparent objects
 		
 		auto& glassObjects = SceneManager::GetCurrentScene()->g_glass;
 		std::sort(glassObjects.begin(), glassObjects.end(),

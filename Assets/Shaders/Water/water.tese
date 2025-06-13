@@ -26,6 +26,18 @@ float random (in vec2 st) {
                          vec2(12.9898,78.233)))*43758.5453123);
 }
 
+float CircularWave(vec2 pos, vec2 source, float time, float A, float k, float omega, float phi) {
+    float r = length(pos - source);
+    return A * cos(k * r - omega * time + phi) / sqrt(r + 0.001); // avoid divide-by-zero
+}
+
+const int NUM_WAVES = 3;
+vec2 waveSources[NUM_WAVES] = vec2[](
+    vec2(-12, -4.5),
+    vec2(-2.0, 3.0),
+    vec2(0.0, -1.0)
+);
+
 vec3 BrownianMotion(vec3 pos) {
     float f = 1.0;
     float a = 1.0;
@@ -36,19 +48,6 @@ vec3 BrownianMotion(vec3 pos) {
     float h = 0.0;
     vec2 derivatives = vec2(0.0); // Stores (dh/dx, dh/dz)
     float maxPeak = 0.9;
-    //h += 0.5 * sin(dot(pos.xz,windDir) + time * windSpeed);
-    /*
-    float f = 1.0;
-    float a = 1.0;
-    float speed = 1.0;
-    float seed = 0.0;
-    vec3 p = pos;
-    float amplitudeSum = 0;
-    float h = 0.0;
-    vec2 derivatives = vec2(0.0); // Stores (dh/dx, dh/dz)
-    float maxPeak = 1.5;
-    */
-
 
     for (int i = 0; i < 64; i++) {
         vec2 dir = normalize(mix(vec2(cos(seed), sin(seed)),windDir,0.3)); // Wave direction
@@ -70,6 +69,7 @@ vec3 BrownianMotion(vec3 pos) {
     }
 
 
+
     // Normalize height and derivatives
     h /= amplitudeSum * 1.0;
     derivatives /= amplitudeSum;
@@ -81,49 +81,6 @@ vec3 BrownianMotion(vec3 pos) {
     // Incorporate derivatives for horizontal displacement
     return vec3(derivatives.x * 0.1, h, derivatives.y * 0.1); // Scale the displacement as needed
 }
-
-/*
-vec3 BrownianMotion(vec3 pos) {
-	float f = 1;
-	float a = 1;
-	float speed = 2;
-	float seed = 0;
-	vec3 p = pos;
-	float amplitudeSum = 0.0f;
-
-    float max = 1;
-
-    float h = 0.0f;
-	vec2 n = vec2(0.0f);
-
-    for (int i = 0; i < 32; i++) {
-        vec2 d = normalize(vec2(cos(seed), sin(seed)));
-        float x = dot(d, p.xz) * f + time * speed;
-		float wave = a * exp(1 * sin(x) - 1);
-        float dx = 1 * wave * cos(x);
-
-        h += wave;		
-		p.xz += d * -dx * a * 1;
-
-
-        amplitudeSum += a;
-		f *= 1.18;
-		a *= 0.82;
-		speed *= 1.07;
-		seed += 1253.2131f;
-    }
-    vec3 outputPos = vec3( p.x, h, p.z) / amplitudeSum;
-	outputPos.y *= 1;
-
-    vec3 T = normalize(vec3(1.0, p.x, 0.0)); // Tangent (x-axis)
-    vec3 B = normalize(vec3(0.0, p.z, 1.0)); // Bitangent (z-axis)
-    N = normalize(cross(B, T)); // Final normal (order matters!)
-
-
-    return outputPos;
-}
-
-*/
 
 
 void main() {

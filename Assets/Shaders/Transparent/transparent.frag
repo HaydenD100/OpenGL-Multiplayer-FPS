@@ -207,7 +207,7 @@ void main() {
     vec3 refractDir = refract(viewDir, FragN, 1.0 / 1.5);
 
     // Apply distortion to UVs
-    vec2 distortedUV =  (refractDir.xy * 0.05);
+    vec2 distortedUV =  (refractDir.xy * 0.03);
 
     // Sample the background scene with distortion
 
@@ -218,7 +218,7 @@ void main() {
 
     float nonLinearDepth = gl_FragCoord.z;
     float linearDepth = LinearizeDepth(nonLinearDepth, 0.0025, 200.0); // Use your camera near/far
-    gTransparent = vec4(color  + 0.01,1);
+    gTransparent = vec4(color * 2  + 0.01,0.5);
     gData = vec4(distortedUV ,linearDepth,1);
 
 

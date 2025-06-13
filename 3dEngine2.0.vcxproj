@@ -44,6 +44,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
+    <EnableASAN>true</EnableASAN>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -113,7 +114,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\core\inc;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\studio\inc;C:\Users\kokok\OneDrive\Desktop\Code\Home\C++\3dEngine2.0\Engine\Core;C:\Users\kokok\OneDrive\Desktop\Code\Home\C++\3dEngine2.0\Engine;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glew-2.1.0\include;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glfw-3.3.8.bin.WIN64\include;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\GLM;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\kokok\OneDrive\Desktop\Code\vc_package\vcpkg\installed\x64-windows-static\include\bullet;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\core\inc;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\studio\inc;C:\Users\kokok\OneDrive\Desktop\Code\Home\C++\3dEngine2.0\Engine\Core;C:\Users\kokok\OneDrive\Desktop\Code\Home\C++\3dEngine2.0\Engine;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glew-2.1.0\include;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glfw-3.3.8.bin.WIN64\include;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\GLM;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -122,8 +123,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\studio\lib\x64;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\core\lib\x64;C:\Users\kokok\OneDrive\Desktop\Code\Home\C++\3dEngine2.0\Engine\Loaders;C:\Users\kokok\OneDrive\Desktop\Code\Home\C++\3dEngine2.0\;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glew-2.1.0\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glew32.lib;glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;glu32.lib;fmodstudioL_vc.lib;fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\kokok\OneDrive\Desktop\Code\vc_package\vcpkg\installed\x64-windows-static\debug\lib;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\studio\lib\x64;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\core\lib\x64;C:\Users\kokok\OneDrive\Desktop\Code\Home\C++\3dEngine2.0\Engine\Loaders;C:\Users\kokok\OneDrive\Desktop\Code\Home\C++\3dEngine2.0\;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glew-2.1.0\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3dll.lib;glew32.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;glu32.lib;fmodstudioL_vc.lib;fmod_vc.lib;BulletCollision_Debug.lib;Bullet3Common_Debug.lib;BulletDynamics_Debug.lib;BulletInverseDynamics_Debug.lib;BulletSoftBody_Debug.lib;LinearMath_Debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -204,6 +205,7 @@
     <ClCompile Include="Engine\Renderer\Probe.cpp" />
     <ClCompile Include="Engine\Renderer\Raycaster.cpp" />
     <ClCompile Include="Engine\Game\Ocean.cpp" />
+    <ClCompile Include="Engine\Physics\TriggerCollider.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\Bloom\downscale.frag" />
@@ -330,6 +332,7 @@
     <ClInclude Include="Engine\Renderer\Probe.h" />
     <ClInclude Include="Engine\Renderer\Raycaster.h" />
     <ClInclude Include="Engine\Game\Ocean.h" />
+    <ClInclude Include="Engine\Physics\TriggerCollider.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="github\screenshots\3DEngine.png" />

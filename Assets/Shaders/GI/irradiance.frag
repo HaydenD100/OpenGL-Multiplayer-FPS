@@ -19,8 +19,7 @@ uniform vec3 volume;
 uniform float spacing;
 
 
-//TODO we could do this in a compute shader
-
+//NOT NEEDED  
 layout(std430, binding = 7) buffer ShCoeffient {
     vec3 L1SH_0[10000];
     vec3 L1SH_1[10000];

@@ -22,6 +22,7 @@
 #include "Engine/Animation/Animation.h"
 #include "Engine/Animation/SkinnedAnimatior.h"
 #include "Engine/Pathfinding/Pathfinding.h"
+#include "Engine/Physics/TriggerCollider.h"
 
 
 
@@ -69,9 +70,11 @@ public:
 	std::vector<GunPickUp> m_gunPickups;
 
 	std::vector<Light> g_lights;
+	std::vector<std::unique_ptr<TriggerCollider>> g_triggers;
 
 
 
+	void Destory();
 	float m_seaLevel = 0;
 private:
 	std::vector<GameObject*> NeedRendering;

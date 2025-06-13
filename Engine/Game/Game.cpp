@@ -60,7 +60,7 @@ namespace Game {
 			desruct.m_destoryed_object = "uni_float_defalated";
 			desruct.m_destoryed_sound = "pop";
 			std::string random = generateRandomString(16);
-			SceneManager::GetCurrentScene()->AddGameObject(random, AssetManager::GetModel("uni_float"), glm::vec3(3, 2, 2), true, 0.5, Convex);
+			SceneManager::GetCurrentScene()->AddGameObject(random, AssetManager::GetModel("uni_float"), glm::vec3(3, 3, 0), true, 0.5, Convex);
 			SceneManager::GetCurrentScene()->GetGameObject(random)->GetRigidBody()->setUserPointer((void*)ObjectType::DESTORYABLE);
 			SceneManager::GetCurrentScene()->GetGameObject(random)->destructable = desruct;
 			SceneManager::GetCurrentScene()->GetGameObject(random)->m_buoyancy = 6.0;

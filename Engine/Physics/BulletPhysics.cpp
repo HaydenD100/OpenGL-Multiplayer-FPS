@@ -13,6 +13,7 @@ namespace PhysicsManagerBullet
 	btBroadphaseInterface* overlappingPairCache;
 	btCollisionDispatcher* dispatcher;
 	btDefaultCollisionConfiguration* collisionConfiguration;
+	btOverlappingPairCache* cache;
 	
 	void AddColliderShape(btCollisionShape* collider) {
 		collisionShapes.push_back(collider);
@@ -36,12 +37,18 @@ namespace PhysicsManagerBullet
 		///btDbvtBroadphase is a good general purpose broadphase. You can also try out btAxis3Sweep.
 		overlappingPairCache = new btDbvtBroadphase();
 
+		cache = new btHashedOverlappingPairCache();
+
+
 		///the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
 		solver = new btSequentialImpulseConstraintSolver;
 
 		dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
 
 		dynamicsWorld->setGravity(btVector3(0, -10, 0));
+
+		dynamicsWorld->getPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
+
 
 		//debugDrawer = new DebugDrawer(Renderer::GetProgramID("debug"));
 		//dynamicsWorld->setDebugDrawer(debugDrawer);

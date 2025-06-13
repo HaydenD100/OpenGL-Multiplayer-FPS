@@ -53,6 +53,8 @@ class GameObject
 {
 public:
 	GameObject();
+	~GameObject();
+
 	GameObject(std::string name, bool save, float mass, ColliderShape shape);
 	GameObject(std::string name, glm::vec3 position, bool save, float mass, ColliderShape shape);
 	GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, btConvexHullShape* shape);
@@ -166,6 +168,7 @@ private:
 	btCollisionShape* collider = nullptr;
 	btConvexHullShape* convexHullShape = nullptr;
 	btBvhTriangleMeshShape* triangleCollison = nullptr;
+	btDefaultMotionState* myMotionState = nullptr;
 	btTransform Btransform;
 
 	std::shared_ptr<btRigidBody> m_rigidBody;
