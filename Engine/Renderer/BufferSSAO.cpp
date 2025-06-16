@@ -2,12 +2,9 @@
 #include "Engine/Backend.h"
 #include <iostream>
 
-BufferSSAO::BufferSSAO() {
-
-}
 
 BufferSSAO::~BufferSSAO() {
-
+	Destroy();
 }
 
 void BufferSSAO::Configure() {

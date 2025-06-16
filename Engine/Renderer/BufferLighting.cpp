@@ -6,7 +6,7 @@ BufferLighting::BufferLighting() {
 }
 
 BufferLighting::~BufferLighting() {
-
+	Destroy();
 }
 
 void BufferLighting::Configure() {

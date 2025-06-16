@@ -2,6 +2,7 @@
 
 
 TriggerCollider::~TriggerCollider() {
+
 }
 TriggerCollider::TriggerCollider(glm::vec3 position, glm::vec3 scale) {
     m_triggerShape = std::make_unique<btBoxShape>(btVector3(scale.x * 0.5f, scale.y * 0.5f, scale.z * 0.5f));

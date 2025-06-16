@@ -209,8 +209,12 @@ GLuint BloomRenderer::BloomMip_i(int index)
 
 
 bloomFBO::bloomFBO() : mInit(false) {}
-bloomFBO::~bloomFBO() {}
+bloomFBO::~bloomFBO() {
+	Destroy();
+}
 
 
 BloomRenderer::BloomRenderer() : mInit(false) {}
-BloomRenderer::~BloomRenderer() {}
+BloomRenderer::~BloomRenderer() {
+	Destroy();
+}

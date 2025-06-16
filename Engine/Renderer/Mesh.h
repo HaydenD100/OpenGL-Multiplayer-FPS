@@ -8,6 +8,10 @@
 struct Mesh {
 public:
     Mesh(const char* path);
+    ~Mesh();
+    Mesh(Mesh&& other) noexcept;
+    Mesh& operator=(const Mesh&) = default;
+
     Mesh(std::vector<glm::vec3> vertices,
         std::vector<glm::vec3> normals,
         std::vector<glm::vec2> UV,
@@ -52,12 +56,13 @@ public:
 
     std::vector<glm::vec3> vertices;
 
+    GLuint vertexbuffer;
+
 
 private:
     bool _shouldRender = true;
     std::string name;
     Texture* texture = nullptr;
-    GLuint vertexbuffer;
     GLuint uvbuffer;
     GLuint normalbuffer;
     GLuint elementbuffer;

@@ -4,6 +4,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "glm/gtx/hash.hpp"
 
+
 static const int spawnpointsize = 1;
 static glm::vec3 spawnpoints[spawnpointsize] = { glm::vec3(0, 20, 0) };
 

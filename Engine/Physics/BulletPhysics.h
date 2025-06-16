@@ -32,6 +32,7 @@ enum CollisionGroups
 namespace PhysicsManagerBullet
 {
 	void Init();
+	void Delete();
 	void Update(float deltaTime);
 	void AddColliderShape(btCollisionShape* collider);
 	void AddRigidBody(btRigidBody* body);

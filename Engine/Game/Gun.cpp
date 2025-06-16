@@ -1,17 +1,19 @@
 #include "Gun.h"
-#include "Engine/Core/Scene/SceneManager.h"
+
 #include "Engine/Core/GameObject.h"
 #include "Engine/Game/Player.h"
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Networking/NetworkManager.h"
 #include "Engine/Core/Camera.h"
 #include "Engine/Core/Input.h"
+#include "Engine/Core/Scene/World.h"
+
 #include <sstream>
 
 
 
 void Gun::Update(float deltaTime, bool isReloading, bool aiming) {
-	//GameObject* gun = SceneManager::GetCurrentScene()->GetGameObject(name);
+	//GameObject* gun = World::GetGameObject(name);
 	//gun->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
 	//gun->GetRigidBody()->setLinearVelocity(btVector3(0, 0, 0));
 	/*
@@ -103,39 +105,39 @@ namespace WeaponManager
 	std::vector<Gun> guns;
 
 	void WeaponManager::Init() {
-		SceneManager::GetCurrentScene()->g_objects.push_back(std::make_unique<GameObject>("knife", AssetManager::GetModel("knifehand"), glm::vec3(5, 0, -5), false, 0, Convex));
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetParentName("player_head");
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() -1]->SetRotationX(-1.5708f);
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetRender(false);
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetDontCull(true);
+		World::g_objects.push_back(std::make_unique<GameObject>("knife", AssetManager::GetModel("knifehand"), glm::vec3(5, 0, -5), false, 0, Convex));
+		World::g_objects[World::g_objects.size() - 1]->SetParentName("player_head");
+		World::g_objects[World::g_objects.size() -1]->SetRotationX(-1.5708f);
+		World::g_objects[World::g_objects.size() - 1]->SetRender(false);
+		World::g_objects[World::g_objects.size() - 1]->SetDontCull(true);
 
 
-		SceneManager::GetCurrentScene()->g_objects.push_back(std::make_unique<GameObject>("glock", AssetManager::GetModel("glockhand"), glm::vec3(5, 0, -5), false, 0, Convex));
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetParentName("player_head");
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetRotationX(-1.5708f);
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetRender(false);
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetDontCull(true);
+		World::g_objects.push_back(std::make_unique<GameObject>("glock", AssetManager::GetModel("glockhand"), glm::vec3(5, 0, -5), false, 0, Convex));
+		World::g_objects[World::g_objects.size() - 1]->SetParentName("player_head");
+		World::g_objects[World::g_objects.size() - 1]->SetRotationX(-1.5708f);
+		World::g_objects[World::g_objects.size() - 1]->SetRender(false);
+		World::g_objects[World::g_objects.size() - 1]->SetDontCull(true);
 
 
-		SceneManager::GetCurrentScene()->g_objects.push_back(std::make_unique<GameObject>("ak47", AssetManager::GetModel("ak47hand"), glm::vec3(0.2, -0.25, -0.2), false, 0, Convex));
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetParentName("player_head");
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetRotationX(-1.5708f);
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetRender(false);
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetDontCull(true);
+		World::g_objects.push_back(std::make_unique<GameObject>("ak47", AssetManager::GetModel("ak47hand"), glm::vec3(0.2, -0.25, -0.2), false, 0, Convex));
+		World::g_objects[World::g_objects.size() - 1]->SetParentName("player_head");
+		World::g_objects[World::g_objects.size() - 1]->SetRotationX(-1.5708f);
+		World::g_objects[World::g_objects.size() - 1]->SetRender(false);
+		World::g_objects[World::g_objects.size() - 1]->SetDontCull(true);
 
 
-		SceneManager::GetCurrentScene()->g_objects.push_back(std::make_unique<GameObject>("shotgun", AssetManager::GetModel("shotgun"), glm::vec3(-3, 2, 3), false, 0, Convex));
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetParentName("player_head");
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetRotationX(-1.5708f);
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetRender(false);
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetDontCull(true);
+		World::g_objects.push_back(std::make_unique<GameObject>("shotgun", AssetManager::GetModel("shotgun"), glm::vec3(-3, 2, 3), false, 0, Convex));
+		World::g_objects[World::g_objects.size() - 1]->SetParentName("player_head");
+		World::g_objects[World::g_objects.size() - 1]->SetRotationX(-1.5708f);
+		World::g_objects[World::g_objects.size() - 1]->SetRender(false);
+		World::g_objects[World::g_objects.size() - 1]->SetDontCull(true);
 
 
-		SceneManager::GetCurrentScene()->g_objects.push_back(std::make_unique<GameObject>("double_barrel", AssetManager::GetModel("double_barrel_hand"), glm::vec3(-3, 2, 3), false, 0, Convex));
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetParentName("player_head");
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetRotationX(-1.5708f);
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetRender(false);
-		SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->g_objects.size() - 1]->SetDontCull(true);
+		World::g_objects.push_back(std::make_unique<GameObject>("double_barrel", AssetManager::GetModel("double_barrel_hand"), glm::vec3(-3, 2, 3), false, 0, Convex));
+		World::g_objects[World::g_objects.size() - 1]->SetParentName("player_head");
+		World::g_objects[World::g_objects.size() - 1]->SetRotationX(-1.5708f);
+		World::g_objects[World::g_objects.size() - 1]->SetRender(false);
+		World::g_objects[World::g_objects.size() - 1]->SetDontCull(true);
 
 		
 		AudioManager::AddSound("Assets/Audio/shotgun_fire.wav", "shotgun_fire1", Camera::GetPosition(), 1, 0.4f);
@@ -278,7 +280,7 @@ namespace WeaponManager
 GunPickUp::GunPickUp(std::string GunName, Model* model, glm::vec3 position) {
 	gunName = GunName;
 	objectName = "pickup" + generateRandomString(10);
-	SceneManager::GetCurrentScene()->g_objects[SceneManager::GetCurrentScene()->AddGameObject(objectName.c_str(), model, position, false, 1, Convex)]->GetRigidBody()->applyCentralImpulse(glmToBtVector3(Camera::GetDirection()) * 10.0f);
+	World::g_objects[World::AddGameObject(objectName.c_str(), model, position, false, 1, Convex)]->GetRigidBody()->applyCentralImpulse(glmToBtVector3(Camera::GetDirection()) * 10.0f);
 	GunPickUpCount++;
 }
 
@@ -294,7 +296,7 @@ bool GunPickUp::Interact() {
 	if (Player::GetInteractingWithName() != objectName || !Player::SelectWeapon(gunName))
 		return false;
 	
-	GameObject* object = SceneManager::GetCurrentScene()->GetGameObject(objectName);
+	GameObject* object = World::GetGameObject(objectName);
 	PhysicsManagerBullet::GetDynamicWorld()->removeRigidBody(object->GetRigidBody().get());
 	object->SetRender(false);
 		

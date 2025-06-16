@@ -3,12 +3,10 @@
 #include "Engine/Backend.h"
 #include <iostream>
 
-BufferTransparent::BufferTransparent(){
 
-}
 
 BufferTransparent::~BufferTransparent() {
-
+	Destroy();
 }
 
 void BufferTransparent::Configure() {
@@ -62,6 +60,8 @@ void BufferTransparent::Bind() {
 void BufferTransparent::Destroy() {
 	glDeleteTextures(1, &gLighting);
 	glDeleteTextures(1, &gData);
+	glDeleteTextures(1, &gPosition);
+
 
 	glDeleteTextures(1, &Depth);
 	glDeleteFramebuffers(1, &ID);

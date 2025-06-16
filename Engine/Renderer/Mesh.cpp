@@ -8,7 +8,56 @@
 #include "Engine/Loaders/vboindexer.h"
 #include "bullet/btBulletDynamicsCommon.h"
 
+Mesh::~Mesh() {
+    if (vertexbuffer) glDeleteBuffers(1, &vertexbuffer);
+    if (uvbuffer) glDeleteBuffers(1, &uvbuffer);
+    if (normalbuffer) glDeleteBuffers(1, &normalbuffer);
+    if (elementbuffer) glDeleteBuffers(1, &elementbuffer);
+    if (tangentbuffer) glDeleteBuffers(1, &tangentbuffer);
+    if (bitangentbuffer) glDeleteBuffers(1, &bitangentbuffer);
+    if (jointIdbuffer) glDeleteBuffers(1, &jointIdbuffer);
+    if (Weightbuffer) glDeleteBuffers(1, &Weightbuffer);
+}
 
+Mesh::Mesh(Mesh&& other) noexcept {
+    // GPU buffers
+    vertexbuffer = other.vertexbuffer;
+    uvbuffer = other.uvbuffer;
+    normalbuffer = other.normalbuffer;
+    elementbuffer = other.elementbuffer;
+    tangentbuffer = other.tangentbuffer;
+    bitangentbuffer = other.bitangentbuffer;
+    jointIdbuffer = other.jointIdbuffer;
+    Weightbuffer = other.Weightbuffer;
+
+    // CPU-side data
+    indices = std::move(other.indices);
+    indexed_vertices = std::move(other.indexed_vertices);
+    indexed_uvs = std::move(other.indexed_uvs);
+    indexed_normals = std::move(other.indexed_normals);
+    indexed_tangents = std::move(other.indexed_tangents);
+    indexed_bitangents = std::move(other.indexed_bitangents);
+    indexed_jointIDs = std::move(other.indexed_jointIDs);
+    indexed_weights = std::move(other.indexed_weights);
+    vertices = std::move(other.vertices);
+
+    // Other data
+    name = std::move(other.name);
+    texture = other.texture;
+    _shouldRender = other._shouldRender;
+
+    // Nullify source's GPU handles
+    other.vertexbuffer = 0;
+    other.uvbuffer = 0;
+    other.normalbuffer = 0;
+    other.elementbuffer = 0;
+    other.tangentbuffer = 0;
+    other.bitangentbuffer = 0;
+    other.jointIdbuffer = 0;
+    other.Weightbuffer = 0;
+    other.texture = nullptr;
+    other._shouldRender = false;
+}
 
 Mesh::Mesh(const char* path) {
     std::vector<glm::vec3> vertices;

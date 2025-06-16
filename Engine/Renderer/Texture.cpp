@@ -1,6 +1,53 @@
 #include "Texture.h"
 
 
+Texture::~Texture() {
+    if (texture != 0) {
+        glDeleteTextures(1, &texture);
+        std::cout << "Deleted texture: " << texture << "\n";
+    }
+    if (textureNormal != 0)
+        glDeleteTextures(1, &textureNormal);
+    if (textureMetalic != 0)
+        glDeleteTextures(1, &textureMetalic);
+    if (textureRoughness != 0)
+        glDeleteTextures(1, &textureRoughness);
+}
+Texture::Texture(Texture&& other) noexcept {
+    texture = other.texture;
+    textureNormal = other.textureNormal;
+    textureMetalic = other.textureMetalic;
+    textureRoughness = other.textureRoughness;
+    name = std::move(other.name);
+
+    other.texture = 0;
+    other.textureNormal = 0;
+    other.textureMetalic = 0;
+    other.textureRoughness = 0;
+}
+
+Texture& Texture::operator=(Texture&& other) noexcept {
+    if (this != &other) {
+        // Clean up existing
+        if (texture) glDeleteTextures(1, &texture);
+        if (textureNormal) glDeleteTextures(1, &textureNormal);
+        if (textureMetalic) glDeleteTextures(1, &textureMetalic);
+        if (textureRoughness) glDeleteTextures(1, &textureRoughness);
+
+        // Move in
+        texture = other.texture;
+        textureNormal = other.textureNormal;
+        textureMetalic = other.textureMetalic;
+        textureRoughness = other.textureRoughness;
+        name = std::move(other.name);
+
+        other.texture = 0;
+        other.textureNormal = 0;
+        other.textureMetalic = 0;
+        other.textureRoughness = 0;
+    }
+    return *this;
+}
 Texture::Texture(aiTexture* aitexture, std::string name) {
     this->name = name;
     this->roughness = 0.5;

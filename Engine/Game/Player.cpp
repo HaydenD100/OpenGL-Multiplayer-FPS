@@ -1,6 +1,6 @@
 #include "Player.h"
 #include "Engine/Core/AssetManager.h"
-#include "Engine/Core/Scene/SceneManager.h"
+
 #include <random>
 
 #include "Engine/Networking/NetworkManager.h"
@@ -10,8 +10,7 @@
 #include "Engine/Audio/Audio.h"
 #include "Engine/Core/Input.h"
 #include "Engine/Core/Common/GameCommon.h"
-
-
+#include "Engine/Core/Scene/World.h"
 
 namespace Player
 {
@@ -73,10 +72,10 @@ namespace Player
 	void Player::Init() {
 		timeSinceDeath = glfwGetTime();
 		srand((unsigned int)time(nullptr));
-		SceneManager::GetCurrentScene()->g_objects.push_back(std::make_unique<GameObject>("player", AssetManager::GetModel("player") , glm::vec3(0, 10, 5), false, 1, Capsule, 0.5, 2.2, 0.5));
-		SceneManager::GetCurrentScene()->g_objects.push_back(std::make_unique<GameObject>("player_head", AssetManager::GetModel("player"), glm::vec3(0, 10, 5), false, 0, Sphere, 0, 0, 0));
-		GameObject* player_head = SceneManager::GetCurrentScene()->GetGameObject("player_head");
-		GameObject* player_body = SceneManager::GetCurrentScene()->GetGameObject("player");
+		World::g_objects.push_back(std::make_unique<GameObject>("player", AssetManager::GetModel("player") , glm::vec3(0, 10, 5), false, 1, Capsule, 0.5, 2.2, 0.5));
+		World::g_objects.push_back(std::make_unique<GameObject>("player_head", AssetManager::GetModel("player"), glm::vec3(0, 10, 5), false, 0, Sphere, 0, 0, 0));
+		GameObject* player_head = World::GetGameObject("player_head");
+		GameObject* player_body = World::GetGameObject("player");
 
 		player_head->SetRender(false);
 		btBroadphaseProxy*  proxy = player_head->GetRigidBody()->getBroadphaseHandle();
@@ -98,8 +97,8 @@ namespace Player
 		std::shared_ptr<btRigidBody> playerHeadRigidBody = player_head->GetRigidBody(); // Assuming GetRigidBody() returns btRigidBody*
 		playerHeadRigidBody->setActivationState(DISABLE_SIMULATION);
 
-		std::shared_ptr<btRigidBody> body = SceneManager::GetCurrentScene()->GetGameObject("player")->GetRigidBody();
-		SceneManager::GetCurrentScene()->GetGameObject("player")->SetRender(false);
+		std::shared_ptr<btRigidBody> body = World::GetGameObject("player")->GetRigidBody();
+		World::GetGameObject("player")->SetRender(false);
 		body->setFriction(0.0f);
 		body->setRestitution(0.0f);
 		body->setCcdMotionThreshold(0.05f);
@@ -142,18 +141,31 @@ namespace Player
 				float maxSpread = WeaponManager::GetGunByName(gunName)->spread;
 				btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit(maxSpread);
 				if (hit.m_collisionObject != nullptr) {
-					ObjectType type = static_cast<ObjectType>(reinterpret_cast<uintptr_t>(hit.m_collisionObject->getUserPointer()));
+
+					int index = hit.m_collisionObject->getUserIndex();
+					if (index < 0 || index >= World::g_objects.size()) return;
+
 					GameObject* gameobject = nullptr;
+					ObjectType type = static_cast<ObjectType>(reinterpret_cast<uintptr_t>(hit.m_collisionObject->getUserPointer()));
+
 					if (type == ObjectType::GLASS) {
 						int randomnum = (rand() % 3) + 1;
 						AudioManager::PlaySound("bullet_impact_glass_" + std::to_string(randomnum), glm::vec3(hit.m_hitPointWorld.getX(), hit.m_hitPointWorld.getY(), hit.m_hitPointWorld.getZ()));
 						return;
 					}
-					else if (type == ObjectType::DEFAULT) {
-						gameobject = SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()].get();
+					else if (type == ObjectType::DEFAULT) 
+					{
+						auto& ptr = World::g_objects[index];
+						if (!ptr) return;
+						gameobject = World::g_objects[hit.m_collisionObject->getUserIndex()].get();
+						if (!gameobject) return;
 					}
-					else if (type == ObjectType::DESTORYABLE) {
-						gameobject = SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()].get();
+					else if (type == ObjectType::DESTORYABLE) 
+					{
+						auto& ptr = World::g_objects[index];
+						if (!ptr) return;
+						gameobject = World::g_objects[hit.m_collisionObject->getUserIndex()].get();
+						if (!gameobject) return;
 						if (gameobject->destructable.m_destoryed_object != "" && !gameobject->destructable.m_destoryed) {
 							Model* model = AssetManager::GetModel(gameobject->destructable.m_destoryed_object);
 							if (model) {
@@ -162,7 +174,6 @@ namespace Player
 								gameobject->SetModel(model);
 								//gameobject->GetRigidBody()->setCollisionShape(gameobject->destructable.convexHullShape);
 								AudioManager::PlaySound(gameobject->destructable.m_destoryed_sound, gameobject->GetPosition());
-								std::cout << gameobject->destructable.m_destoryed_object << "\n";
 							}
 								
 						}
@@ -172,13 +183,11 @@ namespace Player
 						return;
 					}
 					
-					if (gameobject != nullptr )
+					if (gameobject != nullptr)
 					{
-						///std::cout << "Object Name: " << gameobject->GetName() << "\n";
-						btRigidBody* body = gameobject->GetRigidBody().get();
-						if (!body) {
-							return; // Early exit if no rigid body
-						}
+						auto rigidBody = gameobject->GetRigidBody();
+						if (!rigidBody) return;
+						auto body = rigidBody.get();
 
 						btTransform transform = body->getWorldTransform();
 						btVector3 origin = transform.getOrigin();
@@ -203,7 +212,6 @@ namespace Player
 							std::cerr << "Invalid impulse (NaN/Inf detected)!" << std::endl;
 							return;
 						}
-
 						// Apply impulse
 						body->applyImpulse(impulse, localForcePos);
 
@@ -230,10 +238,6 @@ namespace Player
 						if (decal) {
 							AssetManager::AddDecalInstance(vec3local, normal, decal, gameobject);
 						}
-						//NetworkManager::SendGunShotData(gameobject->GetName(), "bullet_hole", vec3local, normal, btToGlmVector3(localForcePos), WeaponManager::GetGunByName(gunName)->damage, btToGlmVector3(2 * glmToBtVector3(Camera::ComputeRay())));
-						//if (type == DEFAULT)
-							//AudioManager::PlaySound("bullet_impact_" + std::to_string(randomnum), gameobject->GetPosition());
-						
 					}
 				}
 			}
@@ -243,7 +247,7 @@ namespace Player
 	void Player::Graffite() {
 		btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit();
 		if (hit.m_collisionObject != nullptr) {
-			GameObject* gameobject = SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()].get();
+			GameObject* gameobject = World::g_objects[hit.m_collisionObject->getUserIndex()].get();
 			if (gameobject != nullptr)
 			{
 				btVector3 start = hit.m_rayFromWorld; // Ray origin
@@ -271,7 +275,7 @@ namespace Player
 	}
 	
 	bool Player::OnGround() {
-		GameObject* player = SceneManager::GetCurrentScene()->GetGameObject("player");
+		GameObject* player = World::GetGameObject("player");
 		if (!player || !player->GetRigidBody()) return false;
 
 		// Ray parameters - adjust these values to match your character's dimensions
@@ -358,8 +362,8 @@ namespace Player
 		//totalRecoil -= totalRecoil * recoilDamping * deltaTime;
 			
 
-		GameObject* player =  SceneManager::GetCurrentScene()->GetGameObject("player");
-		GameObject* head = SceneManager::GetCurrentScene()->GetGameObject("player_head");
+		GameObject* player =  World::GetGameObject("player");
+		GameObject* head = World::GetGameObject("player_head");
 		player->setRotation(glm::vec3(horizontalAngle,0, 0));
 		head->setRotation(glm::vec3(-verticalAngle, horizontalAngle, 0));
 		head->setPosition(player->getPosition() + glm::vec3(0, 1, 0));
@@ -371,12 +375,12 @@ namespace Player
 
 		bool IsGrounded = OnGround();
 
-		glm::vec3 overlap = SceneManager::GetCurrentScene()->g_triggers[0]->CheckOverlap(player->GetRigidBody().get());
+		glm::vec3 overlap = World::g_triggers[0]->CheckOverlap(player->GetRigidBody().get());
 
 		bool insideTrigger = overlap.x > 0 && overlap.y -0.3 > 0 && overlap.z > 0;
 
-		m_isSwimming = (getPosition().y < SceneManager::GetCurrentScene()->m_seaLevel || insideTrigger);
-		m_headUnder = SceneManager::GetCurrentScene()->m_seaLevel - head->getPosition().y;
+		m_isSwimming = (getPosition().y < World::m_seaLevel || insideTrigger);
+		m_headUnder = World::m_seaLevel - head->getPosition().y;
 		//IsGrounded = IsGrounded && !m_isSwimming;
 		if (IsGrounded) {
 			player->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
@@ -482,7 +486,7 @@ namespace Player
 		if (Input::KeyPressed(INTERACT)) {
 			btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit();
 			if (hit.m_collisionObject != nullptr) {
-				GameObject* gameobject = SceneManager::GetCurrentScene()->g_objects[hit.m_collisionObject->getUserIndex()].get();
+				GameObject* gameobject = World::g_objects[hit.m_collisionObject->getUserIndex()].get();
 				if (gameobject != nullptr && glm::distance(gameobject->getPosition(), getPosition()) <= interactDistance)
 					interactingWithName = gameobject->GetName();
 			}
@@ -507,7 +511,7 @@ namespace Player
 			Gun* gun = WeaponManager::GetGunByName(gunName);
 			Model* gunModel = AssetManager::GetModel(gun->gunModel);
 			GunPickUp temp_pickup = GunPickUp(gunName,gunModel,Camera::GetPosition() + Camera::GetDirection() * 1.5f);
-			SceneManager::GetCurrentScene()->m_gunPickups.push_back(temp_pickup);
+			World::m_gunPickups.push_back(temp_pickup);
 		}
 
 		if (Input::RightMouseDown() && !reloading && WeaponManager::GetGunByName(gunName)->type != Melee && gunName != "nothing") {
@@ -577,7 +581,7 @@ namespace Player
 	}
 	
 	glm::vec3 Player::getPosition() {
-		return SceneManager::GetCurrentScene()->GetGameObject("player")->getPosition();
+		return World::GetGameObject("player")->getPosition();
 	}
 	
 	glm::vec3 Player::getForward() {
@@ -585,8 +589,8 @@ namespace Player
 	}
 	
 	void Player::setPosition(glm::vec3 pos) {
-		SceneManager::GetCurrentScene()->GetGameObject("player")->setPosition(pos);
-		Camera::SetPosition(SceneManager::GetCurrentScene()->GetGameObject("player")->getPosition());
+		World::GetGameObject("player")->setPosition(pos);
+		Camera::SetPosition(World::GetGameObject("player")->getPosition());
 	}
 	
 	std::string Player::GetInteractingWithName() {
@@ -601,16 +605,16 @@ namespace Player
 		if (reloading || weaponName == gunName)
 			return false;
 		if (gunName != "nothing")
-			SceneManager::GetCurrentScene()->GetGameObject(WeaponManager::GetGunByName(gunName)->name)->SetRender(false);
+			World::GetGameObject(WeaponManager::GetGunByName(gunName)->name)->SetRender(false);
 		gunName = weaponName;
-		SceneManager::GetCurrentScene()->GetGameObject(WeaponManager::GetGunByName(gunName)->name)->SetRender(true);
+		World::GetGameObject(WeaponManager::GetGunByName(gunName)->name)->SetRender(true);
 		AudioManager::PlaySound("item_pickup", getPosition());
 		WeaponManager::GetGunByName(weaponName)->Equip();
 		return true;
 	}
 	
 	void Player::SwitchWeapons(int index) {
-		SceneManager::GetCurrentScene()->GetGameObject(inv[index])->SetRender(false);
+		World::GetGameObject(inv[index])->SetRender(false);
 		gunName = inv[index];
 	}
 
@@ -632,7 +636,7 @@ namespace Player
 			isDead = 1;
 			timeSinceDeath = glfwGetTime();
 			if(gunName != "nothing")
-				SceneManager::GetCurrentScene()->GetGameObject(gunName)->SetRender(false);
+				World::GetGameObject(gunName)->SetRender(false);
 			gunName = "nothing";
 
 			deaths++;
@@ -654,12 +658,12 @@ namespace Player
 
 		Health = 100;
 		if(gunName != "nothing")
-			SceneManager::GetCurrentScene()->GetGameObject(gunName)->SetRender(false);
+			World::GetGameObject(gunName)->SetRender(false);
 		gunName = "nothing";
 		setPosition(glm::vec3(0,20,0));
 		isDead = 0;
 
-		btRigidBody* player = SceneManager::GetCurrentScene()->GetGameObject("player")->GetRigidBody().get();
+		btRigidBody* player = World::GetGameObject("player")->GetRigidBody().get();
 		player->setAngularVelocity(btVector3(0, 0, 0));
 		player->setLinearVelocity(btVector3(0, 0, 0));
 

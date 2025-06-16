@@ -1,12 +1,12 @@
 #include "Crate.h"
-#include "Engine/Core/Scene/SceneManager.h"
 
+#include "Engine/Core/Scene/World.h"
 
 Crate::Crate(glm::vec3 position, std::string name, Model* model) {
 	this->name = name;
-	SceneManager::GetCurrentScene()->AddGameObject(name, model, position, false, 4, Box);
-	SceneManager::GetCurrentScene()->GetGameObject(name)->GetRigidBody()->setCcdMotionThreshold(0.1);
-	SceneManager::GetCurrentScene()->GetGameObject(name)->GetRigidBody()->setCcdSweptSphereRadius(0.2); // Set the radius for CCD
+	World::AddGameObject(name, model, position, false, 4, Box);
+	World::GetGameObject(name)->GetRigidBody()->setCcdMotionThreshold(0.1);
+	World::GetGameObject(name)->GetRigidBody()->setCcdSweptSphereRadius(0.2); // Set the radius for CCD
 	
 }
 
@@ -25,5 +25,5 @@ void Crate::DealDamage(int damage,glm::vec3 position, glm::vec3 force) {
 }
 
 void Crate::Break() {
-	SceneManager::GetCurrentScene()->RemoveGameObject(name);
+	World::RemoveGameObject(name);
 }

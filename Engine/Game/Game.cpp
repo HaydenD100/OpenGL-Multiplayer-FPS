@@ -1,6 +1,6 @@
 #include "Game.h"
 #include "Engine/Game/Player.h"
-#include "Engine/Core/Scene/SceneManager.h"
+
 #include "Engine/Core/Scene/Scene.h"
 #include "Engine/Core/Camera.h"
 #include "Engine/Networking/NetworkManager.h"
@@ -9,6 +9,8 @@
 #include "Engine/Game/Player.h"
 #include "Engine/Core/Common/GameCommon.h"
 #include "Engine.h"
+#include "Engine/Core/Scene/World.h"
+
 
 namespace Game {
 
@@ -35,9 +37,7 @@ namespace Game {
 		}
 
 		AssetManager::Init();
-		SceneManager::Init();
-		SceneManager::CreateScene(std::move(Scene()));
-		SceneManager::LoadScene(0);
+		World::Load();
 		WeaponManager::Init();
 		AssetManager::LoadAssets();
 
@@ -51,7 +51,7 @@ namespace Game {
 	void Update(float dt) {
 		CheckDebugPress();
 
-		SceneManager::Update(dt);
+		World::Update(dt);
 		Player::Update(dt);
 		Camera::Update(dt);
 			
@@ -60,10 +60,10 @@ namespace Game {
 			desruct.m_destoryed_object = "uni_float_defalated";
 			desruct.m_destoryed_sound = "pop";
 			std::string random = generateRandomString(16);
-			SceneManager::GetCurrentScene()->AddGameObject(random, AssetManager::GetModel("uni_float"), glm::vec3(3, 3, 0), true, 0.5, Convex);
-			SceneManager::GetCurrentScene()->GetGameObject(random)->GetRigidBody()->setUserPointer((void*)ObjectType::DESTORYABLE);
-			SceneManager::GetCurrentScene()->GetGameObject(random)->destructable = desruct;
-			SceneManager::GetCurrentScene()->GetGameObject(random)->m_buoyancy = 6.0;
+			World::AddGameObject(random, AssetManager::GetModel("uni_float"), glm::vec3(3, 3, 0), true, 0.5, Convex);
+			World::GetGameObject(random)->GetRigidBody()->setUserPointer((void*)ObjectType::DESTORYABLE);
+			World::GetGameObject(random)->destructable = desruct;
+			World::GetGameObject(random)->m_buoyancy = 6.0;
 
 		}
 		
@@ -77,7 +77,7 @@ namespace Game {
 		if (Input::KeyDown(RELOADSHADERS))
 			Renderer::LoadAllShaders();
 		if (Input::KeyDown(BAKEGI))
-			Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->g_lights);
+			Renderer::probeGrid.Bake();
 	}
 	void CleanUp() {
 		Client::CleanUp();

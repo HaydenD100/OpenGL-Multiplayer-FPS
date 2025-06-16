@@ -6,7 +6,7 @@ BufferSSR::BufferSSR() {
 }
 
 BufferSSR::~BufferSSR() {
-
+	Destroy();
 }
 
 void BufferSSR::Configure(int width, int height) {
@@ -48,7 +48,9 @@ void BufferSSR::Bind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, ID);
 }
 void BufferSSR::Destroy() {
-
+	glDeleteTextures(1, &Depth);
+	glDeleteTextures(1, &gSSR);
+	glDeleteFramebuffers(1, &ID);
 }
 unsigned int BufferSSR::GetID() {
 	return ID;

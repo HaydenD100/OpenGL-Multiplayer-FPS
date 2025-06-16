@@ -3,7 +3,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <cmath>
 #include "Engine/Core/AssetManager.h"
-#include "Engine/Core/Scene/SceneManager.h"
+
+#include "Engine/Core/Scene/World.h"
 
 namespace Animator {
     std::vector<AnimationInstance> currentAnimationInstances;
@@ -72,7 +73,7 @@ namespace Animator {
         glm::mat4 globalTransformation = parentTransform * nodeTransform;
 
         auto boneInfoMap = currentAnimationInstances[index].Animation->GetBoneIDMap();
-        GameObject* gameobject = SceneManager::GetCurrentScene()->GetGameObject(currentAnimationInstances[index].GameObjectName);
+        GameObject* gameobject = World::GetGameObject(currentAnimationInstances[index].GameObjectName);
         if (boneInfoMap.find(nodeName) != boneInfoMap.end()) {
             int indexBone = boneInfoMap[nodeName].id;
             gameobject->SetFinalBoneMatricies(indexBone, currentAnimationInstances[index].Animation->GetInverseGlobal() * globalTransformation * boneInfoMap[nodeName].offset);

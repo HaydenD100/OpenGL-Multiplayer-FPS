@@ -10,6 +10,8 @@
 #include "Loaders/stb_image.h"
 #include "Engine/Pathfinding/Pathfinding.h"
 
+#include "Engine/Core/Scene/World.h"
+
 #include <random>
 #include <memory>
 
@@ -439,7 +441,7 @@ namespace Renderer
 
 	void Renderer::BeforeRender() {
 
-		Renderer::probeGrid.Bake(SceneManager::GetCurrentScene()->g_lights);
+		Renderer::probeGrid.Bake();
 		ParticleSystem::init();
 		//Raycaster::FillBuffers();
 		int gridX = 10;
@@ -455,7 +457,7 @@ namespace Renderer
 
 
 	
-	void Renderer::SetLights(std::vector<Light> lights, Shader* shader) {
+	void Renderer::SetLights(Shader* shader) {
 		// Upload lights data to the GPU
 		std::vector<glm::vec3> lightPositions;
 		std::vector<glm::vec3> lightDirection;
@@ -467,20 +469,19 @@ namespace Renderer
 		std::vector<float> LightCutoff;
 		std::vector<float> LightOuterCutOff;
 
-
-		for (int i = 0; i < lights.size();i++) {
+		for (int i = 0; i < World::g_lights.size(); i++) {
 	
-			shader->SetVec3("lights[" + std::to_string(i) + "].position",lights[i].position);
-			shader->SetVec3("lights[" + std::to_string(i) + "].color", lights[i].colour);
-			shader->SetFloat("lights[" + std::to_string(i) + "].strength", lights[i].strength);
-			shader->SetFloat("lights[" + std::to_string(i) + "].radius", lights[i].radius);
+			shader->SetVec3("lights[" + std::to_string(i) + "].position",World::g_lights[i].position);
+			shader->SetVec3("lights[" + std::to_string(i) + "].color", World::g_lights[i].colour);
+			shader->SetFloat("lights[" + std::to_string(i) + "].strength", World::g_lights[i].strength);
+			shader->SetFloat("lights[" + std::to_string(i) + "].radius", World::g_lights[i].radius);
 
 			glActiveTexture(GL_TEXTURE8 + i); // Activate texture unit i
-			glBindTexture(GL_TEXTURE_CUBE_MAP, lights[i].depthCubemap); // Bind the depth cubemap to the texture unit
+			glBindTexture(GL_TEXTURE_CUBE_MAP, World::g_lights[i].depthCubemap); // Bind the depth cubemap to the texture unit
 		}
 	}
 
-	void Renderer::SetLights(std::vector<Light> lights, ComputeShader* shader) {
+	void Renderer::SetLights(ComputeShader* shader) {
 		// Upload lights data to the GPU
 		std::vector<glm::vec3> lightPositions;
 		std::vector<glm::vec3> lightDirection;
@@ -493,15 +494,15 @@ namespace Renderer
 		std::vector<float> LightOuterCutOff;
 
 
-		for (int i = 0; i < lights.size(); i++) {
+		for (int i = 0; i < World::g_lights.size(); i++) {
 
-			shader->SetVec3("lights[" + std::to_string(i) + "].position", lights[i].position);
-			shader->SetVec3("lights[" + std::to_string(i) + "].color", lights[i].colour);
-			shader->SetFloat("lights[" + std::to_string(i) + "].strength", lights[i].strength);
-			shader->SetFloat("lights[" + std::to_string(i) + "].radius", lights[i].radius);
+			shader->SetVec3("lights[" + std::to_string(i) + "].position", World::g_lights[i].position);
+			shader->SetVec3("lights[" + std::to_string(i) + "].color", World::g_lights[i].colour);
+			shader->SetFloat("lights[" + std::to_string(i) + "].strength", World::g_lights[i].strength);
+			shader->SetFloat("lights[" + std::to_string(i) + "].radius", World::g_lights[i].radius);
 
 			glActiveTexture(GL_TEXTURE8 + i); // Activate texture unit i
-			glBindTexture(GL_TEXTURE_CUBE_MAP, lights[i].depthCubemap); // Bind the depth cubemap to the texture unit
+			glBindTexture(GL_TEXTURE_CUBE_MAP, World::g_lights[i].depthCubemap); // Bind the depth cubemap to the texture unit
 		}
 	}
 
@@ -515,8 +516,8 @@ namespace Renderer
 	void Renderer::RenderAllObjects(Shader& shader) {
 		NeedRendering.clear();
 		glm::mat4 ViewMatrix = Camera::getViewMatrix();
-		for (int i = 0; i < SceneManager::GetCurrentScene()->g_lights.size(); i++) {
-			GameObject* gameobjectRender = SceneManager::GetCurrentScene()->g_objects[i].get();
+		for (int i = 0; i < World::g_lights.size(); i++) {
+			GameObject* gameobjectRender = World::g_objects[i].get();
 
 			if (!gameobjectRender->ShouldRender())
 				continue;
@@ -576,15 +577,15 @@ namespace Renderer
 		glEnable(GL_DEPTH_TEST);
 		gbuffer.Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), SceneManager::GetCurrentScene()->GetEnviromentLighting().sky);
+		RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), World::GetEnviromentLighting().sky);
 
 		s_geomerty.Use();
 		s_geomerty.SetMat4("P", Camera::getProjectionMatrix());
 		s_geomerty.SetMat4("V", Camera::getViewMatrix());
 
 		glm::mat4 ViewMatrix = Camera::getViewMatrix();
-		for (int i = 0; i < SceneManager::GetCurrentScene()->g_objects.size(); i++) {
-			GameObject* gameobjectRender = SceneManager::GetCurrentScene()->g_objects[i].get();
+		for (int i = 0; i < World::g_objects.size(); i++) {
+			GameObject* gameobjectRender = World::g_objects[i].get();
 
 			if (!gameobjectRender->ShouldRender())
 				continue;
@@ -627,11 +628,10 @@ namespace Renderer
 		s_SolidColor.SetFloat("Metalic", 0);
 
 
-		std::vector<Light> lights = SceneManager::GetCurrentScene()->g_lights;
-		for (int i = 0; i < lights.size(); i++) {
-			s_SolidColor.SetVec3("color", lights[i].colour);
+		for (int i = 0; i < World::g_lights.size(); i++) {
+			s_SolidColor.SetVec3("color", World::g_lights[i].colour);
 			glm::mat4 positionMatrix = glm::mat4(); // create an identity matrix;
-			positionMatrix = glm::translate(positionMatrix, lights[i].position); //position is a vec3
+			positionMatrix = glm::translate(positionMatrix, World::g_lights[i].position); //position is a vec3
 			s_SolidColor.SetMat4("M", positionMatrix);
 			AssetManager::GetModel("light_cube")->RenderModel(s_SolidColor.GetShaderID());
 		}
@@ -674,7 +674,7 @@ namespace Renderer
 		//-----------------------------------------Transaprent stuff---------------------------------------
 		transparentBuffer.Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		SetLights(SceneManager::GetCurrentScene()->g_lights, &s_water);
+		SetLights(&s_water);
 
 		RenderWater();
 
@@ -687,14 +687,14 @@ namespace Renderer
 		s_transparent.SetMat4("V", Camera::getViewMatrix());
 		s_transparent.SetVec3("viewPos", Camera::GetPosition());
 
-		SetLights(SceneManager::GetCurrentScene()->g_lights, &s_transparent);
+		SetLights(&s_transparent);
 		glActiveTexture(GL_TEXTURE4);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, SceneManager::GetCurrentScene()->GetEnviromentLighting().sky.GetTextureID());
+		glBindTexture(GL_TEXTURE_CUBE_MAP, World::GetEnviromentLighting().sky.GetTextureID());
 		glActiveTexture(GL_TEXTURE5);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
 		glm::vec3 cameraPosition = Camera::GetPosition(); // Camera position
 		
-		auto& glassObjects = SceneManager::GetCurrentScene()->g_glass;
+		auto& glassObjects = World::g_glass;
 		std::sort(glassObjects.begin(), glassObjects.end(),
 			[&cameraPosition](const std::unique_ptr<GameObject>& a, const std::unique_ptr<GameObject>& b) {
 				float distA = glm::length2(a->GetPosition() - cameraPosition);
@@ -718,13 +718,13 @@ namespace Renderer
 		/*
 		s_geomerty.Use();
 		glClear(GL_DEPTH_BUFFER_BIT);
-		for (int i = 0; i < SceneManager::GetCurrentScene()->g_overlay.size(); i++) {
-			glm::mat4 ModelMatrix = SceneManager::GetCurrentScene()->g_overlay[i].GetModelMatrix();
+		for (int i = 0; i < World::g_overlay.size(); i++) {
+			glm::mat4 ModelMatrix = World::g_overlay[i].GetModelMatrix();
 			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;
 			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
 
-			//auto transforms = SceneManager::GetCurrentScene()->GetAnimator()->GetFinalBoneMatrices(overlay[i]->GetName());
-			auto transforms = SceneManager::GetCurrentScene()->g_overlay[i].GetFinalBoneMatricies();
+			//auto transforms = World::GetAnimator()->GetFinalBoneMatrices(overlay[i]->GetName());
+			auto transforms = World::g_overlay[i].GetFinalBoneMatricies();
 
 			if (transforms[0] != glm::mat4(1)) {
 				s_geomerty.SetBool("animated", true);
@@ -740,7 +740,7 @@ namespace Renderer
 			s_geomerty.SetMat3("normalMatrix3", normalMatrix);
 			s_geomerty.SetMat4("M", ModelMatrix);
 
-			SceneManager::GetCurrentScene()->g_overlay[i].RenderObject(s_geomerty.GetShaderID());
+			World::g_overlay[i].RenderObject(s_geomerty.GetShaderID());
 		}
 		*/
 		//------------------------------------------------RAYCAST DEBUG--------------------------------
@@ -790,7 +790,7 @@ namespace Renderer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		cs_lighting.Use();
-		SetLights(lights,&cs_lighting);
+		SetLights(&cs_lighting);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
@@ -816,7 +816,7 @@ namespace Renderer
 		cs_lighting.SetVec3("spacing", probeGrid.spacing);
 		cs_lighting.SetInt("lightingState", lightingState);
 		cs_lighting.SetVec2("screen", glm::vec2(Backend::GetWidth(), Backend::GetHeight()));
-		cs_lighting.SetVec3("envLighting", SceneManager::GetCurrentScene()->GetEnviromentLighting().indirectLight);
+		cs_lighting.SetVec3("envLighting", World::GetEnviromentLighting().indirectLight);
 
 		glBindImageTexture(7, lightingBuffer.gLighting, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 		glDispatchCompute(Backend::GetWidth()/32 + 1, Backend::GetHeight()/32 + 1, 1);
@@ -913,7 +913,7 @@ namespace Renderer
 
 		s_water.SetVec3("viewpos", Camera::GetPosition());
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, SceneManager::GetCurrentScene()->GetEnviromentLighting().sky.GetTextureID());
+		glBindTexture(GL_TEXTURE_CUBE_MAP, World::GetEnviromentLighting().sky.GetTextureID());
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
 		s_water.SetMat4("P", Camera::getProjectionMatrix());
@@ -924,8 +924,8 @@ namespace Renderer
 		s_water.SetVec3Array("randomDir", _randomdir);
 
 
-		for (int i = 0; i < SceneManager::GetCurrentScene()->g_water.size(); i++) {
-			GameObject* water = SceneManager::GetCurrentScene()->g_water[i].get();
+		for (int i = 0; i < World::g_water.size(); i++) {
+			GameObject* water = World::g_water[i].get();
 			//Upload the water plane data
 			glm::mat4 ModelMatrix = water->GetModelMatrix();
 

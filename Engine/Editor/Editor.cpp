@@ -1,28 +1,30 @@
 #include "Editor.h"
 #include "Engine/Core/UI/UI.h"
 #include "Engine/Core/AssetManager.h"
-#include "Engine/Core/Scene/SceneManager.h"
+
 #include "Engine/Core/Common.h"
 #include "Engine/Physics/BulletPhysics.h"
+#include "Engine/Core/Scene/World.h"
+
 
 namespace Editor
 {
 	std::vector<GameObject*> objects;
 	void RenderUI() {
 		ImGui::Begin("Lights");
-		size_t s_light = SceneManager::GetCurrentScene()->g_lights.size();
+		size_t s_light = World::g_lights.size();
 		for (int i = 0; i < s_light; i++) {
 			std::string label = "Light " + std::to_string(i);
 			ImGui::Text("%s", label.c_str());
 
 			std::string removeButtonLabel = "Remove Light##" + std::to_string(i);
 			if (ImGui::Button(removeButtonLabel.c_str())) {
-				SceneManager::GetCurrentScene()->RemoveLight(i);
+				World::RemoveLight(i);
 				// Important: Break out because lights list is now invalid
 				break;
 			}
 
-			Light* light = &SceneManager::GetCurrentScene()->g_lights[i];
+			Light* light = &World::g_lights[i];
 
 			ImGui::ColorEdit3(("Colour##" + std::to_string(i)).c_str(), glm::value_ptr(light->colour));
 			ImGui::InputFloat3(("Position##" + std::to_string(i)).c_str(), glm::value_ptr(light->position));
@@ -51,7 +53,7 @@ namespace Editor
 			RayCallback.m_collisionFilterMask = GROUP_STATIC | GROUP_DYNAMIC;
 			PhysicsManagerBullet::GetDynamicWorld()->rayTest(btVector3(cameraPosition.x, cameraPosition.y, cameraPosition.z), btVector3(out_end.x, out_end.y, out_end.z), RayCallback);
 			if (RayCallback.m_collisionObject != NULL) {
-				GameObject* gameobject = SceneManager::GetCurrentScene()->g_objects[RayCallback.m_collisionObject->getUserIndex()].get();
+				GameObject* gameobject = World::g_objects[RayCallback.m_collisionObject->getUserIndex()].get();
 				bool alreadyIncluded = false;
 				for (GameObject* object : objects) {
 					if (gameobject == object)

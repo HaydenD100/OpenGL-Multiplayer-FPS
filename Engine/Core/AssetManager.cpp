@@ -1,6 +1,7 @@
 #include "AssetManager.h"
 #include "Engine/Core/DecalInstance.h"
-#include "Engine/Core/Scene/SceneManager.h"
+
+#include "Engine/Core/Scene/World.h"
 
 namespace AssetManager
 {
@@ -59,7 +60,7 @@ namespace AssetManager
 
 			//glm::vec3 rotation = glm::vec3(data["GameObjects"][gameobject][5], data["GameObjects"][gameobject][6], data["GameObjects"][gameobject][7]);
 			//glm::vec3 scale = glm::vec3(data["GameObjects"][gameobject][8], data["GameObjects"][gameobject][9], data["GameObjects"][gameobject][10]);
-			GameObject* p_gameobject = SceneManager::GetCurrentScene()->GetGameObject(name);
+			GameObject* p_gameobject = World::GetGameObject(name);
 			if (p_gameobject != nullptr) {
 				p_gameobject->setPosition(position);
 			}
@@ -77,8 +78,8 @@ namespace AssetManager
 			colour.z = data["lights"][i]["colourB"];
 
 
-			Light light = Light(position,colour, data["lights"][i]["strength"], data["lights"][i]["radius"]);
-			SceneManager::GetCurrentScene()->SetLight(light, i);
+			//Light light = Light(position,colour, data["lights"][i]["strength"], data["lights"][i]["radius"]);
+			//sWorld::SetLight(std::move(light), i);
 		}
 		
 	}
@@ -91,8 +92,8 @@ namespace AssetManager
 
 		
 		// name,pos,rotation,scale
-		for (int i = 0; i < SceneManager::GetCurrentScene()->g_objects.size(); i++) {
-			GameObject* gameobject = SceneManager::GetCurrentScene()->g_objects[i].get();
+		for (int i = 0; i < World::g_objects.size(); i++) {
+			GameObject* gameobject = World::g_objects[i].get();
 			json gameobjectJSON;
 			gameobjectJSON["name"] = gameobject->GetName();
 			glm::vec3 position = gameobject->GetPosition();
@@ -107,8 +108,8 @@ namespace AssetManager
 			SerializedGameObjects.push_back(gameobjectJSON);
 		}
 
-		for (int i = 0; i < SceneManager::GetCurrentScene()->g_lights.size(); i++) {
-			Light* light = &SceneManager::GetCurrentScene()->g_lights[i];
+		for (int i = 0; i < World::g_lights.size(); i++) {
+			Light* light = &World::g_lights[i];
 			json lightJSON;
 			lightJSON["colourR"] = light->colour.r;
 			lightJSON["colourG"] = light->colour.g;
@@ -196,38 +197,28 @@ namespace AssetManager
 		models[name].SetName(name);
 		return &models[name];
 	}
-	Model* AssetManager::AddModel(std::string name, Model model) {
-		models[name] = model;
+	Model* AssetManager::AddModel(std::string name, Model&& model) {
+		models[name] = std::move(model);
 		return &models[name];
 	}
-	
-
 
 	std::vector<Decal>* GetAllDecals() {
 		return &Decals;
 	}
 
-	size_t AssetManager::AddTexture(Texture texture) {
-		//Make sure textures cant have the same name
-		for (int i = 0; i < Textures.size(); i++) {
-			if (Textures[i].GetName() == texture.GetName())
-				return i;
-		}
-		Textures.push_back(texture);
-		return Textures.size() - 1;
-	}
+
 
 	size_t AssetManager::AddTexture(const char* name, const char* path, float roughness, float metalic) { 
-		Textures.push_back(Texture(name, path, roughness, metalic));
+		Textures.emplace_back(name, path, roughness, metalic);
 		return Textures.size() - 1;
 	}
 
 	size_t AddTexture(const char* name, const char* path, const char* normalPath, float roughness, float metalic) {
-		Textures.push_back(Texture(name, path,normalPath, roughness, metalic));
+		Textures.emplace_back(name, path,normalPath, roughness, metalic);
 		return Textures.size() - 1;
 	}	
 	size_t AddTexture(const char* name, const char* path, const char* normalPath, const char* RoughnessPath, const char* MetalicPath) {
-		Textures.push_back(Texture(name, path, normalPath, RoughnessPath, MetalicPath));
+		Textures.emplace_back(name, path, normalPath, RoughnessPath, MetalicPath);
 		return Textures.size() - 1;
 	}
 	Texture* GetMissingTexture() {

@@ -15,6 +15,7 @@
 #include "Engine/Core/UI/UI.h"
 #include "Engine/Editor/Editor.h"
 
+
 //rewrite of my first 3D Engine
 //Not sure what im going to call it yet 
 //this Engine is fueled by coffee and sleep deprivation
@@ -34,7 +35,6 @@ namespace Engine
 		PhysicsManagerBullet::Init();
 		Game::Init(Game::SinglePlayer);
 		Input::HideCursor();
-
 
 
 		double lastTimeDT = glfwGetTime();
@@ -94,7 +94,7 @@ namespace Engine
 			//Dont use this its not working rightnow
 			
 
-			/*
+			
 			if ((Renderer::DebugState & NoGUi) != NoGUi) {
 
 				std::ostringstream oss;
@@ -125,12 +125,14 @@ namespace Engine
 				oss << "Enemy Kills " << Player::GetDeaths();
 				Renderer::RenderText(oss.str().c_str(), 0, 500, 15);
 			}
-			*/
+			
 			
 			ImGuiUI::DrawUI();
 
 			Renderer::SwapBuffers(Backend::GetWindowPointer());
 		}
+
+		PhysicsManagerBullet::Delete();
 		return 0;
 	}
 }

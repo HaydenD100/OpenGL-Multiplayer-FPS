@@ -2,7 +2,9 @@
 #include "Engine/Core/AssetManager.h"
 #include "Engine/Physics/BulletPhysics.h"
 #include "Engine/Networking/NetworkManager.h"
-#include "Engine/Core/Scene/SceneManager.h"
+
+#include "Engine/Core/Scene/World.h"
+
 #undef max
 
 GameObject::GameObject() = default;
@@ -17,6 +19,64 @@ GameObject::~GameObject() {
 	delete triangleCollison;
 	delete myMotionState;
 
+	std::cout << "Destoryed \n";
+
+}
+
+GameObject::GameObject(GameObject&& other) noexcept
+	: transform(std::move(other.transform)),
+	model(std::exchange(other.model, nullptr)),
+	parentName(std::move(other.parentName)),
+	name(std::move(other.name)),
+	isDynamic(other.isDynamic),
+	shaderType(std::move(other.shaderType)),
+	collider(std::exchange(other.collider, nullptr)),
+	convexHullShape(std::exchange(other.convexHullShape, nullptr)),
+	triangleCollison(std::exchange(other.triangleCollison, nullptr)),
+	myMotionState(std::exchange(other.myMotionState, nullptr)),
+	Btransform(other.Btransform),
+	m_rigidBody(std::move(other.m_rigidBody)),
+	canSave(other.canSave),
+	render(other.render),
+	dontCull(other.dontCull),
+	shouldDelete(other.shouldDelete),
+	includedInRayCast(other.includedInRayCast),
+	includedInGI(other.includedInGI),
+	m_FinalBoneMatrices(std::move(other.m_FinalBoneMatrices)),
+	objectType(other.objectType),
+	destructable(std::move(other.destructable)),
+	m_mass(other.m_mass),
+	m_buoyancy(other.m_buoyancy)
+{
+}
+
+GameObject& GameObject::operator=(GameObject&& other) noexcept {
+	if (this != &other) {
+		transform = std::move(other.transform);
+		model = std::exchange(other.model, nullptr);
+		parentName = std::move(other.parentName);
+		name = std::move(other.name);
+		isDynamic = other.isDynamic;
+		shaderType = std::move(other.shaderType);
+		collider = std::exchange(other.collider, nullptr);
+		convexHullShape = std::exchange(other.convexHullShape, nullptr);
+		triangleCollison = std::exchange(other.triangleCollison, nullptr);
+		myMotionState = std::exchange(other.myMotionState, nullptr);
+		Btransform = other.Btransform;
+		m_rigidBody = std::move(other.m_rigidBody);
+		canSave = other.canSave;
+		render = other.render;
+		dontCull = other.dontCull;
+		shouldDelete = other.shouldDelete;
+		includedInRayCast = other.includedInRayCast;
+		includedInGI = other.includedInGI;
+		m_FinalBoneMatrices = std::move(other.m_FinalBoneMatrices);
+		objectType = other.objectType;
+		destructable = std::move(other.destructable);
+		m_mass = other.m_mass;
+		m_buoyancy = other.m_buoyancy;
+	}
+	return *this;
 }
 
 GameObject::GameObject(std::string name, bool save, float mass, ColliderShape shape) {
@@ -380,7 +440,7 @@ glm::mat4 GameObject::GetModelMatrix() {
 	//Btransform.getOpenGLMatrix(glm::value_ptr(matrix));
 
 	if (!parentName.empty()) {
-		GameObject* parent = SceneManager::GetCurrentScene()->GetGameObject(parentName);
+		GameObject* parent = World::GetGameObject(parentName);
 		if (parent != nullptr) {
 			matrix = parent->GetModelMatrix() * transform.to_mat4();
 		}

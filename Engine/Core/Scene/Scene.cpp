@@ -9,8 +9,6 @@
 //TODO LIST
 //rework guns
 
-
-
 Scene::Scene() {
 
 }
@@ -23,7 +21,7 @@ void Scene::LoadAssets() {
 
 
 	AssetManager::AddTexture("white", "Assets/Textures/white.png", 0.5, 0.0);
-	AssetManager::AddTexture(Texture("dev_textures", "Assets/Textures/dev_textures.png", "Assets/Normals/no_normal.png", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_metallic.jpg"));
+	AssetManager::AddTexture("dev_textures", "Assets/Textures/dev_textures.png", "Assets/Normals/no_normal.png", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_metallic.jpg");
 
 	AssetManager::AddTexture("metalic", "Assets/Textures/white.png", 0.0f, 1.0f);
 
@@ -209,8 +207,12 @@ void Scene::LoadAssets() {
 void Scene::Load() { 
 	LoadAssets();
 
+
 	AddGameObject("Tiltedfloor", AssetManager::GetModel("Tiltedfloor"), glm::vec3(0, 0.1, 0), true, 0, Box);
 	GetGameObject("Tiltedfloor")->IncludInGI(true);
+
+
+
 	//AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), false, 10.0f, Box);
 	AddGameObject("room1", AssetManager::GetModel("room1"), glm::vec3(0, 0.1, 0), true, 0, Concave);
 	GetGameObject("room1")->IncludInGI(true);
@@ -236,8 +238,8 @@ void Scene::Load() {
 	
 	AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(-6.46, -1, 14), false, 0.0, Box);
 	AddGameObject("Crates", AssetManager::GetModel("model_crate"), glm::vec3(3, 0, 3), true, 0, Convex);
-	//SceneManager::GetCurrentScene()->AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
-	//SceneManager::GetCurrentScene()->GetGameObject("ladder_object")->SetRotationX(-1.5708f);
+	//World::AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
+	//World::GetGameObject("ladder_object")->SetRotationX(-1.5708f);
 
 	AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
 	GetGameObject("ladder_object")->SetRotationX(-1.5708f);
@@ -353,20 +355,6 @@ void Scene::Load() {
 	envLight.indirectLight = glm::vec3(0.188, 0.278, 0.4);
 	//envLight.indirectLight = glm::vec3(0.569, 0.69, 0.965);
 
-
-	{
-		Light light(glm::vec3(6.13, 4.5, 5.3), glm::vec3(1, 0.11, 0) * 6.0f, 0.22, 0.20);
-		//lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(0, 10, 0), glm::vec3(1, 0.996, 0.82),10,50);
-		g_lights.push_back(light);
-	}
-	{
-		Light light(glm::vec3(0, 6, -2.4), glm::vec3(1, 0.922, 0.678) * 7.5f, 0.07, 0.017);
-		g_lights.push_back(light);
-	}
-
 }
 
 void Scene::Update(float deltaTime) {
@@ -481,17 +469,10 @@ Light* Scene::GetLight(int i) {
 	return &g_lights[i];
 }
 
-void Scene::SetLight(Light light, int index) {
-	if (index > g_lights.size() - 1) {
-		g_lights.push_back(light);
-	}
-	else {
-		g_lights[index] = light;
-	}
-}
+
 void Scene::RemoveLight(int index) {
-	if (index < g_lights.size())
-		g_lights.erase(g_lights.begin() + index);
+	//if (index < g_lights.size())
+		//g_lights.erase(g_lights.begin() + index);
 }
 
 size_t Scene::AddGameObject(std::unique_ptr<GameObject> gameobject) {

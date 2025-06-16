@@ -34,14 +34,13 @@ namespace AssetManager
 	std::vector<DecalInstance>* GetAllDecalInstances();
 	size_t DecalInstanceSize();
 
-	size_t AddTexture(Texture texture);
 	size_t AddTexture(const char* name, const char* path, float roughness, float metalic);
 	size_t AddTexture(const char* name, const char* path, const char* normalPath, float roughness, float metalic);
 	size_t AddTexture(const char* name, const char* path, const char* normaPath, const char* RoughnessPath, const char* MetalicPath);
 
 	Model* GetModel(std::string name);
 	Model* AddModel(std::string name, const char* path, Texture* texture);
-	Model* AddModel(std::string name, Model model);
+	Model* AddModel(std::string name, Model&& model);
 
 	size_t AddSkinnedAnimation(SkinnedAnimation skinnedanimation);
 	SkinnedAnimation* GetSkinnedAnimation(std::string name);

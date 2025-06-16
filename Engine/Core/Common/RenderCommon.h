@@ -25,6 +25,7 @@ const int DDGIPROBESIZE = 16;
 
 
 
+
 enum LightType
 {
 	PointLight,

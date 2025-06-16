@@ -112,13 +112,14 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;_ITERATOR_DEBUG_LEVEL=0;_HAS_ITERATOR_DEBUGGING=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\Users\kokok\OneDrive\Desktop\Code\vc_package\vcpkg\installed\x64-windows-static\include\bullet;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\core\inc;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\studio\inc;C:\Users\kokok\OneDrive\Desktop\Code\Home\C++\3dEngine2.0\Engine\Core;C:\Users\kokok\OneDrive\Desktop\Code\Home\C++\3dEngine2.0\Engine;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glew-2.1.0\include;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glfw-3.3.8.bin.WIN64\include;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\GLM;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -206,6 +207,7 @@
     <ClCompile Include="Engine\Renderer\Raycaster.cpp" />
     <ClCompile Include="Engine\Game\Ocean.cpp" />
     <ClCompile Include="Engine\Physics\TriggerCollider.cpp" />
+    <ClCompile Include="Engine\Core\Scene\World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\Bloom\downscale.frag" />
@@ -333,6 +335,7 @@
     <ClInclude Include="Engine\Renderer\Raycaster.h" />
     <ClInclude Include="Engine\Game\Ocean.h" />
     <ClInclude Include="Engine\Physics\TriggerCollider.h" />
+    <ClInclude Include="Engine\Core\Scene\World.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="github\screenshots\3DEngine.png" />

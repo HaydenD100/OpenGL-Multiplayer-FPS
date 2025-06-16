@@ -1,6 +1,15 @@
 #include "Light.h"
 #include "Engine/Renderer/Renderer.h"
-#include "Engine/Core/Scene/SceneManager.h"
+#include "Engine/Backend.h"
+
+Light::~Light() {
+	if (depthCubemap != 0) {
+		//glDeleteTextures(1, &depthCubemap);
+		//glDeleteFramebuffers(1, &depthMapFBO);
+		std::cout << "deleteing light\n";
+	}
+}
+
 Light::Light(glm::vec3 position, glm::vec3 direction, glm::vec3 colour, float cutoff, float outercutoff, float strength, float radius) {
 	this->lighttype = Spotlight;
 	this->position = position;
@@ -16,7 +25,6 @@ Light::Light(glm::vec3 position, glm::vec3 direction, glm::vec3 colour, float cu
 	SetUpShadows();
 	GenerateShadows();
 }
-
 
 Light::Light(glm::vec3 position, glm::vec3 colour, float strength, float radius) {
 	this->lighttype = PointLight;

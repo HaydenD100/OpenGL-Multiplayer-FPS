@@ -127,7 +127,7 @@ struct ProbeGrid {
 		probes.push_back(Probe(postion));
 	}
 
-	void Bake(std::vector<Light> lights);
+	void Bake();
 	void ReLight(int probeRelightCount);
 	void ShowProbes();
 

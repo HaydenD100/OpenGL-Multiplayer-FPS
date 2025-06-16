@@ -55,6 +55,12 @@ public:
 	GameObject();
 	~GameObject();
 
+	GameObject(const GameObject&) = delete;
+	GameObject& operator=(const GameObject&) = delete;
+
+	GameObject(GameObject&& other) noexcept;
+	GameObject& operator=(GameObject&& other) noexcept;
+
 	GameObject(std::string name, bool save, float mass, ColliderShape shape);
 	GameObject(std::string name, glm::vec3 position, bool save, float mass, ColliderShape shape);
 	GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, btConvexHullShape* shape);
@@ -62,11 +68,6 @@ public:
 
 	GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape);
 	GameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape, float width, float height, float depth);
-
-	GameObject(const GameObject&) = delete;
-	GameObject& operator=(const GameObject&) = delete;
-	GameObject(GameObject&&) = delete;
-	GameObject& operator=(GameObject&&) = delete;
 
 	glm::mat4 GetModelMatrix();
 	glm::mat4 GetLocalModelMatrix();

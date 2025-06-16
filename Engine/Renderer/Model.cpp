@@ -12,13 +12,44 @@
 
 namespace fs = std::filesystem;
 
+Model::~Model() {
 
-Model::Model(Mesh mesh, Texture* texture) {
+}
 
-    mesh.SetTexture(texture);
-    meshes.push_back(mesh);
-    aabb = generateAABB();
+Model& Model::operator=(Model&& other) noexcept {
+    if (this != &other) {
+        // Move primitive and pointer members
+        aabb = std::move(other.aabb);
+        renderAllMeshes = other.renderAllMeshes;
+        meshes = std::move(other.meshes);
+        currentMesh = other.currentMesh;
+        name = std::move(other.name);
+        m_BoneInfoMap = std::move(other.m_BoneInfoMap);
+        m_BoneCounter = other.m_BoneCounter;
+        collison_shape_vertices = std::move(other.collison_shape_vertices);
 
+        // Optionally reset the moved-from object if you care
+        other.meshes.clear();
+        other.m_BoneInfoMap.clear();
+        other.collison_shape_vertices.clear();
+        other.name = "";
+        other.currentMesh = 0;
+        other.m_BoneCounter = 0;
+    }
+
+    return *this;
+}
+
+Model::Model(Model&& other) noexcept
+    : aabb(std::move(other.aabb)),
+    renderAllMeshes(other.renderAllMeshes),
+    meshes(std::move(other.meshes)),
+    currentMesh(other.currentMesh),
+    name(std::move(other.name)),
+    m_BoneInfoMap(std::move(other.m_BoneInfoMap)),
+    m_BoneCounter(other.m_BoneCounter),
+    collison_shape_vertices(std::move(other.collison_shape_vertices)) {
+    // other is now in a valid but unspecified state
 }
 
 Model::Model(const char* path, Texture* texture, int triangulate) {
@@ -58,6 +89,7 @@ Model::Model(const char* path, Texture* texture) {
     processNode(scene->mRootNode, scene, texture);
 
     aabb = generateAABB();
+
 }
 Model::Model(const char* path, const char* collisonShapePath, Texture* texture) {
 
@@ -233,14 +265,17 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scenem) {
 
 void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
     // process all the node's meshes (if any)
-    Texture* meshTexture = texture;
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        Mesh model_mesh = processMesh(mesh, scene);
+        Mesh mesh1 = std::move(processMesh(mesh, scene));
+        mesh1.SetTexture(texture);
+        meshes.push_back(std::move(mesh1));
+        //meshes.push_back(std::move());
 
         //this is really buggy right now so only load textures from model if the texture that is being assigned to this model is the missing texture
         //TODO :: Fix this
+        /*
         if (scene->mNumMaterials > 0 && texture == AssetManager::GetMissingTexture()) {
             aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
             aiString materialName;//The name of the material found in mesh file
@@ -291,8 +326,8 @@ void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
                 
             }
         }
+        */
             
-        model_mesh.SetTexture(meshTexture);
         int name_count = 0;
         for (int i = 0; i < meshes.size(); i++) {
             if (std::strcmp(meshes[i].GetName().c_str(), mesh->mName.C_Str()) == 0) {
@@ -301,15 +336,14 @@ void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
         }
         if (name_count > 0) {
             std::string mesh_name = mesh->mName.C_Str() + std::to_string(name_count);
-            model_mesh.SetName(mesh_name);
+            meshes.back().SetName(mesh_name);
         }
         else 
-            model_mesh.SetName(mesh->mName.C_Str());
+            meshes.back().SetName(mesh->mName.C_Str());
 
         
        
-        std::cout << "Mesh Name: " << model_mesh.GetName() << "\n";
-        meshes.push_back(model_mesh);
+
     }
     // then do the same for each of its children
     for (unsigned int i = 0; i < node->mNumChildren; i++)
@@ -318,7 +352,7 @@ void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
     }
 }
 void Model::AddMesh(Mesh mesh) {
-    meshes.push_back(mesh);
+    meshes.push_back(std::move(mesh));
 }
 void Model::SetMesh(int mesh) {
     if (mesh >= 0 && mesh < meshes.size())

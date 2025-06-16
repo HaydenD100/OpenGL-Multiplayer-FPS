@@ -59,4 +59,48 @@ namespace PhysicsManagerBullet
 		dynamicsWorld->stepSimulation(deltaTime, 3);
 		//dynamicsWorld->debugDrawWorld();
 	}
+	void Delete() {
+		// Remove rigid bodies from the world and delete them
+		if (dynamicsWorld) {
+			for (int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; --i) {
+				btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
+				btRigidBody* body = btRigidBody::upcast(obj);
+				if (body && body->getMotionState()) {
+					delete body->getMotionState();
+				}
+				dynamicsWorld->removeCollisionObject(obj);
+				delete obj;
+			}
+		}
+
+		// Delete collision shapes
+		for (int i = 0; i < collisionShapes.size(); ++i) {
+			delete collisionShapes[i];
+		}
+		collisionShapes.clear();
+
+		// Delete Bullet physics world components
+		delete dynamicsWorld;
+		dynamicsWorld = nullptr;
+
+		delete solver;
+		solver = nullptr;
+
+		delete overlappingPairCache;
+		overlappingPairCache = nullptr;
+
+		delete dispatcher;
+		dispatcher = nullptr;
+
+		delete collisionConfiguration;
+		collisionConfiguration = nullptr;
+
+		delete cache;
+		cache = nullptr;
+
+		// Optional: delete debug drawer if you add one later
+		// delete debugDrawer;
+		// debugDrawer = nullptr;
+	}
+
 }

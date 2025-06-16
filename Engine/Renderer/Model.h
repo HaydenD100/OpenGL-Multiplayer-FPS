@@ -16,9 +16,16 @@ struct BoneInfo {
 class Model {
 public:
     Model() = default;
+
+    Model(const Model&) = delete;
+    Model& operator=(const Model&) = delete;
+
+    Model(Model&& other) noexcept;
+    Model& operator=(Model&& other) noexcept;
+
+    ~Model();
     AABB* GetAABB();
 
-    Model(Mesh mesh, Texture* texture);
     Model(const char* path, Texture* texture);
     Model(const char* path, Texture* texture, int triangulate);
 

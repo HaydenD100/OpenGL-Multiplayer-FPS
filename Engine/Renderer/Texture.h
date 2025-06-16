@@ -14,6 +14,13 @@ class Texture
 public:
     //static int CurrentTextureNumber;
     Texture() = default;
+    ~Texture();
+    Texture(Texture&& other) noexcept;
+    Texture& operator=(Texture&& other) noexcept;
+
+    Texture(const Texture&) = delete;
+    Texture& operator=(const Texture&) = delete;
+
     Texture(std::vector<GLfloat> data, int width, int height);
     Texture(aiTexture* aitexture, std::string name);
     Texture(const char* name, const char* path, float roughness, float metalic);

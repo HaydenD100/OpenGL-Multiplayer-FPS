@@ -24,32 +24,20 @@
 #include "Engine/Pathfinding/Pathfinding.h"
 #include "Engine/Physics/TriggerCollider.h"
 
-
-
-
-class Scene
+namespace World
 {
-public:
-	Scene();
-	Scene(const Scene&) = delete;
-	Scene& operator=(const Scene&) = delete;
-
-	// Allow move operations
-	Scene(Scene&&) = default;
-	Scene& operator=(Scene&&) = default;
-
 	void Load();
 	void Update(float dt);
 
 	void AddGunPickUp(GunPickUp gunpickup);
 
 	void LoadAssets();
- 
+
 	Light* GetLight(int i);
+	void SetLight(Light&& light, int index);
 	void RemoveLight(int index);
 
 	EnviromentLighting GetEnviromentLighting();
-	std::vector<GameObject*> NeedRenderingObjects();
 
 	unsigned long long AddGameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape);
 	size_t AddGlass(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape);
@@ -59,24 +47,14 @@ public:
 
 	void RemoveGameObject(std::string name);
 
-	std::vector<std::unique_ptr<GameObject>> g_water;
-	std::vector<std::unique_ptr<GameObject>> g_objects;
-	std::vector<std::unique_ptr<GameObject>> g_glass;
-	std::vector<GunPickUp> m_gunPickups;
+	extern EnviromentLighting envLight;
 
-	std::vector<Light> g_lights;
-	std::vector<std::unique_ptr<TriggerCollider>> g_triggers;
-
-
-
-	void Destory();
-	float m_seaLevel = 0;
-private:
-	std::vector<GameObject*> NeedRendering;
-	EnviromentLighting envLight;
-
-	//holds the model shader ID for Gemoetry
-	GLuint ModelMatrixId;
-
-	SkinnedAnimation ragdoll;
+	extern std::vector<std::unique_ptr<GameObject>> g_water;
+	extern std::vector<std::unique_ptr<GameObject>> g_objects;
+	extern std::vector<std::unique_ptr<GameObject>> g_glass;
+	extern std::vector<GunPickUp> m_gunPickups;
+	extern std::vector<Light> g_lights;
+	extern std::vector<std::unique_ptr<TriggerCollider>> g_triggers;
+	extern float m_seaLevel;
 };
+

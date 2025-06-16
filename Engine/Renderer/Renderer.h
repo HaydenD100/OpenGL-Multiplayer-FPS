@@ -83,6 +83,11 @@ private:
     unsigned int textureID;
     unsigned int skyboxVAO, skyboxVBO;
 };
+struct EnviromentLighting {
+	SkyBox sky = SkyBox();
+	glm::vec3 indirectLight = glm::vec3(0, 0, 0);
+};
+
 
 namespace Renderer
 {
@@ -142,8 +147,8 @@ namespace Renderer
 
 
     // Shader
-    void SetLights(std::vector<Light> lights, Shader* shader);
-	void SetLights(std::vector<Light> lights, ComputeShader* shader);
+    void SetLights(Shader* shader);
+	void SetLights(ComputeShader* shader);
 	void SetLightsAllShaders(std::vector<Light> lights);
     void RenderScene(float dt);
 

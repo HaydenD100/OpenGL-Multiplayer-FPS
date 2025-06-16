@@ -5,7 +5,7 @@
 class BufferTransparent
 {
 public:
-	BufferTransparent();
+	BufferTransparent() = default;
 	~BufferTransparent();
 
 	void Bind();

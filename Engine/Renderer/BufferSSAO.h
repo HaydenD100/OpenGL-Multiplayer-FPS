@@ -4,7 +4,7 @@
 class BufferSSAO
 {
 public:
-	BufferSSAO();
+	BufferSSAO() = default;
 	~BufferSSAO();
 
 	void Bind();

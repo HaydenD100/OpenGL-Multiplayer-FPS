@@ -1,8 +1,8 @@
 ﻿#include "Probe.h"
 #include "Engine/Core/AssetManager.h"
-#include "Engine/Core/Scene/SceneManager.h"
-#include "Engine/Renderer/Raycaster.h"
 
+#include "Engine/Renderer/Raycaster.h"
+#include "Engine/Core/Scene/World.h"
 
 void ProbeGrid::ShowProbes() {
 
@@ -41,7 +41,7 @@ void ProbeGrid::FillBuffer() {
 
 
 
-void ProbeGrid::Bake(std::vector<Light> lights) {
+void ProbeGrid::Bake() {
 	std::cout << "Starting Probe Baking \n";
 	float start = glfwGetTime();
 	glViewport(0, 0, PROBESIZE, PROBESIZE);
@@ -73,14 +73,12 @@ void ProbeGrid::Bake(std::vector<Light> lights) {
 
 void ProbeGrid::ReLight(int probeRelightCount) {
 
-	Scene* scene = SceneManager::GetCurrentScene();
-
 	Renderer::cs_probeIrradiance.Use();
 	Renderer::cs_probeIrradiance.SetVec3("gridWorldPos", postion);
 	Renderer::cs_probeIrradiance.SetVec3("volume", volume);
 	Renderer::cs_probeIrradiance.SetVec3("spacing", spacing);
 	Renderer::cs_probeIrradiance.SetInt("start_index", updatedIndex);
-	Renderer::cs_probeIrradiance.SetVec3("Sky_Color", SceneManager::GetCurrentScene()->GetEnviromentLighting().indirectLight);
+	Renderer::cs_probeIrradiance.SetVec3("Sky_Color", World::GetEnviromentLighting().indirectLight);
 
 	updatedIndex += probeRelightCount;
 	if (updatedIndex > probes.size()) {
@@ -89,14 +87,14 @@ void ProbeGrid::ReLight(int probeRelightCount) {
 	}
 
 
-	for (int i = 0; i <  scene->g_lights.size(); i++) {
-		Renderer::cs_probeIrradiance.SetVec3("lights[" + std::to_string(i) + "].position", scene->GetLight(i)->position);
-		Renderer::cs_probeIrradiance.SetVec3("lights[" + std::to_string(i) + "].color", scene->GetLight(i)->colour);
-		Renderer::cs_probeIrradiance.SetFloat("lights[" + std::to_string(i) + "].strength", scene->GetLight(i)->strength);
-		Renderer::cs_probeIrradiance.SetFloat("lights[" + std::to_string(i) + "].radius", scene->GetLight(i)->radius);
+	for (int i = 0; i <  World::g_lights.size(); i++) {
+		Renderer::cs_probeIrradiance.SetVec3("lights[" + std::to_string(i) + "].position", World::GetLight(i)->position);
+		Renderer::cs_probeIrradiance.SetVec3("lights[" + std::to_string(i) + "].color", World::GetLight(i)->colour);
+		Renderer::cs_probeIrradiance.SetFloat("lights[" + std::to_string(i) + "].strength", World::GetLight(i)->strength);
+		Renderer::cs_probeIrradiance.SetFloat("lights[" + std::to_string(i) + "].radius", World::GetLight(i)->radius);
 
 		glActiveTexture(GL_TEXTURE5 + i); // Activate texture unit i
-		glBindTexture(GL_TEXTURE_CUBE_MAP, scene->GetLight(i)->depthCubemap); // Bind the depth cubemap to the texture unit
+		glBindTexture(GL_TEXTURE_CUBE_MAP, World::GetLight(i)->depthCubemap); // Bind the depth cubemap to the texture unit
 	}
 
 	Renderer::probeTexture.ImageBind(6);
@@ -303,8 +301,8 @@ void Probe::Bake() {
 
 		Renderer::s_probeDeffered.SetMat4("V", captureViews[i]);
 
-		for (int i = 0; i < SceneManager::GetCurrentScene()->g_objects.size(); i++) {
-			GameObject* gameobjectRender = SceneManager::GetCurrentScene()->g_objects[i].get();
+		for (int i = 0; i < World::g_objects.size(); i++) {
+			GameObject* gameobjectRender = World::g_objects[i].get();
 
 			if (gameobjectRender->GetShaderType() != "Default" || !gameobjectRender->ShouldRender() || !gameobjectRender->IncludedInGI()) {
 				continue;
