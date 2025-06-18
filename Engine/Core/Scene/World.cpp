@@ -16,6 +16,8 @@ namespace World {
 	std::vector<GunPickUp> m_gunPickups;
 	std::vector<Light> g_lights;
 	std::vector<std::unique_ptr<TriggerCollider>> g_triggers;
+	std::vector<Sprite> g_sprites;
+
 
 	float m_seaLevel = 0;
 
@@ -32,6 +34,10 @@ namespace World {
 		AssetManager::AddTexture("metalic", "Assets/Textures/white.png", 0.0f, 1.0f);
 
 		//AssetManager::AddTexture("cornel", "Assets/Textures/cornel-box.png", 0.8, 0.0);
+		
+
+
+		AssetManager::AddTexture("flash", "Assets/Sprites/MuzzleFlash.png", 0.5, 0.0);
 
 		AssetManager::AddTexture("white_light", "Assets/Textures/white.png", 0.5, 0.0);
 		AssetManager::GetTexture("white_light")->SetEmissive(true);
@@ -69,9 +75,13 @@ namespace World {
 
 
 		AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
+
+		AssetManager::AddModel("quad", Model("Assets/Objects/quad.obj", AssetManager::GetTexture("uvmap")));
+
 		AssetManager::AddModel("probe", Model("Assets/Objects/FBX/probe_cube.fbx", AssetManager::GetTexture("uvmap")));
 		AssetManager::AddModel("cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("uvmap")));
 		AssetManager::AddModel("light_cube", Model("Assets/Objects/FBX/light_cube.fbx", AssetManager::GetTexture("uvmap")));
+
 		AssetManager::GetTexture("uvmap")->SetEmissive(true);
 		AssetManager::AddModel("shaderBall", Model("Assets/Objects/shaderBall.obj", AssetManager::GetTexture("transparent")));
 		AssetManager::AddModel("cubeGlass", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("transparent")));
@@ -370,17 +380,21 @@ namespace World {
 	}
 
 	void Update(float deltaTime) {
-		//problem should pull this out
+		
+		for (size_t i = 0; i < g_sprites.size(); /* no i++ here */) {
+			if (glfwGetTime() >= g_sprites[i].birthTime + g_sprites[i].timePerFrame) {
+				g_sprites[i].frameindex++;
+				g_sprites[i].birthTime = glfwGetTime();
+			}
 
-	// Initialize in your update loop (e.g., inside your render loop)
-		float time = glfwGetTime(); // Get current time in seconds
-		float amplitude = 2.0f;     // How far the light moves (adjust as needed)
-		float speed = 0.5f;         // Oscillation speed (adjust as needed)
+			if (g_sprites[i].columncount * g_sprites[i].rowcount <= g_sprites[i].frameindex) {
+				g_sprites.erase(g_sprites.begin() + i);
+			}
+			else {
+				++i;
+			}
+		}
 
-		// Calculate new Z position
-		float newY = 9 + amplitude * glm::sin(time * speed);
-		// Update light position
-		//lights[1].position.y = newY;
 
 		for (int i = 0; i < g_triggers.size(); i++) {
 
@@ -449,8 +463,8 @@ namespace World {
 
 			}
 			else {
+				//Object probably wont ever leave the water so no need to do this
 				//rb->setDamping(0.0f, 0.0f);
-
 			}
 
 		}

@@ -110,6 +110,7 @@ namespace WeaponManager
 		World::g_objects[World::g_objects.size() -1]->SetRotationX(-1.5708f);
 		World::g_objects[World::g_objects.size() - 1]->SetRender(false);
 		World::g_objects[World::g_objects.size() - 1]->SetDontCull(true);
+		World::g_objects[World::g_objects.size() - 1]->SetShaderType("Overlay");
 
 
 		World::g_objects.push_back(std::make_unique<GameObject>("glock", AssetManager::GetModel("glockhand"), glm::vec3(5, 0, -5), false, 0, Convex));
@@ -117,6 +118,7 @@ namespace WeaponManager
 		World::g_objects[World::g_objects.size() - 1]->SetRotationX(-1.5708f);
 		World::g_objects[World::g_objects.size() - 1]->SetRender(false);
 		World::g_objects[World::g_objects.size() - 1]->SetDontCull(true);
+		World::g_objects[World::g_objects.size() - 1]->SetShaderType("Overlay");
 
 
 		World::g_objects.push_back(std::make_unique<GameObject>("ak47", AssetManager::GetModel("ak47hand"), glm::vec3(0.2, -0.25, -0.2), false, 0, Convex));
@@ -124,6 +126,7 @@ namespace WeaponManager
 		World::g_objects[World::g_objects.size() - 1]->SetRotationX(-1.5708f);
 		World::g_objects[World::g_objects.size() - 1]->SetRender(false);
 		World::g_objects[World::g_objects.size() - 1]->SetDontCull(true);
+		World::g_objects[World::g_objects.size() - 1]->SetShaderType("Overlay");
 
 
 		World::g_objects.push_back(std::make_unique<GameObject>("shotgun", AssetManager::GetModel("shotgun"), glm::vec3(-3, 2, 3), false, 0, Convex));
@@ -131,6 +134,7 @@ namespace WeaponManager
 		World::g_objects[World::g_objects.size() - 1]->SetRotationX(-1.5708f);
 		World::g_objects[World::g_objects.size() - 1]->SetRender(false);
 		World::g_objects[World::g_objects.size() - 1]->SetDontCull(true);
+		World::g_objects[World::g_objects.size() - 1]->SetShaderType("Overlay");
 
 
 		World::g_objects.push_back(std::make_unique<GameObject>("double_barrel", AssetManager::GetModel("double_barrel_hand"), glm::vec3(-3, 2, 3), false, 0, Convex));
@@ -138,6 +142,7 @@ namespace WeaponManager
 		World::g_objects[World::g_objects.size() - 1]->SetRotationX(-1.5708f);
 		World::g_objects[World::g_objects.size() - 1]->SetRender(false);
 		World::g_objects[World::g_objects.size() - 1]->SetDontCull(true);
+		World::g_objects[World::g_objects.size() - 1]->SetShaderType("Overlay");
 
 		
 		AudioManager::AddSound("Assets/Audio/shotgun_fire.wav", "shotgun_fire1", Camera::GetPosition(), 1, 0.4f);
@@ -159,7 +164,7 @@ namespace WeaponManager
 		glock.name = "glock";
 		glock.ammo = 18;
 		glock.reloadtime = 1.5;
-		glock.firerate = 350; 
+		glock.firerate = 400; 
 		glock.shootAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_shoot1.dae", AssetManager::GetModel("glockhand"),0, "glock17_shoot");
 		glock.reloadAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_reload.dae", AssetManager::GetModel("glockhand"), 0, "glock17_reload");
 		glock.equipAnim = SkinnedAnimation("Assets/Objects/FBX/glock17_equip.dae", AssetManager::GetModel("glockhand"), 0, "glock17_equip");
@@ -171,7 +176,7 @@ namespace WeaponManager
 		glock.recoil = 10.0f;
 		glock.recoilY = 50;
 		glock.kickback = 3;
-		glock.weaponOffSet = glm::vec3(-0.3, -0.2f, 0.9);
+		glock.weaponOffSet = glm::vec3(0, 0, 0);
 		glock.aimingPosition = glm::vec3(0.15,-0.2, 0.7);
 		glock.gunModel = "glock"; 
 		glock.gunsShotName = "glock_fire";
@@ -205,7 +210,7 @@ namespace WeaponManager
 		shotgun.name = "shotgun";
 		shotgun.ammo = 6;
 		shotgun.reloadtime = 2.5;
-		shotgun.firerate = 150;
+		shotgun.firerate = 500;
 		shotgun.currentammo = 6;
 		shotgun.damage = 10;
 		shotgun.type = Semi;
@@ -225,7 +230,7 @@ namespace WeaponManager
 		doublebarrel.name = "double_barrel";
 		doublebarrel.ammo = 2;
 		doublebarrel.reloadtime = 2;
-		doublebarrel.firerate = 100;
+		doublebarrel.firerate = 800;
 		doublebarrel.currentammo = 2;
 		doublebarrel.damage = 10;
 		doublebarrel.type = Semi;

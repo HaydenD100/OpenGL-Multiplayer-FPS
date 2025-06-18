@@ -37,12 +37,12 @@ vec4 boxBlur2D(vec2 texCoords,vec2 offset1, vec2 texOffset, int kernelSize, floa
             float distFromCenter = length(texCoords - screenCenter);
             float falloff = clamp(1.0 - distFromCenter * 1.5, 0.0, 1.0); // 2.5 is tweakable
 
-            if (gDepth <= texture(gData, texCoords).z && type != 1)
+            if (gDepth <= texture(gData, texCoords).z)
                 texCoords2 = texCoords; // fallback if in front
 
             vec2 distortion = texCoords2 - texCoords;
             texCoords2 = texCoords + distortion * falloff;
-
+            
             result += texture(gLighting, clamp(texCoords2 + vec2(texOffset.x * x, texOffset.y * y), vec2(0), vec2(1)))
                     + texture(gEmissive, texCoords2 + vec2((texOffset.x + 0.005) * x, (texOffset.y + 0.005) * y));
         }
@@ -68,7 +68,7 @@ void main() {
     vec4 transparent = texture(gTransparent, UV).rgba;
     vec4 transparentData = texture(gData, UV).rgba;
 
-    vec4 lighting = vec4(texture(gLighting, UV).rgb, 1.0);
+    vec4 lighting = texture(gLighting, UV).rgba;
 
     vec4 ssr = vec4(texture(gSSR, UV).rg,0,0);
     vec2 texSize  = textureSize(gSSR, 0).xy;
@@ -78,9 +78,15 @@ void main() {
     if(transparent.rgb != vec3(0)){
         //vec4 blurredImage = boxBlur2D(UV, vec2(0.0015), 5);
         float gDepth = texture(gPosition,UV).w;
+        float gTransDepth = texture(gPosition,UV).w;
+
         vec2 backgroundUV = UV;
         float type = transparentData.w;
         vec4 backgroundSample = boxBlur2D(backgroundUV,transparentData.xy,vec2(0.0008),3,type);
+
+
+        if (gDepth < texture(gData, UV).z)
+            backgroundSample = texture(gLighting, clamp(UV, vec2(0), vec2(1))) + texture(gEmissive, UV);
         vec4 blended = backgroundSample + vec4(transparent.rgb,0);
 
 

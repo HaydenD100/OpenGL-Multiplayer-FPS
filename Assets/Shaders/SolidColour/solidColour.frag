@@ -15,7 +15,7 @@ in vec3 TrueNormal;
 
 uniform mat4 V;
 uniform bool IsEmissive;
-uniform vec3 color;
+uniform vec4 color;
 uniform float Roughness;
 uniform float Metalic;
 
@@ -29,10 +29,10 @@ void main()
     // also store the per-fragment normals into the gbuffer
     gRMA = vec4(Roughness,Metalic,0,0);
     gNormal = vec4(TrueNormal, 0);
-    gAlbedo = vec4(color, 1); // RGB for Albedo, R for Specular Intensity
+    gAlbedo = color; // RGB for Albedo, R for Specular Intensity
     gTrueNormal = vec4(TrueNormal,0);  // Use transpose of TBN to inverse the transformation
     if(IsEmissive){
-        gEmission = vec4(color, 1);
+        gEmission = vec4(color.xyz, 1);
     }
         
 

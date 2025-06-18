@@ -11,6 +11,8 @@
 #include "Engine/Core/Input.h"
 #include "Engine/Core/Common/GameCommon.h"
 #include "Engine/Core/Scene/World.h"
+#include <glm/gtx/quaternion.hpp> // for glm::quat_cast if needed
+
 
 namespace Player
 {
@@ -131,7 +133,17 @@ namespace Player
 				WeaponManager::GetGunByName(gunName)->currentammo = -1;
 				return;
 			}
+			Sprite sprite;
+			sprite.scale = glm::vec4(1.3);
+			// Get camera position and rotation
+			sprite.name = WeaponManager::GetGunByName(gunName)->name;
+			sprite.rotation = glm::vec4(0);
+			sprite.rowcount = 5;
+			sprite.columncount = 4;
+			sprite.timePerFrame = 0.03;
+			sprite.birthTime = glfwGetTime();
 			
+			World::g_sprites.push_back(sprite);
 			WeaponManager::GetGunByName(gunName)->currentammo--;
 			WeaponManager::GetGunByName(gunName)->Shoot();
 			totalRecoil.x += WeaponManager::GetGunByName(gunName)->recoil * 0.01;
@@ -192,26 +204,13 @@ namespace Player
 						btTransform transform = body->getWorldTransform();
 						btVector3 origin = transform.getOrigin();
 
-						// Check for NaN/Inf in the transform
-						if (std::isnan(origin.x()) || std::isinf(origin.x()) ||
-							std::isnan(origin.y()) || std::isinf(origin.y()) ||
-							std::isnan(origin.z()) || std::isinf(origin.z())) {
-							std::cerr << "Invalid transform (NaN/Inf detected)!" << std::endl;
-							return;
-						}
-
 						// Compute local force position safely
 						btVector3 hitPointWorld = hit.m_hitPointWorld;
 						btVector3 localForcePos = transform.inverse() * hitPointWorld;
 
 						// Check for NaN/Inf in the impulse calculation
 						btVector3 impulse = 2 * glmToBtVector3(Camera::ComputeRay());
-						if (std::isnan(impulse.x()) || std::isinf(impulse.x()) ||
-							std::isnan(impulse.y()) || std::isinf(impulse.y()) ||
-							std::isnan(impulse.z()) || std::isinf(impulse.z())) {
-							std::cerr << "Invalid impulse (NaN/Inf detected)!" << std::endl;
-							return;
-						}
+
 						// Apply impulse
 						body->applyImpulse(impulse, localForcePos);
 
@@ -555,8 +554,13 @@ namespace Player
 		
 		horizontalAngle += Input::GetSensitivity() * float(Backend::GetWidth() / 2 - Input::GetMouseX());
 
-		if ((Input::KeyDown(FORWARD) || Input::KeyDown(LEFT) || Input::KeyDown(BACKWARD) || Input::KeyDown(RIGHT)) && footstepTime + footstep_interval < glfwGetTime()  && IsGrounded) {
+		if ((Input::KeyDown(FORWARD) || Input::KeyDown(LEFT) || Input::KeyDown(BACKWARD) || Input::KeyDown(RIGHT)) && footstepTime + footstep_interval < glfwGetTime()  && IsGrounded && !m_isSwimming) {
 			AudioManager::PlaySound("foot_step" + std::to_string((rand() % 4) + 1), player->getPosition());
+			footstepTime = glfwGetTime();
+		}
+
+		if ((Input::KeyDown(FORWARD) || Input::KeyDown(LEFT) || Input::KeyDown(BACKWARD) || Input::KeyDown(RIGHT)) && footstepTime + footstep_interval + 0.5 < glfwGetTime() && m_isSwimming) {
+			AudioManager::PlaySound("water_step" + std::to_string((rand() % 4) + 1), player->getPosition());
 			footstepTime = glfwGetTime();
 		}
 

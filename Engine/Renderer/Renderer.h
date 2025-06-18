@@ -22,9 +22,12 @@
 
 
 
+
+
 enum RenderDebugStates {
 	NoGUi = 1,
-	ShowProbes = 2
+	ShowProbes = 2,
+	ShowTrigger = 4
 };
 
 class SkyBox

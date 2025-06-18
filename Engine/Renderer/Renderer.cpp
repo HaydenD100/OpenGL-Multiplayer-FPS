@@ -122,6 +122,8 @@ namespace Renderer
 	Shader s_drawPoint;
 	Shader s_drawLine;
 	Shader s_particle;
+	Shader s_spriteSheet;
+
 
 	//ComputeShaders
 	ComputeShader cs_lighting;
@@ -152,9 +154,7 @@ namespace Renderer
 	ProbeGrid probeGrid;
 
 	//some objects will be withheld from rendering in the gemoetry render
-	std::vector<GameObject*> NeedRendering;
-	std::vector<GameObject*> overlay;
-	std::vector<GameObject*> waterObjects;
+	std::vector<GameObject*> g_overlay;
 
 	//Generate all the probes on another thread while the assets are loading
 	std::thread ProbeGridThread;
@@ -164,6 +164,7 @@ namespace Renderer
 	int DebugState = 0;
 	int WaterWireFrame = 1;
 
+	int frameCount = 0;
 
 
 	void Renderer::LoadAllShaders() {
@@ -188,6 +189,7 @@ namespace Renderer
 		s_textShader.Load("Assets/Shaders/textShader.vert", "Assets/Shaders/textShader.frag");
 		s_drawPoint.Load("Assets/Shaders/Debug/point.vert", "Assets/Shaders/Debug/point.frag");
 		s_particle.Load("Assets/Shaders/Particles/particle.vert", "Assets/Shaders/Particles/particle.frag");
+		s_spriteSheet.Load("Assets/Shaders/spriteSheet.vert", "Assets/Shaders/spriteSheet.frag");
 
 		cs_probeIrradiance.Load("Assets/Shaders/GI/irradiance.comp");
 		cs_Raycaster.Load("Assets/Shaders/GI/triangleIntersection.comp");
@@ -514,7 +516,7 @@ namespace Renderer
 
 
 	void Renderer::RenderAllObjects(Shader& shader) {
-		NeedRendering.clear();
+		g_overlay.clear();
 		glm::mat4 ViewMatrix = Camera::getViewMatrix();
 		for (int i = 0; i < World::g_lights.size(); i++) {
 			GameObject* gameobjectRender = World::g_objects[i].get();
@@ -523,7 +525,7 @@ namespace Renderer
 				continue;
 			if (gameobjectRender->GetShaderType() != "Default") {
 				//make guns render on top;
-				NeedRendering.push_back(gameobjectRender);
+				g_overlay.push_back(gameobjectRender);
 				continue;
 			}
 
@@ -554,9 +556,11 @@ namespace Renderer
 	}
 
 	void Renderer::RenderScene(float dt) {
-
+		frameCount++;
 		//--------------------------------------------PROBE-------------------------------------------	
 		Renderer::CheckDebugState();
+		Renderer::probeGrid.ReLight(UPDATED_PROBE_COUNT_PER_FRAME);
+
 		//ParticleSystem::Simulate(dt);
 		
 
@@ -573,6 +577,8 @@ namespace Renderer
 		//glDispatchCompute(512 / 32, 1, 1); // 32 workgroups for 512 rows
 		//glMemoryBarrier(GL_ALL_BARRIER_BITS);
 		//-------------------------------------------GBUFFER-----------------------------------------
+
+		g_overlay.clear();
 
 		glEnable(GL_DEPTH_TEST);
 		gbuffer.Bind();
@@ -591,6 +597,10 @@ namespace Renderer
 				continue;
 			if (!gameobjectRender->GetModel()->GetAABB()->isOnFrustum(Camera::GetFrustum(), gameobjectRender->getTransform()) && !gameobjectRender->DontCull())
 				continue;
+			if (gameobjectRender->GetShaderType() == "Overlay") {
+				g_overlay.push_back(gameobjectRender);
+				continue;
+			}
 
 			auto transforms = gameobjectRender->GetFinalBoneMatricies();
 			if (transforms[0] != glm::mat4(1)) {
@@ -629,11 +639,25 @@ namespace Renderer
 
 
 		for (int i = 0; i < World::g_lights.size(); i++) {
-			s_SolidColor.SetVec3("color", World::g_lights[i].colour);
+			s_SolidColor.SetVec4("color", glm::vec4(World::g_lights[i].colour,1));
 			glm::mat4 positionMatrix = glm::mat4(); // create an identity matrix;
 			positionMatrix = glm::translate(positionMatrix, World::g_lights[i].position); //position is a vec3
 			s_SolidColor.SetMat4("M", positionMatrix);
 			AssetManager::GetModel("light_cube")->RenderModel(s_SolidColor.GetShaderID());
+		}
+
+		if ((DebugState & ShowTrigger) == ShowTrigger) {
+			s_SolidColor.SetBool("IsEmissive", false);
+
+			for (int i = 0; i < World::g_triggers.size(); i++) {
+				s_SolidColor.SetVec4("color", glm::vec4(1, 0, 0, 0.5));
+				glm::mat4 positionMatrix = glm::mat4(); // create an identity matrix;
+				positionMatrix = glm::translate(positionMatrix, World::g_triggers[i].get()->m_pos);
+				positionMatrix = glm::scale(positionMatrix, World::g_triggers[i].get()->m_scale * 0.5f); //0.5 becuase the model cube is 2 units wide
+
+				s_SolidColor.SetMat4("M", positionMatrix);
+				AssetManager::GetModel("cube")->RenderModel(s_SolidColor.GetShaderID());
+			}
 		}
 
 		if((DebugState & ShowProbes) == ShowProbes)
@@ -642,6 +666,45 @@ namespace Renderer
 		//-----------------------------------------Decal---------------------------------------
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glDepthMask(GL_FALSE);
+		s_spriteSheet.Use();
+		s_spriteSheet.SetMat4("P", Camera::getProjectionMatrix());
+		s_spriteSheet.SetMat4("V", Camera::getViewMatrix());
+		s_spriteSheet.SetMat4("inverseV", glm::inverse(Camera::getViewMatrix()));
+		s_spriteSheet.SetFloat("u_mixFactor", 0.1);
+		
+		//TODO this is pretty much hard coded for gun fire sprites
+		for (int i = 0; i < World::g_sprites.size(); i++) {
+			s_spriteSheet.SetInt("u_rowCount", World::g_sprites[i].rowcount);
+			s_spriteSheet.SetInt("u_columnCount", World::g_sprites[i].columncount);
+			s_spriteSheet.SetVec4("u_position", World::g_sprites[i].position);
+			s_spriteSheet.SetVec4("u_rotation", World::g_sprites[i].rotation);
+			s_spriteSheet.SetVec4("u_scale", World::g_sprites[i].scale);
+			s_spriteSheet.SetInt("u_frameIndex", World::g_sprites[i].frameindex);
+			s_spriteSheet.SetInt("u_frameNextIndex", World::g_sprites[i].frameindex + 1);
+			glm::mat4 modelMatrix = World::GetGameObject(World::g_sprites[i].name)->GetModelMatrix(); // Your transformation matrix
+			glm::vec3 worldPos = glm::vec3(modelMatrix[3]); // Extract x, y, z from the 4th column
+			s_spriteSheet.SetVec4("u_position", glm::vec4(worldPos + Camera::GetRotation() * 2.0f, 1.0f));
+
+			if(World::g_sprites[i].frameindex < 2)
+				s_spriteSheet.SetBool("IsEmissive", true);
+			else
+				s_spriteSheet.SetBool("IsEmissive", false);
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexture("flash")->GetTexture());
+			AssetManager::GetModel("quad")->GetMesh(0)->UploadData();
+			glDrawElements(
+				GL_TRIANGLES,      // mode
+				(GLsizei)AssetManager::GetModel("quad")->GetMesh(0)->indices.size(),    // count
+				GL_UNSIGNED_SHORT,   // type
+				(void*)0           // element array buffer offset
+			);
+		}
+
+		glDepthMask(GL_TRUE);
+
 
 		s_decal.Use();
 		glActiveTexture(GL_TEXTURE3);
@@ -715,16 +778,22 @@ namespace Renderer
 		glDisable(GL_BLEND);
 		
 		//---------------------------------------------------Overlay-------------------------------------
-		/*
-		s_geomerty.Use();
+		gbuffer.Bind();
 		glClear(GL_DEPTH_BUFFER_BIT);
-		for (int i = 0; i < World::g_overlay.size(); i++) {
-			glm::mat4 ModelMatrix = World::g_overlay[i].GetModelMatrix();
+
+		s_geomerty.Use();
+		s_geomerty.SetMat4("P", Camera::getProjectionMatrix());
+		s_geomerty.SetMat4("V", Camera::getViewMatrix());
+
+
+
+		for (int i = 0; i < g_overlay.size(); i++) {
+			glm::mat4 ModelMatrix = g_overlay[i]->GetModelMatrix();
 			glm::mat4 modelViewMatrix = Camera::getViewMatrix() * ModelMatrix;
 			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
 
 			//auto transforms = World::GetAnimator()->GetFinalBoneMatrices(overlay[i]->GetName());
-			auto transforms = World::g_overlay[i].GetFinalBoneMatricies();
+			auto transforms = g_overlay[i]->GetFinalBoneMatricies();
 
 			if (transforms[0] != glm::mat4(1)) {
 				s_geomerty.SetBool("animated", true);
@@ -740,9 +809,9 @@ namespace Renderer
 			s_geomerty.SetMat3("normalMatrix3", normalMatrix);
 			s_geomerty.SetMat4("M", ModelMatrix);
 
-			World::g_overlay[i].RenderObject(s_geomerty.GetShaderID());
+			g_overlay[i]->RenderObject(s_geomerty.GetShaderID());
 		}
-		*/
+		
 		//------------------------------------------------RAYCAST DEBUG--------------------------------
 		/*
 		s_SolidColor.Use();
@@ -783,9 +852,6 @@ namespace Renderer
 
 		//RenderPlane();
 		//---------------------------------------------------LIGHTING-------------------------------------
-
-		Renderer::probeGrid.ReLight(UPDATED_PROBE_COUNT_PER_FRAME);
-
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -1023,6 +1089,12 @@ namespace Renderer
 				DebugState = ShowProbes & !ShowProbes;
 			else
 				DebugState = ShowProbes | ShowProbes;
+		}
+		if (Input::KeyPressed(SHOWDEBUGTRIGGERS)) {
+			if ((DebugState & ShowTrigger) == ShowTrigger)
+				DebugState = ShowTrigger & !ShowTrigger;
+			else
+				DebugState = ShowTrigger | ShowTrigger;
 		}
 			
 	}

@@ -10,6 +10,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <string>
+
 
 #define MAX_LIGHTS 100
 #define MAX_PARTICLES 1000
@@ -24,7 +26,19 @@ const int PROBESIZE = 32;
 const int DDGIPROBESIZE = 16;
 
 
+struct Sprite {
+	int rowcount = 0;
+	int columncount = 0;
+	glm::vec4 position = glm::vec4(0);
+	glm::vec4 rotation = glm::vec4(0);
+	glm::vec4 scale = glm::vec4(0);
+	int frameindex = 0;
+	float timePerFrame = 0;
+	float birthTime = 0;
+	std::string name = "";
 
+	int loop = 0;
+};
 
 enum LightType
 {

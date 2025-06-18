@@ -52,5 +52,6 @@ enum Controls {
 	PROBETOGGLE = 'y',
 	GUITOGGLE = 'u',
 	EDITORTOGGLE = 'l',
-	SPAWNFLOATIES = 'n'
+	SPAWNFLOATIES = 'n',
+	SHOWDEBUGTRIGGERS = 'k'
 };

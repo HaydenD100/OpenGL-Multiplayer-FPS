@@ -236,6 +236,12 @@ void Shader::SetVec3(const std::string& name, const glm::vec3& value) {
         //std::cout << "Couldnt find uniform: " << name << "\n";
     glUniform3fv(m_uniformsLocations[name], 1, &value[0]);
 }
+void Shader::SetVec4(const std::string& name, const glm::vec4& value) {
+    if (m_uniformsLocations.find(name) == m_uniformsLocations.end())
+        m_uniformsLocations[name] = glGetUniformLocation(m_ID, name.c_str());
+    glUniform4fv(m_uniformsLocations[name], 1, &value[0]);
+}
+
 void Shader::SetVec2(const std::string& name, const glm::vec2& value) {
     if (m_uniformsLocations.find(name) == m_uniformsLocations.end())
         m_uniformsLocations[name] = glGetUniformLocation(m_ID, name.c_str());

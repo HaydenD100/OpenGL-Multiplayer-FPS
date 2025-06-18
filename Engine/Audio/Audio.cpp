@@ -91,9 +91,13 @@ namespace AudioManager {
 		AudioManager::AddSound("Assets/Audio/player_step_2.wav", "foot_step2", glm::vec3(0, 0, 0), 10, 0.3);
 		AudioManager::AddSound("Assets/Audio/player_step_3.wav", "foot_step3", glm::vec3(0, 0, 0), 10, 0.3);
 		AudioManager::AddSound("Assets/Audio/player_step_4.wav", "foot_step4", glm::vec3(0, 0, 0), 10, 0.3);
+
+		AudioManager::AddSound("Assets/Audio/player_step_swim_1.wav", "water_step1", glm::vec3(0, 0, 0), 10, 1.0);
+		AudioManager::AddSound("Assets/Audio/player_step_swim_2.wav", "water_step2", glm::vec3(0, 0, 0), 10, 1.0);
+		AudioManager::AddSound("Assets/Audio/player_step_swim_3.wav", "water_step3", glm::vec3(0, 0, 0), 10, 1.0);
+		AudioManager::AddSound("Assets/Audio/player_step_swim_4.wav", "water_step4", glm::vec3(0, 0, 0), 10, 1.0);
+
 		AudioManager::AddSound("Assets/Audio/item_pick_up.wav", "item_pickup", glm::vec3(0, 0, 0), 10, 0.8);
-
-
 		AudioManager::AddSound("Assets/Audio/spray_paint.wav", "spray_paint", glm::vec3(0, 0, 0), 10, 1);
 
 		AudioManager::AddSound("Assets/Audio/bullet_impact_00.wav", "bullet_impact_0", glm::vec3(0, 0, 0), 10, 0.8);
@@ -101,6 +105,9 @@ namespace AudioManager {
 		AudioManager::AddSound("Assets/Audio/bullet_impact_02.wav", "bullet_impact_2", glm::vec3(0, 0, 0), 10, 0.8);
 		AudioManager::AddSound("Assets/Audio/bullet_impact_03.wav", "bullet_impact_3", glm::vec3(0, 0, 0), 10, 0.8);
 		AudioManager::AddSound("Assets/Audio/bullet_impact_04.wav", "bullet_impact_4", glm::vec3(0, 0, 0), 10, 0.8);
+
+		AudioManager::AddSound("Assets/Audio/Water_BulletImpact1.wav", "water_bullet_impact_0", glm::vec3(0, 0, 0), 10, 0.8);
+		AudioManager::AddSound("Assets/Audio/Water_BulletImpact2.wav", "water_bullet_impact_1", glm::vec3(0, 0, 0), 10, 0.8);
 
 		AudioManager::AddSound("Assets/Audio/glass_impact.wav", "bullet_impact_glasst_0", glm::vec3(0, 0, 0), 10, 0.8);
 		AudioManager::AddSound("Assets/Audio/glass_impact1.wav", "bullet_impact_glass_1", glm::vec3(0, 0, 0), 10, 0.8);

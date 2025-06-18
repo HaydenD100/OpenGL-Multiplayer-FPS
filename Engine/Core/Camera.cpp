@@ -162,6 +162,7 @@ namespace Camera
 	glm::vec3 Camera::GetDirection() {
 		return direction;
 	}
+
 	glm::vec3 GetRotation() {
 		glm::vec3 cameraDirection;
 		cameraDirection.x = -ViewMatrix[0][2];

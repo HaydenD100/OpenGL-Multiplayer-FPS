@@ -55,6 +55,8 @@ namespace World
 	extern std::vector<GunPickUp> m_gunPickups;
 	extern std::vector<Light> g_lights;
 	extern std::vector<std::unique_ptr<TriggerCollider>> g_triggers;
+	extern std::vector<Sprite> g_sprites;
+
 	extern float m_seaLevel;
 };
 

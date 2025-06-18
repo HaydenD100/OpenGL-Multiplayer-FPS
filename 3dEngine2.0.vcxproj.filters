@@ -426,6 +426,8 @@
     <None Include="Assets\Shaders\Particles\simParticle.comp" />
     <None Include="Assets\Shaders\Particles\particle.vert" />
     <None Include="Assets\Shaders\Particles\particle.frag" />
+    <None Include="Assets\Shaders\spriteSheet.vert" />
+    <None Include="Assets\Shaders\spriteSheet.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />
