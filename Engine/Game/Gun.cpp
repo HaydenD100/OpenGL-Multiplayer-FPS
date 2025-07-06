@@ -110,7 +110,7 @@ namespace WeaponManager
 		World::g_objects[World::g_objects.size() -1]->SetRotationX(-1.5708f);
 		World::g_objects[World::g_objects.size() - 1]->SetRender(false);
 		World::g_objects[World::g_objects.size() - 1]->SetDontCull(true);
-		World::g_objects[World::g_objects.size() - 1]->SetShaderType("Overlay");
+		//World::g_objects[World::g_objects.size() - 1]->SetShaderType("Overlay");
 
 
 		World::g_objects.push_back(std::make_unique<GameObject>("glock", AssetManager::GetModel("glockhand"), glm::vec3(5, 0, -5), false, 0, Convex));
@@ -118,7 +118,7 @@ namespace WeaponManager
 		World::g_objects[World::g_objects.size() - 1]->SetRotationX(-1.5708f);
 		World::g_objects[World::g_objects.size() - 1]->SetRender(false);
 		World::g_objects[World::g_objects.size() - 1]->SetDontCull(true);
-		World::g_objects[World::g_objects.size() - 1]->SetShaderType("Overlay");
+		//World::g_objects[World::g_objects.size() - 1]->SetShaderType("Overlay");
 
 
 		World::g_objects.push_back(std::make_unique<GameObject>("ak47", AssetManager::GetModel("ak47hand"), glm::vec3(0.2, -0.25, -0.2), false, 0, Convex));
@@ -126,7 +126,7 @@ namespace WeaponManager
 		World::g_objects[World::g_objects.size() - 1]->SetRotationX(-1.5708f);
 		World::g_objects[World::g_objects.size() - 1]->SetRender(false);
 		World::g_objects[World::g_objects.size() - 1]->SetDontCull(true);
-		World::g_objects[World::g_objects.size() - 1]->SetShaderType("Overlay");
+		//World::g_objects[World::g_objects.size() - 1]->SetShaderType("Overlay");
 
 
 		World::g_objects.push_back(std::make_unique<GameObject>("shotgun", AssetManager::GetModel("shotgun"), glm::vec3(-3, 2, 3), false, 0, Convex));
@@ -134,7 +134,7 @@ namespace WeaponManager
 		World::g_objects[World::g_objects.size() - 1]->SetRotationX(-1.5708f);
 		World::g_objects[World::g_objects.size() - 1]->SetRender(false);
 		World::g_objects[World::g_objects.size() - 1]->SetDontCull(true);
-		World::g_objects[World::g_objects.size() - 1]->SetShaderType("Overlay");
+		//World::g_objects[World::g_objects.size() - 1]->SetShaderType("Overlay");
 
 
 		World::g_objects.push_back(std::make_unique<GameObject>("double_barrel", AssetManager::GetModel("double_barrel_hand"), glm::vec3(-3, 2, 3), false, 0, Convex));
@@ -142,7 +142,7 @@ namespace WeaponManager
 		World::g_objects[World::g_objects.size() - 1]->SetRotationX(-1.5708f);
 		World::g_objects[World::g_objects.size() - 1]->SetRender(false);
 		World::g_objects[World::g_objects.size() - 1]->SetDontCull(true);
-		World::g_objects[World::g_objects.size() - 1]->SetShaderType("Overlay");
+		//World::g_objects[World::g_objects.size() - 1]->SetShaderType("Overlay");
 
 		
 		AudioManager::AddSound("Assets/Audio/shotgun_fire.wav", "shotgun_fire1", Camera::GetPosition(), 1, 0.4f);

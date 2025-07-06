@@ -246,15 +246,23 @@ namespace Player
 	void Player::Graffite() {
 		btCollisionWorld::ClosestRayResultCallback hit = Camera::GetRayHit();
 		if (hit.m_collisionObject != nullptr) {
-			GameObject* gameobject = World::g_objects[hit.m_collisionObject->getUserIndex()].get();
-			if (gameobject != nullptr)
+
+			int index = hit.m_collisionObject->getUserIndex();
+			if (index < 0 || index >= World::g_objects.size()) return;
+
+			GameObject* gameobject = nullptr;
+
+			if (gameobject)
 			{
+				auto rigidBody = gameobject->GetRigidBody();
+				if (!rigidBody) return;
+				auto body = rigidBody.get();
+
 				btVector3 start = hit.m_rayFromWorld; // Ray origin
 				btVector3 end = hit.m_hitPointWorld; // Hit point
 				float distance = (end - start).length();
 				if (distance > 4)
 					return;
-				std::shared_ptr<btRigidBody> body = gameobject->GetRigidBody();
 				glm::vec4 worldPositionHomogeneous(glm::vec3(hit.m_hitPointWorld.getX(), hit.m_hitPointWorld.getY(), hit.m_hitPointWorld.getZ()), 1.0f);
 				glm::vec4 localPositionHomogeneous = glm::inverse(gameobject->GetModelMatrix()) * worldPositionHomogeneous;
 				glm::vec3 vec3local = glm::vec3(localPositionHomogeneous.x, localPositionHomogeneous.y, localPositionHomogeneous.z);

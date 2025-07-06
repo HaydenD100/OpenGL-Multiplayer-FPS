@@ -13,6 +13,7 @@ in vec3 Normal;
 in vec3 FragN;
 in vec4 FragPos;
 in vec4 viewFragPos;
+uniform vec3 viewpos;
 
 
 layout(binding = 0) uniform sampler2D DiffuseTextureSampler;
@@ -51,6 +52,29 @@ vec3 gridSamplingDisk[20] = vec3[]
    vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
 );
 
+
+vec3 parallaxCorrectedDir(vec3 worldPos, vec3 reflVec, vec3 boxMin, vec3 boxMax, vec3 boxCenter) {
+    vec3 boxSize = boxMax - boxMin;
+    vec3 localPos = worldPos - boxCenter;
+
+    // Find intersection of the reflection ray with the box
+    vec3 invRefl = 1.0 / reflVec;
+    vec3 tMin = (boxMin - localPos) * invRefl;
+    vec3 tMax = (boxMax - localPos) * invRefl;
+
+    vec3 t1 = min(tMin, tMax);
+    vec3 t2 = max(tMin, tMax);
+
+    float tNear = max(max(t1.x, t1.y), t1.z);
+    float tFar  = min(min(t2.x, t2.y), t2.z);
+
+    // Clamp to prevent artifacts
+    tNear = max(tNear, 0.0);
+    tFar  = max(tFar, 0.0);
+
+    vec3 hitPos = localPos + reflVec * tFar;
+    return normalize(hitPos);
+}
 
 
 float ShadowCalculation(vec3 fragPos, int index, vec3 N){
@@ -133,13 +157,23 @@ void main() {
     vec3 backgroundPos = texture(uDepthMap, uv).rgb;
     float sampleDepth = -backgroundPos.z;
 
-
-
     if(fragDepth > sampleDepth && sampleDepth != 0)
         discard;
 
 
     vec3 albedo =  pow(texture(DiffuseTextureSampler, UV).rgb,vec3(2.2));
+
+        vec3 I = normalize(viewpos - FragPos.xyz);
+    vec3 R = reflect(I, normalize(FragN));
+    R = parallaxCorrectedDir(viewPos,R, vec3(-150),vec3(150),vec3(0));
+    vec3 envColor = texture(envMap, R).rgb * 0.2;
+    float fresnel = pow(1.0 - dot(normalize(FragN), -I), 5.0);
+    fresnel = clamp(fresnel, 0.0, 1.0);
+
+    vec3 fresnelReflect = pow(envColor, vec3(2.2)) * 10; // Convert envColor to linear
+    albedo = fresnelReflect;
+    //albedo = mix(albedo, fresnelReflect, fresnel);
+
     float alpha = texture(DiffuseTextureSampler, UV).a;
 
     float roughness = Roughness;
@@ -175,7 +209,7 @@ void main() {
         vec3 H = normalize(V + L);
         float NDF = DistributionGGX(FragN, H, roughness);
         float G = GeometrySmith(FragN, V, L, roughness);
-        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0) * 1.5;
 
         vec3 numerator = NDF * G * F;
         float denominator = 4.0 * max(dot(FragN, V), 0.0) * max(dot(FragN, L), 0.0) + 0.0001;
@@ -218,7 +252,7 @@ void main() {
 
     float nonLinearDepth = gl_FragCoord.z;
     float linearDepth = LinearizeDepth(nonLinearDepth, 0.0025, 200.0); // Use your camera near/far
-    gTransparent = vec4(color * 2  + 0.01,0.5);
+    gTransparent = vec4(color * 15 + albedo * 0.1,0.5);
     gData = vec4(distortedUV ,linearDepth,1);
 
 

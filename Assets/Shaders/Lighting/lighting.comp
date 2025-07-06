@@ -544,7 +544,7 @@ void main() {
 	float amfactor = min(1, 1 - metallic * 1.0);
 	ambientLighting *= (1.0) * vec3(amfactor);
 
-    vec3 directlight = ao * Lo + ambientLighting;
+    vec3 directlight = ao * Lo + ao * ambientLighting;
     vec3 color = directlight + adjustedIndirectLighting;
 
     color = mix(color, Tonemap_ACES(color), 1.0);   

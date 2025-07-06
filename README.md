@@ -3,6 +3,10 @@ https://github.com/HaydenD100/3dEngine2.0
 
 ## Changelog
 
+### 3D Engine 2.0 2025/July/06
+I haven't made an update to the changelog in a while but I there's been lots of changes, firstly indirect lighting has been optimized and is smoother than then it was back in February, water and glass have both been added to the engine and floating/buoyancy has also been added. There's a basic animated billboard particle for gun flash that I have also added. I was starting to rewrite the multiplayer but I haven't finished that and I think I'm going to take a break on this engine and start working on a real time vulkan raytracer for the next little bit. The engine is in a stable state and i’m happy with the progress i've achieved over the last year.
+![screenshot](https://github.com/HaydenD100/3dEngine2.0/blob/1v1/github/screenshots/ocean.png)
+
 ### 3D Engine 2.0 2025/Feburary/27
 The Indirect lighting I implemented last month is now updated In real time instead of being baked at the start. I achieved this by baking “gbuffer” cubemaps for each probe and then relighting the probes over a few frames (800 probes a frame). 
 ![screenshot](https://github.com/HaydenD100/3dEngine2.0/blob/1v1/github/screenshots/realtime.png)

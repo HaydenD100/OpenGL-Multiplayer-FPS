@@ -178,7 +178,7 @@ void main() {
         vec3 H = normalize(Vpos + L);
         float NDF = DistributionGGX(N, H, roughness);
         float G = GeometrySmith(N, Vpos, L, roughness);
-        vec3 F = fresnelSchlick(max(dot(H, Vpos), 0.0), F0) * 1.5;
+        vec3 F = fresnelSchlick(max(dot(H, Vpos), 0.0), F0) * 10;
 
         vec3 numerator = NDF * G * F;
         float denominator = 4.0 * max(dot(N, Vpos), 0.0) * max(dot(N, L), 0.0) + 0.0001;
@@ -208,7 +208,7 @@ void main() {
     vec3 H = normalize(Vpos + L);
     float NDF = DistributionGGX(N, H, roughness);
     float G = GeometrySmith(N, Vpos, L, roughness);
-    vec3 F = fresnelSchlick(max(dot(H, Vpos), 0.0), F0) *  1.5;;
+    vec3 F = fresnelSchlick(max(dot(H, Vpos), 0.0), F0) *  1.5;
 
     vec3 numerator = NDF * G * F;
     float denominator = 4.0 * max(dot(N, Vpos), 0.0) * max(dot(N, L), 0.0) + 0.0001;
@@ -253,6 +253,6 @@ void main() {
 
     float nonLinearDepth = gl_FragCoord.z;
     float linearDepth = LinearizeDepth(nonLinearDepth, 0.0025, 200.0); // Use your camera near/far
-    gTransparent = vec4(color + vec3(0,0.6,0.6) * 1 ,0.2);
+    gTransparent = vec4(color + vec3(0,0.6,0.6) ,0.2);
     gData = vec4(distortedUV,linearDepth,0.9);
 }
