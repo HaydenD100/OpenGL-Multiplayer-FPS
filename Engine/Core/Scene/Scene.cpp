@@ -48,7 +48,8 @@ void Scene::LoadAssets() {
 	AssetManager::AddTexture("shotgun", "Assets/Textures/remington.png", "Assets/Normals/remington_normal.png", "Assets/Roughness/remington_roughness.png","Assets/Metalic/remington_metallic.png");
 	//AssetManager::AddTexture(Texture("shelf"));
 	//AssetManager::AddTexture(Texture("vase"));
-	//AssetManager::AddTexture(Texture("plant"));
+
+	AssetManager::AddTexture("barn", "Assets/Textures/SM_wooden_barn_SM_wooden_barn_PBR.png", "Assets/Normals/SM_wooden_barn_SM_wooden_barn_PBR_normal.png", "Assets/Roughness/SM_wooden_barn_SM_wooden_barn_PBR_roughness.png", "Assets/Metalic/SM_wooden_barn_SM_wooden_barn_PBR_metallic.png");
 	AssetManager::AddTexture("angled-tiled-floor", "Assets/Textures/angled-tiled-floor.png",0.5f,0.0f);
 	AssetManager::AddTexture("CratePile", "Assets/Textures/Crate.jpeg", "Assets/Normals/Crate.jpeg", "Assets/Roughness/Crate.jpeg", "Assets/Metalic/vase_metalic.png");
 
@@ -74,6 +75,7 @@ void Scene::LoadAssets() {
 
 	//AssetManager::AddModel("running", Model("Assets/Objects/FBX/Running.fbx", AssetManager::GetTexture("white")));
 
+	AssetManager::AddModel("barn", Model("Assets/Objects/FBX/house.fbx", AssetManager::GetTexture("barn")));
 
 	AssetManager::AddModel("ladder", Model("Assets/Objects/FBX/ladder.fbx", AssetManager::GetTexture("ladder")));
 	//AssetManager::AddModel("shelf", Model("Assets/Objects/FBX/shelf.fbx", AssetManager::GetTexture("shelf")));
@@ -210,6 +212,9 @@ void Scene::Load() {
 
 	AddGameObject("Tiltedfloor", AssetManager::GetModel("Tiltedfloor"), glm::vec3(0, 0.1, 0), true, 0, Box);
 	GetGameObject("Tiltedfloor")->IncludInGI(true);
+
+	AddGameObject("barn", AssetManager::GetModel("barn"), glm::vec3(0, 1, 0), true, 0, Box);
+	GetGameObject("barn")->IncludInGI(true);
 
 
 

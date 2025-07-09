@@ -42,9 +42,6 @@
     <ClCompile Include="Engine\Loaders\vboindexer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Scene\Scene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\Scene\SceneManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -181,6 +178,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Core\Scene\World.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Scene\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -362,6 +362,15 @@
     <ClInclude Include="Engine\Core\Scene\World.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\nuklear\nuklear.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\nuklear\nuklear_glfw_gl3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\nuklear\nuklear_glfw_gl4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\SkyBoxShader.vert" />
@@ -458,6 +467,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="github\screenshots\lights.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="github\screenshots\ocean.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -94,7 +94,7 @@ namespace Engine
 			//Dont use this its not working rightnow
 			
 
-			/*
+			
 			if ((Renderer::DebugState & NoGUi) != NoGUi) {
 
 				std::ostringstream oss;
@@ -125,7 +125,7 @@ namespace Engine
 				oss << "Enemy Kills " << Player::GetDeaths();
 				Renderer::RenderText(oss.str().c_str(), 0, 500, 15);
 			}
-			*/
+			
 			
 			
 			ImGuiUI::DrawUI();

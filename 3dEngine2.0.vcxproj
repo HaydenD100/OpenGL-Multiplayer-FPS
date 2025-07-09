@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Core\Scene\Scene.cpp" />
     <ClCompile Include="Engine\Renderer\BufferTransparent.cpp" />
     <ClCompile Include="Engine\Editor\Editor.cpp" />
     <ClCompile Include="Engine\Core\Common\RenderCommon.h" />
@@ -175,7 +176,6 @@
     <ClCompile Include="Engine\Renderer\Gbuffer.cpp" />
     <ClCompile Include="Engine\Renderer\Particle.cpp" />
     <ClCompile Include="Engine\Renderer\Renderer.cpp" />
-    <ClCompile Include="Engine\Core\Scene\Scene.cpp" />
     <ClCompile Include="Engine\Core\Scene\SceneManager.cpp" />
     <ClCompile Include="Engine\Renderer\Shader.cpp" />
     <ClCompile Include="Engine\Renderer\StorageBuffer.cpp" />
@@ -279,6 +279,9 @@
     <Text Include="todo.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\nuklear\nuklear.h" />
+    <ClInclude Include="Engine\nuklear\nuklear_glfw_gl3.h" />
+    <ClInclude Include="Engine\nuklear\nuklear_glfw_gl4.h" />
     <ClInclude Include="Engine\Renderer\BufferTransparent.h" />
     <ClInclude Include="Engine\Editor\Editor.h" />
     <ClInclude Include="Engine\Core\Common\GameCommon.h" />
@@ -348,6 +351,7 @@
     <Image Include="github\screenshots\deffered.png" />
     <Image Include="github\screenshots\gunsnmore.png" />
     <Image Include="github\screenshots\lights.png" />
+    <Image Include="github\screenshots\ocean.png" />
     <Image Include="github\screenshots\PBRHallwayLight.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
