@@ -171,7 +171,7 @@ void main() {
     fresnel = clamp(fresnel, 0.0, 1.0);
 
     vec3 fresnelReflect = pow(envColor, vec3(2.2)) * 10; // Convert envColor to linear
-    albedo = fresnelReflect;
+    //albedo = fresnelReflect;
     //albedo = mix(albedo, fresnelReflect, fresnel);
 
     float alpha = texture(DiffuseTextureSampler, UV).a;
@@ -252,7 +252,7 @@ void main() {
 
     float nonLinearDepth = gl_FragCoord.z;
     float linearDepth = LinearizeDepth(nonLinearDepth, 0.0025, 200.0); // Use your camera near/far
-    gTransparent = vec4(color * 15 + albedo * 0.1,0.5);
+    gTransparent = vec4(color + albedo * 0.1,0.5);
     gData = vec4(distortedUV ,linearDepth,1);
 
 

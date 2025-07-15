@@ -70,7 +70,7 @@ struct ProbeGrid {
 		const int height = static_cast<int>(std::round(Height * invSpacing.y));
 		const int depth = static_cast<int>(std::round(Depth * invSpacing.z));
 
-		volume = glm::vec3(width, height, depth) * spacing;
+		volume = glm::vec3(width, height, depth);
 		postion = start;
 		this->spacing = spacing;
 
@@ -83,26 +83,23 @@ struct ProbeGrid {
 
 		std::cout << "Starting configure \n";
 
-		// Single precalculation of start offset scaled by inverse spacing
 		const glm::vec3 scaledStart = start * invSpacing;
 
-		// Flattened loop structure with integer indices
-		for (int x = 0; x < width; ++x) {
-			const float xPos = static_cast<float>(x) + scaledStart.x;
-			for (int y = 0; y < height; ++y) {
+		for (int z = 0; z < depth; ++z) { // Outermost loop: corresponds to gl_WorkGroupID.z (slowest changing)
+			const float zPos = static_cast<float>(z) + scaledStart.z;
+			for (int y = 0; y < height; ++y) { // Middle loop: corresponds to start_index (gl_WorkGroupID.y)
 				const float yPos = static_cast<float>(y) + scaledStart.y;
-				for (int z = 0; z < depth; ++z) {
-					const float zPos = static_cast<float>(z) + scaledStart.z;
+				for (int x = 0; x < width; ++x) { // Innermost loop: corresponds to gl_WorkGroupID.x (fastest changing)
+					const float xPos = static_cast<float>(x) + scaledStart.x;
 
 					// Create position vector once and reuse
 					const glm::vec3 pos(xPos, yPos, zPos);
-					//std::cout << "Pos: " << (pos * spacing).x << " " << (pos * spacing).y <<  " " << (pos * spacing).z << "\n";
+					//std::cout << "Pos: " << (pos * spacing).x << " " << (pos * spacing).y << " " << (pos * spacing).z << "\n";
 					probes.emplace_back(pos * spacing);
 					positions.push_back(pos * spacing);
 				}
 			}
 		}
-
 		glNamedBufferStorage(
 			b_probePosition,
 			sizeof(glm::vec3) * positions.size(),

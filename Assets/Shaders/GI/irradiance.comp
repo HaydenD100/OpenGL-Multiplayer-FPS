@@ -3,31 +3,20 @@
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
-
 uniform vec3 gridWorldPos;
 uniform vec3 volume;
 uniform vec3 spacing;
 uniform int start_index;
 uniform vec3 Sky_Color;
 
-
 layout(binding = 8, std430) readonly buffer ssbo3 {
     samplerCube textures[];
 };
-layout(binding = 9, std430) readonly buffer ssbo4 {
-    vec3 positions[];
-};
 
-layout(std430, binding = 7) buffer ShCoeffient {
-    vec3 L1SH_0[3750 * 2];
-    vec3 L1SH_1[3750 * 2];
-    vec3 L1SH_2[3750 * 2];
-    vec3 L1SH_3[3750 * 2];
-};
-
-
-layout(rgba16f, binding = 6)  uniform image3D probeGrid;
-
+layout(rgba32f, binding = 1) uniform image3D probeGridx;
+layout(rgba32f, binding = 2) uniform image3D probeGridy;
+layout(rgba32f, binding = 3) uniform image3D probeGridz;
+layout(rgba32f, binding = 4) uniform image3D probeGridw;
 
 //Credits to https://www.shadertoy.com/view/wtt3W2
 
@@ -147,17 +136,16 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 vec3 DirectLighting(vec3 p, float b, int probeID, vec3 probe_world_pos){
     vec3 diffuse = textureLod(textures[probeID * 3], p, b).rgb;
     vec3 FragPos = textureLod(textures[probeID * 3 + 2], p, b).rgb;
-    if(FragPos == vec3(0)){
-        return vec3(Sky_Color);
-    }
-
     vec3 N = normalize(textureLod(textures[probeID * 3 + 1], p, b)).xyz;
     vec3 V = normalize(probe_world_pos - FragPos);
 
+    return probe_world_pos;
+    if(FragPos == vec3(0)){
+        return vec3(Sky_Color);
+    }
+    
     float metallic = 0.1;
     float roughness = 1;
-
-
     // Reflectance at normal incidence
     vec3 F0 = mix(vec3(0.04), diffuse, metallic);
 
@@ -537,27 +525,23 @@ bool isAngle(vec3 position) {
 
 void main()
 {		
-    uint workGroupID = gl_WorkGroupID.x;
-    uint workInvocationID = gl_LocalInvocationID.x;
-    int probeID = start_index + int(workGroupID);
+    ivec3 workGroupID = ivec3(gl_WorkGroupID.xyz);
 
-    vec3 probe_world_pos = positions[probeID];
-     
-	SphericalHarmonics shRadiance = CubeMapToRadianceSH(probeID,probe_world_pos);
-	//SphericalHarmonics shDepth = DepthMapToRadianceSH();
+    uint linearWorkGroupID = gl_WorkGroupID.z * int(volume.x * volume.y) +
+                             start_index * int(volume.x) +
+                             gl_WorkGroupID.x;
 
-	
-    L1SH_0[probeID] = shRadiance[0];
-	L1SH_1[probeID] = shRadiance[1];
-	L1SH_2[probeID] = shRadiance[2];
-	L1SH_3[probeID] = shRadiance[3];
 
-	#if (myL >= 2)
-		L1SH_4[probeID] = shRadiance[4];
-		L1SH_5[probeID] = shRadiance[5];
-		L1SH_6[probeID] = shRadiance[6];
-		L1SH_7[probeID] = shRadiance[7];
-		L1SH_8[probeID] = shRadiance[8];
-	#endif
-  
+    //size_t index = coord.z * (width * height) + coord.y * width + coord.x;
+                             
+    ivec3 index = ivec3(workGroupID.x,start_index,workGroupID.z);
+    int probeID = int(linearWorkGroupID);
+    vec3 probe_world_pos = (vec3(index) + gridWorldPos) * spacing;
+
+    SphericalHarmonics shRadiance = CubeMapToRadianceSH(probeID,probe_world_pos);
+
+    imageStore(probeGridx, index, vec4(shRadiance[0].x, shRadiance[0].y, shRadiance[0].z, 0));
+    imageStore(probeGridy, index, vec4(shRadiance[1].x, shRadiance[1].y, shRadiance[1].z, 0));
+    imageStore(probeGridz, index, vec4(shRadiance[2].x, shRadiance[2].y, shRadiance[2].z, 0));
+    imageStore(probeGridw, index, vec4(shRadiance[3].x, shRadiance[3].y, shRadiance[3].z, 0));
 }

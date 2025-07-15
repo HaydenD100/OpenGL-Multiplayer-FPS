@@ -64,6 +64,10 @@ namespace World {
 		AssetManager::AddTexture("angled-tiled-floor", "Assets/Textures/angled-tiled-floor.png", 0.5f, 0.0f);
 		AssetManager::AddTexture("CratePile", "Assets/Textures/Crate.jpeg", "Assets/Normals/Crate.jpeg", "Assets/Roughness/Crate.jpeg", "Assets/Metalic/vase_metalic.png");
 
+
+		AssetManager::AddTexture("barn", "Assets/Textures/SM_wooden_barn_SM_wooden_barn_PBR.png", "Assets/Normals/SM_wooden_barn_SM_wooden_barn_PBR_normal.png", "Assets/Roughness/SM_wooden_barn_SM_wooden_barn_PBR_roughness.png", "Assets/Metalic/SM_wooden_barn_SM_wooden_barn_PBR_metallic.png");
+		std::cout << "test\n";
+
 		//Double Barel
 		AssetManager::AddTexture("double_barrel_shotgun_main_barrel", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_normal.png", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_metallic.jpg");
 		AssetManager::AddTexture("double_barrel_shotgun_wooden_grip_back", "Assets/Objects/FBX/DoubleBarrel/Woooden Grip Back_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Woooden Grip Back_normal.png", "Assets/Objects/FBX/DoubleBarrel/Woooden Grip Back_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Woooden Grip Back_metallic.jpg");
@@ -90,6 +94,7 @@ namespace World {
 
 		//AssetManager::AddModel("running", Model("Assets/Objects/FBX/Running.fbx", AssetManager::GetTexture("white")));
 
+		AssetManager::AddModel("barn", Model("Assets/Objects/FBX/house.fbx", AssetManager::GetTexture("barn")));
 
 		AssetManager::AddModel("ladder", Model("Assets/Objects/FBX/ladder.fbx", AssetManager::GetTexture("ladder")));
 		//AssetManager::AddModel("shelf", Model("Assets/Objects/FBX/shelf.fbx", AssetManager::GetTexture("shelf")));
@@ -109,9 +114,7 @@ namespace World {
 		AssetManager::AddModel("playertwo", Model("Assets/Objects/FBX/bean_death.dae", "Assets/Objects/player_mesh.obj", AssetManager::GetTexture("uvmap")));
 		//AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 
-
-
-
+		AssetManager::AddModel("sponza", Model("Assets/Objects/sponza.obj", AssetManager::GetTexture("white")));
 		//AssetManager::AddModel("fence1", Model("Assets/Objects/fence1.fbx", AssetManager::GetTexture("concrete")));
 		//AssetManager::AddModel("fence2", Model("Assets/Objects/fence2.fbx", AssetManager::GetTexture("concrete")));
 		//AssetManager::AddModel("fence3", Model("Assets/Objects/fence3.fbx", AssetManager::GetTexture("concrete")));
@@ -157,6 +160,9 @@ namespace World {
 
 		//AssetManager::AddModel("GI_map_1", Model("Assets/Maps/cornel_box.obj", AssetManager::GetTexture("cornel")));
 		AssetManager::AddModel("GI_map_1", Model("Assets/Maps/sand_box.obj", AssetManager::GetTexture("angled-tiled-floor")));
+
+		AssetManager::AddModel("test_gi", Model("Assets/objects/gi_test.obj", AssetManager::GetTexture("white")));
+
 		//AssetManager::GetModel("GI_map_1")->GetMeshByName("stairs_plane")->ToggleRender(false);
 
 		AssetManager::AddModel("Cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("metalic")));
@@ -228,6 +234,17 @@ namespace World {
 
 
 
+		AddGameObject("sponza", AssetManager::GetModel("sponza"), glm::vec3(0, 1, 0), true, 0, Concave);
+		GetGameObject("sponza")->IncludInGI(true);
+
+
+		/*
+		AddGameObject("barn", AssetManager::GetModel("barn"), glm::vec3(0, 1, 0), true, 0, Convex);
+		GetGameObject("barn")->IncludInGI(true);
+
+		AddGameObject("test_gi", AssetManager::GetModel("test_gi"), glm::vec3(0, 1, 0), true, 0, Concave);
+		GetGameObject("test_gi")->IncludInGI(true);
+		*/
 		//AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), false, 10.0f, Box);
 		AddGameObject("room1", AssetManager::GetModel("room1"), glm::vec3(0, 0.1, 0), true, 0, Concave);
 		GetGameObject("room1")->IncludInGI(true);
@@ -367,8 +384,8 @@ namespace World {
 
 		envLight.sky = SkyBox(faces);
 		//Average light of skybox
-		envLight.indirectLight = glm::vec3(0.188, 0.278, 0.4);
-		//envLight.indirectLight = glm::vec3(0.569, 0.69, 0.965);
+		envLight.indirectLight = glm::vec3(0.18, 0.278, 0.4);
+		envLight.indirectLight = glm::vec3(0.918, 0.941, 1);
 		std::cout << "test load\n";
 
 		g_lights.emplace_back(glm::vec3(0, 10, 0), glm::vec3(1, 0.996, 0.82), 10, 50);

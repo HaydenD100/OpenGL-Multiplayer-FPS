@@ -77,6 +77,9 @@ void Scene::LoadAssets() {
 
 	AssetManager::AddModel("barn", Model("Assets/Objects/FBX/house.fbx", AssetManager::GetTexture("barn")));
 
+	AssetManager::AddModel("sponza", Model("Assets/Objects/sponza.obj", AssetManager::GetTexture("white")));
+
+	
 	AssetManager::AddModel("ladder", Model("Assets/Objects/FBX/ladder.fbx", AssetManager::GetTexture("ladder")));
 	//AssetManager::AddModel("shelf", Model("Assets/Objects/FBX/shelf.fbx", AssetManager::GetTexture("shelf")));
 	//AssetManager::AddModel("vase", Model("Assets/Objects/FBX/vase.fbx", AssetManager::GetTexture("vase")));
@@ -207,20 +210,31 @@ void Scene::LoadAssets() {
 
 
 void Scene::Load() { 
+
+	/*
+	NOT IN USE ANYMORE GO TO world.cpp INSTEAD 
+	##############################################################################################################################
+	*/
 	LoadAssets();
 
 
 	AddGameObject("Tiltedfloor", AssetManager::GetModel("Tiltedfloor"), glm::vec3(0, 0.1, 0), true, 0, Box);
 	GetGameObject("Tiltedfloor")->IncludInGI(true);
 
-	AddGameObject("barn", AssetManager::GetModel("barn"), glm::vec3(0, 1, 0), true, 0, Box);
-	GetGameObject("barn")->IncludInGI(true);
+	//AddGameObject("barn", AssetManager::GetModel("barn"), glm::vec3(0, 1, 0), true, 0, Box);
+	//GetGameObject("barn")->IncludInGI(true);
+	//GetGameObject("barn")->SetRotationX(-1.5708f);
 
+
+	AddGameObject("sponza", AssetManager::GetModel("sponza"), glm::vec3(0, 1, 0), true, 0, Concave);
+	GetGameObject("sponza")->IncludInGI(true);
+
+	
 
 
 	//AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), false, 10.0f, Box);
-	AddGameObject("room1", AssetManager::GetModel("room1"), glm::vec3(0, 0.1, 0), true, 0, Concave);
-	GetGameObject("room1")->IncludInGI(true);
+	//AddGameObject("room1", AssetManager::GetModel("room1"), glm::vec3(0, 0.1, 0), true, 0, Concave);
+	//GetGameObject("room1")->IncludInGI(true);
 
 	AddGameObject("seafloor", AssetManager::GetModel("seafloor"), glm::vec3(0, -10, 0), true, 0, Concave);
 

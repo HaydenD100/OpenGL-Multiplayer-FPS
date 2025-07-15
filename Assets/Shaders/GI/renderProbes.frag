@@ -9,16 +9,16 @@ in vec3 FragPos;
 in vec4 Normal;
 in vec3 WorldPos;
 
-
-layout(std430, binding = 7) buffer ShCoeffient {
-    vec3 L1SH_0[3750 * 2];
-    vec3 L1SH_1[3750 * 2];
-    vec3 L1SH_2[3750* 2];
-    vec3 L1SH_3[3750* 2];
-};
+uniform vec3 gridWorldPos;
+uniform vec3 volume;
+uniform vec3 spacing;
+ivec3 u_gridResolution;
 
 
-layout(rgba16f, binding = 6)  uniform image3D probeGrid;
+layout(binding = 5) uniform sampler3D probeGridx;
+layout(binding = 6) uniform sampler3D probeGridy;
+layout(binding = 7) uniform sampler3D probeGridz;
+layout(binding = 8) uniform sampler3D probeGridw;
 
 
 uniform int probeID;
@@ -346,54 +346,33 @@ void main()
 {    
   
     vec3 col;
-	SphericalHarmonics shRadiance;
 
-	shRadiance[0] = L1SH_0[probeID];
-	shRadiance[1] = L1SH_1[probeID];
-	shRadiance[2] = L1SH_2[probeID];
-	shRadiance[3] = L1SH_3[probeID];
+    vec3 continuousGridCoords = (WorldPos - gridWorldPos) / spacing;
 
-	#if (myL >= 2)
-		shRadiance[4] = L1SH_4[probeID];
-		shRadiance[5] = L1SH_5[probeID];
-		shRadiance[6] = L1SH_6[probeID];
-		shRadiance[7] = L1SH_7[probeID];
-		shRadiance[8] = L1SH_8[probeID];
-	#endif
-	/*
-	SphericalHarmonics shDepth;
-	shDepth[0] = vec3(probeDepthEncoded[probeID][0][0]);
-	shDepth[1] = vec3(probeDepthEncoded[probeID][0][1]);
-	shDepth[2] = vec3(probeDepthEncoded[probeID][0][2]);
-	shDepth[3] = vec3(probeDepthEncoded[probeID][0][3]);
+    vec3 alpha = fract(continuousGridCoords);
+    //vec3 alpha = continuousGridCoords - floor(continuousGridCoords);
+    ivec3 baseCellIdx = ivec3(floor(continuousGridCoords));
+    baseCellIdx = clamp(baseCellIdx, ivec3(0), u_gridResolution - 2); // This clamp is likely correct for the base.
+    ivec3 currentProbeGridIdx = baseCellIdx;
+    // 6. Get the world position of the *current* probe being evaluated
+    // This is the center of the probe at currentProbeGridIdx.
+    vec3 probe_worldPos = gridWorldPos + vec3(currentProbeGridIdx) * spacing;
 
-	shDepth[4] = vec3(probeDepthEncoded[probeID][1][0]);
-	shDepth[5] = vec3(probeDepthEncoded[probeID][1][1]);
-	shDepth[6] = vec3(probeDepthEncoded[probeID][1][2]);
-	shDepth[7] = vec3(probeDepthEncoded[probeID][1][3]);
+    // 7. Direction from fragment to probe (normalized for accurate dot product)
+    vec3 dirToProbe = normalize(probe_worldPos - WorldPos);
 
-	shDepth[8]  = vec3(probeDepthEncoded[probeID][2][0]);
-	shDepth[9]  = vec3(probeDepthEncoded[probeID][2][1]);
-	shDepth[10] = vec3(probeDepthEncoded[probeID][2][2]);
-	shDepth[11] = vec3(probeDepthEncoded[probeID][2][3]);
-
-	shDepth[12] = vec3(probeDepthEncoded[probeID][3][0]);
-	shDepth[13] = vec3(probeDepthEncoded[probeID][3][1]);
-	shDepth[14] = vec3(probeDepthEncoded[probeID][3][2]);
-	shDepth[15] = vec3(probeDepthEncoded[probeID][3][3]);
-	*/
-	//float depth =  GetRadianceFromSH(shDepth, WorldPos).x;
-
+    // 8. Retrieve SH coefficients for this specific probeID
+    SphericalHarmonics shRadiance;
+    #if (myL >= 0)
+        shRadiance[0] = texelFetch(probeGridx,ivec3(continuousGridCoords),0).rgb;
+    #endif
+    #if (myL >= 1)
+        shRadiance [1] = texelFetch(probeGridy,ivec3(continuousGridCoords),0).rgb;
+        shRadiance [2] = texelFetch(probeGridz,ivec3(continuousGridCoords),0).rgb;
+        shRadiance [3] = texelFetch(probeGridw,ivec3(continuousGridCoords),0).rgb;
+    #endif
 
 	col =  GetRadianceFromSH(shRadiance, WorldPos);
-
-	int probeDepthDirection = clampToNearestDirectionINT(WorldPos);
-
-	int flattenedIndex = int(floor(probeID * 16 + probeDepthDirection));
-
-	//float depth = depthSto[flattenedIndex];
-
-
     
     // store the fragment position vector in the first gbuffer texture
     gPosition = FragPos;
@@ -403,6 +382,5 @@ void main()
 	//gAlbedo = vec4(depth,0,0, 1); // RGB for Albedo, R for Specular Intensity
 
 	gAlbedo = vec4(col, 1); // RGB for Albedo, R for Specular Intensity
-	//gAlbedo = vec4(depth,depth,depth, 1); // RGB for Albedo, R for Specular Intensity
 
 }

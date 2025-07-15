@@ -10,8 +10,14 @@ void ProbeGrid::ShowProbes() {
 	Renderer::s_probeRender.SetMat4("P", Camera::getProjectionMatrix());
 	Renderer::s_probeRender.SetMat4("V", Camera::getViewMatrix());
 
-	Renderer::SHBuffer.Bind(7);
-	Renderer::probeTexture.Bind(6);
+	Renderer::probeTextureX.Bind(5);
+	Renderer::probeTextureY.Bind(6);
+	Renderer::probeTextureZ.Bind(7);
+	Renderer::probeTextureW.Bind(8);
+
+	Renderer::s_probeRender.SetVec3("gridWorldPos", postion);
+	Renderer::s_probeRender.SetVec3("volume", volume);
+	Renderer::s_probeRender.SetVec3("spacing", spacing);
 
 	for (int i = 0; i < probes.size(); i++) {
 
@@ -23,6 +29,7 @@ void ProbeGrid::ShowProbes() {
 	}
 }
 void ProbeGrid::FillBuffer() {
+	handels.reserve(probes.size() * 3);
 	for (auto probe : probes) {
 		probe.CreateBindless();
 		handels.push_back(probe.h_gAlbedo);
@@ -53,7 +60,6 @@ void ProbeGrid::Bake() {
 	Renderer::s_probeDeffered.SetVec3("volume", volume);
 	Renderer::s_probeDeffered.SetVec3("spacing", spacing);
 
-	Renderer::probeTexture.ImageBind(6);
 	glDisable(GL_CULL_FACE);
 
 	for (int i = 0; i < probes.size(); i++) {
@@ -81,8 +87,8 @@ void ProbeGrid::ReLight(int probeRelightCount) {
 	Renderer::cs_probeIrradiance.SetVec3("Sky_Color", World::GetEnviromentLighting().indirectLight);
 
 	updatedIndex += probeRelightCount;
-	if (updatedIndex > probes.size()) {
-		probeRelightCount = updatedIndex - probes.size();
+	if (updatedIndex > volume.y) {
+		probeRelightCount = updatedIndex - volume.y;
 		updatedIndex = 0;
 	}
 
@@ -97,13 +103,13 @@ void ProbeGrid::ReLight(int probeRelightCount) {
 		glBindTexture(GL_TEXTURE_CUBE_MAP, World::GetLight(i)->depthCubemap); // Bind the depth cubemap to the texture unit
 	}
 
-	Renderer::probeTexture.ImageBind(6);
-	Renderer::SHBuffer.Bind(7);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, b_handles);
-	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 9, b_probePosition);
+	Renderer::probeTextureX.ImageBind(1);
+	Renderer::probeTextureY.ImageBind(2);
+	Renderer::probeTextureZ.ImageBind(3);
+	Renderer::probeTextureW.ImageBind(4);
 
-	GLuint num_items = probeRelightCount;
-	glDispatchCompute(num_items, 1, 1);
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 8, b_handles);
+	glDispatchCompute(volume.x, updatedIndex, volume.z);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
 }
@@ -290,6 +296,18 @@ void Probe::Bake() {
 	Renderer::s_probeDeffered.SetVec3("position", transform.position);
 	Renderer::s_probeDeffered.SetInt("probeID", probeID);
 
+	Renderer::s_probeDeffered.SetVec3("gridWorldPos", Renderer::probeGrid.postion);
+	Renderer::s_probeDeffered.SetVec3("volume", Renderer::probeGrid.volume);
+	Renderer::s_probeDeffered.SetVec3("spacing", Renderer::probeGrid.spacing);
+
+	Renderer::probeTextureX.ImageBind(4);
+	Renderer::probeTextureY.ImageBind(5);
+	Renderer::probeTextureZ.ImageBind(6);
+	Renderer::probeTextureW.ImageBind(7);
+
+
+
+
 	for (unsigned int i = 0; i < 6; ++i)
 	{
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, probePosition, 0);
@@ -314,6 +332,8 @@ void Probe::Bake() {
 
 			Renderer::s_probeDeffered.SetMat3("normalMatrix3", normalMatrix);
 			Renderer::s_probeDeffered.SetMat4("M", ModelMatrix);
+			Renderer::probeTextureX.Bind(7);
+
 			gameobjectRender->RenderObject(Renderer::s_probeDeffered.GetShaderID());
 		}		
 	}

@@ -10,10 +10,28 @@
             "rotationZ": 0.0
         },
         {
+            "name": "sponza",
+            "positionX": 0.0,
+            "positionY": 4.0,
+            "positionZ": 0.0,
+            "rotationX": 0.0,
+            "rotationY": -0.0,
+            "rotationZ": 0.0
+        },
+        {
             "name": "room1",
             "positionX": 3.0,
             "positionY": -1.2999999523162842,
             "positionZ": 16.0,
+            "rotationX": 0.0,
+            "rotationY": -0.0,
+            "rotationZ": 0.0
+        },
+        {
+            "name": "seafloor",
+            "positionX": 0.0,
+            "positionY": -10.0,
+            "positionZ": 0.0,
             "rotationX": 0.0,
             "rotationY": -0.0,
             "rotationZ": 0.0
@@ -48,38 +66,38 @@
         {
             "name": "uni_float",
             "positionX": 9.646221160888672,
-            "positionY": -395.09393310546875,
+            "positionY": -251.1425018310547,
             "positionZ": -0.17526601254940033,
-            "rotationX": -1.5696088075637817,
+            "rotationX": -1.5696210861206055,
             "rotationY": 0.0,
             "rotationZ": 0.0
         },
         {
             "name": "uni_float1",
-            "positionX": 3.216660737991333,
-            "positionY": -1.2839581966400146,
-            "positionZ": 2.3249168395996094,
-            "rotationX": -1.5706233978271484,
-            "rotationY": 0.16562272608280182,
-            "rotationZ": 1.9375882402528077e-05
+            "positionX": 3.7236580848693848,
+            "positionY": -1.283961296081543,
+            "positionZ": 3.20216965675354,
+            "rotationX": -1.5706483125686646,
+            "rotationY": -0.11667344719171524,
+            "rotationZ": 2.454892273817677e-05
         },
         {
             "name": "uni_float2",
-            "positionX": 10.462394714355469,
-            "positionY": -1.803934931755066,
-            "positionZ": 0.16202281415462494,
-            "rotationX": -1.56987726688385,
+            "positionX": 10.843501091003418,
+            "positionY": -1.8550505638122559,
+            "positionZ": 4.649770736694336,
+            "rotationX": -1.5697671175003052,
             "rotationY": 0.0,
             "rotationZ": 0.0
         },
         {
             "name": "uni_float3",
-            "positionX": -3.4514291286468506,
-            "positionY": -1.283959984779358,
-            "positionZ": 6.161315441131592,
-            "rotationX": -1.5706515312194824,
-            "rotationY": -0.0029199705459177494,
-            "rotationZ": -1.1813761375378817e-05
+            "positionX": -2.9170961380004883,
+            "positionY": -1.2841103076934814,
+            "positionZ": 3.4214060306549072,
+            "rotationX": -1.570637822151184,
+            "rotationY": -0.08324754983186722,
+            "rotationZ": 0.0006338964449241757
         },
         {
             "name": "targetHolder",
@@ -92,12 +110,12 @@
         },
         {
             "name": "target",
-            "positionX": 6.000408172607422,
+            "positionX": 6.0,
             "positionY": 1.5600001811981201,
             "positionZ": 2.802596928649634e-45,
             "rotationX": 0.0,
             "rotationY": -0.0,
-            "rotationZ": 0.00185414869338274
+            "rotationZ": 0.0
         },
         {
             "name": "targetHolder2",
@@ -110,12 +128,12 @@
         },
         {
             "name": "target2",
-            "positionX": 5.999305248260498,
-            "positionY": 1.560001015663147,
+            "positionX": 6.000000476837158,
+            "positionY": 1.5600000619888306,
             "positionZ": 0.5000001192092896,
             "rotationX": 0.0,
             "rotationY": 0.0,
-            "rotationZ": -0.0031564724631607533
+            "rotationZ": -2.3311390862090775e-07
         },
         {
             "name": "targetHolder3",
@@ -128,12 +146,12 @@
         },
         {
             "name": "target3",
-            "positionX": 6.002150535583496,
-            "positionY": 1.560010313987732,
+            "positionX": 5.999963760375977,
+            "positionY": 1.5600000619888306,
             "positionZ": 1.000000238418579,
             "rotationX": 0.0,
-            "rotationY": -0.0,
-            "rotationZ": 0.009775510989129543
+            "rotationY": 0.0,
+            "rotationZ": -0.0001653181534493342
         },
         {
             "name": "knife",
@@ -182,43 +200,43 @@
         },
         {
             "name": "player",
-            "positionX": 0.9008175730705261,
-            "positionY": -0.5000069737434387,
-            "positionZ": 1.8654019832611084,
+            "positionX": -19.432125091552734,
+            "positionY": 5.062389850616455,
+            "positionZ": 0.9891477823257446,
             "rotationX": 0.0,
             "rotationY": -0.0,
             "rotationZ": 0.0
         },
         {
             "name": "player_head",
-            "positionX": 0.9008175730705261,
-            "positionY": 0.4999930262565613,
-            "positionZ": 1.8654019832611084,
-            "rotationX": -2.8355929851531982,
-            "rotationY": 0.3890139162540436,
-            "rotationZ": 3.1415927410125732
+            "positionX": -19.432125091552734,
+            "positionY": 6.062389850616455,
+            "positionZ": 0.9891477823257446,
+            "rotationX": 3.1075925827026367,
+            "rotationY": 1.4452036619186401,
+            "rotationZ": -3.141592502593994
         }
     ],
     "lights": [
         {
-            "colourB": 0.6225490570068359,
-            "colourG": 0.8778834342956543,
+            "colourB": 0.8199999928474426,
+            "colourG": 0.9959999918937683,
             "colourR": 1.0,
-            "positionX": -2.0,
-            "positionY": 8.0,
-            "positionZ": -2.0,
-            "radius": 30.0,
-            "strength": 5.0
+            "positionX": 0.0,
+            "positionY": 10.0,
+            "positionZ": 0.0,
+            "radius": 50.0,
+            "strength": 10.0
         },
         {
-            "colourB": 1.0,
-            "colourG": 1.0,
-            "colourR": 1.0,
-            "positionX": -3.0,
+            "colourB": 0.5881631970405579,
+            "colourG": 0.8816656470298767,
+            "colourR": 0.9754902124404907,
+            "positionX": 100.0,
             "positionY": 6.0,
-            "positionZ": 15.0,
-            "radius": 30.0,
-            "strength": 5.0
+            "positionZ": -2.4000000953674316,
+            "radius": 0.017000000923871994,
+            "strength": 0.07000000029802322
         }
     ]
 }

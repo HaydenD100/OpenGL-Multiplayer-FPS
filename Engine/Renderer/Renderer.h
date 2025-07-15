@@ -10,6 +10,7 @@
 #include "Engine/Renderer/BufferLighting.h"
 #include "Engine/Renderer/BufferTransparent.h"
 
+#include "Engine/Renderer/GIBuffer.h"
 #include "Engine/Renderer/BufferSSAO.h"
 #include "Engine/Renderer/BufferSSR.h"
 #include "Engine/Renderer/Texture3D.h"
@@ -96,9 +97,10 @@ namespace Renderer
 {
     
 	extern ProbeGrid probeGrid;
-
-	extern StorageBuffer SHBuffer;
-	extern Texture3D probeTexture;
+	extern Texture3D probeTextureX;
+	extern Texture3D probeTextureY;
+	extern Texture3D probeTextureZ;
+	extern Texture3D probeTextureW;
 
 	extern Shader s_downScale;
 	extern Shader s_upScale;

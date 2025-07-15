@@ -194,6 +194,7 @@
     <ClCompile Include="Engine\Physics\BulletPhysics.cpp" />
     <ClCompile Include="Engine\Physics\Physics.cpp" />
     <ClCompile Include="Engine\Core\Lights\light.cpp" />
+    <ClCompile Include="Engine\Renderer\GIBuffer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Engine\Physics\NividaPhysics.cpp" />
     <ClCompile Include="Engine\Renderer\Mesh.cpp" />
@@ -234,14 +235,13 @@
     <None Include="Assets\Shaders\GI\irradiance.comp" />
     <None Include="Assets\Shaders\GI\irradiance.vert" />
     <None Include="Assets\Shaders\GI\irradiance.frag" />
-    <None Include="Assets\Shaders\GI\probe.frag" />
-    <None Include="Assets\Shaders\GI\probe.vert" />
     <None Include="Assets\Shaders\GI\probeCheck.comp" />
     <None Include="Assets\Shaders\GI\probeGeom.frag" />
     <None Include="Assets\Shaders\GI\probeGeom.vert" />
     <None Include="Assets\Shaders\GI\renderProbes.frag" />
     <None Include="Assets\Shaders\GI\renderProbes.vert" />
     <None Include="Assets\Shaders\GI\triangleIntersection.comp" />
+    <None Include="Assets\Shaders\Lighting\GI.comp" />
     <None Include="Assets\Shaders\Lighting\lighting.comp" />
     <None Include="Assets\Shaders\Particles\particle.frag" />
     <None Include="Assets\Shaders\Particles\particle.vert" />
@@ -341,6 +341,7 @@
     <ClInclude Include="Engine\Game\Ocean.h" />
     <ClInclude Include="Engine\Physics\TriggerCollider.h" />
     <ClInclude Include="Engine\Core\Scene\World.h" />
+    <ClInclude Include="Engine\Renderer\GIBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="github\screenshots\3DEngine.png" />

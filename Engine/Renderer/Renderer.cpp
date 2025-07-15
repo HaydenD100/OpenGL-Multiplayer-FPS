@@ -127,6 +127,7 @@ namespace Renderer
 
 	//ComputeShaders
 	ComputeShader cs_lighting;
+	ComputeShader cs_GI;
 	ComputeShader cs_post;
 	ComputeShader cs_ssao;
 	ComputeShader cs_water_vec;
@@ -139,9 +140,15 @@ namespace Renderer
 	BloomRenderer emmisiveRenderer;
 
 	StorageBuffer SHBuffer;
-	Texture3D probeTexture;
+
+	Texture3D probeTextureX;
+	Texture3D probeTextureY;
+	Texture3D probeTextureZ;
+	Texture3D probeTextureW;
+
 	Texture3D voxelizedScene;
 
+	GIBuffer GIbuffer;
 
 	GBuffer gbuffer;
 	BufferSSAO ssaoBuffer;
@@ -199,6 +206,7 @@ namespace Renderer
 		cs_water_vec.Load("Assets/Shaders/Water/wave_vec.comp");
 		cs_water_height_fft_col.Load("Assets/Shaders/Water/water_height_col.comp");
 		cs_sim_particle.Load("Assets/Shaders/Particles/simParticle.comp");
+		cs_GI.Load("Assets/Shaders/Lighting/GI.comp");
 		//TODO :: change this so the texture bindings are defined in the GLSL shader
 		
 		cs_lighting.Use();
@@ -390,14 +398,19 @@ namespace Renderer
 
 		//Raycaster::Init();
 
-		glm::vec3 spacing = glm::vec3(3,4,3);
-		glm::vec3 propgationGridSize = glm::vec3(40, 20, 40);
+		glm::vec3 spacing = glm::vec3(4,4,4);
+		glm::vec3 propgationGridSize = glm::vec3(60, 30, 60);
+		//glm::vec3 spacing = glm::vec3(1, 1, 1);
+		//glm::vec3 propgationGridSize = glm::vec3(1, 3, 1);
+
 		glm::vec3 gridPos = glm::vec3(propgationGridSize.x/-2, -3, propgationGridSize.z/-2);
 
-		probeTexture.Create(glm::ceil(propgationGridSize.x / spacing.x), glm::ceil(propgationGridSize.y / spacing.y), glm::ceil(propgationGridSize.z / spacing.z));
-		probeGrid.Configure(propgationGridSize.x, propgationGridSize.y, propgationGridSize.z, spacing, gridPos);
+		probeTextureX.Create(glm::ceil(propgationGridSize.x / spacing.x), glm::ceil(propgationGridSize.y / spacing.y), glm::ceil(propgationGridSize.z / spacing.z));
+		probeTextureY.Create(glm::ceil(propgationGridSize.x / spacing.x), glm::ceil(propgationGridSize.y / spacing.y), glm::ceil(propgationGridSize.z / spacing.z));
+		probeTextureZ.Create(glm::ceil(propgationGridSize.x / spacing.x), glm::ceil(propgationGridSize.y / spacing.y), glm::ceil(propgationGridSize.z / spacing.z));
+		probeTextureW.Create(glm::ceil(propgationGridSize.x / spacing.x), glm::ceil(propgationGridSize.y / spacing.y), glm::ceil(propgationGridSize.z / spacing.z));
 
-		SHBuffer.Configure((10 * sizeof(glm::vec3)) * 10000 );
+		probeGrid.Configure(propgationGridSize.x, propgationGridSize.y, propgationGridSize.z, spacing, gridPos);
 
 		_randomdir = generate_random_directions(waveCount);
 
@@ -413,6 +426,7 @@ namespace Renderer
 		fxaaBuffer.Configure(Backend::GetWidth(), Backend::GetHeight());
 		emmisiveRenderer.Init(Backend::GetWidth(), Backend::GetHeight());
 		transparentBuffer.Configure();
+		GIbuffer.Configure(Backend::GetWidth(), Backend::GetHeight());
 
 		glGenFramebuffers(1, &FinalFrameFBO);
 		glBindFramebuffer(GL_FRAMEBUFFER, FinalFrameFBO);
@@ -559,7 +573,10 @@ namespace Renderer
 		frameCount++;
 		//--------------------------------------------PROBE-------------------------------------------	
 		Renderer::CheckDebugState();
-		Renderer::probeGrid.ReLight(UPDATED_PROBE_COUNT_PER_FRAME);
+
+		//Renderer::probeGrid.Bake();
+
+		Renderer::probeGrid.ReLight(1);
 
 		//ParticleSystem::Simulate(dt);
 		
@@ -853,6 +870,34 @@ namespace Renderer
 		//RenderPlane();
 		//---------------------------------------------------LIGHTING-------------------------------------
 
+
+		cs_GI.Use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gTrueNormal);
+
+		probeTextureX.Bind(5);
+		probeTextureY.Bind(6);
+		probeTextureZ.Bind(7);
+		probeTextureW.Bind(8);
+
+
+		cs_GI.SetVec3("viewPos", Camera::GetPosition());
+		cs_GI.SetMat4("inverseV", glm::inverse(Camera::getViewMatrix()));
+		cs_GI.SetMat4("V", Camera::getViewMatrix());
+		cs_GI.SetVec3("gridWorldPos", probeGrid.postion);
+		cs_GI.SetVec3("volume", probeGrid.volume);
+		cs_GI.SetVec3("spacing", probeGrid.spacing);
+		cs_GI.SetInt("lightingState", lightingState);
+		cs_GI.SetVec2("screen", glm::vec2(Backend::GetWidth(), Backend::GetHeight()));
+		cs_GI.SetVec3("envLighting", World::GetEnviromentLighting().indirectLight);
+
+		glBindImageTexture(4, GIbuffer.gGI, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+		glDispatchCompute(Backend::GetWidth() / 32 + 1, Backend::GetHeight() / 32 + 1, 1);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		cs_lighting.Use();
@@ -866,13 +911,12 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gAlbedo);
 		glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gRMA);
-		glActiveTexture(GL_TEXTURE4);
-		glBindTexture(GL_TEXTURE_2D, ssaoBuffer.gSSAO);
+		//glActiveTexture(GL_TEXTURE4);
+		//glBindTexture(GL_TEXTURE_2D, ssaoBuffer.gSSAO);
 		glActiveTexture(GL_TEXTURE5);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gTrueNormal);
-
-		SHBuffer.Bind(7);
-		probeTexture.Bind(6);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, GIbuffer.gGI);
 
 		cs_lighting.SetVec3("viewPos", Camera::GetPosition());
 		cs_lighting.SetMat4("inverseV", glm::inverse(Camera::getViewMatrix()));

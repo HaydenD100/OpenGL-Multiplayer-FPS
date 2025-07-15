@@ -183,6 +183,9 @@
     <ClCompile Include="Engine\Core\Scene\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Renderer\GIBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Scene\Scene.h">
@@ -371,6 +374,9 @@
     <ClInclude Include="Engine\nuklear\nuklear_glfw_gl4.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Renderer\GIBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\SkyBoxShader.vert" />
@@ -400,8 +406,6 @@
     <None Include="Assets\Shaders\Final\final.frag" />
     <None Include="Assets\Shaders\SSR\SSR.frag" />
     <None Include="Assets\Shaders\SSR\SSR.vert" />
-    <None Include="Assets\Shaders\GI\probe.vert" />
-    <None Include="Assets\Shaders\GI\probe.frag" />
     <None Include="Assets\Shaders\GI\irradiance.vert" />
     <None Include="Assets\Shaders\GI\renderProbes.vert" />
     <None Include="Assets\Shaders\GI\renderProbes.frag" />
@@ -437,6 +441,7 @@
     <None Include="Assets\Shaders\Particles\particle.frag" />
     <None Include="Assets\Shaders\spriteSheet.vert" />
     <None Include="Assets\Shaders\spriteSheet.frag" />
+    <None Include="Assets\Shaders\Lighting\GI.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

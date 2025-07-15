@@ -1,0 +1,417 @@
+#version 460
+layout (local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
+layout (rgba32f, binding = 4) uniform writeonly image2D gGI;
+
+layout(binding = 5) uniform sampler3D probeGridx;
+layout(binding = 6) uniform sampler3D probeGridy;
+layout(binding = 7) uniform sampler3D probeGridz;
+layout(binding = 8) uniform sampler3D probeGridw;
+
+
+uniform vec3 gridWorldPos;
+uniform vec3 volume;
+uniform vec3 spacing;
+ivec3 u_gridResolution;
+
+
+layout(binding = 0) uniform sampler2D gPostion;
+layout(binding = 1) uniform sampler2D gTrueNormal; 
+
+
+uniform vec3 viewPos;
+uniform vec2 screen;
+uniform mat4 inverseV; // Inverse of the view matrix
+uniform mat4 V; // View matrix
+
+
+const float PI = 3.1415926535897932384626433832795;
+const float e = 2.71828182845904;
+vec3 gridSamplingDisk[20] = vec3[]
+(
+   vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
+   vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+   vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
+   vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
+   vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
+);
+
+// ----------------------------------------------------------------------------
+float DistributionGGX(vec3 N, vec3 H, float roughness) {
+    float a = roughness * roughness;
+    float a2 = a * a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH * NdotH;
+
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+
+    return a2 / denom;
+}
+// ----------------------------------------------------------------------------
+float GeometrySchlickGGX(float NdotV, float roughness) {
+    float k = (roughness + 1.0);
+    k = (k * k) / 8.0;
+
+    return NdotV / (NdotV * (1.0 - k) + k);
+}
+// ----------------------------------------------------------------------------
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    return GeometrySchlickGGX(NdotV, roughness) * GeometrySchlickGGX(NdotL, roughness);
+}
+// ----------------------------------------------------------------------------
+vec3 fresnelSchlick(float cosTheta, vec3 F0) {
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+// ----------------------------------------------------------------------------
+
+
+float LinearizeDepth(float depth) {
+    float zNear = 0.1;          // Near plane
+    float zFar = 100.0;         // Far plane
+    return (2.0 * zNear) / (zFar + zNear - depth * (zFar - zNear));
+}
+
+#define myT vec3
+#define myL 1
+#define SphericalHarmonicsTL(T, L) T[(L + 1)*(L + 1)]
+#define SphericalHarmonics SphericalHarmonicsTL(myT, myL)
+#define shSize(L) ((L + 1)*(L + 1))
+#define reflectTex iChannel0
+
+// Constants
+const float PIH = 1.5707963267948966192313216916398;
+const float sqrtPI = 1.7724538509055160272981674833411; //sqrt(PI)
+const float goldenAngle = 2.3999632297286533222315555066336; // PI * (3.0 - sqrt(5.0));
+const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
+
+vec3 SigmoidFunction(vec3 inputColor){
+    return 1.0f / 1.0f + pow(vec3(e), -1 * inputColor); 
+}
+
+
+SphericalHarmonics shZero() {
+	SphericalHarmonics result;
+	for (int i = 0; i < shSize(myL); ++i)
+	{
+		result[i] = myT(0.0);
+	}
+    return result;
+}
+
+
+void shScale(inout SphericalHarmonics sh, myT scale) {
+	for (int i = 0; i < shSize(myL); ++i)
+	{
+		sh[i] *= scale;
+	}
+}
+
+vec3 SpherePoints_GoldenAngle(float i, float numSamples) {
+    float theta = i * goldenAngle;
+    float z = (1.0 - 1.0 / numSamples) * (1.0 - 2.0 * i / (numSamples - 1.0));
+    float radius = sqrt(1.0 - z * z);
+    return vec3(radius * vec2(cos(theta), sin(theta)), z);
+}
+
+void shAddWeighted(inout SphericalHarmonics accumulatorSh, in SphericalHarmonics sh, myT weight)
+{
+	for (int i = 0; i < shSize(myL); ++i)
+	{
+		accumulatorSh[i] += sh[i] * weight;
+	}
+}
+
+SphericalHarmonics shEvaluate(vec3 p)
+{
+	// From Peter-Pike Sloan's Stupid SH Tricks
+	// http://www.ppsloan.org/publications/StupidSH36.pdf
+	// https://github.com/dariomanesku/cmft/blob/master/src/cmft/cubemapfilter.cpp#L130
+
+	SphericalHarmonics result;
+
+	float x = -p.x;
+	float y = -p.y;
+	float z = p.z;
+
+	float x2 = x*x;
+	float y2 = y*y;
+	float z2 = z*z;
+
+	float z3 = z2*z;
+
+	float x4 = x2*x2;
+	float y4 = y2*y2;
+	float z4 = z2*z2;
+
+	int i = 0;
+
+	result[i++] =  myT( 1.0f/(2.0f*sqrtPI) );
+
+	#if (myL >= 1)
+		result[i++] = myT(-sqrt(3.0f/(4.0f*PI))*y );
+		result[i++] = myT( sqrt(3.0f/(4.0f*PI))*z );
+		result[i++] = myT(-sqrt(3.0f/(4.0f*PI))*x );        	
+    #endif
+
+	#if (myL >= 2)
+		result[i++] = myT( sqrt(15.0f/(4.0f*PI))*y*x );
+		result[i++] = myT(-sqrt(15.0f/(4.0f*PI))*y*z );
+		result[i++] = myT( sqrt(5.0f/(16.0f*PI))*(3.0f*z2-1.0f) );
+		result[i++] = myT(-sqrt(15.0f/(4.0f*PI))*x*z );
+		result[i++] = myT( sqrt(15.0f/(16.0f*PI))*(x2-y2) );			
+    #endif
+
+	#if (myL >= 3)
+		result[i++] = myT(-sqrt( 70.0f/(64.0f*PI))*y*(3.0f*x2-y2) );
+		result[i++] = myT( sqrt(105.0f/ (4.0f*PI))*y*x*z );
+		result[i++] = myT(-sqrt( 21.0f/(16.0f*PI))*y*(-1.0f+5.0f*z2) );
+		result[i++] = myT( sqrt(  7.0f/(16.0f*PI))*(5.0f*z3-3.0f*z) );
+		result[i++] = myT(-sqrt( 42.0f/(64.0f*PI))*x*(-1.0f+5.0f*z2) );
+		result[i++] = myT( sqrt(105.0f/(16.0f*PI))*(x2-y2)*z );
+		result[i++] = myT(-sqrt( 70.0f/(64.0f*PI))*x*(x2-3.0f*y2) );			
+    #endif
+
+	#if (myL >= 4)
+		result[i++] = myT( 3.0f*sqrt(35.0f/(16.0f*PI))*x*y*(x2-y2) );
+		result[i++] = myT(-3.0f*sqrt(70.0f/(64.0f*PI))*y*z*(3.0f*x2-y2) );
+		result[i++] = myT( 3.0f*sqrt( 5.0f/(16.0f*PI))*y*x*(-1.0f+7.0f*z2) );
+		result[i++] = myT(-3.0f*sqrt(10.0f/(64.0f*PI))*y*z*(-3.0f+7.0f*z2) );
+		result[i++] = myT( (105.0f*z4-90.0f*z2+9.0f)/(16.0f*sqrtPI) );
+		result[i++] = myT(-3.0f*sqrt(10.0f/(64.0f*PI))*x*z*(-3.0f+7.0f*z2) );
+		result[i++] = myT( 3.0f*sqrt( 5.0f/(64.0f*PI))*(x2-y2)*(-1.0f+7.0f*z2) );
+		result[i++] = myT(-3.0f*sqrt(70.0f/(64.0f*PI))*x*z*(x2-3.0f*y2) );
+		result[i++] = myT( 3.0f*sqrt(35.0f/(4.0f*(64.0f*PI)))*(x4-6.0f*y2*x2+y4) );
+    #endif
+
+	return result;
+}
+
+
+
+
+#define ENV_SMPL_NUM 256
+#define NORM2SNORM(value) (value * 2.0 - 1.0)
+#define SNORM2NORM(value) (value * 0.5 + 0.5)
+
+vec3 EquirectToDirection(vec2 uv) {
+    uv = NORM2SNORM(uv);
+    uv.x *= PI;  // phi
+    uv.y *= PIH; // theta
+        
+    /* Calculate a direction from spherical coords:
+	** R = 1
+    ** x = R sin(phi) cos(theta)
+	** y = R sin(phi) sin(theta)
+	** z = R cos(phi)
+	*/
+    return vec3(cos(uv.x)*cos(uv.y)
+              , sin(uv.y)
+              , sin(uv.x)*cos(uv.y));
+}
+
+myT shDot(in SphericalHarmonics shA, in SphericalHarmonics shB)
+{
+	myT result = myT(0.0);
+	for (int i = 0; i < shSize(myL); ++i)
+	{
+		result += shA[i] * shB[i];
+	}
+	return result;
+}
+
+myT shEvaluateDiffuse(SphericalHarmonics sh, vec3 direction) {
+
+	SphericalHarmonics directionSh = shEvaluate(direction);
+	// https://cseweb.ucsd.edu/~ravir/papers/envmap/envmap.pdf equation 8
+
+	const float A[5] = float[5](
+		 1.0,
+		 2.0 / 3.0,
+		 1.0 / 4.0,
+		 0.0,
+		-1.0f / 24.0
+	);
+
+	int i = 0;
+
+	myT result = sh[i] * directionSh[i] * A[0]; ++i;
+
+	#if (myL >= 1)
+		result += sh[i] * directionSh[i] * A[1]; ++i;
+		result += sh[i] * directionSh[i] * A[1]; ++i;
+		result += sh[i] * directionSh[i] * A[1]; ++i;
+	#endif
+
+	#if (myL >= 2)
+		result += sh[i] * directionSh[i] * A[2]; ++i;
+		result += sh[i] * directionSh[i] * A[2]; ++i;
+		result += sh[i] * directionSh[i] * A[2]; ++i;
+		result += sh[i] * directionSh[i] * A[2]; ++i;
+		result += sh[i] * directionSh[i] * A[2]; ++i;
+	#endif
+
+	// L3 and other odd bands > 1 have 0 factor
+
+	#if (myL >= 4)
+		i = 16;
+
+		result += sh[i] * directionSh[i] * A[4]; ++i;
+		result += sh[i] * directionSh[i] * A[4]; ++i;
+		result += sh[i] * directionSh[i] * A[4]; ++i;
+		result += sh[i] * directionSh[i] * A[4]; ++i;
+		result += sh[i] * directionSh[i] * A[4]; ++i;
+		result += sh[i] * directionSh[i] * A[4]; ++i;
+		result += sh[i] * directionSh[i] * A[4]; ++i;
+		result += sh[i] * directionSh[i] * A[4]; ++i;
+		result += sh[i] * directionSh[i] * A[4]; ++i;
+	#endif
+
+	return result;  
+
+}
+
+vec3 GetRadianceFromSH(SphericalHarmonics shRadiance, vec3 direction) {
+    SphericalHarmonics shDirection = shEvaluate(direction);
+
+    vec3 sampleSh = max(vec3(0.0), shDot(shRadiance, shDirection));    
+    return sampleSh;
+}
+
+vec3 GetIrradianceFromSH(SphericalHarmonics shRadiance, vec3 direction) {
+    SphericalHarmonics shDirection = shEvaluate(direction);
+
+    vec3 sampleIrradianceSh = max(vec3(0.0), shEvaluateDiffuse(shRadiance, direction));
+    return sampleIrradianceSh;
+
+}
+
+
+
+vec3 NormalizePoint(vec3 point, vec3 minPoint, vec3 maxPoint) {
+    return (point - minPoint) / (maxPoint - minPoint);
+}
+
+vec3 interpolate1D(vec3 v1, vec3 v2, float x){
+    return v1*(1-x) + v2*x;
+}
+vec3 interpolate2D(vec3 v1, vec3 v2, vec3 v3, vec3 v4, float x, float y){
+
+    vec3 s = interpolate1D(v1, v2, x);
+    vec3 t = interpolate1D(v3, v4, x);
+    return interpolate1D(s, t, y);
+}
+
+vec3 interpolate3D(vec3 v1, vec3 v2, vec3 v3, vec3 v4, vec3 v5, vec3 v6, vec3 v7, vec3 v8, float x, float y, float z)
+{
+    vec3 s = interpolate2D(v1, v2, v3, v4, x, y);
+    vec3 t = interpolate2D(v5, v6, v7, v8, x, y);
+    return interpolate1D(s, t, z);
+}
+
+
+
+vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
+    vec3 continuousGridCoords = (fragWorldPos - gridWorldPos) / spacing;
+
+    vec3 alpha = fract(continuousGridCoords);
+
+    ivec3 baseCellIdx = ivec3(floor(continuousGridCoords));
+    baseCellIdx = clamp(baseCellIdx, ivec3(0), ivec3(volume) - 2); // This clamp is likely correct for the base.
+
+
+    ivec3 currentProbeGridIdx = baseCellIdx + offset;
+
+
+    // 6. Get the world position of the *current* probe being evaluated
+    // This is the center of the probe at currentProbeGridIdx.
+    vec3 probe_worldPos = gridWorldPos + vec3(currentProbeGridIdx) * spacing;
+
+
+    // 7. Direction from fragment to probe (normalized for accurate dot product)
+    vec3 dirToProbe = normalize(probe_worldPos - fragWorldPos);
+
+    // 8. Retrieve SH coefficients for this specific probeID
+    SphericalHarmonics shRadiance;
+    #if (myL >= 0)
+        shRadiance[0] = texelFetch(probeGridx,currentProbeGridIdx,0).rgb;
+    #endif
+    #if (myL >= 1)
+        shRadiance [1] = texelFetch(probeGridy,currentProbeGridIdx,0).rgb;
+        shRadiance [2] = texelFetch(probeGridz,currentProbeGridIdx,0).rgb;
+        shRadiance [3] = texelFetch(probeGridw,currentProbeGridIdx,0).rgb;
+    #endif
+
+    vec3 probe_color = GetRadianceFromSH(shRadiance, dirToProbe);
+    
+    return probe_color;
+
+    float weight_x = (offset.x == 0) ? (1.0 - alpha.x) : alpha.x;
+    float weight_y = (offset.y == 0) ? (1.0 - alpha.y) : alpha.y;
+    float weight_z = (offset.z == 0) ? (1.0 - alpha.z) : alpha.z;
+
+    float trilinearLerpWeight = weight_x * weight_y * weight_z;
+    float vdotn = dot(dirToProbe, Normal);
+
+    // If the probe is "behind" the fragment's normal (vdotn <= 0.0), set weight to 0.
+    // Otherwise, use the calculated trilinear weight.
+    if (vdotn <= 0.0) { // Probe is behind or exactly on the plane
+        weight = 0.0;
+    } else {
+        weight = trilinearLerpWeight;
+    }
+
+    // 11. Improved Visibility Heuristic: Smooth falloff based on normal
+    float normalVisibilityFactor = max(0.0, dot(dirToProbe, Normal));
+
+    // Combine trilinear weight with visibility factor
+    weight = trilinearLerpWeight * normalVisibilityFactor;
+    return probe_color;
+}
+
+
+vec3 GetIndirectLighting(vec3 WorldPos, vec3 Normal) {
+    float w;
+    vec3 light;
+    float sumWeights = 0.0; // Sum of weights for normalization
+    vec3 indirectLightingAccumulator = vec3(0.0);
+
+    // Iterate through all 8 corners of the bounding cell
+    for (int i = 0; i < 1; i++) {
+        // Correct way to generate the 8 binary offsets (000 to 111)
+        // These represent the relative position of the corner within the cube (0 or 1 for each axis)
+        ivec3 offset = ivec3(
+            (i & 1),        // x: 0, 1, 0, 1, 0, 1, 0, 1
+            ((i >> 1) & 1), // y: 0, 0, 1, 1, 0, 0, 1, 1
+            ((i >> 2) & 1)  // z: 0, 0, 0, 0, 1, 1, 1, 1
+        );
+
+        light = GetProbe(WorldPos, offset, w, Normal);
+        indirectLightingAccumulator += w * light;
+        sumWeights += w;
+    }
+
+    // Normalize the accumulated lighting by the sum of weights.
+    // Use a small epsilon to prevent division by zero, returning black if no probes contributed.
+    if (sumWeights > 0.00001) {
+        return indirectLightingAccumulator / sumWeights;
+    } else {
+        return vec3(0.0); // No valid probes contributed or all weights were zero
+    }
+}
+
+
+void main() {
+    ivec2 coords = ivec2(gl_GlobalInvocationID.xy );
+    vec2 UV = (vec2(gl_GlobalInvocationID.xy) + 0.5) / screen;
+
+ // Retrieve data from G-buffer
+    vec3 FragPos_view = texture(gPostion, UV).rgb;
+    vec3 trueNormal = texture(gTrueNormal, UV).rgb;
+    // Transform view-space position to world-space position
+	vec3 FragPos = (inverseV * vec4(FragPos_view, 1.0)).xyz;
+    vec3 indirectLighting = GetIndirectLighting(FragPos,trueNormal);
+   	imageStore(gGI, coords,vec4(indirectLighting,1));
+
+}

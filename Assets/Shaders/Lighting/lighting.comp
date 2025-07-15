@@ -3,17 +3,6 @@ layout (local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 
 layout (rgba32f, binding = 7) uniform writeonly image2D gLighting;
 
-layout(std430, binding = 7) buffer ShCoeffient {
-    vec3 L1SH_0[10000];
-    vec3 L1SH_1[10000];
-    vec3 L1SH_2[10000];
-    vec3 L1SH_3[10000];
-};
-
-layout(binding = 6) uniform sampler3D probeGrid;
-
-
-
 uniform vec3 gridWorldPos;
 uniform vec3 volume;
 uniform vec3 spacing;
@@ -26,8 +15,9 @@ layout(binding = 0) uniform sampler2D gPostion;    // View-space position
 layout(binding = 1) uniform sampler2D gNormal;     // View-space normal
 layout(binding = 2) uniform sampler2D gAlbeido;
 layout(binding = 3) uniform sampler2D gPBR;
-layout(binding = 4) uniform sampler2D ssaoTexture;
+//layout(binding = 4) uniform sampler2D ssaoTexture;
 layout(binding = 5) uniform sampler2D gTrueNormal;
+layout(binding = 4) uniform sampler2D gGI;
 
 
 
@@ -377,69 +367,7 @@ vec3 interpolate3D(vec3 v1, vec3 v2, vec3 v3, vec3 v4, vec3 v5, vec3 v6, vec3 v7
 
 
 
-vec3 GetProbe(vec3 fragWorldPos, ivec3 offset, out float weight, vec3 Normal) {
 
-
-    vec3 gridCoords = (fragWorldPos - gridWorldPos) / spacing;
-    ivec3 base = ivec3(floor(gridCoords));
-    vec3 a = gridCoords - base;
-    int probeID = int(texelFetch(probeGrid, base + offset, 0).r);
-    vec3 probe_worldPos = gridWorldPos + (base + offset)  * spacing;
-    vec3 dir = probe_worldPos - fragWorldPos;
-
-    vec3 v = normalize(dir); // TODO: no need to normalize if only checking sign
-    float vdotn = dot(v, Normal);
-    vec3 weights = mix(1. - a, a, offset);
-
-    //There was an issue where it will always sample pos offset, but if the normal is facing in the negative dir then the weight will spit out 0 becuase of the vdotn > -0.0.
-    //I fixed this by checking if the normal is in the negative and then sampling negative offset. theres still a few artifacts where it switches from pos to neg but its alot better then beofre
-
-    
-    #if (myL >= 1)
-        SphericalHarmonics shRadiance;
-        shRadiance[0] = L1SH_0[probeID];
-	    shRadiance[1] = L1SH_1[probeID];
-	    shRadiance[2] = L1SH_2[probeID];
-	    shRadiance[3] = L1SH_3[probeID];
-    #endif
-
-    #if (myL >= 2)
-		shRadiance[4] = L1SH_4[probeID];
-		shRadiance[5] = L1SH_5[probeID];
-		shRadiance[6] = L1SH_6[probeID];
-		shRadiance[7] = L1SH_7[probeID];
-		shRadiance[8] = L1SH_8[probeID];
-	#endif
-
-
-    vec3 probe_color =  GetRadianceFromSH(shRadiance, dir);
-
-    if(vdotn > -0.0 && probe_color != vec3(0))
-        weight = weights.x * weights.y * weights.z;
-    else
-        weight = 0.0;        
-    return probe_color;
-}
-
-
-vec3 GetIndirectLighting(vec3 WorldPos, vec3 Normal) { // Interpolate visible probes
-    float w;
-    vec3 light;
-    float sumW = 0.;
-    vec3 indirectLighting = vec3(0.);
-
-    for (int i = 0; i < 8; i++) {
-        ivec3 offset = ivec3(i, i/2, i/4) & ivec3(1);
-        //offset = ivec3(1,0,0);
-
-        light = GetProbe(WorldPos, offset, w, Normal);
-        indirectLighting += w * light;
-        sumW += w;
-    }
-    indirectLighting /= sumW;
-
-    return indirectLighting;
-}
 
 
 vec3 Tonemap_ACES(const vec3 x) { // Narkowicz 2015, "ACES Filmic Tone Mapping Curve"
@@ -449,6 +377,26 @@ vec3 Tonemap_ACES(const vec3 x) { // Narkowicz 2015, "ACES Filmic Tone Mapping C
     const float d = 0.59;
     const float e = 0.14;
     return (x * (a * x + b)) / (x * (c * x + d) + e);
+}
+
+vec4 fastBlur(sampler2D tex, vec2 uv, vec2 resolution, float radius) {
+    vec2 texelSize = 1.0 / resolution;
+    vec4 color = vec4(0.0);
+    float total = 0.0;
+
+    // Sample center and 4 neighbors (cross pattern)
+    for (int x = -1; x <= 1; x++) {
+        for (int y = -1; y <= 1; y++) {
+            if (abs(x) + abs(y) > 1) continue; // Skip diagonals
+
+            vec2 offset = vec2(float(x), float(y)) * texelSize * radius;
+            vec4 sample1 = texture2D(tex, uv + offset);
+            color += sample1;
+            total += 1.0;
+        }
+    }
+
+    return color / total;
 }
 
 
@@ -463,10 +411,7 @@ void main() {
     vec3 Normal_view = normalize(texture(gNormal, UV).rgb);
     vec3 trueNormal = texture(gTrueNormal, UV).rgb;
 
-
-
     vec3 albedo = pow(texture(gAlbeido, UV).rgb,vec3(2.2));
-
     float skybox = texture(gPBR, UV).z;
 
 
@@ -480,7 +425,7 @@ void main() {
     float roughness = texture(gPBR, UV).x;
     float ambeint = texture(gPBR, UV).w;
 
-    float ao = texture(ssaoTexture, UV).r;
+    //float ao = texture(ssaoTexture, UV).r;
 
     // Transform view-space position to world-space position
     vec3 FragPos = (inverseV * vec4(FragPos_view, 1.0)).xyz;
@@ -524,33 +469,40 @@ void main() {
         float NdotL = max(dot(N, L), 0.0);
         float shadow = ShadowCalculation(FragPos , i, N);
         //the 1.3 makes it a little brighter
-        Lo += ((kD * albedo * envLighting) * (shadow) / PI + specular) * radiance * NdotL * (shadow);
+        Lo += ((kD * albedo * 1) * (shadow) / PI + specular) * radiance * NdotL * (shadow);
         spec += specular * radiance * NdotL * (shadow);
     }
     
-
+    /*
     vec3 indirectLighting = GetIndirectLighting(FragPos,trueNormal);
     vec3 adjustedIndirectLighting = indirectLighting;
     //TODO FIX THIS 
-    float factor = min(1, (roughness == 0 ) ? 0.4 : roughness * 1.5);
+    float factor = min(1, (roughness == 0 ) ? 1 : roughness * 1.5);
     adjustedIndirectLighting *= (0.8) * vec3(factor);
     adjustedIndirectLighting = max(adjustedIndirectLighting, vec3(0));
-    adjustedIndirectLighting *= albedo * 1;
+    adjustedIndirectLighting *= albedo * 0.7;
+    */
 
-    vec3 ambientColor = albedo * (envLighting);
+    vec3 gi = texture(gGI, UV).rgb;
+    //vec3 gi = fastBlur(gGI, UV, textureSize(gGI, 0).xy,1).xyz;
+
+    vec3 ambientColor = albedo * (0);
     vec3 ambientLighting = ambientColor * vec3((ambeint == 0) ? 0.1 : ambeint);
 
     // Ambient hack
 	float amfactor = min(1, 1 - metallic * 1.0);
 	ambientLighting *= (1.0) * vec3(amfactor);
 
+    vec3 ao = vec3(1);
     vec3 directlight = ao * Lo + ao * ambientLighting;
-    vec3 color = directlight + adjustedIndirectLighting;
+    vec3 color = directlight + gi;
 
     color = mix(color, Tonemap_ACES(color), 1.0);   
     //color = color / (color  + vec3(1.0));
 
     color = pow(color, vec3(1.0/2.2));
+
+
 
     //color = Lo;
 
@@ -564,13 +516,12 @@ void main() {
         imageStore(gLighting, coords, vec4(color, 1));
 
     }
-
     if(lightingState == 2)
-        imageStore(gLighting, coords,vec4(adjustedIndirectLighting,1));
+        imageStore(gLighting, coords,vec4(pow(gi, vec3(1.0/2.2)),1));
     if(lightingState == 3)
-        imageStore(gLighting, coords, vec4(albedo,1));
+        imageStore(gLighting, coords, vec4(pow(albedo, vec3(1.0/2.2)),1));
     if(lightingState == 4)
-        imageStore(gLighting, coords,vec4(texture(gPBR,UV).xyz,1));
+        imageStore(gLighting, coords,vec4(N,1));
     if(lightingState == 5)
         imageStore(gLighting, coords,vec4(FragPos,1));
 
