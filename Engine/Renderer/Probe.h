@@ -70,7 +70,7 @@ struct ProbeGrid {
 		const int height = static_cast<int>(std::round(Height * invSpacing.y));
 		const int depth = static_cast<int>(std::round(Depth * invSpacing.z));
 
-		volume = glm::vec3(width, height, depth) * spacing;
+		volume = glm::vec3(width, height, depth);
 		postion = start;
 		this->spacing = spacing;
 

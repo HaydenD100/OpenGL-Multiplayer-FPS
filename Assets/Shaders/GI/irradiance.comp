@@ -145,7 +145,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 
 
 vec3 DirectLighting(vec3 p, float b, int probeID, vec3 probe_world_pos){
-    vec3 diffuse = textureLod(textures[probeID * 3], p, b).rgb;
+    vec3 diffuse = pow(textureLod(textures[probeID * 3], p, b).rgb,vec3(2.2));
     vec3 FragPos = textureLod(textures[probeID * 3 + 2], p, b).rgb;
     if(FragPos == vec3(0)){
         return vec3(Sky_Color);

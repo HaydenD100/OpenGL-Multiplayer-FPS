@@ -109,8 +109,9 @@ namespace World {
 		AssetManager::AddModel("playertwo", Model("Assets/Objects/FBX/bean_death.dae", "Assets/Objects/player_mesh.obj", AssetManager::GetTexture("uvmap")));
 		//AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 
+		AssetManager::AddModel("sponza", Model("Assets/Maps/sponza.obj", AssetManager::GetTexture("white")));
 
-
+		
 
 		//AssetManager::AddModel("fence1", Model("Assets/Objects/fence1.fbx", AssetManager::GetTexture("concrete")));
 		//AssetManager::AddModel("fence2", Model("Assets/Objects/fence2.fbx", AssetManager::GetTexture("concrete")));
@@ -226,8 +227,9 @@ namespace World {
 		AddGameObject("Tiltedfloor", AssetManager::GetModel("Tiltedfloor"), glm::vec3(0, 0.1, 0), true, 0, Box);
 		GetGameObject("Tiltedfloor")->IncludInGI(true);
 
-
-
+		AddGameObject("sponza", AssetManager::GetModel("sponza"), glm::vec3(0, 1, 0), true, 0,Concave);
+		GetGameObject("sponza")->IncludInGI(true);
+		
 		//AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), false, 10.0f, Box);
 		AddGameObject("room1", AssetManager::GetModel("room1"), glm::vec3(0, 0.1, 0), true, 0, Concave);
 		GetGameObject("room1")->IncludInGI(true);
@@ -367,15 +369,13 @@ namespace World {
 
 		envLight.sky = SkyBox(faces);
 		//Average light of skybox
-		envLight.indirectLight = glm::vec3(0.188, 0.278, 0.4);
+		envLight.indirectLight = glm::vec3(0, 0, 0);
 		//envLight.indirectLight = glm::vec3(0.569, 0.69, 0.965);
-		std::cout << "test load\n";
 
 		g_lights.emplace_back(glm::vec3(0, 10, 0), glm::vec3(1, 0.996, 0.82), 10, 50);
 		g_lights.back().SetUpShadows();
 		g_lights.emplace_back(glm::vec3(0, 6, -2.4), glm::vec3(1, 0.922, 0.678) * 7.5f, 0.07, 0.017);
 		g_lights.back().SetUpShadows();
-		std::cout << "test load 1\n";
 
 	}
 
