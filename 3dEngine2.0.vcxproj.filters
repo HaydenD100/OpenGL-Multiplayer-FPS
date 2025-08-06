@@ -411,8 +411,7 @@
     <None Include="Assets\Shaders\fxaa\fxaa.vert" />
     <None Include="Assets\Shaders\fxaa\fxaa.frag" />
     <None Include="Assets\Shaders\GI\probeCheck.comp" />
-    <None Include="Assets\Shaders\Water\water.vert" />
-    <None Include="Assets\Shaders\Water\water.frag" />
+    <None Include="Assets\Shaders\Terrain\terrain.vert" />
     <None Include="Assets\Shaders\GI\triangleIntersection.comp" />
     <None Include="Assets\Shaders\GI\ddgiProbes.comp" />
     <None Include="Assets\Shaders\GI\irradiance.frag" />
@@ -427,8 +426,8 @@
     <None Include="Assets\Shaders\SSAO\ssao.comp" />
     <None Include="Assets\Shaders\PostProccess\post.comp" />
     <None Include="Assets\Shaders\fxaa\fxaa.comp" />
-    <None Include="Assets\Shaders\Water\water.tesc" />
-    <None Include="Assets\Shaders\Water\water.tese" />
+    <None Include="Assets\Shaders\Terrain\terrain.tesc" />
+    <None Include="Assets\Shaders\Terrain\terrain.tese" />
     <None Include="Assets\Shaders\Water\wave_vec.comp" />
     <None Include="Assets\Shaders\Water\water_height_row.comp" />
     <None Include="Assets\Shaders\Water\water_height_col.comp" />

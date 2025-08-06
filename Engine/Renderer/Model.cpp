@@ -268,6 +268,7 @@ void Model::processNode(aiNode* node, const aiScene* scene, Texture* texture) {
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+        std::cout << mesh->mName.C_Str() << "\n";
         Mesh mesh1 = std::move(processMesh(mesh, scene));
         mesh1.SetTexture(texture);
         meshes.push_back(std::move(mesh1));

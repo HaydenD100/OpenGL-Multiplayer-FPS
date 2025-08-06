@@ -267,10 +267,9 @@
     <None Include="Assets\Shaders\Texture_Render\Texture_Render.vert" />
     <None Include="Assets\Shaders\Transparent\transparent.frag" />
     <None Include="Assets\Shaders\Transparent\transparent.vert" />
-    <None Include="Assets\Shaders\Water\water.frag" />
-    <None Include="Assets\Shaders\Water\water.vert" />
-    <None Include="Assets\Shaders\Water\water.tesc" />
-    <None Include="Assets\Shaders\Water\water.tese" />
+    <None Include="Assets\Shaders\Terrain\terrain.vert" />
+    <None Include="Assets\Shaders\Terrain\terrain.tesc" />
+    <None Include="Assets\Shaders\Terrain\terrain.tese" />
     <None Include="Assets\Shaders\Water\water_height_col.comp" />
     <None Include="Assets\Shaders\Water\water_height_row.comp" />
     <None Include="Assets\Shaders\Water\wave_vec.comp" />

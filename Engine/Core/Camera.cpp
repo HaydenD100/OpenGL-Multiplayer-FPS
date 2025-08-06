@@ -128,7 +128,7 @@ namespace Camera
 	void Camera::Update(float dt) {
 		//if (verticalAngle <= maxAngle && verticalAngle >= -maxAngle)
 
-		verticalAngle += Input::GetSensitivity() * float(Backend::GetHeight() / 2 - Input::GetMouseY());
+		verticalAngle += Input::GetSensitivity() * float(Backend::GetHeight() / 2 - Input::GetMouseY() + 0.00001);
 		if (verticalAngle > maxAngle)
 			verticalAngle = maxAngle;
 		else if (verticalAngle < -maxAngle)

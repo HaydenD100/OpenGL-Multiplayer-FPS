@@ -88,6 +88,7 @@ private:
 };
 struct EnviromentLighting {
 	SkyBox sky = SkyBox();
+	glm::vec3 skycolor = glm::vec3(1, 1, 1);
 	glm::vec3 indirectLight = glm::vec3(0, 0, 0);
 };
 

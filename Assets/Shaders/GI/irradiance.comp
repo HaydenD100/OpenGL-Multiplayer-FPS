@@ -194,7 +194,7 @@ vec3 DirectLighting(vec3 p, float b, int probeID, vec3 probe_world_pos){
 
     }
     vec3 ambient = vec3(1);
-    vec3 Lightcolor = ambient * Lo * 2;
+    vec3 Lightcolor = Lo;
 
     // HDR and gamma correction
     //Lightcolor = Lightcolor / (Lightcolor + vec3(1.0));

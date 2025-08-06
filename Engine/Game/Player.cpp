@@ -416,7 +416,7 @@ namespace Player
 		//In the water move in the direction of the camera
 		if (m_isSwimming) {
 			//player->GetRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
-			player->GetRigidBody()->setGravity(btVector3(0, 10, 0));
+			player->GetRigidBody()->setGravity(btVector3(0, 0, 0));
 			player->GetRigidBody()->setLinearVelocity(btVector3( 0.8 * player->GetRigidBody()->getLinearVelocity().x(), player->GetRigidBody()->getLinearVelocity().y(), 0.8 * player->GetRigidBody()->getLinearVelocity().z()));
 			forward = Camera::GetRotation();
 

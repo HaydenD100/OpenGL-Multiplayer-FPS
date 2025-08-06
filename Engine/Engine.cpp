@@ -93,9 +93,9 @@ namespace Engine
 
 			//Dont use this its not working rightnow
 			
-
 			
-			if ((Renderer::DebugState & NoGUi) != NoGUi) {
+			
+			if ((Renderer::DebugState & NoGUi) != NoGUi && false) {
 
 				std::ostringstream oss;
 				oss << "FPS: " << FPS;

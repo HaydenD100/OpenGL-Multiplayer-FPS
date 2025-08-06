@@ -78,7 +78,7 @@ void ProbeGrid::ReLight(int probeRelightCount) {
 	Renderer::cs_probeIrradiance.SetVec3("volume", volume);
 	Renderer::cs_probeIrradiance.SetVec3("spacing", spacing);
 	Renderer::cs_probeIrradiance.SetInt("start_index", updatedIndex);
-	Renderer::cs_probeIrradiance.SetVec3("Sky_Color", World::GetEnviromentLighting().indirectLight);
+	Renderer::cs_probeIrradiance.SetVec3("Sky_Color", World::GetEnviromentLighting().skycolor);
 
 	updatedIndex += probeRelightCount;
 	if (updatedIndex > probes.size()) {

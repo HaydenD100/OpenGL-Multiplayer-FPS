@@ -29,9 +29,13 @@ namespace World {
 
 
 		AssetManager::AddTexture("white", "Assets/Textures/white.png", 0.5, 0.0);
+		AssetManager::AddTexture("red", "Assets/Textures/red.png", 0.1, 0.5);
+
 		AssetManager::AddTexture("dev_textures", "Assets/Textures/dev_textures.png", "Assets/Normals/no_normal.png", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_metallic.jpg");
 
 		AssetManager::AddTexture("metalic", "Assets/Textures/white.png", 0.0f, 1.0f);
+		AssetManager::AddTexture("orange", "Assets/Textures/Orange_Playground_textures.png", 0.5f, 0.0f);
+		AssetManager::AddTexture("gray", "Assets/Textures/Grey_plain.png", 0.5f, 1.0f);
 
 		//AssetManager::AddTexture("cornel", "Assets/Textures/cornel-box.png", 0.8, 0.0);
 		
@@ -73,7 +77,6 @@ namespace World {
 		AssetManager::AddTexture("transparent", "Assets/Textures/dusty1.png", "Assets/Normals/dirty_glass.png", 0.1f, 0.0f);
 		AssetManager::AddTexture("unicorn", "Assets/Textures/unicorn.png", "Assets/Normals/unicorn_normal.png", 0.3f, 0.0f);
 
-
 		AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
 
 		AssetManager::AddModel("quad", Model("Assets/Objects/quad.obj", AssetManager::GetTexture("uvmap")));
@@ -91,7 +94,8 @@ namespace World {
 		//AssetManager::AddModel("running", Model("Assets/Objects/FBX/Running.fbx", AssetManager::GetTexture("white")));
 
 
-		AssetManager::AddModel("ladder", Model("Assets/Objects/FBX/ladder.fbx", AssetManager::GetTexture("ladder")));
+		AssetManager::AddModel("bunny", Model("Assets/Objects/bunny.fbx", AssetManager::GetTexture("red")));
+
 		//AssetManager::AddModel("shelf", Model("Assets/Objects/FBX/shelf.fbx", AssetManager::GetTexture("shelf")));
 		//AssetManager::AddModel("vase", Model("Assets/Objects/FBX/vase.fbx", AssetManager::GetTexture("vase")));
 		//AssetManager::GetModel("vase")->GetMeshByName("Mesh.001")->SetTexture(AssetManager::GetTexture("plant"));
@@ -167,8 +171,8 @@ namespace World {
 		AssetManager::AddModel("pool_water", Model("Assets/Objects/FBX/pool_water.obj", AssetManager::GetTexture("white"), 0));
 
 
-		AssetManager::AddModel("room1", Model("Assets/Maps/room1.obj", AssetManager::GetTexture("white")));
-
+		AssetManager::AddModel("fps", Model("Assets/Maps/fps2.fbx", AssetManager::GetTexture("orange")));
+		AssetManager::GetModel("fps")->GetMeshByName("Object_0")->SetTexture(AssetManager::GetTexture("gray"));
 
 		AssetManager::AddModel("target", Model("Assets/Objects/FBX/target.obj", AssetManager::GetTexture("white")));
 
@@ -227,12 +231,16 @@ namespace World {
 		AddGameObject("Tiltedfloor", AssetManager::GetModel("Tiltedfloor"), glm::vec3(0, 0.1, 0), true, 0, Box);
 		GetGameObject("Tiltedfloor")->IncludInGI(true);
 
-		AddGameObject("sponza", AssetManager::GetModel("sponza"), glm::vec3(0, 1, 0), true, 0,Concave);
-		GetGameObject("sponza")->IncludInGI(true);
-		
-		//AddGameObject("Cube", AssetManager::GetModel("Cube"), glm::vec3(0, 6, 0), false, 10.0f, Box);
-		AddGameObject("room1", AssetManager::GetModel("room1"), glm::vec3(0, 0.1, 0), true, 0, Concave);
-		GetGameObject("room1")->IncludInGI(true);
+		//AddGameObject("sponza", AssetManager::GetModel("sponza"), glm::vec3(0, 1, 0), true, 0,Concave);
+		//GetGameObject("sponza")->IncludInGI(true);
+
+		//AddGameObject("bunny", AssetManager::GetModel("bunny"), glm::vec3(17, 5, 17), true, 0, Box);
+		//GetGameObject("bunny")->IncludInGI(true);
+		//GetGameObject("bunny")->SetRotationX(-1 * glm::radians(90.0f));
+
+		AddGameObject("fps", AssetManager::GetModel("fps"), glm::vec3(0, 0.1, 0), true, 0, Concave);
+		GetGameObject("fps")->IncludInGI(true);
+		GetGameObject("fps")->SetRotationX(-1 * ToRadian(90));
 
 		AddGameObject("seafloor", AssetManager::GetModel("seafloor"), glm::vec3(0, -10, 0), true, 0, Concave);
 
@@ -255,11 +263,7 @@ namespace World {
 
 		AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(-6.46, -1, 14), false, 0.0, Box);
 		AddGameObject("Crates", AssetManager::GetModel("model_crate"), glm::vec3(3, 0, 3), true, 0, Convex);
-		//World::AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
-		//World::GetGameObject("ladder_object")->SetRotationX(-1.5708f);
 
-		AddGameObject("ladder_object", AssetManager::GetModel("ladder"), glm::vec3(0, 0, 0), true, 0, Concave);
-		GetGameObject("ladder_object")->SetRotationX(-1.5708f);
 
 
 		AddGameObject("uni_float", AssetManager::GetModel("uni_float"), glm::vec3(6, 2, 0), true, 2, Convex);
@@ -369,7 +373,8 @@ namespace World {
 
 		envLight.sky = SkyBox(faces);
 		//Average light of skybox
-		envLight.indirectLight = glm::vec3(0, 0, 0);
+		envLight.indirectLight = glm::vec3(0.01, 0.01, 0.01);
+		envLight.skycolor = glm::vec3(1, 1, 1) * 2.5f;
 		//envLight.indirectLight = glm::vec3(0.569, 0.69, 0.965);
 
 		g_lights.emplace_back(glm::vec3(0, 10, 0), glm::vec3(1, 0.996, 0.82), 10, 50);

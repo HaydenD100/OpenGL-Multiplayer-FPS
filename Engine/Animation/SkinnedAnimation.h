@@ -30,6 +30,7 @@ public:
         const aiScene* scene = importer.ReadFile(animationPath, aiProcess_Triangulate);
         if (!scene) {
             std::cout << "ERROR " << animationPath << "\n";
+            return;
         }
         assert(scene && scene->mRootNode);
         std::cout << "Aniamtions: " << scene->mNumAnimations << " For " << animationPath << "\n";

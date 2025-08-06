@@ -510,8 +510,8 @@ void main() {
         //float attenuation = 1.0 / (1.0 + lights[i].linear * distance + lights[i].quadratic * (distance * distance));
         //vec3 radiance = lights[i].color * attenuation;
 
-        vec3 radiance = lights[i].strength * lights[i].color;// * 1.25;
-	    float attenuation = smoothstep(lights[i].radius, 0,  distance);
+        vec3 radiance = lights[i].strength * 10 * lights[i].color;// * 1.25;
+	    float attenuation = smoothstep(lights[i].radius * 10, 0,  distance);
 
         // Cook-Torrance BRDF
         vec3 H = normalize(Vpos + L);
@@ -539,7 +539,7 @@ void main() {
     float factor = min(1, (roughness == 0 ) ? 0.4 : roughness * 1.5);
     adjustedIndirectLighting *= (0.8) * vec3(factor);
     adjustedIndirectLighting = max(adjustedIndirectLighting, vec3(0));
-    adjustedIndirectLighting *= albedo * 1.5;
+    adjustedIndirectLighting *= albedo * 0.8;
 
     vec3 ambientColor = albedo * (0);
     vec3 ambientLighting = ambientColor * vec3((ambeint == 0) ? 0.1 : ambeint);
@@ -550,12 +550,10 @@ void main() {
 
     vec3 directlight = ao * Lo + ao * ambientLighting;
     vec3 color = directlight ;
+    color += adjustedIndirectLighting;
 
     color = mix(color, Tonemap_ACES(color), 1.0);   
-    //color = color / (color  + vec3(1.0));
-
     color = pow(color, vec3(1.0/2.2));
-    color += adjustedIndirectLighting;
 
     //color = Lo;
 
@@ -563,10 +561,9 @@ void main() {
     if(lightingState == 0)
         imageStore(gLighting, coords,vec4(color, spec));// + vec4(albedo * 0.2,1);
     if(lightingState == 1){
-        vec3 color = directlight;
-        color = mix(color, Tonemap_ACES(color), 1.0);   
-        color = pow(color, vec3(1.0/2.2));
-        imageStore(gLighting, coords, vec4(color, 1));
+        directlight = mix(directlight, Tonemap_ACES(directlight), 1.0);   
+        directlight = pow(directlight, vec3(1.0/2.2));
+        imageStore(gLighting, coords, vec4(directlight, 1));
 
     }
 
@@ -575,7 +572,7 @@ void main() {
     if(lightingState == 3)
         imageStore(gLighting, coords, vec4(albedo,1));
     if(lightingState == 4)
-        imageStore(gLighting, coords,vec4(texture(gPBR,UV).xyz,1));
+        imageStore(gLighting, coords,vec4(N,1));
     if(lightingState == 5)
         imageStore(gLighting, coords,vec4(FragPos,1));
 
