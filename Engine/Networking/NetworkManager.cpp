@@ -16,6 +16,8 @@ namespace Client {
 
 	std::thread networkThread;
 
+	ThreadSafeQueue<Packet> p_queue;
+
 
 	void Init(const char* IP) {
 		std::cout << "Connecting to server... \n";
@@ -39,8 +41,7 @@ namespace Client {
 		const char* source = "Connected";
 		char buf[1024];
 		strncpy(buf, source, sizeof(buf) - 1);
-		SendData(buf);
-
+		SendData(buf, 1024);
 
 		networkThread = std::thread(Run);
 
@@ -53,18 +54,22 @@ namespace Client {
 
 	void Run() {
 		// Send a message to the server
-		std::string s("Testing");
-		int sendOk = sendto(out, s.c_str(), s.size() + 1, 0, (sockaddr*)&server, sizeof(server));
+
+		std::string s("Connected To Server");
+		int sendOk = sendto(out, s.c_str(), s.size(), 0, (sockaddr*)&server, sizeof(server));
 		if (sendOk == SOCKET_ERROR) {
 			std::cout << "That didn't work! " << WSAGetLastError() << std::endl;
 			return;
 		}
+
+		std::cout << "Running\n";
 
 		// Buffer to receive data
 		char buf[1024];
 		sockaddr_in from;
 		int fromLen = sizeof(from);
 
+		IsConnected = 1;
 		while (IsConnected) {
 			ZeroMemory(buf, 1024);
 
@@ -74,26 +79,50 @@ namespace Client {
 				continue;
 			}
 
-			// Print the received message
-			Packet packet;
-			// Safely extract ID and code from first 4 bytes
-			std::memcpy(&packet.ID, buf, sizeof(uint16_t));
-			std::memcpy(&packet.code, buf + 2, sizeof(uint16_t));
-			// Copy rest of the data (512 bytes)
-			std::memcpy(packet.data, buf + 4, sizeof(packet.data));
-			std::cout << "SERVER> " << packet.code << " : " << packet.data << "\n";
+			Packet t_packet;
+			t_packet = Packet::Decode(buf);
+			p_queue.enqueue(t_packet);
+			std::cout << "SERVER> " << t_packet.code << " : ID :" << t_packet.ID << " : " << t_packet.data << "\n";
+		}
+	}
+	void ExtractPositionRotation(const Packet& packet, glm::vec3& position, glm::vec3& rotation) {
+		std::memcpy(&position, packet.data, sizeof(glm::vec3));
+		std::memcpy(&rotation, packet.data + sizeof(glm::vec3), sizeof(glm::vec3));
+	}
+
+	void Evaluate() {
+		Packet t_packet = p_queue.dequeue();
+
+		switch (t_packet.code) {
+		case POSITION:
+
+			break;
+
+
+		default:
+			break;
 		}
 	}
 	void SendWorldPosition(glm::vec3 position, glm::vec3 rotation) {
+		Packet t_packet;
+		t_packet.ID = 0;
+		t_packet.code = POSITION;
 
-	}
+		std::memcpy(t_packet.data, &position, sizeof(position));
+		std::memcpy(t_packet.data + sizeof(position), &rotation, sizeof(rotation));
 
-	void SendData(char buf[1024]) {
-		int sendOk = sendto(out, buf, 1024 + 1, 0, (sockaddr*)&server, sizeof(server));
+		const char* rawBuffer = t_packet.Encode();
+
+		int sendOk = sendto(out, rawBuffer, Packet::EncodedSize(), 0, (sockaddr*)&server, sizeof(server));
 		if (sendOk == SOCKET_ERROR) {
-			std::cout << "That didn't work! " << WSAGetLastError() << std::endl;
-			return;
+			std::cout << "Send failed! " << WSAGetLastError() << std::endl;
 		}
 	}
 
+	void SendData(const char* buf, size_t len) {
+		int sendOk = sendto(out, buf, static_cast<int>(len), 0, (sockaddr*)&server, sizeof(server));
+		if (sendOk == SOCKET_ERROR) {
+			std::cout << "Send failed! " << WSAGetLastError() << std::endl;
+		}
+	}
 }

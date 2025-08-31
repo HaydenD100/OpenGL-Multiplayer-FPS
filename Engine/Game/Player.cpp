@@ -696,3 +696,12 @@ namespace Player
 	}
 
 }
+
+
+void ClientPlayer::Init(uint16_t client_id) {
+	id = client_id;
+	World::AddGameObject(std::to_string(id),AssetManager::GetModel("cube"),glm::vec3(0,10,0),false,0,ColliderShape::Box);
+}
+void ClientPlayer::Update() {
+	World::GetGameObject(std::to_string(id))->setPosition(position);
+}

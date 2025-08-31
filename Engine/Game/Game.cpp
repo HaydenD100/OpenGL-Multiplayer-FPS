@@ -10,6 +10,7 @@
 #include "Engine/Core/Common/GameCommon.h"
 #include "Engine.h"
 #include "Engine/Core/Scene/World.h"
+#include "Engine/Networking/NetworkManager.h"
 
 
 namespace Game {
@@ -27,10 +28,10 @@ namespace Game {
 
 		if (multiPlayerMode == MultiPlayer) {
 			//TODO :: myGui ConnectMenu
-			//std::cout << "==================================CONNECT/HOST=========================================================================\n";
-			//std::cout << "ENTER the IP of the server to join:";
-			//char temp[256];
-			//std::cin.getline(temp, sizeof(temp));
+			std::cout << "==================================CONNECT/HOST=========================================================================\n";
+			std::cout << "ENTER the IP of the server to join:";
+			char temp[256];
+			std::cin.getline(temp, sizeof(temp));
 			//Client::Init(temp);
 
 			Client::Init("127.0.0.1");
@@ -45,7 +46,7 @@ namespace Game {
 		Player::setPosition(glm::vec3(0, 10, 0));
 		Animator::Init();
 
-		//PathFinding::Init();
+		PathFinding::Init();
 		std::cout << "Scene and Asset Load took " << (glfwGetTime() - startLoadTime) << "s \n";
 	}
 	void Update(float dt) {
@@ -69,6 +70,10 @@ namespace Game {
 		
 		Animator::UpdateAnimation(dt);
 		AudioManager::UpdateListener(Player::getPosition(), Player::getForward(), Player::getForward());
+
+		if (m_multiPlayerMode == MultiPlayer) {
+			Client::SendWorldPosition(Player::getPosition(), Player::getForward());
+		}
 
 		//Host keeps track of all the physics objects 
 		

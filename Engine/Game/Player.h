@@ -38,3 +38,10 @@ namespace Player
 
 }
 
+struct ClientPlayer {
+	glm::vec3 position;
+	uint16_t id;
+
+	void Init(uint16_t client_id);
+	void Update();
+};

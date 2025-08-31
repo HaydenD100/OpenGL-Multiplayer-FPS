@@ -124,7 +124,6 @@ namespace Renderer
 	Shader s_particle;
 	Shader s_spriteSheet;
 
-
 	//ComputeShaders
 	ComputeShader cs_lighting;
 	ComputeShader cs_post;
@@ -636,7 +635,6 @@ namespace Renderer
 		s_SolidColor.SetBool("IsEmissive", true);
 		s_SolidColor.SetFloat("Rougness", 0.5);
 		s_SolidColor.SetFloat("Metalic", 0);
-
 
 		for (int i = 0; i < World::g_lights.size(); i++) {
 			s_SolidColor.SetVec4("color", glm::vec4(World::g_lights[i].colour,1));
