@@ -11,6 +11,7 @@ enum ObjectType {
 	GLASS,
 	PLAYER,
 	WATER,
+	FUR,
 	DESTORYABLE
 };
 //#include "Loaders/nlohmann/json.hpp"

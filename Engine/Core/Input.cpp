@@ -13,7 +13,7 @@ namespace Input
     double mouseOffsetX = 0;
     double mouseOffsetY = 0;
 
-    float sensitivity = 0.002;
+    float sensitivity = 0.002f;
 
     bool leftMouseDown = false;
     bool rightMouseDown = false;

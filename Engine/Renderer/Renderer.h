@@ -9,6 +9,9 @@
 #include "Engine/Renderer/Gbuffer.h"
 #include "Engine/Renderer/BufferLighting.h"
 #include "Engine/Renderer/BufferTransparent.h"
+#include "Engine/Renderer/BufferFur.h"
+
+#include "Engine/Renderer/Skybox.h"
 
 #include "Engine/Renderer/BufferSSAO.h"
 #include "Engine/Renderer/BufferSSR.h"
@@ -22,74 +25,16 @@
 
 
 
-
+struct EnviromentLighting {
+	SkyBox sky = SkyBox();
+	glm::vec3 skycolor = glm::vec3(1, 1, 1);
+	glm::vec3 indirectLight = glm::vec3(0, 0, 0);
+};
 
 enum RenderDebugStates {
 	NoGUi = 1,
 	ShowProbes = 2,
 	ShowTrigger = 4
-};
-
-class SkyBox
-{
-public:
-    SkyBox();
-    SkyBox(std::vector<std::string> faces);
-    unsigned int GetTextureID();
-    unsigned int GetSkyBoxVAO();
-private:
-	float skyboxVertices[108] =  {
-		// positions          
-		-1.0f,  1.0f, -1.0f,
-		-1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-		 1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,
-
-		-1.0f, -1.0f,  1.0f,
-		-1.0f, -1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f, -1.0f,
-		-1.0f,  1.0f,  1.0f,
-		-1.0f, -1.0f,  1.0f,
-
-		 1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-
-		-1.0f, -1.0f,  1.0f,
-		-1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f, -1.0f,  1.0f,
-		-1.0f, -1.0f,  1.0f,
-
-		-1.0f,  1.0f, -1.0f,
-		 1.0f,  1.0f, -1.0f,
-		 1.0f,  1.0f,  1.0f,
-		 1.0f,  1.0f,  1.0f,
-		-1.0f,  1.0f,  1.0f,
-		-1.0f,  1.0f, -1.0f,
-
-		-1.0f, -1.0f, -1.0f,
-		-1.0f, -1.0f,  1.0f,
-		 1.0f, -1.0f, -1.0f,
-		 1.0f, -1.0f, -1.0f,
-		-1.0f, -1.0f,  1.0f,
-		 1.0f, -1.0f,  1.0f
-	};
-
-    unsigned int textureID;
-    unsigned int skyboxVAO, skyboxVBO;
-};
-struct EnviromentLighting {
-	SkyBox sky = SkyBox();
-	glm::vec3 skycolor = glm::vec3(1, 1, 1);
-	glm::vec3 indirectLight = glm::vec3(0, 0, 0);
 };
 
 
@@ -145,7 +90,13 @@ namespace Renderer
     void RenderText(const char* text, int x, int y, int size);
     void RendererSkyBox(glm::mat4 view, glm::mat4 projection, SkyBox skybox);
     void RenderAllObjects(Shader& shader);
+	void RenderDeffered();
+	void RenderSSAO();
 	void RenderWater();
+	void RenderFur();
+	void RenderSolid();
+	void RenderGunFlash();
+	void RenderDecal();
 	//anything that needs to be ran before the gameLoop;
 	void BeforeRender();
 

@@ -7,59 +7,17 @@
 #include "Engine/Renderer/Raycaster.h"
 #include "Engine/Core/Input.h"
 #include "Engine/Core/UI/Text2D.h" 
-#include "Loaders/stb_image.h"
 #include "Engine/Pathfinding/Pathfinding.h"
-
 #include "Engine/Core/Scene/World.h"
+
+#include "Loaders/stb_image.h"
 
 #include <random>
 #include <memory>
 
 #include "glm/gtx/norm.hpp"
 
-SkyBox::SkyBox() = default;
 
-SkyBox::SkyBox(std::vector<std::string> faces) {
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
-
-	int width, height, nrChannels;
-	for (unsigned int i = 0; i < faces.size(); i++) {
-		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 3);
-		if (data) {
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
-			);
-			stbi_image_free(data);
-		}
-		else {
-			std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
-			stbi_image_free(data);
-		}
-	}
-	
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-}
-
-unsigned int SkyBox::GetTextureID() {
-	return textureID;
-}
-
-unsigned int SkyBox::GetSkyBoxVAO() {
-	glGenVertexArrays(1, &skyboxVAO);
-	glGenBuffers(1, &skyboxVBO);
-	glBindVertexArray(skyboxVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-	return skyboxVAO;
-}
 
 
 namespace Renderer
@@ -75,6 +33,9 @@ namespace Renderer
 	Texture GaussianNoise;
 	Texture waterVecOut;
 	Texture waterHeightMap;
+	//Fur
+	Texture randomNoise;
+
 	std::vector<glm::vec3> _randomdir;
 	const int waveCount = 32;
 
@@ -123,7 +84,8 @@ namespace Renderer
 	Shader s_drawLine;
 	Shader s_particle;
 	Shader s_spriteSheet;
-
+	Shader s_fur;
+ 
 	//ComputeShaders
 	ComputeShader cs_lighting;
 	ComputeShader cs_post;
@@ -147,6 +109,7 @@ namespace Renderer
 	BufferSSR ssrBuffer;
 	BufferSSR fxaaBuffer;
 	BufferLighting lightingBuffer;
+	BufferFur furBuffer;
 	BufferLighting postBuffer;
 	BufferTransparent transparentBuffer;
 
@@ -189,6 +152,8 @@ namespace Renderer
 		s_drawPoint.Load("Assets/Shaders/Debug/point.vert", "Assets/Shaders/Debug/point.frag");
 		s_particle.Load("Assets/Shaders/Particles/particle.vert", "Assets/Shaders/Particles/particle.frag");
 		s_spriteSheet.Load("Assets/Shaders/spriteSheet.vert", "Assets/Shaders/spriteSheet.frag");
+		s_fur.Load("Assets/Shaders/Fur/fur.vert","Assets/Shaders/Fur/fur.frag");
+
 
 		cs_probeIrradiance.Load("Assets/Shaders/GI/irradiance.comp");
 		cs_Raycaster.Load("Assets/Shaders/GI/triangleIntersection.comp");
@@ -300,10 +265,12 @@ namespace Renderer
 			ssaoNoise.push_back(noise);
 		}
 
-
-
 		LoadAllShaders();
 		ConfigureFrameBuffers();
+		
+		//create 256 by 256 texture with random noise
+		randomNoise.FillWithRandom();
+
 
 		static const GLfloat g_quad_vertex_buffer_data[] = {
 		-1.0f, -1.0f, 0.0f,
@@ -382,16 +349,15 @@ namespace Renderer
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		
 		//GaussianNoise = Texture(generateGaussianNoise(512, 512), 512, 512);
 		//waterVecOut = Texture(generateGaussianNoise(512, 512), 512, 512);
 		//waterHeightMap = Texture(generateGaussianNoise(512, 512), 512, 512);
 
 		//Raycaster::Init();
 
-		glm::vec3 spacing = glm::vec3(3,4,3);
-		glm::vec3 propgationGridSize = glm::vec3(45, 20, 45);
-		glm::vec3 gridPos = glm::vec3(0, 0, 0);
+		glm::vec3 spacing = glm::vec3(2,2,2);
+		glm::vec3 propgationGridSize = glm::vec3(25, 10, 15);
+		glm::vec3 gridPos = glm::vec3(-11.2, -2, -6);
 
 		probeTexture.Create(glm::ceil(propgationGridSize.x / spacing.x), glm::ceil(propgationGridSize.y / spacing.y), glm::ceil(propgationGridSize.z / spacing.z));
 		probeGrid.Configure(propgationGridSize.x, propgationGridSize.y, propgationGridSize.z, spacing, gridPos);
@@ -412,6 +378,7 @@ namespace Renderer
 		fxaaBuffer.Configure(Backend::GetWidth(), Backend::GetHeight());
 		emmisiveRenderer.Init(Backend::GetWidth(), Backend::GetHeight());
 		transparentBuffer.Configure();
+		furBuffer.Configure();
 
 		glGenFramebuffers(1, &FinalFrameFBO);
 		glBindFramebuffer(GL_FRAMEBUFFER, FinalFrameFBO);
@@ -435,6 +402,7 @@ namespace Renderer
 		postBuffer.Destroy();
 		fxaaBuffer.Destroy();
 		transparentBuffer.Destroy();
+		furBuffer.Destroy();
 		//emmisiveRenderer.Destroy();
 	}
 
@@ -577,167 +545,22 @@ namespace Renderer
 		//glMemoryBarrier(GL_ALL_BARRIER_BITS);
 		//-------------------------------------------GBUFFER-----------------------------------------
 
-		g_overlay.clear();
-
-		glEnable(GL_DEPTH_TEST);
-		gbuffer.Bind();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), World::GetEnviromentLighting().sky);
-
-		s_geomerty.Use();
-		s_geomerty.SetMat4("P", Camera::getProjectionMatrix());
-		s_geomerty.SetMat4("V", Camera::getViewMatrix());
-
-		glm::mat4 ViewMatrix = Camera::getViewMatrix();
-		for (int i = 0; i < World::g_objects.size(); i++) {
-			GameObject* gameobjectRender = World::g_objects[i].get();
-
-			if (!gameobjectRender->ShouldRender())
-				continue;
-			if (!gameobjectRender->GetModel()->GetAABB()->isOnFrustum(Camera::GetFrustum(), gameobjectRender->getTransform()) && !gameobjectRender->DontCull())
-				continue;
-			if (gameobjectRender->GetShaderType() == "Overlay") {
-				g_overlay.push_back(gameobjectRender);
-				continue;
-			}
-
-			auto transforms = gameobjectRender->GetFinalBoneMatricies();
-			if (transforms[0] != glm::mat4(1)) {
-				s_geomerty.SetBool("animated", true);
-				for (int i = 0; i < transforms.size(); ++i) {
-					std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
-					s_geomerty.SetMat4(pos.c_str(), transforms[i]);
-				}
-			}
-			else
-				s_geomerty.SetBool("animated", false);
-
-
-			glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
-			glm::mat4 modelViewMatrix = ViewMatrix * ModelMatrix;
-			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
-
-			s_geomerty.SetMat3("normalMatrix3", normalMatrix);
-			s_geomerty.SetMat4("M", ModelMatrix);
-			gameobjectRender->RenderObject(s_geomerty.GetShaderID());
-		}
-
-
-
-
+		
 		//ParticleSystem::RenderParticles();
-
-		//This can be removed later but it just renders a cube thats glowing to show where point lights are
-		s_SolidColor.Use();
-		s_SolidColor.SetMat4("P", Camera::getProjectionMatrix());
-		s_SolidColor.SetMat4("V", Camera::getViewMatrix());
-		s_SolidColor.SetBool("animated", false);
-		s_SolidColor.SetBool("IsEmissive", true);
-		s_SolidColor.SetFloat("Rougness", 0.5);
-		s_SolidColor.SetFloat("Metalic", 0);
-
-		for (int i = 0; i < World::g_lights.size(); i++) {
-			s_SolidColor.SetVec4("color", glm::vec4(World::g_lights[i].colour,1));
-			glm::mat4 positionMatrix = glm::mat4(); // create an identity matrix;
-			positionMatrix = glm::translate(positionMatrix, World::g_lights[i].position); //position is a vec3
-			s_SolidColor.SetMat4("M", positionMatrix);
-			AssetManager::GetModel("light_cube")->RenderModel(s_SolidColor.GetShaderID());
-		}
-
-		if ((DebugState & ShowTrigger) == ShowTrigger) {
-			s_SolidColor.SetBool("IsEmissive", false);
-
-			for (int i = 0; i < World::g_triggers.size(); i++) {
-				s_SolidColor.SetVec4("color", glm::vec4(1, 0, 0, 0.5));
-				glm::mat4 positionMatrix = glm::mat4(); // create an identity matrix;
-				positionMatrix = glm::translate(positionMatrix, World::g_triggers[i].get()->m_pos);
-				positionMatrix = glm::scale(positionMatrix, World::g_triggers[i].get()->m_scale * 0.5f); //0.5 becuase the model cube is 2 units wide
-
-				s_SolidColor.SetMat4("M", positionMatrix);
-				AssetManager::GetModel("cube")->RenderModel(s_SolidColor.GetShaderID());
-			}
-		}
-
+		RenderDeffered();
+		RenderSolid();
+		RenderFur();
 		if((DebugState & ShowProbes) == ShowProbes)
 			probeGrid.ShowProbes();
-
-		//-----------------------------------------Decal---------------------------------------
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		glDepthMask(GL_FALSE);
-		s_spriteSheet.Use();
-		s_spriteSheet.SetMat4("P", Camera::getProjectionMatrix());
-		s_spriteSheet.SetMat4("V", Camera::getViewMatrix());
-		s_spriteSheet.SetMat4("inverseV", glm::inverse(Camera::getViewMatrix()));
-		s_spriteSheet.SetFloat("u_mixFactor", 0.1);
-		
-		//TODO this is pretty much hard coded for gun fire sprites
-		for (int i = 0; i < World::g_sprites.size(); i++) {
-			s_spriteSheet.SetInt("u_rowCount", World::g_sprites[i].rowcount);
-			s_spriteSheet.SetInt("u_columnCount", World::g_sprites[i].columncount);
-			s_spriteSheet.SetVec4("u_position", World::g_sprites[i].position);
-			s_spriteSheet.SetVec4("u_rotation", World::g_sprites[i].rotation);
-			s_spriteSheet.SetVec4("u_scale", World::g_sprites[i].scale);
-			s_spriteSheet.SetInt("u_frameIndex", World::g_sprites[i].frameindex);
-			s_spriteSheet.SetInt("u_frameNextIndex", World::g_sprites[i].frameindex + 1);
-			glm::mat4 modelMatrix = World::GetGameObject(World::g_sprites[i].name)->GetModelMatrix(); // Your transformation matrix
-			glm::vec3 worldPos = glm::vec3(modelMatrix[3]); // Extract x, y, z from the 4th column
-			s_spriteSheet.SetVec4("u_position", glm::vec4(worldPos + Camera::GetRotation() * 2.0f, 1.0f));
-
-			if(World::g_sprites[i].frameindex < 2)
-				s_spriteSheet.SetBool("IsEmissive", true);
-			else
-				s_spriteSheet.SetBool("IsEmissive", false);
-
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexture("flash")->GetTexture());
-			AssetManager::GetModel("quad")->GetMesh(0)->UploadData();
-			glDrawElements(
-				GL_TRIANGLES,      // mode
-				(GLsizei)AssetManager::GetModel("quad")->GetMesh(0)->indices.size(),    // count
-				GL_UNSIGNED_SHORT,   // type
-				(void*)0           // element array buffer offset
-			);
-		}
-
-		glDepthMask(GL_TRUE);
-
-
-		s_decal.Use();
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, gbuffer.Depth);
-		s_decal.SetMat4("P", Camera::getProjectionMatrix());
-		s_decal.SetMat4("V", Camera::getViewMatrix());
-		s_decal.SetMat4("inverseV", glm::inverse(Camera::getViewMatrix()));
-		s_decal.SetMat4("inverseP", glm::inverse(Camera::getProjectionMatrix()));
-		s_decal.SetVec2("resolution", glm::vec2(Backend::GetWidth(), Backend::GetHeight()));
-
-		std::vector<DecalInstance>* decals = AssetManager::GetAllDecalInstances();
-		for (int i = 0; i < decals->size(); i++) {
-			DecalInstance& decal = (*decals)[i];
-
-			// Skip decals with null parents or those outside the camera frustum
-			//getting rid of  || !decal.GetAABB()->isOnFrustum(Camera::GetFrustum(), decal.getTransform()) for now
-			if (decal.CheckParentIsNull())
-				continue;
-			decal.GetDecal()->AddInstace(&decal);
-		}
-		std::vector<Decal>* decalsToBeRendered = AssetManager::GetAllDecals();
-		for (int i = 0; i < decalsToBeRendered->size(); i++) {
-			Decal& decal = (*decalsToBeRendered)[i];
-			glm::vec3 size = decal.GetSize();
-
-			s_decal.SetVec3("size", size);
-			decal.RenderDecal(s_decal.GetShaderID());
-		}
+		RenderGunFlash();
+		RenderDecal();
 
 		//-----------------------------------------Transaprent stuff---------------------------------------
 		transparentBuffer.Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		SetLights(&s_water);
-
-		RenderWater();
+		//Super jank
+		//RenderWater();
 
 		glDisablei(GL_BLEND, 1);
 		glEnablei(GL_BLEND, 0);
@@ -825,28 +648,8 @@ namespace Renderer
 
 
 		//---------------------------------------------------SSAO-------------------------------------
-		//ssaoBuffer.Bind();
-		//glViewport(0, 0, Backend::GetWidth(), Backend::GetHeight());
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
-		cs_ssao.Use();
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, gbuffer.gNormal);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, noiseTexture);
-		cs_ssao.SetMat4("projection", Camera::getProjectionMatrix());		
-		cs_ssao.SetFloat("ScreenWidth", Backend::GetWidth());
-		cs_ssao.SetFloat("ScreenHeight", Backend::GetHeight());
-
-		glBindImageTexture(7, ssaoBuffer.gSSAO, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R16F);
-
-		glDispatchCompute(Backend::GetWidth() / 32 + 1, Backend::GetHeight() / 32 + 1, 1);
-		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+		RenderSSAO();
+		
 
 		//RenderPlane();
 		//---------------------------------------------------LIGHTING-------------------------------------
@@ -910,8 +713,8 @@ namespace Renderer
 		glActiveTexture(GL_TEXTURE4);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gRMA);
 		RenderPlane();
-
 		*/
+		
 		//-------------------------------------------------EMISSIVE-----------------------------------
 		emmisiveRenderer.RenderBloomTexture(gbuffer.gEmission, 0.005f);
 
@@ -924,7 +727,7 @@ namespace Renderer
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, lightingBuffer.gLighting);
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, waterHeightMap.GetTexture());
+		glBindTexture(GL_TEXTURE_2D, ssrBuffer.gSSR);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, emmisiveRenderer.BloomTexture());
 		glActiveTexture(GL_TEXTURE3);
@@ -935,7 +738,8 @@ namespace Renderer
 		glBindTexture(GL_TEXTURE_2D, transparentBuffer.gPosition);
 		glActiveTexture(GL_TEXTURE6);
 		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
-
+		glActiveTexture(GL_TEXTURE8);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gFur);
 
 		glBindImageTexture(7, postBuffer.gLighting, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
@@ -965,7 +769,69 @@ namespace Renderer
 		glDisable(GL_DEPTH_TEST);
 	}
 
+	void RenderDeffered() {
+		g_overlay.clear();
+		glEnable(GL_DEPTH_TEST);
+		gbuffer.Bind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		RendererSkyBox(Camera::getViewMatrix(), Camera::getProjectionMatrix(), World::GetEnviromentLighting().sky);
 
+		s_geomerty.Use();
+		s_geomerty.SetMat4("P", Camera::getProjectionMatrix());
+		s_geomerty.SetMat4("V", Camera::getViewMatrix());
+
+		glm::mat4 ViewMatrix = Camera::getViewMatrix();
+		for (int i = 0; i < World::g_objects.size(); i++) {
+			GameObject* gameobjectRender = World::g_objects[i].get();
+
+			if (!gameobjectRender->ShouldRender())
+				continue;
+			if (!gameobjectRender->GetModel()->GetAABB()->isOnFrustum(Camera::GetFrustum(), gameobjectRender->getTransform()) && !gameobjectRender->DontCull())
+				continue;
+			if (gameobjectRender->GetShaderType() == "Overlay") {
+				g_overlay.push_back(gameobjectRender);
+				continue;
+			}
+
+			auto transforms = gameobjectRender->GetFinalBoneMatricies();
+			if (transforms[0] != glm::mat4(1)) {
+				s_geomerty.SetBool("animated", true);
+				for (int i = 0; i < transforms.size(); ++i) {
+					std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
+					s_geomerty.SetMat4(pos.c_str(), transforms[i]);
+				}
+			}
+			else
+				s_geomerty.SetBool("animated", false);
+
+
+			glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
+			glm::mat4 modelViewMatrix = ViewMatrix * ModelMatrix;
+			glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
+
+			s_geomerty.SetMat3("normalMatrix3", normalMatrix);
+			s_geomerty.SetMat4("M", ModelMatrix);
+			gameobjectRender->RenderObject(s_geomerty.GetShaderID());
+		}
+	}
+	static void RenderSSAO() {
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		cs_ssao.Use();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gNormal);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, noiseTexture);
+		cs_ssao.SetMat4("projection", Camera::getProjectionMatrix());
+		cs_ssao.SetFloat("ScreenWidth", Backend::GetWidth());
+		cs_ssao.SetFloat("ScreenHeight", Backend::GetHeight());
+
+		glBindImageTexture(7, ssaoBuffer.gSSAO, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R16F);
+
+		glDispatchCompute(Backend::GetWidth() / 32 + 1, Backend::GetHeight() / 32 + 1, 1);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+	}
 	void Renderer::RenderWater() {
 
 		if(Input::KeyDown('m'))
@@ -1008,6 +874,153 @@ namespace Renderer
 		if (Input::KeyDown('m'))
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+	}
+	void RenderFur() {
+		glDisable(GL_CULL_FACE);
+
+		s_fur.Use();
+		s_fur.SetMat4("P", Camera::getProjectionMatrix());
+		s_fur.SetMat4("V", Camera::getViewMatrix());
+		glm::mat4 ViewMatrix = Camera::getViewMatrix();
+		
+		glBindTextureUnit(5, randomNoise.GetTexture());
+
+		for (int i = 0; i < World::g_fur.size(); i++) {
+			GameObject* gameobjectRender = World::g_fur[i].get();
+
+			if (!gameobjectRender->ShouldRender())
+				continue;
+
+
+			auto transforms = gameobjectRender->GetFinalBoneMatricies();
+			if (transforms[0] != glm::mat4(1)) {
+				s_fur.SetBool("animated", true);
+				for (int i = 0; i < transforms.size(); ++i) {
+					std::string pos = "finalBonesMatrices[" + std::to_string(i) + "]";
+					s_fur.SetMat4(pos.c_str(), transforms[i]);
+				}
+			}
+			else
+				s_fur.SetBool("animated", false);
+
+
+			glm::mat4 ModelMatrix = gameobjectRender->GetModelMatrix();
+
+			for (int l = 0; l < FUR_LAYER_COUNT; l++) {
+				
+				glm::mat4 modelViewMatrix = ViewMatrix * ModelMatrix;
+				glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelViewMatrix)));
+
+				s_fur.SetFloat("Layer", l);
+				s_fur.SetMat3("normalMatrix3", normalMatrix);
+				s_fur.SetMat4("M", ModelMatrix);
+				gameobjectRender->RenderObject(s_fur.GetShaderID());
+			}
+		}
+		glEnable(GL_CULL_FACE);
+
+	}
+	void RenderDecal() {
+		s_decal.Use();
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.Depth);
+		s_decal.SetMat4("P", Camera::getProjectionMatrix());
+		s_decal.SetMat4("V", Camera::getViewMatrix());
+		s_decal.SetMat4("inverseV", glm::inverse(Camera::getViewMatrix()));
+		s_decal.SetMat4("inverseP", glm::inverse(Camera::getProjectionMatrix()));
+		s_decal.SetVec2("resolution", glm::vec2(Backend::GetWidth(), Backend::GetHeight()));
+
+		std::vector<DecalInstance>* decals = AssetManager::GetAllDecalInstances();
+		for (int i = 0; i < decals->size(); i++) {
+			DecalInstance& decal = (*decals)[i];
+
+			// Skip decals with null parents or those outside the camera frustum
+			//getting rid of  || !decal.GetAABB()->isOnFrustum(Camera::GetFrustum(), decal.getTransform()) for now
+			if (decal.CheckParentIsNull())
+				continue;
+			decal.GetDecal()->AddInstace(&decal);
+		}
+		std::vector<Decal>* decalsToBeRendered = AssetManager::GetAllDecals();
+		for (int i = 0; i < decalsToBeRendered->size(); i++) {
+			Decal& decal = (*decalsToBeRendered)[i];
+			glm::vec3 size = decal.GetSize();
+
+			s_decal.SetVec3("size", size);
+			decal.RenderDecal(s_decal.GetShaderID());
+		}
+	}
+	void RenderGunFlash() {
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		gbuffer.Bind();
+		glDepthMask(GL_FALSE);
+		s_spriteSheet.Use();
+		s_spriteSheet.SetMat4("P", Camera::getProjectionMatrix());
+		s_spriteSheet.SetMat4("V", Camera::getViewMatrix());
+		s_spriteSheet.SetMat4("inverseV", glm::inverse(Camera::getViewMatrix()));
+		s_spriteSheet.SetFloat("u_mixFactor", 0.1);
+
+		//TODO this is pretty much hard coded for gun fire sprites
+		for (int i = 0; i < World::g_sprites.size(); i++) {
+			s_spriteSheet.SetInt("u_rowCount", World::g_sprites[i].rowcount);
+			s_spriteSheet.SetInt("u_columnCount", World::g_sprites[i].columncount);
+			s_spriteSheet.SetVec4("u_position", World::g_sprites[i].position);
+			s_spriteSheet.SetVec4("u_rotation", World::g_sprites[i].rotation);
+			s_spriteSheet.SetVec4("u_scale", World::g_sprites[i].scale);
+			s_spriteSheet.SetInt("u_frameIndex", World::g_sprites[i].frameindex);
+			s_spriteSheet.SetInt("u_frameNextIndex", World::g_sprites[i].frameindex + 1);
+			glm::mat4 modelMatrix = World::GetGameObject(World::g_sprites[i].name)->GetModelMatrix(); // Your transformation matrix
+			glm::vec3 worldPos = glm::vec3(modelMatrix[3]); // Extract x, y, z from the 4th column
+			s_spriteSheet.SetVec4("u_position", glm::vec4(worldPos + Camera::GetRotation() * 2.0f, 1.0f));
+
+			if (World::g_sprites[i].frameindex < 2)
+				s_spriteSheet.SetBool("IsEmissive", true);
+			else
+				s_spriteSheet.SetBool("IsEmissive", false);
+
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, AssetManager::GetTexture("flash")->GetTexture());
+			AssetManager::GetModel("quad")->GetMesh(0)->UploadData();
+			glDrawElements(
+				GL_TRIANGLES,      // mode
+				(GLsizei)AssetManager::GetModel("quad")->GetMesh(0)->indices.size(),    // count
+				GL_UNSIGNED_SHORT,   // type
+				(void*)0           // element array buffer offset
+			);
+		}
+
+		glDepthMask(GL_TRUE);
+	}
+	void RenderSolid() {
+		s_SolidColor.Use();
+		s_SolidColor.SetMat4("P", Camera::getProjectionMatrix());
+		s_SolidColor.SetMat4("V", Camera::getViewMatrix());
+		s_SolidColor.SetBool("animated", false);
+		s_SolidColor.SetBool("IsEmissive", true);
+		s_SolidColor.SetFloat("Rougness", 0.5);
+		s_SolidColor.SetFloat("Metalic", 0);
+
+		for (int i = 0; i < World::g_lights.size(); i++) {
+			s_SolidColor.SetVec4("color", glm::vec4(World::g_lights[i].colour, 1));
+			glm::mat4 positionMatrix = glm::mat4(); // create an identity matrix;
+			positionMatrix = glm::translate(positionMatrix, World::g_lights[i].position); //position is a vec3
+			s_SolidColor.SetMat4("M", positionMatrix);
+			AssetManager::GetModel("light_cube")->RenderModel(s_SolidColor.GetShaderID());
+		}
+
+		if ((DebugState & ShowTrigger) == ShowTrigger) {
+			s_SolidColor.SetBool("IsEmissive", false);
+
+			for (int i = 0; i < World::g_triggers.size(); i++) {
+				s_SolidColor.SetVec4("color", glm::vec4(1, 0, 0, 0.5));
+				glm::mat4 positionMatrix = glm::mat4(); // create an identity matrix;
+				positionMatrix = glm::translate(positionMatrix, World::g_triggers[i].get()->m_pos);
+				positionMatrix = glm::scale(positionMatrix, World::g_triggers[i].get()->m_scale * 0.5f); //0.5 becuase the model cube is 2 units wide
+
+				s_SolidColor.SetMat4("M", positionMatrix);
+				AssetManager::GetModel("cube")->RenderModel(s_SolidColor.GetShaderID());
+			}
+		}
 	}
 	
 	void Renderer::RendererSkyBox(glm::mat4 view, glm::mat4 projection, SkyBox skybox) {

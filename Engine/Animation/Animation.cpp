@@ -176,8 +176,17 @@ namespace AnimationManager
 		}
 		else
 			std::cout << "Null Object pointer passed to animation or animation does not exsit \n";
-		
 	}
+	void Play(std::string Name, GameObject* gameobject) {
+		Animation* animation = GetAnimation(Name);
+		if (gameobject != nullptr && animation != nullptr) {
+			animation->SetGameObject(gameobject);
+			animation->Start();
+		}
+		else
+			std::cout << "Null Object pointer passed to animation or animation does not exsit \n";
+	}
+
 
 	bool IsAnimationPlaying(std::string name) {
 		for (int i = 0; i < animations.size(); i++) {

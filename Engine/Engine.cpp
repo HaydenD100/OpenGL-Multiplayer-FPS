@@ -59,6 +59,7 @@ namespace Engine
 				frameCount = 0;
 				previousTime = currentTime;
 			}
+
 			if (Input::KeyPressed(EDITORTOGGLE)) {
 				Editing = !Editing;
 				ImGuiIO& io = ImGui::GetIO();
@@ -73,8 +74,8 @@ namespace Engine
 			ImGuiUI::NewFrame();
 
 			Input::Update();
-			
 			AudioManager::Update();
+
 			if (!Editing) {
 				Input::CenterMouse();
 				PhysicsManagerBullet::Update(dt);
@@ -93,9 +94,8 @@ namespace Engine
 
 			//Dont use this its not working rightnow
 			
-			
-			
-			if ((Renderer::DebugState & NoGUi) != NoGUi && false) {
+			/*
+			if ((Renderer::DebugState & NoGUi) != NoGUi) {
 
 				std::ostringstream oss;
 				oss << "FPS: " << FPS;
@@ -125,11 +125,8 @@ namespace Engine
 				oss << "Enemy Kills " << Player::GetDeaths();
 				Renderer::RenderText(oss.str().c_str(), 0, 500, 15);
 			}
-			
-			
-			
+			*/
 			ImGuiUI::DrawUI();
-
 			Renderer::SwapBuffers(Backend::GetWindowPointer());
 		}
 

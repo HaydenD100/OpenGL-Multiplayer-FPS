@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -136,7 +136,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\core\inc;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\studio\inc;C:\Users\kokok\OneDrive\Desktop\Code\Home\C++\3dEngine2.0\Engine\Core;C:\Users\kokok\OneDrive\Desktop\Code\Home\C++\3dEngine2.0\Engine;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glew-2.1.0\include;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glfw-3.3.8.bin.WIN64\include;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\GLM;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Vendor\imgui\backends;$(SolutionDir)\Vendor\imgui;$(SolutionDir)\Vendor\glew\include;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\core\inc;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\studio\inc;$(SolutionDir)\Engine\Core;$(SolutionDir)\Engine;$(SolutionDir)\Vendor\glfw\include;$(SolutionDir)\Vendor\GLM;$(SolutionDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -147,12 +147,13 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\studio\lib\x64;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\core\lib\x64;C:\Users\kokok\OneDrive\Desktop\Code\Home\C++\3dEngine2.0\Engine\Loaders;C:\Users\kokok\OneDrive\Desktop\Code\Home\C++\3dEngine2.0\;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glfw-3.3.8.bin.WIN64\lib-vc2022\Dynamic;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glew-2.1.0\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\studio\lib\x64;C:\Program Files %28x86%29\FMOD SoundSystem\FMOD Studio API Windows\api\core\lib\x64;$(SolutionDir)\Engine\Loaders;$(SolutionDir)\Vendor\glew\lib\Release\x64;$(SolutionDir);C:\Users\kokok\Desktop\Code\Home\C++\3dEngine2.0\Vendor\glfw\lib-vc2022;C:\Users\kokok\OneDrive\Desktop\Code\Libaries\glew-2.1.0\lib\Release\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3dll.lib;glew32.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;glu32.lib;fmodstudioL_vc.lib;fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Engine\Core\Scene\Scene.cpp" />
+    <ClCompile Include="Engine\Renderer\BufferFur.cpp" />
     <ClCompile Include="Engine\Renderer\BufferTransparent.cpp" />
     <ClCompile Include="Engine\Editor\Editor.cpp" />
     <ClCompile Include="Engine\Core\Common\RenderCommon.h" />
@@ -178,6 +179,7 @@
     <ClCompile Include="Engine\Renderer\Renderer.cpp" />
     <ClCompile Include="Engine\Core\Scene\SceneManager.cpp" />
     <ClCompile Include="Engine\Renderer\Shader.cpp" />
+    <ClCompile Include="Engine\Renderer\Skybox.cpp" />
     <ClCompile Include="Engine\Renderer\StorageBuffer.cpp" />
     <ClCompile Include="Engine\Renderer\Texture.cpp" />
     <ClCompile Include="Engine\Core\UI\Text2D.cpp" />
@@ -208,6 +210,14 @@
     <ClCompile Include="Engine\Game\Ocean.cpp" />
     <ClCompile Include="Engine\Physics\TriggerCollider.cpp" />
     <ClCompile Include="Engine\Core\Scene\World.cpp" />
+    <ClCompile Include="Vendor\imgui\imgui.cpp" />
+    <ClCompile Include="Vendor\imgui\imgui_demo.cpp" />
+    <ClCompile Include="Vendor\imgui\imgui_draw.cpp" />
+    <ClCompile Include="Vendor\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="Vendor\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="Vendor\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="Vendor\imgui\imgui_tables.cpp" />
+    <ClCompile Include="Vendor\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\Bloom\downscale.frag" />
@@ -227,6 +237,8 @@
     <None Include="Assets\Shaders\Editor\Editor.vert" />
     <None Include="Assets\Shaders\Final\final.frag" />
     <None Include="Assets\Shaders\Final\final.vert" />
+    <None Include="Assets\Shaders\Fur\fur.frag" />
+    <None Include="Assets\Shaders\Fur\fur.vert" />
     <None Include="Assets\Shaders\fxaa\fxaa.comp" />
     <None Include="Assets\Shaders\fxaa\fxaa.frag" />
     <None Include="Assets\Shaders\fxaa\fxaa.vert" />
@@ -281,6 +293,7 @@
     <ClInclude Include="Engine\nuklear\nuklear.h" />
     <ClInclude Include="Engine\nuklear\nuklear_glfw_gl3.h" />
     <ClInclude Include="Engine\nuklear\nuklear_glfw_gl4.h" />
+    <ClInclude Include="Engine\Renderer\BufferFur.h" />
     <ClInclude Include="Engine\Renderer\BufferTransparent.h" />
     <ClInclude Include="Engine\Editor\Editor.h" />
     <ClInclude Include="Engine\Core\Common\GameCommon.h" />
@@ -309,6 +322,7 @@
     <ClInclude Include="Engine\Core\Scene\Scene.h" />
     <ClInclude Include="Engine\Core\Scene\SceneManager.h" />
     <ClInclude Include="Engine\Renderer\Shader.h" />
+    <ClInclude Include="Engine\Renderer\Skybox.h" />
     <ClInclude Include="Engine\Renderer\StorageBuffer.h" />
     <ClInclude Include="Engine\Renderer\Texture.h" />
     <ClInclude Include="Engine\Core\UI\Text2D.h" />
@@ -340,6 +354,15 @@
     <ClInclude Include="Engine\Game\Ocean.h" />
     <ClInclude Include="Engine\Physics\TriggerCollider.h" />
     <ClInclude Include="Engine\Core\Scene\World.h" />
+    <ClInclude Include="Vendor\imgui\imconfig.h" />
+    <ClInclude Include="Vendor\imgui\imgui.h" />
+    <ClInclude Include="Vendor\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="Vendor\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="Vendor\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="Vendor\imgui\imgui_internal.h" />
+    <ClInclude Include="Vendor\imgui\imstb_rectpack.h" />
+    <ClInclude Include="Vendor\imgui\imstb_textedit.h" />
+    <ClInclude Include="Vendor\imgui\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="github\screenshots\3DEngine.png" />

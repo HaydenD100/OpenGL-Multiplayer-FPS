@@ -30,8 +30,8 @@ uniform bool HasNormalMap = true;
 
 
 float LinearizeDepth(float depth) {
-    float zNear = 0.001;          // Near plane
-    float zFar = 15.0;         // Far plane
+    float zNear = 0.1;          // Near plane
+    float zFar = 25.0;         // Far plane
     return (2.0 * zNear) / (zFar + zNear - depth * (zFar - zNear));
 }
 

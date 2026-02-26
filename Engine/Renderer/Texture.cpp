@@ -1,5 +1,6 @@
 #include "Texture.h"
-
+#include <vector>
+#include <random>
 
 Texture::~Texture() {
     if (texture != 0) {
@@ -12,6 +13,37 @@ Texture::~Texture() {
         glDeleteTextures(1, &textureMetalic);
     if (textureRoughness != 0)
         glDeleteTextures(1, &textureRoughness);
+}
+
+void Texture::FillWithRandom() {
+    int width = 256;
+    int height = 256;
+    std::vector<float> data(width * height);
+
+    std::mt19937 gen(1337); // fixed seed (deterministic)
+    std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+
+    for (int i = 0; i < width * height; ++i) {
+        data[i] = dis(gen);
+    }
+
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_R32F,
+        width,
+        height,
+        0,
+        GL_RED,
+        GL_FLOAT,
+        data.data()
+    );
 }
 Texture::Texture(Texture&& other) noexcept {
     texture = other.texture;

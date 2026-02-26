@@ -12,13 +12,15 @@ namespace World {
 
 	std::vector<std::unique_ptr<GameObject>> g_water;
 	std::vector<std::unique_ptr<GameObject>> g_objects;
+	std::vector<std::unique_ptr<GameObject>> g_fur;
 	std::vector<std::unique_ptr<GameObject>> g_glass;
+
 	std::vector<GunPickUp> m_gunPickups;
 	std::vector<Light> g_lights;
 	std::vector<std::unique_ptr<TriggerCollider>> g_triggers;
 	std::vector<Sprite> g_sprites;
 
-
+	SkinnedAnimation cat; 
 	float m_seaLevel = 0;
 
 	void LoadAssets() {
@@ -28,12 +30,14 @@ namespace World {
 		//Mehdi Shahsavan credits for some of these models
 
 
-		AssetManager::AddTexture("white", "Assets/Textures/white.png", 0.5, 0.0);
+		AssetManager::AddTexture("white", "Assets/Textures/white.png", 0.5,0.0);
 		AssetManager::AddTexture("red", "Assets/Textures/red.png", 0.1, 0.5);
+		AssetManager::AddTexture("fur", "Assets/Materials/leopard-pattern-fur-texture.jpg", 0.1, 0.5);
 
+		
 		AssetManager::AddTexture("dev_textures", "Assets/Textures/dev_textures.png", "Assets/Normals/no_normal.png", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_metallic.jpg");
 
-		AssetManager::AddTexture("metalic", "Assets/Textures/white.png", 0.0f, 1.0f);
+		AssetManager::AddTexture("metalic", "Assets/Textures/white.png", 0.1f, 1.0f);
 		AssetManager::AddTexture("orange", "Assets/Textures/Orange_Playground_textures.png", 0.5f, 0.0f);
 		AssetManager::AddTexture("gray", "Assets/Textures/Grey_plain.png", 0.5f, 1.0f);
 
@@ -67,6 +71,9 @@ namespace World {
 		//AssetManager::AddTexture(Texture("plant"));
 		AssetManager::AddTexture("angled-tiled-floor", "Assets/Textures/angled-tiled-floor.png", 0.5f, 0.0f);
 		AssetManager::AddTexture("CratePile", "Assets/Textures/Crate.jpeg", "Assets/Normals/Crate.jpeg", "Assets/Roughness/Crate.jpeg", "Assets/Metalic/vase_metalic.png");
+		//AssetManager::AddTexture("Marble", "Assets/Materials/stringy_marble_albedo.png", "Assets/Materials/stringy_marble_normal.png", "Assets/Materials/stringy_marble_roughness.png", "Assets/Materials/stringy_marble_metallic.png");
+		AssetManager::AddTexture("Marble", "Assets/Materials/stringy_marble_albedo.png", "Assets/Materials/stringy_marble_normal.png", 0.3f, 1.0f);
+		AssetManager::AddTexture("OldCar", "Assets/Materials/car_d.png", "Assets/Materials/car_n.png", "Assets/Materials/car_r.png", "Assets/Materials/car_m.png");
 
 		//Double Barel
 		AssetManager::AddTexture("double_barrel_shotgun_main_barrel", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_normal.png", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Main Barrel_metallic.jpg");
@@ -75,9 +82,10 @@ namespace World {
 		AssetManager::AddTexture("double_barrel_shotgun_metal_receiver", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_albedo.jpg", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_normal.png", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_roughness.jpg", "Assets/Objects/FBX/DoubleBarrel/Metal Receiver_metallic.jpg");
 
 		AssetManager::AddTexture("transparent", "Assets/Textures/dusty1.png", "Assets/Normals/dirty_glass.png", 0.1f, 0.0f);
-		AssetManager::AddTexture("unicorn", "Assets/Textures/unicorn.png", "Assets/Normals/unicorn_normal.png", 0.3f, 0.0f);
+		AssetManager::AddTexture("unicorn", "Assets/Textures/unicorn.png", "Assets/Normals/unicorn_normal.png", 0.3f, 1.0f);
 
 		AssetManager::AddTexture("uvmap", "Assets/Textures/uvmap.png", 0, 0);
+		AssetManager::GetTexture("uvmap")->SetEmissive(true);
 
 		AssetManager::AddModel("quad", Model("Assets/Objects/quad.obj", AssetManager::GetTexture("uvmap")));
 
@@ -85,7 +93,6 @@ namespace World {
 		AssetManager::AddModel("cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("uvmap")));
 		AssetManager::AddModel("light_cube", Model("Assets/Objects/FBX/light_cube.fbx", AssetManager::GetTexture("uvmap")));
 
-		AssetManager::GetTexture("uvmap")->SetEmissive(true);
 		AssetManager::AddModel("shaderBall", Model("Assets/Objects/shaderBall.obj", AssetManager::GetTexture("transparent")));
 		AssetManager::AddModel("cubeGlass", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("transparent")));
 		//AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
@@ -93,8 +100,13 @@ namespace World {
 
 		//AssetManager::AddModel("running", Model("Assets/Objects/FBX/Running.fbx", AssetManager::GetTexture("white")));
 
+		AssetManager::AddModel("utah_teapot", Model("Assets/Objects/FBX/teapot.fbx", AssetManager::GetTexture("fur")));
 
-		AssetManager::AddModel("bunny", Model("Assets/Objects/bunny.fbx", AssetManager::GetTexture("red")));
+		AssetManager::AddModel("cute_cat", Model("Assets/Objects/FBX/cute_cat.fbx", AssetManager::GetTexture("fur")));
+		AssetManager::AddModel("bunny", Model("Assets/Objects/bunny.fbx", AssetManager::GetTexture("fur")));
+		AssetManager::AddModel("OldCar", Model("Assets/Objects/FBX/oldcar.fbx", AssetManager::GetTexture("OldCar")));
+		
+		AssetManager::AddModel("sphere", Model("Assets/Objects/sphere.obj", AssetManager::GetTexture("fur")));
 
 		//AssetManager::AddModel("shelf", Model("Assets/Objects/FBX/shelf.fbx", AssetManager::GetTexture("shelf")));
 		//AssetManager::AddModel("vase", Model("Assets/Objects/FBX/vase.fbx", AssetManager::GetTexture("vase")));
@@ -103,7 +115,7 @@ namespace World {
 
 		//AssetManager::AddModel("Bench", Model("Assets/Objects/FBX/Bench.fbx", AssetManager::GetTexture("angled-tiled-floor")));
 
-		AssetManager::AddModel("Tiltedfloor", Model("Assets/Objects/floor.obj", AssetManager::GetTexture("angled-tiled-floor")));
+		//AssetManager::AddModel("Tiltedfloor", Model("Assets/Objects/floor.obj", AssetManager::GetTexture("angled-tiled-floor")));
 
 		//AssetManager::AddModel("ceiling_light", Model("Assets/Objects/FBX/ceiling_light.fbx", AssetManager::GetTexture("Industrial_Light")));
 		//AssetManager::GetModel("ceiling_light")->GetMeshByName("l1.001")->SetTexture(AssetManager::GetTexture("white_light"));
@@ -113,7 +125,7 @@ namespace World {
 		AssetManager::AddModel("playertwo", Model("Assets/Objects/FBX/bean_death.dae", "Assets/Objects/player_mesh.obj", AssetManager::GetTexture("uvmap")));
 		//AssetManager::AddModel("window", Model("Assets/Objects/FBX/window.fbx", AssetManager::GetTexture("window")));
 
-		AssetManager::AddModel("sponza", Model("Assets/Maps/sponza.obj", AssetManager::GetTexture("white")));
+		//AssetManager::AddModel("sponza", Model("Assets/Maps/sponza.obj", AssetManager::GetTexture("white")));
 
 		
 
@@ -126,7 +138,7 @@ namespace World {
 		//AssetManager::AddModel("cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("red_glass")));
 		//AssetManager::AddModel("cube1", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("green_glass")));
 
-		AssetManager::AddModel("model_crate", Model("Assets/Objects/FBX/model_crate.obj", AssetManager::GetTexture("CratePile")));
+		//AssetManager::AddModel("model_crate", Model("Assets/Objects/FBX/model_crate.obj", AssetManager::GetTexture("CratePile")));
 
 		AssetManager::AddModel("glock", Model("Assets/Objects/FBX/glock17.fbx", "Assets/Objects/glock17_convex.obj", AssetManager::GetTexture("glock")));
 		AssetManager::AddModel("glockhand", Model("Assets/Objects/FBX/glock17_shoot1.dae", AssetManager::GetTexture("glock")));
@@ -161,14 +173,18 @@ namespace World {
 		AssetManager::AddModel("water_COL", Model("Assets/Objects/FBX/water_test.obj", AssetManager::GetTexture("white")));
 
 		//AssetManager::AddModel("GI_map_1", Model("Assets/Maps/cornel_box.obj", AssetManager::GetTexture("cornel")));
-		AssetManager::AddModel("GI_map_1", Model("Assets/Maps/sand_box.obj", AssetManager::GetTexture("angled-tiled-floor")));
+		//AssetManager::AddModel("GI_map_1", Model("Assets/Maps/sand_box.obj", AssetManager::GetTexture("angled-tiled-floor")));
 		//AssetManager::GetModel("GI_map_1")->GetMeshByName("stairs_plane")->ToggleRender(false);
 
-		AssetManager::AddModel("Cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("metalic")));
-		AssetManager::AddModel("seafloor", Model("Assets/Objects/FBX/seafloor.obj", AssetManager::GetTexture("white")));
+		AssetManager::AddModel("test_map", Model("Assets/Maps/test_map_new.obj", AssetManager::GetTexture("Marble")));
+		AssetManager::AddModel("marble_map", Model("Assets/Maps/Marble_map.fbx", AssetManager::GetTexture("white")));
+		AssetManager::GetModel("marble_map")->GetMeshByName("floor")->SetTexture(AssetManager::GetTexture("Marble"));
+
+		AssetManager::AddModel("Cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("fur")));
+		//AssetManager::AddModel("seafloor", Model("Assets/Objects/FBX/seafloor.obj", AssetManager::GetTexture("white")));
 
 		AssetManager::AddModel("pool", Model("Assets/Objects/FBX/pool.obj", AssetManager::GetTexture("angled-tiled-floor")));
-		AssetManager::AddModel("pool_water", Model("Assets/Objects/FBX/pool_water.obj", AssetManager::GetTexture("white"), 0));
+		//AssetManager::AddModel("pool_water", Model("Assets/Objects/FBX/pool_water.obj", AssetManager::GetTexture("white"), 0));
 
 
 		AssetManager::AddModel("fps", Model("Assets/Maps/fps2.fbx", AssetManager::GetTexture("orange")));
@@ -176,9 +192,9 @@ namespace World {
 
 		AssetManager::AddModel("target", Model("Assets/Objects/FBX/target.obj", AssetManager::GetTexture("white")));
 
-		AssetManager::AddModel("breakable_crate_t", Model("Assets/Objects/FBX/Crate/top.obj", AssetManager::GetTexture("white")));
-		AssetManager::AddModel("breakable_crate_b", Model("Assets/Objects/FBX/Crate/bottom.obj", AssetManager::GetTexture("white")));
-		AssetManager::AddModel("breakable_crate_l", Model("Assets/Objects/FBX/Crate/side.obj", AssetManager::GetTexture("white")));
+		//AssetManager::AddModel("breakable_crate_t", Model("Assets/Objects/FBX/Crate/top.obj", AssetManager::GetTexture("white")));
+		//AssetManager::AddModel("breakable_crate_b", Model("Assets/Objects/FBX/Crate/bottom.obj", AssetManager::GetTexture("white")));
+		//AssetManager::AddModel("breakable_crate_l", Model("Assets/Objects/FBX/Crate/side.obj", AssetManager::GetTexture("white")));
 
 		AssetManager::AddModel("uni_float", Model("Assets/Objects/FBX/unicorn.fbx", AssetManager::GetTexture("unicorn")));
 		AssetManager::AddModel("uni_float_defalated", Model("Assets/Objects/FBX/unicorn_defalated_rig.fbx", AssetManager::GetTexture("unicorn")));
@@ -200,7 +216,6 @@ namespace World {
 		model->GetMeshByName("pallet4")->SetTexture(AssetManager::GetTexture("pallet"));
 		model->GetMeshByName("pallet3.001")->SetTexture(AssetManager::GetTexture("pallet"));
 		*/
-		//AssetManager::AddModel("cat", Model("Assets/Objects/FBX/run_fast.fbx", AssetManager::GetTexture("white")));
 
 		AssetManager::AddModel("ak47", Model("Assets/Objects/FBX/ak47.fbx", "Assets/Objects/ak47_convex.obj", AssetManager::GetTexture("ak47")));
 		//AssetManager::AddModel("door", Model(Mesh("Assets/Objects/door.obj"), AssetManager::GetTexture("door")));
@@ -217,10 +232,9 @@ namespace World {
 		AssetManager::AddDecal("freaky_decal", AssetManager::GetTexture("freaky"), glm::vec3(1, 0.1, 1));
 
 		//these are diffrent animations from skinnedanimation
-		//AnimationManager::AddAnimation(Animation(, "unicorn_deflated"));
 		//AnimationManager::AddAnimation(Animation("Assets/Animations/door_close.fbx", "door_close"));	
 		//ragdoll = SkinnedAnimation("Assets/Objects/FBX/unicorn_defalated_rig.fbx", AssetManager::GetModel("uni_float_defalated"), 0, "uni_float_defalated");
-
+		cat = SkinnedAnimation("Assets/Objects/FBX/cute_cat.fbx", AssetManager::GetModel("cute_cat"), 0, "cute_cat");
 	}
 
 
@@ -228,24 +242,44 @@ namespace World {
 	void Load() {
 		LoadAssets();
 
-		AddGameObject("Tiltedfloor", AssetManager::GetModel("Tiltedfloor"), glm::vec3(0, 0.1, 0), true, 0, Box);
-		GetGameObject("Tiltedfloor")->IncludInGI(true);
+		//AddGameObject("Tiltedfloor", AssetManager::GetModel("Tiltedfloor"), glm::vec3(0, 0.1, 0), true, 0, Box);
+		//GetGameObject("Tiltedfloor")->IncludInGI(true);
 
 		//AddGameObject("sponza", AssetManager::GetModel("sponza"), glm::vec3(0, 1, 0), true, 0,Concave);
 		//GetGameObject("sponza")->IncludInGI(true);
 
-		//AddGameObject("bunny", AssetManager::GetModel("bunny"), glm::vec3(17, 5, 17), true, 0, Box);
+		//AddGameObject("bunny", AssetManager::GetModel("bunny"), glm::vec3(5, -0.6, 3), true, 0, Box);
 		//GetGameObject("bunny")->IncludInGI(true);
 		//GetGameObject("bunny")->SetRotationX(-1 * glm::radians(90.0f));
+		//GetGameObject("bunny")->SetRotationY(-1 * glm::radians(90.0f));
+		/*
+		AddGameObject("OldCar", AssetManager::GetModel("OldCar"), glm::vec3(0, 0.1, 0), true, 0, Concave);
+		GetGameObject("OldCar")->IncludInGI(true);
+		GetGameObject("OldCar")->SetRotationX(-1 * ToRadian(90));
+		*/
+		/*
+			AddGameObject("utah_teapot", AssetManager::GetModel("utah_teapot"), glm::vec3(7, 0.7, 0), true, 0,Concave);
+			GetGameObject("utah_teapot")->IncludInGI(true);
+			GetGameObject("utah_teapot")->SetRotationX(-1 * glm::radians(90.0f));
+			GetGameObject("utah_teapot")->SetRotationY(-1 * glm::radians(90.0f));
+		*/
 
-		AddGameObject("fps", AssetManager::GetModel("fps"), glm::vec3(0, 0.1, 0), true, 0, Concave);
-		GetGameObject("fps")->IncludInGI(true);
-		GetGameObject("fps")->SetRotationX(-1 * ToRadian(90));
+		AddFur("bunny", AssetManager::GetModel("bunny"), glm::vec3(7, 1.7, 0), true, 0, Convex);
+		g_fur.back()->SetRotationX(-1 * glm::radians(90.0f));
+		g_fur.back()->SetRotationY(-1 * glm::radians(180.0f));
 
-		AddGameObject("seafloor", AssetManager::GetModel("seafloor"), glm::vec3(0, -10, 0), true, 0, Concave);
+		//AddGameObject("test_map_1", AssetManager::GetModel("test_map_1"), glm::vec3(14.5, 0.5, 14.5), true, 0, Concave);
+		//GetGameObject("test_map_1")->IncludInGI(true);
+		AddGameObject("marble_map", AssetManager::GetModel("marble_map"), glm::vec3(0, 0.5,0), true, 0, Concave);
+		GetGameObject("marble_map")->IncludInGI(true);
+		GetGameObject("marble_map")->SetRotationX(-1 * glm::radians(90.0f));
 
+		//AddGameObject("quad", AssetManager::GetModel("quad"), glm::vec3(2, 2, -3), true, 0, Concave);
 
-		AddGameObject("pool", AssetManager::GetModel("pool"), glm::vec3(3, -0.9, 0), true, 0, Concave);
+		
+		//TODO :: this entire system is so hacky, gotta fix it
+
+		AddGameObject("pool", AssetManager::GetModel("pool"), glm::vec3(3, -5, 0), true, 0, Concave);
 		g_water.emplace_back(std::make_unique<GameObject>("pool_water", AssetManager::GetModel("pool_water"), glm::vec3(3, -2.6, 0), true, 0, None));
 		g_water[0]->GetRigidBody()->setUserIndex(0);
 		g_water[0]->GetRigidBody()->setUserPointer((void*)ObjectType::WATER);
@@ -257,14 +291,12 @@ namespace World {
 
 		g_triggers.emplace_back(std::make_unique<TriggerCollider>(glm::vec3(3, -1.3, -1.8), glm::vec3(4, 1.8, 4)));
 
-		AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(0, 0, 0), false, 1.0, Box);
-		AddGlass("cubeGlass", AssetManager::GetModel("cubeGlass"), glm::vec3(-3, 0, 0), false, 0.0, Convex);
+		//AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(0, 0, 0), false, 1.0, Box);
+		//AddGlass("cubeGlass", AssetManager::GetModel("cubeGlass"), glm::vec3(-3, 0, 0), false, 0.0, Convex);
 
 
-		AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(-6.46, -1, 14), false, 0.0, Box);
-		AddGameObject("Crates", AssetManager::GetModel("model_crate"), glm::vec3(3, 0, 3), true, 0, Convex);
-
-
+		//AddGlass("shaderBall_glass", AssetManager::GetModel("shaderBall"), glm::vec3(-6.46, -1, 14), false, 0.0, Box);
+		//AddGameObject("Crates", AssetManager::GetModel("model_crate"), glm::vec3(3, 0, 3), true, 0, Convex);
 
 		AddGameObject("uni_float", AssetManager::GetModel("uni_float"), glm::vec3(6, 2, 0), true, 2, Convex);
 		AudioManager::AddSound("Assets/Audio/balloonpop.wav", "pop", glm::vec3(0, 0, 0), 20, 1.8);
@@ -275,20 +307,6 @@ namespace World {
 
 		GetGameObject("uni_float")->destructable = desruct;
 
-		AddGameObject("uni_float1", AssetManager::GetModel("uni_float"), glm::vec3(3, 2, 2), true, 0.5, Convex);
-		GetGameObject("uni_float1")->GetRigidBody()->setUserPointer((void*)ObjectType::DESTORYABLE);
-		GetGameObject("uni_float1")->destructable = desruct;
-		GetGameObject("uni_float1")->m_buoyancy = 6.0;
-
-		AddGameObject("uni_float2", AssetManager::GetModel("uni_float"), glm::vec3(3, 4, 2), true, 0.5, Convex);
-		GetGameObject("uni_float2")->GetRigidBody()->setUserPointer((void*)ObjectType::DESTORYABLE);
-		GetGameObject("uni_float2")->destructable = desruct;
-		GetGameObject("uni_float2")->m_buoyancy = 6.0;
-
-		AddGameObject("uni_float3", AssetManager::GetModel("uni_float"), glm::vec3(3, 5, 2), true, 0.5, Convex);
-		GetGameObject("uni_float3")->GetRigidBody()->setUserPointer((void*)ObjectType::DESTORYABLE);
-		GetGameObject("uni_float3")->destructable = desruct;
-		GetGameObject("uni_float3")->m_buoyancy = 6.0;
 
 		//AddGameObject("crate_t", AssetManager::GetModel("breakable_crate_t"), glm::vec3(6, 2, 0), true, 2, Convex);
 		//AddGameObject("crate_b", AssetManager::GetModel("breakable_crate_b"), glm::vec3(6, 2, 0), true, 2, Convex);
@@ -311,7 +329,7 @@ namespace World {
 		//btFixedConstraint* fixed2 = new btFixedConstraint(*GetGameObject("crate_l")->GetRigidBody(), *GetGameObject("crate_l2")->GetRigidBody(), localA, localB);
 		//PhysicsManagerBullet::GetDynamicWorld()->addConstraint(fixed2, true);
 
-
+		/*
 		AddGameObject("targetHolder", AssetManager::GetModel("target"), glm::vec3(6, 2, 0), true, 0, Convex);
 		AddGameObject("target", AssetManager::GetModel("target"), glm::vec3(6, 1.5, 0), true, 5, Convex);
 		AddGameObject("targetHolder2", AssetManager::GetModel("target"), glm::vec3(6, 2, 0.5), true, 0, Convex);
@@ -360,7 +378,7 @@ namespace World {
 		hinge2->setLimit(-SIMD_PI / 1.2, SIMD_PI / 1.2);
 		// Add to dynamics world
 		PhysicsManagerBullet::GetDynamicWorld()->addConstraint(hinge2, true);
-
+		*/
 		// Sets renderer
 		std::vector<std::string> faces{
 			"Assets/Skybox/daylight/right.png",
@@ -374,18 +392,24 @@ namespace World {
 		envLight.sky = SkyBox(faces);
 		//Average light of skybox
 		envLight.indirectLight = glm::vec3(0.01, 0.01, 0.01);
-		envLight.skycolor = glm::vec3(1, 1, 1) * 2.5f;
+		envLight.skycolor = glm::vec3(0.1, 0.1, 0.1);
 		//envLight.indirectLight = glm::vec3(0.569, 0.69, 0.965);
 
-		g_lights.emplace_back(glm::vec3(0, 10, 0), glm::vec3(1, 0.996, 0.82), 10, 50);
+		g_lights.emplace_back(glm::vec3(5, 10, 5), glm::vec3(1, 0.996, 0.82), 5, 25);
 		g_lights.back().SetUpShadows();
-		g_lights.emplace_back(glm::vec3(0, 6, -2.4), glm::vec3(1, 0.922, 0.678) * 7.5f, 0.07, 0.017);
+		
+		g_lights.emplace_back(glm::vec3(0, 6, -2.4), glm::vec3(1, 0, 0), 0.07, 0.017);
+		g_lights.back().SetUpShadows();
+		/*
+		g_lights.emplace_back(glm::vec3(0, 5, -2.4), glm::vec3(0, 1, 0), 3, 20);
 		g_lights.back().SetUpShadows();
 
+		g_lights.emplace_back(glm::vec3(0, 6, -2.4), glm::vec3(0, 0, 1), 3, 20);
+		g_lights.back().SetUpShadows();
+		*/
 	}
 
 	void Update(float deltaTime) {
-		
 		for (size_t i = 0; i < g_sprites.size(); /* no i++ here */) {
 			if (glfwGetTime() >= g_sprites[i].birthTime + g_sprites[i].timePerFrame) {
 				g_sprites[i].frameindex++;
@@ -411,7 +435,7 @@ namespace World {
 		for (int i = 0; i < g_objects.size(); i++) {
 			g_objects[i]->Update();
 			btRigidBody* rb = g_objects[i]->GetRigidBody().get();
-			if (!rb || g_objects[i]->m_mass == 0)
+			if (!rb || g_objects[i]->m_mass == 0 || g_triggers.size() <= 0)
 				continue;
 
 			glm::vec3 overlap = g_triggers[0]->CheckOverlap(rb);
@@ -522,6 +546,16 @@ namespace World {
 		size_t index = g_glass.size() - 1;  // Get index in g_glass
 		g_glass[index]->GetRigidBody()->setUserIndex(index);
 		g_glass[index]->GetRigidBody()->setUserPointer((void*)ObjectType::GLASS);
+
+		return index;
+	}
+
+	static size_t AddFur(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape) {
+		// Add to g_glass vector
+		g_fur.emplace_back(std::make_unique<GameObject>(name, model, position, save, mass, shape));
+		size_t index = g_fur.size() - 1;  // Get index in g_glass
+		g_fur[index]->GetRigidBody()->setUserIndex(index);
+		g_fur[index]->GetRigidBody()->setUserPointer((void*)ObjectType::FUR);
 
 		return index;
 	}

@@ -520,14 +520,13 @@ namespace Player
 			GunPickUp temp_pickup = GunPickUp(gunName,gunModel,Camera::GetPosition() + Camera::GetDirection() * 1.5f);
 			World::m_gunPickups.push_back(temp_pickup);
 		}
-
+		/*
 		if (Input::RightMouseDown() && !reloading && WeaponManager::GetGunByName(gunName)->type != Melee && gunName != "nothing") {
 			aiming = true;
 		}
 		else {
 			aiming = false;
-		}
-		
+		}*/
 		if (gunName != "nothing") {
 			if (glfwGetTime() - reloadingTime > WeaponManager::GetGunByName(gunName)->reloadtime && reloading)
 			{

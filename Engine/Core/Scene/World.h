@@ -23,6 +23,7 @@
 #include "Engine/Animation/SkinnedAnimatior.h"
 #include "Engine/Pathfinding/Pathfinding.h"
 #include "Engine/Physics/TriggerCollider.h"
+#include "Renderer/Skybox.h"
 
 namespace World
 {
@@ -41,7 +42,7 @@ namespace World
 
 	unsigned long long AddGameObject(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape);
 	size_t AddGlass(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape);
-
+	static size_t AddFur(std::string name, Model* model, glm::vec3 position, bool save, float mass, ColliderShape shape);
 	size_t AddGameObject(std::unique_ptr<GameObject> gameobject);
 	GameObject* GetGameObject(std::string name);
 
@@ -52,6 +53,8 @@ namespace World
 	extern std::vector<std::unique_ptr<GameObject>> g_water;
 	extern std::vector<std::unique_ptr<GameObject>> g_objects;
 	extern std::vector<std::unique_ptr<GameObject>> g_glass;
+	extern std::vector<std::unique_ptr<GameObject>> g_fur;
+
 	extern std::vector<GunPickUp> m_gunPickups;
 	extern std::vector<Light> g_lights;
 	extern std::vector<std::unique_ptr<TriggerCollider>> g_triggers;

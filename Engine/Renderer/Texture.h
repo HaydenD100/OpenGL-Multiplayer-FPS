@@ -39,7 +39,7 @@ public:
     float GetMetalic();
     bool IsEmissive();
     void SetEmissive(bool state);
-
+    void FillWithRandom();
 
 
 

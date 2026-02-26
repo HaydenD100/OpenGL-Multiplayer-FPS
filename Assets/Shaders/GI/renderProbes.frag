@@ -401,8 +401,8 @@ void main()
     gRMA = vec4(0,0,1,0);
     gNormal = Normal;
 	//gAlbedo = vec4(depth,0,0, 1); // RGB for Albedo, R for Specular Intensity
-
-	gAlbedo = vec4(col, 1); // RGB for Albedo, R for Specular Intensity
+	//multiply by two to see the probes more clearly
+	gAlbedo = vec4(col * 2, 1); // RGB for Albedo, R for Specular Intensity
 	//gAlbedo = vec4(depth,depth,depth, 1); // RGB for Albedo, R for Specular Intensity
 
 }

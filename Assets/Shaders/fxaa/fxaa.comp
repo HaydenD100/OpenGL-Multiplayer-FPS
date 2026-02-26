@@ -79,6 +79,7 @@ vec3 Fxaa(sampler2D tex) {
 }
 
 void main() {
+
     vec3 result = Fxaa(inputTexture);
     //result = texture(inputTexture, TexCoords).xyz;
     // Output the final color

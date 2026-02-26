@@ -88,28 +88,32 @@ vec3 gridSamplingDisk[20] = vec3[]
 float ShadowCalculation(vec3 fragPos, int index, vec3 probe_world_pos, vec3 N)
 {
     vec3 fragToLight = fragPos - lights[index].position;
-     vec3 lightDir = lights[index].position - fragPos;
     float currentDepth = length(fragToLight);
+    
+    float far_plane = 25.0; 
+    float normalizedDepth = currentDepth / far_plane;
+
     float shadow = 0.0;
-    //float bias = 0.2;
-    //float bias =0.1  ;
-    float bias = max(0.1 * (1.0 - dot(N, normalize(lightDir))), 0.005f);
+    vec3 lightDir = normalize(-fragToLight);
+    
+
+    float bias = max(0.05 * (1.0 - dot(N, lightDir)), 0.005);
 
     int samples = 20;
     float viewDistance = length(probe_world_pos - fragPos);
-    float diskRadius = (1.0 + (viewDistance / lights[index].radius)) / 200;
+    float diskRadius = (1.0 + (viewDistance / far_plane)) / 200.0;
+
     for(int i = 0; i < samples; ++i)
     {
         float closestDepth = texture(lights[index].depthMap, fragToLight + gridSamplingDisk[i] * diskRadius).r;
-        closestDepth *= lights[index].radius;   // undo mapping [0;1]
-        if(currentDepth - bias > closestDepth)
+        
+        if(normalizedDepth - bias > closestDepth)
             shadow += 1.0;
     }
     shadow /= float(samples);  
     
     return shadow;
 }
-
 
 
 // ----------------------------------------------------------------------------
@@ -155,52 +159,52 @@ vec3 DirectLighting(vec3 p, float b, int probeID, vec3 probe_world_pos){
     vec3 V = normalize(probe_world_pos - FragPos);
 
     float metallic = 0.1;
-    float roughness = 1;
+    float roughness = 0.4;
 
-
-    // Reflectance at normal incidence
+        // Reflectance at normal incidence
     vec3 F0 = mix(vec3(0.04), diffuse, metallic);
 
     vec3 Lo = vec3(0.0);
-    vec3 spec = vec3(0.0);
+
     for (int i = 0; i < MAXLIGHTS; ++i) {
-        if (lights[i].radius == 0) continue;
+        if (lights[i].radius <= 0.0) continue;
 
-        // Calculate distance between light and fragment
-        vec3 L = normalize(lights[i].position - FragPos);
-        float distance = length(lights[i].position - FragPos);
+        // 1. Calculate distance and light direction
+        vec3 lightVec = lights[i].position - FragPos;
+        float distance = length(lightVec);
+        vec3 L = normalize(lightVec);
+        vec3 H = normalize(V + L); 
 
-         vec3 radiance = lights[i].strength * lights[i].color;// * 1.25;
-	    float attenuation = smoothstep(lights[i].radius, 0,  distance);
+        // 2. Attenuation and Radiance
+        float attenuation = smoothstep(lights[i].radius, 0.0, distance);
+        // Note: Kept the * 10 from your first snippet as it affects light intensity
+        vec3 radiance = (lights[i].color * lights[i].strength * 3) * attenuation;
 
-        // Cook-Torrance BRDF
-        vec3 H = normalize(V + L);
+        // 3. Cook-Torrance BRDF components
         float NDF = DistributionGGX(N, H, roughness);
-        float G = GeometrySmith(N, V, L, roughness);
-        vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
+        float G   = GeometrySmith(N, V, L, roughness);
+        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
-        vec3 numerator = NDF * G * F;
+        // 4. Specular & Diffuse terms
+        vec3 numerator    = NDF * G * F;
         float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001;
-        vec3 specular = numerator / denominator;
+        vec3 specular     = numerator / denominator;
 
+        // Energy conservation
         vec3 kS = F;
-        vec3 kD = (1.0 - kS) * (1.0 - metallic);
+        vec3 kD = (vec3(1.0) - kS) * (1.0 - metallic);	  
+
+        // 5. Lighting Integration
         float NdotL = max(dot(N, L), 0.0);
-        float shadow = ShadowCalculation(FragPos , i,probe_world_pos, N);
-        //the 1.3 makes it a little brighter
-        Lo += ((kD * diffuse) * (1.0f - shadow) * 1.0 / PI + specular) * radiance * NdotL * (1.0f - shadow);
-        spec += specular * radiance * NdotL * (1.0 - shadow);
+    
+        // Shadow Calculation (keeping your specific signature)
+        float shadow = ShadowCalculation(FragPos, i, probe_world_pos, N);
 
-
+        Lo += (kD * diffuse / 3.14159265 + specular) * radiance * NdotL * shadow;
     }
     vec3 ambient = vec3(1);
     vec3 Lightcolor = Lo;
-
-    // HDR and gamma correction
-    //Lightcolor = Lightcolor / (Lightcolor + vec3(1.0));
-    //Lightcolor = N;
     return Lightcolor;
-    //return vec3(1);
 }
 
 
@@ -317,6 +321,42 @@ SphericalHarmonics shEvaluate(vec3 p)
 
 #define ENV_SMPL_NUM 256
 SphericalHarmonics CubeMapToRadianceSH(int probeID, vec3 probe_world_pos) {
+    SphericalHarmonics shRadiance = shZero();
+
+    vec2 ts = vec2(textureSize(textures[0], 0));
+    float maxMipMap = log2(max(ts.x, ts.y));
+    float lodBias = maxMipMap - 5.0;
+
+    float totalWeight = 0.0;
+
+    for (int i = 0; i < ENV_SMPL_NUM; ++i) {
+        vec3 direction = SpherePoints_GoldenAngle(float(i), float(ENV_SMPL_NUM));
+        vec3 radiance = sampleReflectionMap(direction, lodBias, probeID, probe_world_pos);
+        
+        // 1. Calculate Luminance (standard Rec. 709 coefficients)
+        float luminance = dot(radiance, vec3(0.2126, 0.7152, 0.0722));
+        
+        // 2. Define a weight that favors bright pixels
+        // We add a small epsilon to avoid division by zero and ensure dark areas still get some SH contribution
+        float weight = luminance + 0.001; 
+        
+        // 3. Accumulate weighted SH
+        shAddWeighted(shRadiance, shEvaluate(direction), radiance * weight);
+        totalWeight += weight;
+    }
+
+    // 4. Normalize by the total weight instead of a static 4*PI
+    // This ensures that the energy is conserved even if we 'favored' certain directions
+    if (totalWeight > 0.0) {
+        float normalization = (4.0 * PI) / totalWeight;
+        shScale(shRadiance, vec3(normalization));
+    }
+
+    return shRadiance;
+}
+/*
+#define ENV_SMPL_NUM 256
+SphericalHarmonics CubeMapToRadianceSH(int probeID, vec3 probe_world_pos) {
     // Initialise sh to 0
     SphericalHarmonics shRadiance = shZero();
 
@@ -338,7 +378,7 @@ SphericalHarmonics CubeMapToRadianceSH(int probeID, vec3 probe_world_pos) {
 
     return shRadiance;
 }
-
+*/
 SphericalHarmonics DepthMapToRadianceSH() {
     // Initialise sh to 0
     SphericalHarmonics shRadiance = shZero();

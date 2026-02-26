@@ -53,6 +53,27 @@ namespace Animator {
         temp.Animation = pAnimation;
         temp.m_CurrentTime = 0.0;
         temp.GameObjectName = GameObjectname;
+        temp.object = NULL;
+        temp.loop = loop;
+        temp.isPlaying = true;
+
+        currentAnimationInstances.push_back(temp);
+    }
+    void Animator::PlayAnimationObject(SkinnedAnimation* pAnimation, GameObject* g_object, bool loop) {
+        for (int i = 0; i < currentAnimationInstances.size(); i++) {
+            if (currentAnimationInstances[i].Animation == pAnimation && currentAnimationInstances[i].object == g_object && currentAnimationInstances[i].loop == loop) {
+                if (currentAnimationInstances[i].isPlaying == true)
+                    currentAnimationInstances[i].m_CurrentTime = 0;
+                else
+                    currentAnimationInstances[i].isPlaying = true;
+                return;
+            }
+        }
+        AnimationInstance temp;
+        temp.Animation = pAnimation;
+        temp.m_CurrentTime = 0.0;
+        temp.GameObjectName = "None";
+        temp.object = g_object;
         temp.loop = loop;
         temp.isPlaying = true;
 
@@ -73,7 +94,15 @@ namespace Animator {
         glm::mat4 globalTransformation = parentTransform * nodeTransform;
 
         auto boneInfoMap = currentAnimationInstances[index].Animation->GetBoneIDMap();
-        GameObject* gameobject = World::GetGameObject(currentAnimationInstances[index].GameObjectName);
+        GameObject* gameobject;
+        if (currentAnimationInstances[index].object == NULL) {
+            gameobject = World::GetGameObject(currentAnimationInstances[index].GameObjectName);
+        }else {
+            gameobject = currentAnimationInstances[index].object;
+        }
+        if (!gameobject) {
+            printf("ERROR OBJECT NOT FOUND CANNOT CALCULATE BONE TRANSFORM");
+        }
         if (boneInfoMap.find(nodeName) != boneInfoMap.end()) {
             int indexBone = boneInfoMap[nodeName].id;
             gameobject->SetFinalBoneMatricies(indexBone, currentAnimationInstances[index].Animation->GetInverseGlobal() * globalTransformation * boneInfoMap[nodeName].offset);

@@ -137,7 +137,7 @@ Probe::Probe(glm::vec3 postion) {
 	glGenTextures(1, &probeAlbedo);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, probeAlbedo);
 	for (unsigned int i = 0; i < 6; ++i) {
-		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16F, PROBESIZE, PROBESIZE, 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB8, PROBESIZE, PROBESIZE, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 
 	}
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -205,7 +205,7 @@ Probe::Probe(glm::vec3 postion) {
 	// Unbind framebuffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.001f, 25.0f);
+	captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 25.0f);
 
 	//const int rays = 100;
 	//for (int i = 0; i < rays; i++ ) {

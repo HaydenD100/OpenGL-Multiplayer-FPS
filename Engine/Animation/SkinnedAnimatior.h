@@ -1,11 +1,13 @@
 #pragma once
 #include "Engine/Animation/SkinnedAnimation.h"
+#include "Engine/Core/GameObject.h"
 #include <vector>
 #include <string>
 #include <glm/mat4x4.hpp>
 
 struct AnimationInstance {
     std::string GameObjectName;
+    GameObject* object;
     SkinnedAnimation* Animation;
     float m_CurrentTime;
 
@@ -21,6 +23,8 @@ namespace Animator
 
     void UpdateAnimation(float dt);
     void PlayAnimation(SkinnedAnimation* pAnimation, std::string GameObjectname, bool loop = true);
+    void PlayAnimationObject(SkinnedAnimation* pAnimation, GameObject* object, bool loop = true);
+
     void CalculateBoneTransform(const AssimpNodeData* node, glm::mat4 parentTransform, int index);
 
     // std::vector<glm::mat4> GetFinalBoneMatrices(std::string gameObjectname);

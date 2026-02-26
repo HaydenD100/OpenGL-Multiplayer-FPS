@@ -64,6 +64,8 @@ namespace AnimationManager
 	void AddAnimation(Animation animation);
 	void ClearAnimations();
 	void Play(std::string Name, std::string ObjectName);
+	void Play(std::string Name, GameObject *gameobject);
+
 	void Stop(std::string Name);
 	void Pause(std::string Name);
 	void Update(float deltaTime);

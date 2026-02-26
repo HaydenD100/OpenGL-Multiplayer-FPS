@@ -146,7 +146,7 @@ void Scene::LoadAssets() {
 	//AssetManager::GetModel("GI_map_1")->GetMeshByName("stairs_plane")->ToggleRender(false);
 
 	AssetManager::AddModel("Cube", Model("Assets/Objects/FBX/cube.fbx", AssetManager::GetTexture("metalic")));
-	AssetManager::AddModel("seafloor", Model("Assets/Objects/FBX/seafloor.obj", AssetManager::GetTexture("white")));
+	//AssetManager::AddModel("seafloor", Model("Assets/Objects/FBX/seafloor.obj", AssetManager::GetTexture("white")));
 
 	AssetManager::AddModel("pool", Model("Assets/Objects/FBX/pool.obj", AssetManager::GetTexture("angled-tiled-floor")));
 	AssetManager::AddModel("pool_water", Model("Assets/Objects/FBX/pool_water.obj", AssetManager::GetTexture("white"), 0));
@@ -207,6 +207,7 @@ void Scene::LoadAssets() {
 
 
 void Scene::Load() { 
+	/*
 	LoadAssets();
 
 
@@ -222,7 +223,7 @@ void Scene::Load() {
 	AddGameObject("room1", AssetManager::GetModel("room1"), glm::vec3(0, 0.1, 0), true, 0, Concave);
 	GetGameObject("room1")->IncludInGI(true);
 
-	AddGameObject("seafloor", AssetManager::GetModel("seafloor"), glm::vec3(0, -10, 0), true, 0, Concave);
+	//AddGameObject("seafloor", AssetManager::GetModel("seafloor"), glm::vec3(0, -10, 0), true, 0, Concave);
 
 
 	AddGameObject("pool", AssetManager::GetModel("pool"), glm::vec3(3, -0.9, 0), true, 0, Concave);
@@ -359,7 +360,7 @@ void Scene::Load() {
 	//Average light of skybox
 	envLight.indirectLight = glm::vec3(0.188, 0.278, 0.4);
 	//envLight.indirectLight = glm::vec3(0.569, 0.69, 0.965);
-
+	*/
 }
 
 void Scene::Update(float deltaTime) {

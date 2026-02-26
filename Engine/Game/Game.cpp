@@ -40,7 +40,7 @@ namespace Game {
 		AssetManager::Init();
 		World::Load();
 		WeaponManager::Init();
-		AssetManager::LoadAssets();
+		//AssetManager::LoadAssets();
 
 		Player::Init();
 		Player::setPosition(glm::vec3(0, 10, 0));
