@@ -501,6 +501,7 @@
     <None Include="Assets\Shaders\spriteSheet.frag" />
     <None Include="Assets\Shaders\Fur\fur.vert" />
     <None Include="Assets\Shaders\Fur\fur.frag" />
+    <None Include="Assets\Shaders\SDF\sdftest.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

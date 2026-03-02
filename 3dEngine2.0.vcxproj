@@ -259,6 +259,7 @@
     <None Include="Assets\Shaders\Particles\particle.vert" />
     <None Include="Assets\Shaders\Particles\simParticle.comp" />
     <None Include="Assets\Shaders\PostProccess\post.comp" />
+    <None Include="Assets\Shaders\SDF\sdftest.comp" />
     <None Include="Assets\Shaders\Shadow\depth.frag" />
     <None Include="Assets\Shaders\Shadow\depth.geom" />
     <None Include="Assets\Shaders\Shadow\depth.vert" />

@@ -96,6 +96,7 @@ namespace Renderer
 	ComputeShader cs_sim_particle;
 	ComputeShader cs_probeIrradiance;
 	ComputeShader cs_Raycaster;
+	ComputeShader cs_sdf;
 
 	BloomRenderer emmisiveRenderer;
 
@@ -163,6 +164,7 @@ namespace Renderer
 		cs_water_vec.Load("Assets/Shaders/Water/wave_vec.comp");
 		cs_water_height_fft_col.Load("Assets/Shaders/Water/water_height_col.comp");
 		cs_sim_particle.Load("Assets/Shaders/Particles/simParticle.comp");
+		cs_sdf.Load("Assets/Shaders/SDF/sdftest.comp");
 		//TODO :: change this so the texture bindings are defined in the GLSL shader
 		
 		cs_lighting.Use();
@@ -549,11 +551,13 @@ namespace Renderer
 		//ParticleSystem::RenderParticles();
 		RenderDeffered();
 		RenderSolid();
-		RenderFur();
+		//RenderFur();
 		if((DebugState & ShowProbes) == ShowProbes)
 			probeGrid.ShowProbes();
 		RenderGunFlash();
 		RenderDecal();
+
+		
 
 		//-----------------------------------------Transaprent stuff---------------------------------------
 		transparentBuffer.Bind();
@@ -598,6 +602,28 @@ namespace Renderer
 		}
 		glDisable(GL_BLEND);
 		
+
+		//Test
+		cs_sdf.Use();
+
+		cs_sdf.SetVec2("screen", glm::vec2(Backend::GetWidth(), Backend::GetHeight()));
+		cs_sdf.SetVec3("cameraPos", Camera::GetPosition());
+		cs_sdf.SetVec3("cameraDir", Camera::GetDirection());
+		cs_sdf.SetVec3("cameraUp", Camera::GetUp());
+		cs_sdf.SetVec3("cameraRight", Camera::GetRight());
+		cs_sdf.SetMat4("V", Camera::getViewMatrix());
+
+		glBindImageTexture(0, gbuffer.gPosition, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+		glBindImageTexture(1, gbuffer.gNormal, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+		glBindImageTexture(2, gbuffer.gAlbedo, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+		glBindImageTexture(3, gbuffer.gRMA, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+		glBindImageTexture(4, gbuffer.gTrueNormal, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, gbuffer.gPosition);
+
+		glDispatchCompute(Backend::GetWidth() / 32 + 1, Backend::GetHeight() / 32 + 1, 1);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
 		//---------------------------------------------------Overlay-------------------------------------
 		gbuffer.Bind();
 		glClear(GL_DEPTH_BUFFER_BIT);

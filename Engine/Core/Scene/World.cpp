@@ -198,6 +198,8 @@ namespace World {
 
 		AssetManager::AddModel("uni_float", Model("Assets/Objects/FBX/unicorn.fbx", AssetManager::GetTexture("unicorn")));
 		AssetManager::AddModel("uni_float_defalated", Model("Assets/Objects/FBX/unicorn_defalated_rig.fbx", AssetManager::GetTexture("unicorn")));
+		
+		AssetManager::AddModel("sphere", Model("Assets/Objects/sphere.obj", AssetManager::GetTexture("red")));
 
 		//Super laggy
 		//AssetManager::AddModel("GI_map_1", Model("Assets/Maps/Sponza/sponza.obj", AssetManager::GetTexture("white")));
@@ -273,6 +275,9 @@ namespace World {
 		AddGameObject("marble_map", AssetManager::GetModel("marble_map"), glm::vec3(0, 0.5,0), true, 0, Concave);
 		GetGameObject("marble_map")->IncludInGI(true);
 		GetGameObject("marble_map")->SetRotationX(-1 * glm::radians(90.0f));
+		
+		//AddGameObject("sphere1", AssetManager::GetModel("sphere"), glm::vec3(1, 1, 1), true, 0, Concave);
+		//AddGameObject("sphere2", AssetManager::GetModel("sphere"), glm::vec3(4, 4, 4), true, 0, Concave);
 
 		//AddGameObject("quad", AssetManager::GetModel("quad"), glm::vec3(2, 2, -3), true, 0, Concave);
 

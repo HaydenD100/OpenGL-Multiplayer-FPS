@@ -87,7 +87,6 @@ void main() {
     vec4 emissive = vec4(texture(gEmissive, UV).rgb,1); 
     vec4 albedo = lighting + emissive;
 
-
     if(transparent.rgb != vec3(0)){
         //vec4 blurredImage = boxBlur2D(UV, vec2(0.0015), 5);
         float gDepth = texture(gPosition,UV).w;

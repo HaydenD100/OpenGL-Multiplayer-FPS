@@ -1,0 +1,155 @@
+#version 460
+layout (local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
+
+layout (rgba16f, binding = 0) uniform writeonly image2D gPosition;
+layout (rgba16f, binding = 1) uniform writeonly image2D gNormal;
+layout (rgba16f, binding = 2) uniform writeonly image2D gAlbedo;
+layout (rgba16f, binding = 3) uniform writeonly image2D gRMA;
+layout (rgba16f, binding = 4) uniform writeonly image2D gTrueNormal;
+
+layout(binding = 5) uniform sampler2D gPostionRead; 
+
+uniform vec2 screen;
+uniform vec3 cameraPos;
+uniform vec3 cameraDir;
+uniform vec3 cameraUp;
+uniform vec3 cameraRight;
+
+uniform mat4 V;
+
+
+const int MAX_POINTS = 12;
+
+vec4 positions[MAX_POINTS] = vec4[](
+    vec4(0.0, 1.5, -0.0, 0.5),
+    vec4(1.8, 1.2, -0.5, 0.5),
+    vec4(0.3, 2.0, -1.2, 0.5),
+    vec4(2.5, 1.5, -0.0, 0.5),
+    vec4(1.0, 1.0, -2.0, 0.5),
+    vec4(3.0, 1.8, -1.5, 0.5),
+    vec4(0.5, 3.0, -1.0, 0.5),
+    vec4(2.2, 2.5, -0.8, 0.5),
+    vec4(1.5, 1.2, -2.5, 0.5),
+    vec4(3.5, 1.0, -0.3, 0.5),
+    vec4(0.8, 2.8, -2.2, 0.5),
+    vec4(2.8, 1.5, -3.0, 0.5)
+);
+//RayMarch
+const int MAX_STEPS = 35;
+const float MIN_DISTANCE = 0.035;
+
+float sdSphere( vec3 p1, vec3 p2, float r )
+{
+  return length(p2 - p1) - r;
+}
+
+float smoothMin(float a, float b, float k)
+{
+    float h = max(k - abs(a - b), 0.0) / k;
+    return min(a, b) - h*h*h * k * (1.0/6.0);
+}
+float binary_search_smooth(vec3 p){
+    float depth = 99999;
+
+    for(int i = 0; i < MAX_POINTS; i++){
+        float sdf_distance = sdSphere(p, positions[i].xyz, positions[i].w);
+         depth = smoothMin(depth, sdf_distance, 0.7); // k = blend factor
+    }
+
+    return depth;
+}
+
+float binary_search(vec3 p){
+    
+    float depth = 99999;
+
+    for(int i = 0; i < MAX_POINTS; i++){
+        float sdf_distance = sdSphere(p, positions[i].xyz, positions[i].w);
+        if(sdf_distance < depth){
+            depth = sdf_distance;
+        }
+    }
+
+    return depth;
+}
+
+vec3 getNormal(vec3 p)
+{
+    const float e = 0.001;
+
+    float dx = binary_search_smooth(p + vec3(e,0,0)) - binary_search_smooth(p - vec3(e,0,0));
+    float dy = binary_search_smooth(p + vec3(0,e,0)) - binary_search_smooth(p - vec3(0,e,0));
+    float dz = binary_search_smooth(p + vec3(0,0,e)) - binary_search_smooth(p - vec3(0,0,e));
+
+    return normalize(vec3(dx, dy, dz));
+}
+vec4 raymarch(vec3 dir, out vec3 hitPos)
+{
+    float depth = 0.0;
+    vec3 p = cameraPos;
+
+    for(int i = 0; i < MAX_STEPS; i++)
+    {
+        float d = binary_search_smooth(p);
+
+        if(d < MIN_DISTANCE)
+        {
+            hitPos = p;
+            return vec4(1,0,0,depth);
+        }
+
+        if(depth > 100.0)
+            break;
+
+        p += dir * d;
+        depth += d;
+    }
+
+    hitPos = vec3(0);
+    return vec4(0);
+}
+
+float LinearizeDepth(float z, float near, float far)
+{
+    float ndc = z * 2.0 - 1.0; // Convert to Normalized Device Coordinates [-1, 1]
+    return (2.0 * near * far) / (far + near - ndc * (far - near));
+}
+
+void main() {
+    ivec2 coords = ivec2(gl_GlobalInvocationID.xy);
+    if(coords.x >= int(screen.x) || coords.y >= int(screen.y))
+        return;
+    vec2 UV = (vec2(gl_GlobalInvocationID.xy) + 0.5) / screen;
+
+    vec2 offset = vec2(0.1);
+
+    vec2 ndc = UV * 2.0 - 1.0;
+    ndc.x *=  screen.x / screen.y;
+    float fov = radians(50.0);
+    float focal = 1.0 / tan(fov * 0.5);
+    vec3 rayDir = normalize(
+        cameraDir * focal +
+        ndc.x * cameraRight +
+        ndc.y * cameraUp
+    );    
+    vec3 hitPos;
+    vec4 result = raymarch(rayDir, hitPos);
+
+    if(result.x == 1){
+        vec3 Current_FragPos_view = texture(gPostionRead, UV).rgb;
+        vec3 fragPos = (V * vec4(hitPos,1)).xyz;
+        if(fragPos.z < Current_FragPos_view.z && Current_FragPos_view.z != 0 ){
+            return;
+        }
+        vec3 normal = getNormal(hitPos);
+        imageStore(gTrueNormal, coords,vec4(normal,0));
+        normal = (V * vec4(normal,0)).xyz;
+        imageStore(gAlbedo, coords, vec4(1,0,0,1));
+        imageStore(gNormal, coords,vec4( normal,1));
+        imageStore(gPosition, coords,vec4(fragPos, result.w));
+        imageStore(gRMA, coords,vec4(0.1, 0,0,0));
+
+
+    }
+
+}

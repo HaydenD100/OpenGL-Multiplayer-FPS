@@ -56,5 +56,4 @@ void main()
     FragPos = viewPos.xyz; 
     UV = vertexUV;
     gl_Position = P * viewPos;
-
 }

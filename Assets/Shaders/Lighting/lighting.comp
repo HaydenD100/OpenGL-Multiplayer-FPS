@@ -582,8 +582,8 @@ for (int i = 0; i < MAXLIGHTS; ++i) {
     if(lightingState == 3)
         imageStore(gLighting, coords, vec4(albedo,1));
     if(lightingState == 4)
-        imageStore(gLighting, coords,vec4(N,1));
+        imageStore(gLighting, coords,vec4(trueNormal,1));
     if(lightingState == 5)
-        imageStore(gLighting, coords,vec4(FragPos,1));
+        imageStore(gLighting, coords,vec4(FragPos_view,1));
 
 }
