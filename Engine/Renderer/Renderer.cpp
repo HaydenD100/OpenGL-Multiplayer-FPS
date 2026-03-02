@@ -551,7 +551,7 @@ namespace Renderer
 		//ParticleSystem::RenderParticles();
 		RenderDeffered();
 		RenderSolid();
-		//RenderFur();
+		RenderFur();
 		if((DebugState & ShowProbes) == ShowProbes)
 			probeGrid.ShowProbes();
 		RenderGunFlash();

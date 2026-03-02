@@ -3,6 +3,16 @@ https://github.com/HaydenD100/3dEngine2.0
 
 ## Changelog
 
+
+### 3D Engine 2.0 2026/March/01
+Since my last change log I've been spending more time working on other projects, both programming but also hardware. I’ve been putting this engine on the backburner for a bit now but I keep coming back to fiddle with it, it's become a sandbox of sorts for me to just implement whatever is interesting to me at the time. 
+
+Other than various tweaks to the Global Illumination and other lighting system, I have implemented a fur shader using shell texturing, it's a technique where the model is rendered multiple times over the original model and then uses a noise map to “cut out” parts of these extra renders creating the illusion of volume. 
+
+The other main feature is the engine now supports ray marching https://en.wikipedia.org/wiki/Ray_marching, I am using this to render metaballs and other Signed distance function objects, all the rendering is done in a compute shader and rendered directly to the gBuffer. 
+![screenshot](https://github.com/HaydenD100/3dEngine2.0/blob/Main/github/screenshots/MetaBalls_Screen.png)
+Raymarched Meta Balls using Signed distance functions
+
 ### 3D Engine 2.0 2025/July/06
 I haven't made an update to the changelog in a while but I there's been lots of changes, firstly indirect lighting has been optimized and is smoother than then it was back in February, water and glass have both been added to the engine and floating/buoyancy has also been added. There's a basic animated billboard particle for gun flash that I have also added. I was starting to rewrite the multiplayer but I haven't finished that and I think I'm going to take a break on this engine and start working on a real time vulkan raytracer for the next little bit. The engine is in a stable state and i’m happy with the progress i've achieved over the last year.
 ![screenshot](https://github.com/HaydenD100/3dEngine2.0/blob/Main/github/screenshots/ocean.png)
